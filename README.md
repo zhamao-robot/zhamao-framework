@@ -1,6 +1,6 @@
 # CQBot-swoole
 A fast and multi-task framework for Coolq-HTTP-API<br>
-一个快速、多进程的CQ-HTTP-API插件框架 made by php-swoole
+一个快速、多进程的<a href="https://cqhttp.cc/">CQ-HTTP-API插件</a>框架 made by php-swoole
 <br>
 <br>
 [![作者QQ](https://img.shields.io/badge/作者QQ-627577391-orange.svg)]()<br>
