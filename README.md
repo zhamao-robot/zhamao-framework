@@ -69,11 +69,13 @@ $ make && make install</pre>
 <h4>3. 编辑php.ini文件添加swoole</h4>
 <pre>#找到php.ini文件
 #一般在/etc/php.ini或者/etc/php/7.0/cli/php.ini或其他地方
-#php -i可以查看php.ini位置
+$ php -i # 可以查看php.ini位置
 
 #修改php.ini，添加swoole.so到扩展列表里
+
 #if使用vim编辑
 $ sudo vim /etc/php.ini
+
 #找到extension=xxxx.dll一堆那个地方
 #插入一行：extension=swoole.so
 #然后就成功安装了swoole扩展！</pre>
