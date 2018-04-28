@@ -21,11 +21,11 @@ Swoole的用处最简单可以理解为，只需要简单几行代码即可运�
 <br>
 <br>
 <h2>环境需求</h2>
-1. Linux（由于酷Q是基于Windows版的，所以这里推荐搭配docker版）
-2. php7.0以上
-3. php-mbstring（多字节扩展）
-4. swoole-2.x
-5. screen（可选）
+1. Linux（由于酷Q是基于Windows版的，所以这里推荐搭配docker版）<br>
+2. php7.0以上<br>
+3. php-mbstring（多字节扩展）<br>
+4. swoole-2.x<br>
+5. screen（可选）<br>
 6. CQ-http-api插件和酷Q（docker版）
 <br>
 <br>
