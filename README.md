@@ -3,7 +3,7 @@ A fast and multi-task framework for Coolq-HTTP-API<br>
 一个快速、多进程的CQ-HTTP-API插件框架 made by php-swoole
 <br>
 <br>
-<br>
+[![作者QQ](https://img.shields.io/badge/作者QQ-627577391-orange.svg)]()<br>
 <h2>什么是swoole</h2>
 Swoole是一个C编写的、高性能的PHP扩展。支持多线程、多进程、同步、异步、协程、SQL等。<br>
 Swoole的用处最简单可以理解为，只需要简单几行代码即可运行一个HTTP服务器，比python等同类型解释型语言快非常多。<br>
@@ -88,3 +88,4 @@ $ cd CQBot-swoole/
 $ php start.php</pre>
 <h4>5. 修改自己的参数</h4>
 你可以进入start.php文件中，修改自己的机器人管理群、管理员QQ号、错误日志显示等级等功能。
+<br><br>
