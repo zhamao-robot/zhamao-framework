@@ -6,9 +6,6 @@
  * Time: 11:31
  */
 
-namespace cqbot\utils;
-
-
 class ErrorStatus
 {
     static $error = [

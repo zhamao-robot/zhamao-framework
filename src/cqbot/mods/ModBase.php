@@ -6,17 +6,12 @@
  * Time: 10:39
  */
 
-namespace cqbot\mods;
-
-
-use cqbot\CQBot;
-use cqbot\utils\CQUtil;
-
 abstract class ModBase
 {
     protected $main;
     protected $data;
     protected $cmds;
+    public $call_task = false;
 
     public function __construct(CQBot $main, $data, $mod_cmd = false){
         $this->main = $main;
@@ -41,4 +36,17 @@ abstract class ModBase
     public function getMessageType(){ return $this->data["message_type"]; }
 
     public function getCommands(){ return $this->cmds; }
+
+    public function sendDefaultHelp($cmd, $args = [], $help = ""){
+        $msg = "「".$cmd."使用帮助」";
+        $msg .= "\n用法：".Buffer::get("cmd_prefix").$cmd;
+        if($args != []){
+            $msg .= " ".implode(" ", $args);
+        }
+        if($help != ""){
+            $msg .= "：".$help;
+        }
+        $this->reply($msg);
+        return true;
+    }
 }

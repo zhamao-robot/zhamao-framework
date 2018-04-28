@@ -15,6 +15,7 @@ function loadAllClass($dir){
         else {
             if (count($taskFileName) < 2 || $taskFileName[1] != "php") continue;
             require_once($dir . $m);
+            Console::debug("Loading PHP file ".$dir.$m);
         }
     }
 }

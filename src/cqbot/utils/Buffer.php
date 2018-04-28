@@ -6,8 +6,6 @@
  * Time: 11:30
  */
 
-namespace cqbot\utils;
-
 
 class Buffer
 {
@@ -28,7 +26,7 @@ class Buffer
     /** @var \swoole_atomic $out_count */
     static $api_id;//API调用ID
 
-    static function get($name){ return self::$data[$name]; }
+    static function get($name){ return self::$data[$name] ?? null; }
 
     static function set($name, $value){ self::$data[$name] = $value; }
 
@@ -46,4 +44,9 @@ class Buffer
     static function isset($name){ return isset(self::$data[$name]); }
 
     static function array_key_exists($name, $key){ return isset(self::$data[$name][$key]); }
+
+    static function in_array($name, $value){
+        if(!is_array((self::$data[$name] ?? 1))) return false;
+        return in_array($value, self::$data[$name]);
+    }
 }

@@ -6,11 +6,6 @@
  * Time: 11:32
  */
 
-namespace cqbot;
-
-
-use cqbot\utils\Buffer;
-
 class Console
 {
     static function setColor($string, $color = ""){

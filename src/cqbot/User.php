@@ -6,10 +6,7 @@
  * Time: 13:29
  */
 
-namespace cqbot;
-
-use cqbot\utils\Buffer;
-use cqbot\utils\DataProvider as DP;
+use DataProvider as DP;
 
 class User
 {

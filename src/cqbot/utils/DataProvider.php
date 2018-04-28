@@ -6,9 +6,6 @@
  * Time: 12:54
  */
 
-namespace cqbot\utils;
-
-
 class DataProvider
 {
     /**

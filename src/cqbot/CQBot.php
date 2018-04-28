@@ -6,13 +6,6 @@
  * Time: 10:43
  */
 
-namespace cqbot;
-
-
-use cqbot\mods\ModBase;
-use cqbot\utils\Buffer;
-use cqbot\utils\CQUtil;
-
 class CQBot
 {
     /** @var Framework */
@@ -41,33 +34,26 @@ class CQBot
                 CQUtil::errorLog("请求执行任务时异常\n" . $e->getMessage());
                 CQUtil::sendDebugMsg("引起异常的消息：\n" . $it["message"]);
             }
-            $msg_arr = explode("&amp;&amp", $this->replace($it["message"], $it));
-            foreach ($msg_arr as $item) {
-                $msg = trim($item);
-                $msg = explode(" ", $msg);
-                $this->checkFunction($msg, $it);
-            }
         }
-    }
-
-    public function checkFunction($msgCut, $it){
-        $cmdList = Buffer::get("commands");
-        if (isset($cmdList[$msgCut[0]])) {
-            Console::debug("Call CQFunction:" . $msgCut[0]);
-            $temp = $cmdList[$msgCut[0]];
-            /** @var ModBase $class */
-            $class = new $temp($this, $it);
-            $class->execute($msgCut);
-            return true;
-        }
-        Console::debug("未找到指令:[" . $msgCut[0] . "]");
-        return false;
     }
 
     public function callTask($it){
         if ($this->data["post_type"] == "message") {
-            foreach(Buffer::get("mod_task") as $v){
-                new $v($this, $this->data);
+            foreach(Buffer::get("mods") as $v){
+                Console::info("Activating module ".$v);
+                /** @var ModBase $w */
+                $w = new $v($this, $this->data);
+                if($w->call_task === false){
+                    $msg = trim($this->data["message"]);
+                    $msg = explode(" ", $msg);
+                    $prefix = Buffer::get("cmd_prefix");
+                    if($prefix != ""){
+                        if(mb_substr($msg[0],0,mb_strlen($prefix)) == $prefix){
+                            $msg[0] = mb_substr($msg[0], mb_strlen($prefix));
+                        }
+                    }
+                    $w->execute($msg);
+                }
             }
         }
     }

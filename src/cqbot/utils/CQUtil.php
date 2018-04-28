@@ -6,22 +6,39 @@
  * Time: 10:39
  */
 
-namespace cqbot\utils;
-
-
-use cqbot\Console;
-use function cqbot\CQMsg;
-use cqbot\Framework;
-use cqbot\User;
-use cqbot\utils\DataProvider as DP;
+use DataProvider as DP;
 
 class CQUtil
 {
-    public static function loadAllFiles(){
+    public static function loadAllFiles() {
+        Console::debug("loading configs...");
         Buffer::set("su", DP::getJsonData("su.json"));//超级管理员用户列表
-        Buffer::set("commands", DP::getJsonData("commands.json"));//非实时激活类指令对应模块列表
+        if (count(Buffer::get("su")) < 1 && Framework::$super_user !== "") {
+            Console::info("Added super user");
+            Buffer::set("su", [Framework::$super_user]);
+        }
+        Buffer::set("mods", self::getMods());//加载模块列表
+        Buffer::set("user", []);//清空用户列表
+        Buffer::set("time_send", false);//发送Timing数据到管理群
+        Buffer::set("cmd_prefix", DP::getJsonData("config.json")["cmd_prefix"] ?? "");//设置指令的前缀符号
+        Buffer::set("res_code", file_get_contents(WORKING_DIR."src/cqbot/Framework.php"));
+    }
 
-        //TODO: load all config files to memory
+    public static function saveAllFiles() {
+        Console::info("Saving files...");
+        DP::setJsonData("su.json", Buffer::get("su"));//保存超级管理员的QQ列表
+
+        //保存cmd_prefix（指令前缀）
+        $config = DP::getJsonData("config.json");
+        $config["cmd_prefix"] = Buffer::get("cmd_prefix");
+        DP::setJsonData("config.json", $config);
+
+        //保存用户数据
+        foreach (self::getAllUsers() as $k => $v) {
+            $serial = serialize($v);
+            file_put_contents(DP::getUserFolder() . $k . ".dat", $serial);
+        }
+        Console::info("Saved files");
     }
 
     /**
@@ -30,15 +47,14 @@ class CQUtil
      * @param string $head
      * @param int $send_debug_message
      */
-    public static function errorLog($log, $head = "ERROR", $send_debug_message = 1){
+    public static function errorLog($log, $head = "ERROR", $send_debug_message = 1) {
         Console::error($log, ($head === "ERROR") ? null : "[" . $head . "] ");
         $time = date("Y-m-d H:i:s");
         $msg = "[$head @ $time]: $log\n";
         file_put_contents(DP::getDataFolder() . "log_error.txt", $msg, FILE_APPEND);
         if (self::checkAPIConnection() === -1) {
             file_put_contents(DP::getDataFolder() . "last_error.log", $msg, FILE_APPEND);
-        }
-        else {
+        } else {
             if ($send_debug_message)
                 self::sendDebugMsg($msg, 0);
         }
@@ -50,7 +66,7 @@ class CQUtil
      * @param int $need_head
      * @return null
      */
-    static function sendDebugMsg($msg, $need_head = 1){
+    static function sendDebugMsg($msg, $need_head = 1) {
         if (Framework::$admin_group == "") return null;
         if ($need_head)
             $data = CQMsg("[DEBUG] " . date("H:i:s") . ": " . $msg, "group", Framework::$admin_group);
@@ -63,11 +79,11 @@ class CQUtil
      * 检查API端口连接情况
      * @return int
      */
-    static function checkAPIConnection(){
+    static function checkAPIConnection() {
         if (Buffer::$api === null) return -1;//在framework链接API之前
         if (Buffer::$api->isConnected() === false) {
             //链接被断开
-            Buffer::$api->upgrade('/api/', function ($cli){
+            Buffer::$api->upgrade('/api/', function ($cli) {
                 self::sendDebugMsg("API重新链接成功");
                 self::APIPushDelayMsg();
             });
@@ -81,7 +97,7 @@ class CQUtil
      * @param $data
      * @return bool
      */
-    static function APIPush($data){
+    static function APIPush($data) {
         if ($data == null || $data == "") {
             Console::error("EMPTY DATA PUSH");
             return false;
@@ -104,7 +120,10 @@ class CQUtil
         return true;
     }
 
-    static function APIPushDelayMsg(){
+    /**
+     * 延迟推送在API连接断开后收到的消息函数
+     */
+    static function APIPushDelayMsg() {
         $delay_push_list = Buffer::get("delay_push");
         $cur_time = time();
         foreach ($delay_push_list as $item) {
@@ -121,7 +140,7 @@ class CQUtil
      * 推迟推送API，用于酷Q重启后的重新连接API
      * @param $data
      */
-    static function APIPushAfterConnected($data){
+    static function APIPushAfterConnected($data) {
         $delay_push_list = Buffer::get("delay_push");
         $delay_push_list[] = ["data" => $data, "time" => time()];
         Buffer::set("delay_push", $delay_push_list);
@@ -132,8 +151,8 @@ class CQUtil
      * @param $str
      * @return null|string|string[]
      */
-    static function unicodeDecode($str){
-        return preg_replace_callback('/\\\\u([0-9a-f]{4})/i', function ($matches){
+    static function unicodeDecode($str) {
+        return preg_replace_callback('/\\\\u([0-9a-f]{4})/i', function ($matches) {
             return mb_convert_encoding(pack("H*", $matches[1]), "UTF-8", "UCS-2BE");
         },
             $str);
@@ -144,7 +163,7 @@ class CQUtil
      * @param $url
      * @return mixed
      */
-    static function getHTML($url){
+    static function getHTML($url) {
         $ch = curl_init();
         $timeout = 5;
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -163,7 +182,7 @@ class CQUtil
      * @param string $encoding
      * @return string
      */
-    static public function getRev($str, $encoding = 'utf-8'){
+    static public function getRev($str, $encoding = 'utf-8') {
         $result = '';
         $len = mb_strlen($str);
         for ($i = $len - 1; $i >= 0; $i--) {
@@ -183,7 +202,7 @@ class CQUtil
      * @param int $send_debug_message
      * @return bool|string
      */
-    static function sendEmail($address, $title, $content, $name = "CQ开发团队", $send_debug_message = 1){
+    static function sendEmail($address, $title, $content, $name = "CQ开发团队", $send_debug_message = 1) {
         $mail = new \PHPMailer(true);
         try {
             $mail->isSMTP();
@@ -197,8 +216,7 @@ class CQUtil
             if (is_array($address)) {
                 foreach ($address as $item)
                     $mail->addAddress($item);
-            }
-            else {
+            } else {
                 $mail->addAddress($address);
             }
             //Content
@@ -224,28 +242,25 @@ class CQUtil
      * @param $time
      * @return array
      */
-    static function getRunTime($time){
+    static function getRunTime($time) {
         $time_len = time() - $time;
         $run_time = [];
         if (intval($time_len / 86400) > 0) {
             $run_time[0] = intval($time_len / 86400);
             $time_len = $time_len % 86400;
-        }
-        else {
+        } else {
             $run_time[0] = 0;
         }
         if (intval($time_len / 3600) > 0) {
             $run_time[1] = intval($time_len / 3600);
             $time_len = $time_len % 3600;
-        }
-        else {
+        } else {
             $run_time[1] = 0;
         }
         if (intval($time_len / 60) > 0) {
             $run_time[2] = intval($time_len / 60);
             $time_len = $time_len % 60;
-        }
-        else {
+        } else {
             $run_time[2] = 0;
         }
         $run_time[3] = $time_len;
@@ -257,7 +272,7 @@ class CQUtil
      * @param $time
      * @return string
      */
-    static function getRunTimeFormat($time){
+    static function getRunTimeFormat($time) {
         $time_len = time() - $time;
         $msg = "";
         if (intval($time_len / 86400) > 0) {
@@ -282,7 +297,7 @@ class CQUtil
      * @param $user_id
      * @return bool
      */
-    static function isGroupAdmin($group, $user_id){
+    static function isGroupAdmin($group, $user_id) {
         $ls = Buffer::get("group_list")[$group]["member"];
         $is_admin = false;
         foreach ($ls as $k => $v) {
@@ -303,7 +318,7 @@ class CQUtil
      * @param $content
      * @param string $name
      */
-    static function sendErrorEmail($title, $content, $name = "机器人错误提示"){
+    static function sendErrorEmail($title, $content, $name = "机器人错误提示") {
         self::sendEmail(["here your receive email address"], $title, $content, $name, 0);
     }
 
@@ -313,7 +328,7 @@ class CQUtil
      * @param bool $real_all
      * @return array[User]
      */
-    static function getAllUsers($real_all = false): array{
+    static function getAllUsers($real_all = false): array {
         if ($real_all === true) {
             $dir = scandir(DP::getUserFolder());
             unset($dir[0], $dir[1]);
@@ -335,7 +350,7 @@ class CQUtil
      * @param $id
      * @return User
      */
-    static function getUser($id){
+    static function getUser($id) {
         $d = Buffer::get("user");
         if (!isset($d[$id])) {
             self::initUser($id);
@@ -350,7 +365,7 @@ class CQUtil
      * 初始化用户实例。如果没有此用户的实例数据，会创建
      * @param $id
      */
-    static function initUser($id){
+    static function initUser($id) {
         if (file_exists(DP::getUserFolder() . $id . ".dat")) $class = unserialize(file_get_contents(DP::getUserFolder() . $id . ".dat"));
         else {
             Console::info("无法找到用户 " . $id . " 的数据，正在创建...");
@@ -365,7 +380,7 @@ class CQUtil
      * @param $msg
      * @return bool
      */
-    static function sendGroupMsg($groupId, $msg){
+    static function sendGroupMsg($groupId, $msg) {
         $reply = ["action" => "send_group_msg", "params" => ["group_id" => $groupId, "message" => $msg]];
         $reply["echo"] = $reply;
         $reply["echo"]["time"] = time();
@@ -387,7 +402,7 @@ class CQUtil
      * @param $msg
      * @return bool
      */
-    static function sendPrivateMsg($userId, $msg){
+    static function sendPrivateMsg($userId, $msg) {
         $reply = ["action" => "send_private_msg", "params" => ["user_id" => $userId, "message" => $msg]];
         $reply["echo"] = $reply;
         $reply["echo"]["time"] = time();
@@ -404,9 +419,9 @@ class CQUtil
     }
 
 
-    static function getFriendName($qq){ return Buffer::get("friend_list")[$qq]["nickname"] ?? "unknown"; }
+    static function getFriendName($qq) { return Buffer::get("friend_list")[$qq]["nickname"] ?? "unknown"; }
 
-    static function getGroupName($group){ return Buffer::get("group_list")[$group]["group_name"] ?? "unknown"; }
+    static function getGroupName($group) { return Buffer::get("group_list")[$group]["group_name"] ?? "unknown"; }
 
     /**
      * 发送其他API，HTTP插件支持的其他API都可以发送。
@@ -414,12 +429,11 @@ class CQUtil
      * @param $data
      * @param $echo
      */
-    static function sendAPI($data, $echo){
+    static function sendAPI($data, $echo) {
         if (!is_array($data)) {
             $api = [];
             $api["action"] = $data;
-        }
-        else {
+        } else {
             $api = $data;
         }
         $api["echo"] = $echo;
@@ -431,7 +445,7 @@ class CQUtil
      * @param $name
      * @return bool
      */
-    static function removeCommand($name){
+    static function removeCommand($name) {
         $list = Buffer::get("commands");
         if (!isset($list[$name])) return false;
         unset($list[$name]);
@@ -447,8 +461,8 @@ class CQUtil
      * @param $class
      * @return bool
      */
-    static function addCommand($name, $class){
-        if (!is_file(WORKING_DIR.'src/cqbot/mods/' . $class . '.php')) {
+    static function addCommand($name, $class) {
+        if (!is_file(WORKING_DIR . 'src/cqbot/mods/' . $class . '.php')) {
             return false;
         }
         $list = Buffer::get("commands");
@@ -462,15 +476,16 @@ class CQUtil
      * 获取模块列表的通用方法
      * @return array
      */
-    static function getMods(){
-        $dir = WORKING_DIR."src/cqbot/mods/";
+    static function getMods() {
+        $dir = WORKING_DIR . "src/cqbot/mods/";
         $dirs = scandir($dir);
         $ls = [];
         unset($dirs[0], $dirs[1]);
-        foreach($dirs as $v){
-            if($v != "ModBase.php" && (strstr($v,".php") !== false)){
+        foreach ($dirs as $v) {
+            if ($v != "ModBase.php" && (strstr($v, ".php") !== false)) {
                 $name = substr($v, 0, -4);
-                $ls[]=$name;
+                $ls[] = $name;
+                Console::debug("loading mod: " . $name);
             }
         }
         return $ls;
@@ -481,8 +496,27 @@ class CQUtil
      * @param $mod_name
      * @return bool
      */
-    static function isModExists($mod_name){
+    static function isModExists($mod_name) {
         $ls = self::getMods();
         return in_array($mod_name, $ls);
+    }
+
+    /**
+     * 重启框架，此服务重启为全自动的
+     */
+    static function reload(){
+        Console::info("Reloading server");
+        self::saveAllFiles();
+        Buffer::$event->reload();
+    }
+
+    /**
+     * 停止运行框架，需要用shell再次开启才能启动
+     */
+    static function stop(){
+        Console::info("Stopping server...");
+        self::saveAllFiles();
+        Buffer::$api->close();
+        Buffer::$event->shutdown();
     }
 }
