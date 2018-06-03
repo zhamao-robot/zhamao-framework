@@ -522,49 +522,78 @@ class CQUtil
      * @param $req
      * @return string
      */
-    public static function executeType($req){
-        switch($req["post_type"]){
+    static function executeType($req) {
+        switch ($req["post_type"]) {
             case "message":
                 return "消息";
-            case "event":
-                switch($req["event"]){
+            case "event"://兼容3.x
+                switch ($req["event"]) {
                     case "group_upload":
-                        return "群[".$req["group_id"]."] 文件上传：".$req["file"]["name"]."（".intval($req["file"]["size"] / 1024)."kb）";
+                        return "群[" . $req["group_id"] . "] 文件上传：" . $req["file"]["name"] . "（" . intval($req["file"]["size"] / 1024) . "kb）";
                     case "group_admin":
-                        switch($req["sub_type"]){
+                        switch ($req["sub_type"]) {
                             case "set":
-                                return "群[".$req["group_id"]."] 设置管理员：".$req["user_id"];
+                                return "群[" . $req["group_id"] . "] 设置管理员：" . $req["user_id"];
                             case "unset":
-                                return "群[".$req["group_id"]."] 取消管理员：".$req["user_id"];
+                                return "群[" . $req["group_id"] . "] 取消管理员：" . $req["user_id"];
                             default:
                                 return "unknown_group_admin_type";
                         }
                     case "group_decrease":
-                        switch($req["sub_type"]){
+                        switch ($req["sub_type"]) {
                             case "leave":
-                                return "群[".$req["group_id"]."] 成员主动退群：".$req["user_id"];
+                                return "群[" . $req["group_id"] . "] 成员主动退群：" . $req["user_id"];
                             case "kick":
-                                return "群[".$req["group_id"]."] 管理员[".$req["operator_id"]."]踢出了：".$req["user_id"];
+                                return "群[" . $req["group_id"] . "] 管理员[" . $req["operator_id"] . "]踢出了：" . $req["user_id"];
                             case "kick_me":
-                                return "群[".$req["group_id"]."] 本账号被踢出";
+                                return "群[" . $req["group_id"] . "] 本账号被踢出";
                             default:
                                 return "unknown_group_decrease_type";
                         }
                     case "group_increase":
-                        return "群[".$req["group_id"]."] ".$req["operator_id"]." 同意 ".$req["user_id"]." 加入了群";
+                        return "群[" . $req["group_id"] . "] " . $req["operator_id"] . " 同意 " . $req["user_id"] . " 加入了群";
+                    default:
+                        return "unknown_event";
+                }
+            case "notice":
+                switch ($req["notice_type"]) {
+                    case "group_upload":
+                        return "群[" . $req["group_id"] . "] 文件上传：" . $req["file"]["name"] . "（" . intval($req["file"]["size"] / 1024) . "kb）";
+                    case "group_admin":
+                        switch ($req["sub_type"]) {
+                            case "set":
+                                return "群[" . $req["group_id"] . "] 设置管理员：" . $req["user_id"];
+                            case "unset":
+                                return "群[" . $req["group_id"] . "] 取消管理员：" . $req["user_id"];
+                            default:
+                                return "unknown_group_admin_type";
+                        }
+                    case "group_decrease":
+                        switch ($req["sub_type"]) {
+                            case "leave":
+                                return "群[" . $req["group_id"] . "] 成员主动退群：" . $req["user_id"];
+                            case "kick":
+                                return "群[" . $req["group_id"] . "] 管理员[" . $req["operator_id"] . "]踢出了：" . $req["user_id"];
+                            case "kick_me":
+                                return "群[" . $req["group_id"] . "] 本账号被踢出";
+                            default:
+                                return "unknown_group_decrease_type";
+                        }
+                    case "group_increase":
+                        return "群[" . $req["group_id"] . "] " . $req["operator_id"] . " 同意 " . $req["user_id"] . " 加入了群";
                     default:
                         return "unknown_event";
                 }
             case "request":
-                switch($req["request_type"]){
+                switch ($req["request_type"]) {
                     case "friend":
-                        return "加好友请求：".$req["user_id"]."，验证信息：".$req["message"];
+                        return "加好友请求：" . $req["user_id"] . "，验证信息：" . ($req["message"] ?? $req["comment"]);//兼容3.x
                     case "group":
-                        switch($req["sub_type"]){
+                        switch ($req["sub_type"]) {
                             case "add":
-                                return "加群[".$req["group_id"]."] 请求：".$req["user_id"]."，请求信息：".$req["message"];
+                                return "加群[" . $req["group_id"] . "] 请求：" . $req["user_id"] . "，请求信息：" . ($req["message"] ?? $req["comment"]);//兼容3.x
                             case "invite":
-                                return "用户".$req["user_id"]."邀请机器人进入群：".$req["group_id"];
+                                return "用户" . $req["user_id"] . "邀请机器人进入群：" . $req["group_id"];
                             default:
                                 return "unknown_group_type";
                         }
