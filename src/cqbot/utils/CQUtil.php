@@ -12,12 +12,9 @@ class CQUtil
 {
     public static function loadAllFiles() {
         Console::debug("loading configs...");
-        Buffer::set("su", DP::getJsonData("su.json"));//超级管理员用户列表
-        if (count(Buffer::get("su")) < 1 && Framework::$super_user !== "") {
-            Console::info("Added super user");
-            Buffer::set("su", [Framework::$super_user]);
-        }
-        Buffer::set("mods", self::getMods());//加载模块列表
+        Buffer::set("su", Framework::$super_user);//超级管理员用户列表
+
+        Buffer::set("mods", self::getMods());//加载的模块列表
         Buffer::set("user", []);//清空用户列表
         Buffer::set("time_send", false);//发送Timing数据到管理群
         Buffer::set("cmd_prefix", DP::getJsonData("config.json")["cmd_prefix"] ?? "");//设置指令的前缀符号
@@ -26,11 +23,11 @@ class CQUtil
 
     public static function saveAllFiles() {
         Console::info("Saving files...");
-        DP::setJsonData("su.json", Buffer::get("su"));//保存超级管理员的QQ列表
 
         //保存cmd_prefix（指令前缀）
         $config = DP::getJsonData("config.json");
         $config["cmd_prefix"] = Buffer::get("cmd_prefix");
+        $config["super_user"] = Buffer::get("su");
         DP::setJsonData("config.json", $config);
 
         //保存用户数据
@@ -518,5 +515,74 @@ class CQUtil
         self::saveAllFiles();
         Buffer::$api->close();
         Buffer::$event->shutdown();
+    }
+
+    /**
+     * 此函数用于解析其他非消息类型事件，显示在log里
+     * @param $req
+     * @return string
+     */
+    public static function executeType($req){
+        switch($req["post_type"]){
+            case "message":
+                return "消息";
+            case "event":
+                switch($req["event"]){
+                    case "group_upload":
+                        return "群[".$req["group_id"]."] 文件上传：".$req["file"]["name"]."（".intval($req["file"]["size"] / 1024)."kb）";
+                    case "group_admin":
+                        switch($req["sub_type"]){
+                            case "set":
+                                return "群[".$req["group_id"]."] 设置管理员：".$req["user_id"];
+                            case "unset":
+                                return "群[".$req["group_id"]."] 取消管理员：".$req["user_id"];
+                            default:
+                                return "unknown_group_admin_type";
+                        }
+                    case "group_decrease":
+                        switch($req["sub_type"]){
+                            case "leave":
+                                return "群[".$req["group_id"]."] 成员主动退群：".$req["user_id"];
+                            case "kick":
+                                return "群[".$req["group_id"]."] 管理员[".$req["operator_id"]."]踢出了：".$req["user_id"];
+                            case "kick_me":
+                                return "群[".$req["group_id"]."] 本账号被踢出";
+                            default:
+                                return "unknown_group_decrease_type";
+                        }
+                    case "group_increase":
+                        return "群[".$req["group_id"]."] ".$req["operator_id"]." 同意 ".$req["user_id"]." 加入了群";
+                    default:
+                        return "unknown_event";
+                }
+            case "request":
+                switch($req["request_type"]){
+                    case "friend":
+                        return "加好友请求：".$req["user_id"]."，验证信息：".$req["message"];
+                    case "group":
+                        switch($req["sub_type"]){
+                            case "add":
+                                return "加群[".$req["group_id"]."] 请求：".$req["user_id"]."，请求信息：".$req["message"];
+                            case "invite":
+                                return "用户".$req["user_id"]."邀请机器人进入群：".$req["group_id"];
+                            default:
+                                return "unknown_group_type";
+                        }
+                    default:
+                        return "unknown_request_type";
+                }
+            default:
+                return "unknown_post_type";
+        }
+    }
+
+    /**
+     * 返回群的类
+     * @param $group_id
+     * @return Group|null
+     */
+    static function getGroup($group_id){
+        $d = Buffer::get("groups");
+        return $d[$group_id] ?? null;
     }
 }

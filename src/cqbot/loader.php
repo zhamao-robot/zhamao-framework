@@ -22,6 +22,8 @@ function loadAllClass($dir){
 
 //加载需要优先加载的文件
 require_once(WORKING_DIR."src/cqbot/mods/ModBase.php");
+require_once(WORKING_DIR."src/cqbot/item/User.php");
+require_once(WORKING_DIR."src/cqbot/event/Event.php");
 
 loadAllClass(WORKING_DIR."src/cqbot/");
 

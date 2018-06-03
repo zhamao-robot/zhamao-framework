@@ -49,4 +49,30 @@ class Buffer
         if(!is_array((self::$data[$name] ?? 1))) return false;
         return in_array($value, self::$data[$name]);
     }
+
+    ////////////预留部分，为redis更新作准备/////////////
+
+    /** @var string[] 为未来支持redis数据库做准备 */
+    static $vars = [];
+    static $ls = [];
+
+    static function _get(string $name){
+
+    }
+
+    static function _setString(string $key, string $value){
+
+    }
+
+    static function _setList(string $key, array $value){
+
+    }
+
+    static function _appendList(string $key, string $value){
+
+    }
+
+    static function _ping(){
+
+    }
 }
