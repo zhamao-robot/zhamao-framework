@@ -10,13 +10,13 @@ class Group
 {
     private $group_id;
     private $group_name;
-    private $prefix;
+    //private $prefix;
     private $members = [];
 
     public function __construct($group_id, $info) {
         $this->group_id = $group_id;
         $this->group_name = $info["group_name"];
-        $this->prefix = $info["prefix"];
+        //$this->prefix = $info["prefix"];
         $member_list = $info["member"];
         $this->members = [];
         foreach ($member_list as $k => $v) {
@@ -39,13 +39,6 @@ class Group
     }
 
     /**
-     * @return mixed
-     */
-    public function getPrefix() {
-        return $this->prefix;
-    }
-
-    /**
      * @return array
      */
     public function getMembers(): array {
@@ -65,14 +58,6 @@ class Group
      */
     public function setGroupName($group_name) {
         $this->group_name = $group_name;
-    }
-
-    /**
-     * set自定义群称号的方法
-     * @param mixed $prefix
-     */
-    public function setPrefix($prefix) {
-        $this->prefix = $prefix;
     }
 
     /**

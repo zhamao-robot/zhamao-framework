@@ -19,6 +19,9 @@ class Example extends ModBase
             case "ping":
                 $this->reply("pong");
                 return true;
+            case "test":
+                $this->reply("Hello world");
+                return true;
         }
         return false;
     }

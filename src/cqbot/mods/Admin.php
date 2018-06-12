@@ -47,9 +47,6 @@ class Admin extends ModBase
                 if(Buffer::in_array("su", $user)) Buffer::unsetByValue("su", $user);
                 $this->reply("removed operator $user");
                 return true;
-            case "test":
-                $this->reply("Hello world");
-                return true;
         }
         return false;
     }
