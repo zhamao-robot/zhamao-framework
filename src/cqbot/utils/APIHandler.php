@@ -9,14 +9,14 @@
 class APIHandler
 {
     static function execute($cmd, $res = null) {
-        if (!isset($cmd[0])) return;
-        switch ($cmd[0]) {
+        if (!isset($cmd["type"])) return false;
+        switch ($cmd["type"]) {
             case "set_friend_add_request":
-                $id = $cmd[1];
+                $id = $cmd["params"][0];
                 $msg = "Hi～你好！";
                 $msg .= "\n第一次见面请多关照！";
-                CQUtil::sendPrivateMsg($id, $msg);
-                break;
+                CQUtil::sendPrivateMsg($id, $msg, $cmd["self_id"]);
+                return true;
             case "get_friend_list":
                 $friend = $res["data"][0]["friends"];
                 $list = [];
@@ -25,9 +25,9 @@ class APIHandler
                 }
                 Buffer::set("friend_list", $list);
                 Console::put(Console::setColor("已读取" . count(Buffer::get("friend_list")) . "个好友", "blue"));
-                break;
+                return true;
             case "update_group_member_list":
-                $group_id = $cmd[1];
+                $group_id = $cmd["params"][0];
                 $info_data = $res["data"];
                 Console::info(Console::setColor("Updating group $group_id members, it will take several minutes.", "yellow"));
                 foreach ($info_data as $k => $v) {
@@ -35,11 +35,11 @@ class APIHandler
                     CQUtil::getGroup($group_id)->setMember($v["user_id"], $s);
                     $s->updateData();
                 }
-                break;
+                return true;
             case "update_group_member_info":
                 $info_data = $res["data"];
-                $group = $cmd[1];
-                $user = $cmd[2];
+                $group = $cmd["params"][0];
+                $user = $cmd["params"][1];
                 $g = CQUtil::getGroup($group);
                 $member = $g->getMember($user);
                 $member->setAttribute($info_data);
@@ -48,43 +48,44 @@ class APIHandler
                 $member->setLastSentTime($info_data["last_sent_time"]);
                 $member->setRole($info_data["role"]);
                 Console::info("Updated group member information: " . $group . ":" . $user);
-                break;
+                return true;
             case "update_group_info":
                 $group = $res["data"];
-                $current = $cmd[1];
+                $current = $cmd["params"][0];
                 $list = [];
                 foreach ($group as $k => $v) {
                     $list[$v["group_id"]] = $group[$k];
                 }
                 if (!isset($list[$current]) && Buffer::array_key_exists("groups", $current)) {
                     Buffer::unset("groups", $current);
-                    break;
+                    return true;
                 }
                 $g = CQUtil::getGroup($current);
                 $g->setGroupName($list[$current]["group_name"]);
-                $g->setPrefix($list[$current]["prefix"]);
-                break;
+                return true;
             case "get_group_member_list":
                 $group_data = $res["data"];
                 $ls = Buffer::get("group_list");
-                $group_id = $cmd[1];
+                $group_id = $cmd["params"][0];
                 $ls[$group_id]["member"] = $group_data;
-                $group = new Group($group_id, $ls[$group_id]);
+                $group = new Group($group_id, $ls[$group_id], $cmd["self_id"]);
+                //TODO: 添加获取API时多账号对群的实例化的支持
                 Buffer::appendKey("groups", $group_id, $group);
-                break;
+                return true;
             case "get_group_list":
                 $group = $res["data"];
                 $list = [];
                 foreach ($group as $k => $v) {
                     $list[$v["group_id"]] = $group[$k];
-                    CQUtil::sendAPI(["action" => "get_group_member_list", "params" => ["group_id" => $v["group_id"]]], ["get_group_member_list", $v["group_id"]]);
+                    CQUtil::sendAPI(CQUtil::getApiConnectionByQQ($cmd["self_id"])->fd, ["action" => "get_group_member_list", "params" => ["group_id" => $v["group_id"]]], ["get_group_member_list", $v["group_id"]]);
                 }
                 Buffer::set("group_list", $list);
                 Console::put(Console::setColor("已读取" . count(Buffer::get("group_list")) . "个群", "blue"));
-                break;
+                return true;
             case "get_version_info":
                 Buffer::set("version_info", $res["data"]);
-                break;
+                return true;
         }
+        return false;
     }
 }

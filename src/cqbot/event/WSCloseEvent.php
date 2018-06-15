@@ -9,6 +9,11 @@
 class WSCloseEvent extends Event
 {
     public function __construct(swoole_server $server, int $fd) {
-
+        $connect = CQUtil::getConnection($fd);
+        if ($connect->getPair() !== null) {
+            $connect->getPair()->setPair(null);
+            $connect->setPair(null);
+        }
+        unset(Buffer::$connect[$fd]);
     }
 }

@@ -65,7 +65,7 @@ class GroupMember extends User
      * 返回用户是不是群管理员
      * @return bool
      */
-    public function isAdmin(){
+    public function isAdmin() {
         return in_array($this->getRole(), ["owner", "admin"]);
     }
 
@@ -82,7 +82,7 @@ class GroupMember extends User
                 "card" => $card
             ]
         ];
-        CQUtil::sendAPI($data, []);
+        CQUtil::sendAPI(CQUtil::getApiConnectionByQQ($this->getGroup()->getSelfId())->fd, $data, []);
     }
 
     /**
@@ -123,9 +123,9 @@ class GroupMember extends User
     /**
      * 更新群组成员信息
      */
-    public function updateData(){
+    public function updateData() {
         $user_id = $this->getId();
-        CQUtil::sendAPI([
+        CQUtil::sendAPI(CQUtil::getApiConnectionByQQ($this->getGroup()->getSelfId())->fd, [
             "action" => "get_group_member_info",
             "params" => [
                 "group_id" => $this->getGroup()->getGroupId(),

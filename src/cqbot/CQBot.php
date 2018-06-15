@@ -19,22 +19,25 @@ class CQBot
 
     public $starttime;
     public $endtime;
+    public $current_id;
 
-    public function __construct(Framework $framework){
+    public function __construct(Framework $framework, $package) {
         $this->starttime = microtime(true);
         $this->framework = $framework;
-    }
-
-    public function execute($it){
-        $this->data = $it;
-        if ($it["post_type"] == "message") {
+        $this->data = $package;
+        $this->current_id = $this->data["self_id"];
+        if ($package["post_type"] == "message") {
             try {
-                $this->callTask($it);
+                $this->callTask($package);
             } catch (\Exception $e) {
-                CQUtil::errorLog("请求执行任务时异常\n" . $e->getMessage());
-                CQUtil::sendDebugMsg("引起异常的消息：\n" . $it["message"]);
+                CQUtil::errorLog("请求执行任务时异常\n" . $e->getMessage(), $this->current_id);
+                CQUtil::sendDebugMsg("引起异常的消息：\n" . $package["message"], $this->current_id);
             }
         }
+    }
+
+    public function execute($it) {
+
     }
 
     public function callTask($it){
@@ -69,7 +72,8 @@ class CQBot
                 break;
             case "discuss":
                 $reply = json_encode(["action" => "send_discuss_msg", "params" => ["discuss_id" => $this->data["discuss_id"], "message" => $msg]]);
-                if (CQUtil::APIPush($reply)) {
+                $connect = CQUtil::getApiConnectionByQQ($this->current_id);
+                if (CQUtil::sendAPI($connect->fd, $reply, ["send_discuss_msg"])) {
                     $out_count = Buffer::$out_count->get();
                     if (Buffer::$data["info_level"] == 2) {
                         Console::put("************API PUSHED***********");
@@ -88,12 +92,12 @@ class CQBot
 
     public function sendGroupMsg($groupId, $msg){
         $this->function_called = true;
-        CQUtil::sendGroupMsg($groupId, $msg);
+        CQUtil::sendGroupMsg($groupId, $msg, $this->current_id);
     }
 
     public function sendPrivateMsg($userId, $msg){
         $this->function_called = true;
-        CQUtil::sendPrivateMsg($userId, $msg);
+        CQUtil::sendPrivateMsg($userId, $msg, $this->current_id);
     }
 
     public function isAdmin($user){

@@ -20,15 +20,6 @@ class WorkerStartEvent extends Event
         $this->getFramework()->scheduler = new Scheduler($this->getFramework());
         $server->tick(1000, [$this->getFramework(), "processTick"]);
 
-        //API连接部分
-        $this->getFramework()->api = new \swoole_http_client($this->getFramework()->host, $this->getFramework()->api_port);
-        $this->getFramework()->api->set(['websocket_mask' => true]);
-        $this->getFramework()->api->on('message', [$this->getFramework(), "onApiMessage"]);
-        $this->getFramework()->api->on("close", function ($cli){
-            Console::info(Console::setColor("API connection closed", "red"));
-        });
-        $this->getFramework()->api->upgrade('/api/', [$this->getFramework(), "onUpgrade"]);
-
         Console::debug("master_pid = " . $server->master_pid);
         Console::debug("worker_id = " . $worker_id);
         Console::put("\n==========STARTUP DONE==========\n");

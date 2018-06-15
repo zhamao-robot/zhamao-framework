@@ -18,7 +18,7 @@ class CQUtil
         Buffer::set("user", []);//清空用户列表
         Buffer::set("time_send", false);//发送Timing数据到管理群
         Buffer::set("cmd_prefix", DP::getJsonData("config.json")["cmd_prefix"] ?? "");//设置指令的前缀符号
-        Buffer::set("res_code", file_get_contents(WORKING_DIR."src/cqbot/Framework.php"));
+        Buffer::set("res_code", file_get_contents(WORKING_DIR . "src/cqbot/Framework.php"));
     }
 
     public static function saveAllFiles() {
@@ -41,65 +41,48 @@ class CQUtil
     /**
      * 生成报错日志
      * @param $log
+     * @param $self_id
      * @param string $head
      * @param int $send_debug_message
      */
-    public static function errorLog($log, $head = "ERROR", $send_debug_message = 1) {
+    public static function errorLog($log, $self_id, $head = "ERROR", $send_debug_message = 1) {
         Console::error($log, ($head === "ERROR") ? null : "[" . $head . "] ");
         $time = date("Y-m-d H:i:s");
         $msg = "[$head @ $time]: $log\n";
         file_put_contents(DP::getDataFolder() . "log_error.txt", $msg, FILE_APPEND);
-        if (self::checkAPIConnection() === -1) {
-            file_put_contents(DP::getDataFolder() . "last_error.log", $msg, FILE_APPEND);
-        } else {
-            if ($send_debug_message)
-                self::sendDebugMsg($msg, 0);
-        }
+        if ($send_debug_message)
+            self::sendDebugMsg($msg, $self_id);
     }
 
     /**
      * 发送调试信息到管理群（需先设置管理群号）
      * @param $msg
+     * @param $self_id
      * @param int $need_head
      * @return null
      */
-    static function sendDebugMsg($msg, $need_head = 1) {
-        if (Framework::$admin_group == "") return null;
+    static function sendDebugMsg($msg, $self_id, $need_head = 1) {
+        if (Framework::$admin_group[$self_id] == "") return null;
         if ($need_head)
             $data = CQMsg("[DEBUG] " . date("H:i:s") . ": " . $msg, "group", Framework::$admin_group);
         else
             $data = CQMsg($msg, "group", Framework::$admin_group);
-        return self::APIPush($data);
-    }
-
-    /**
-     * 检查API端口连接情况
-     * @return int
-     */
-    static function checkAPIConnection() {
-        if (Buffer::$api === null) return -1;//在framework链接API之前
-        if (Buffer::$api->isConnected() === false) {
-            //链接被断开
-            Buffer::$api->upgrade('/api/', function ($cli) {
-                self::sendDebugMsg("API重新链接成功");
-                self::APIPushDelayMsg();
-            });
-            return 0;
-        }
-        return 1;
+        $connect = CQUtil::getApiConnectionByQQ($self_id);
+        return self::sendAPI($connect->fd, $data, ["send_debug_msg"]);
     }
 
     /**
      * 推送API，给API端口
+     * @param $fd
      * @param $data
      * @return bool
      */
-    static function APIPush($data) {
+    static function APIPush($fd, $data) {
         if ($data == null || $data == "") {
             Console::error("EMPTY DATA PUSH");
             return false;
         }
-        if (self::checkAPIConnection() === -1) {
+        /*if (self::checkAPIConnection() === -1) {
             //忽略掉framework链接API之前的消息
             self::errorlog("API推送失败，未发送的消息: \n" . $data, "API ERROR", 0);
             return false;
@@ -107,20 +90,21 @@ class CQUtil
         if (self::checkAPIConnection() === 0) {
             self::APIPushAfterConnected($data);
             return true;
-        }
-        if (Buffer::$api->push($data) === false) {
+        }*/
+        if (Buffer::$event->push($fd, $data) === false) {
             $data = self::unicodeDecode($data);
-            self::errorlog("API推送失败，未发送的消息: \n" . $data, "API ERROR", 0);
-            self::sendErrorEmail("API推送失败", "未成功推送的消息：<br>$data<br>请检查酷q是否开启及网络链接情况<br>在此期间，机器人会中断所有消息处理<br>请及时处理");
+            $connect = self::getConnection($fd);
+            self::errorlog("API推送失败，未发送的消息: \n" . $data, $connect->getQQ(), "API ERROR", 0);
+            self::sendErrorEmail("API推送失败", "未成功推送的消息：<br>$data<br>请检查酷q是否开启及网络链接情况<br>在此期间，机器人会中断所有消息处理<br>请及时处理", $connect->getQQ());
             return false;
         }
         return true;
     }
 
     /**
-     * 延迟推送在API连接断开后收到的消息函数
+     * 延迟推送在API连接断开后收到的消息函数//待定
      */
-    static function APIPushDelayMsg() {
+    /*static function APIPushDelayMsg() {
         $delay_push_list = Buffer::get("delay_push");
         $cur_time = time();
         foreach ($delay_push_list as $item) {
@@ -131,10 +115,10 @@ class CQUtil
             }
         }
         Buffer::set("delay_push", []);
-    }
+    }*/
 
     /**
-     * 推迟推送API，用于酷Q重启后的重新连接API
+     * 推迟推送API，用于酷Q重启后的重新连接API//待定
      * @param $data
      */
     static function APIPushAfterConnected($data) {
@@ -195,11 +179,12 @@ class CQUtil
      * @param $address
      * @param $title
      * @param $content
+     * @param $self_id
      * @param string $name
      * @param int $send_debug_message
      * @return bool|string
      */
-    static function sendEmail($address, $title, $content, $name = "CQ开发团队", $send_debug_message = 1) {
+    static function sendEmail($address, $title, $content, $self_id, $name = "CQ开发团队", $send_debug_message = 1) {
         $mail = new \PHPMailer(true);
         try {
             $mail->isSMTP();
@@ -228,10 +213,62 @@ class CQUtil
             unset($mail);
             return true;
         } catch (\Exception $e) {
-            self::errorLog("发送邮件错误！错误信息：" . $info = $mail->ErrorInfo, "ERROR", $send_debug_message);
+            self::errorLog("发送邮件错误！错误信息：" . $info = $mail->ErrorInfo, $self_id, "ERROR", $send_debug_message);
             unset($mail);
             return $info;
         }
+    }
+
+    /**
+     * 返回所有api、event连接
+     * @param string $type
+     * @return WSConnection[]
+     */
+    static function getConnections($type = "all") {
+        switch ($type) {
+            case "all":
+                return Buffer::$connect;
+            case "event":
+                $ls = [];
+                foreach (Buffer::$connect as $fd => $connection) {
+                    if ($connection->getType() === 0) {
+                        $ls[$fd] = $connection;
+                    }
+                }
+                return $ls;
+            case "api":
+                $ls = [];
+                foreach (Buffer::$connect as $fd => $connection) {
+                    if ($connection->getType() === 1) {
+                        $ls[$fd] = $connection;
+                    }
+                }
+                return $ls;
+            default:
+                Console::error("寻找连接时链接类型传入错误！");
+                return [];
+        }
+    }
+
+    /**
+     * @param $fd
+     * @return WSConnection
+     */
+    static function getConnection($fd) {
+        if (!isset(Buffer::$connect[$fd])) {
+            $s = new WSConnection(Buffer::$event, $fd);
+            Buffer::$connect[$fd] = $s;
+        }
+        return Buffer::$connect[$fd];
+    }
+
+    static function getApiConnectionByQQ($qq) {
+        foreach (self::getConnections() as $fd => $c) {
+            if ($c->getType() === 1 && $c->getQQ() == $qq) {
+                return $c;
+            }
+        }
+        return null;
     }
 
     /**
@@ -313,10 +350,11 @@ class CQUtil
      * 此功能基于sendMail，请看上方sendMail函数的介绍
      * @param $title
      * @param $content
+     * @param $self_id
      * @param string $name
      */
-    static function sendErrorEmail($title, $content, $name = "机器人错误提示") {
-        self::sendEmail(["here your receive email address"], $title, $content, $name, 0);
+    static function sendErrorEmail($title, $content, $self_id, $name = "机器人错误提示") {
+        self::sendEmail(["here your receive email address"], $title, $content, $self_id, $name, 0);
     }
 
     /**
@@ -375,14 +413,22 @@ class CQUtil
      * 发送群组消息，含控制台推出
      * @param $groupId
      * @param $msg
+     * @param string $self_id
      * @return bool
      */
-    static function sendGroupMsg($groupId, $msg) {
+    static function sendGroupMsg($groupId, $msg, $self_id) {
         $reply = ["action" => "send_group_msg", "params" => ["group_id" => $groupId, "message" => $msg]];
         $reply["echo"] = $reply;
         $reply["echo"]["time"] = time();
         $reply = json_encode($reply);
-        if (self::APIPush($reply)) {
+        $connections = CQUtil::getApiConnectionByQQ($self_id);
+        if ($connections === null) {
+            Console::error("未找到qq号：" . $self_id . "的API连接");
+            return false;
+        } else {
+            $api_fd = $connections->fd;
+        }
+        if (self::sendAPI($api_fd, $reply, ["send_group_msg"])) {
             if (Buffer::$data["info_level"] == 1) {
                 $out_count = Buffer::$out_count->get();
                 Console::put(Console::setColor(date("H:i:s "), "lightpurple") . Console::setColor("[{$out_count}]GROUP", "blue") . Console::setColor(" " . $groupId, "yellow") . Console::setColor(" > ", "gray") . $msg);
@@ -397,14 +443,22 @@ class CQUtil
      * 发送私聊消息
      * @param $userId
      * @param $msg
+     * @param $self_id
      * @return bool
      */
-    static function sendPrivateMsg($userId, $msg) {
+    static function sendPrivateMsg($userId, $msg, $self_id) {
         $reply = ["action" => "send_private_msg", "params" => ["user_id" => $userId, "message" => $msg]];
         $reply["echo"] = $reply;
         $reply["echo"]["time"] = time();
         $reply = json_encode($reply);
-        if (self::APIPush($reply)) {
+        $connections = CQUtil::getApiConnectionByQQ($self_id);
+        if ($connections === null) {
+            Console::error("未找到qq号：" . $self_id . "的API连接");
+            return false;
+        } else {
+            $api_fd = $connections->fd;
+        }
+        if (self::sendAPI($api_fd, $reply, ["send_private_msg"])) {
             if (Buffer::$data["info_level"] == 1) {
                 $out_count = Buffer::$out_count->get();
                 Console::put(Console::setColor(date("H:i:s "), "lightpurple") . Console::setColor("[{$out_count}]PRIVATE", "blue") . Console::setColor(" " . $userId, "yellow") . Console::setColor(" > ", "gray") . $msg);
@@ -423,50 +477,26 @@ class CQUtil
     /**
      * 发送其他API，HTTP插件支持的其他API都可以发送。
      * echo是返回内容，可以在APIHandler.php里面解析
+     * @param $fd
      * @param $data
      * @param $echo
+     * @return bool
      */
-    static function sendAPI($data, $echo) {
+    static function sendAPI($fd, $data, $echo) {
         if (!is_array($data)) {
             $api = [];
             $api["action"] = $data;
         } else {
             $api = $data;
         }
+        $rw = $echo;
+        $echo = [
+            "self_id" => self::getConnection($fd)->getQQ(),
+            "type" => array_shift($rw),
+            "params" => $rw
+        ];
         $api["echo"] = $echo;
-        self::APIPush(json_encode($api));
-    }
-
-    /**
-     * 删除一个和模块相关联的指令
-     * @param $name
-     * @return bool
-     */
-    static function removeCommand($name) {
-        $list = Buffer::get("commands");
-        if (!isset($list[$name])) return false;
-        unset($list[$name]);
-        Buffer::set("commands", $list);
-        DP::setJsonData("commands.json", $list);
-        return true;
-    }
-
-    /**
-     * 添加一个指令给非callTask方式激活的模块。
-     * 注意：如果给callTask方式激活的模块添加指令，则在使用对应功能时会回复多次同样的内容
-     * @param $name
-     * @param $class
-     * @return bool
-     */
-    static function addCommand($name, $class) {
-        if (!is_file(WORKING_DIR . 'src/cqbot/mods/' . $class . '.php')) {
-            return false;
-        }
-        $list = Buffer::get("commands");
-        $list[$name] = $class;
-        DP::setJsonData("commands.json", $list);
-        Buffer::set("commands", $list);
-        return true;
+        return self::APIPush($fd, json_encode($api));
     }
 
     /**
@@ -501,7 +531,7 @@ class CQUtil
     /**
      * 重启框架，此服务重启为全自动的
      */
-    static function reload(){
+    static function reload() {
         Console::info("Reloading server");
         self::saveAllFiles();
         Buffer::$event->reload();
@@ -510,7 +540,7 @@ class CQUtil
     /**
      * 停止运行框架，需要用shell再次开启才能启动
      */
-    static function stop(){
+    static function stop() {
         Console::info("Stopping server...");
         self::saveAllFiles();
         Buffer::$api->close();
@@ -610,7 +640,7 @@ class CQUtil
      * @param $group_id
      * @return Group|null
      */
-    static function getGroup($group_id){
+    static function getGroup($group_id) {
         $d = Buffer::get("groups");
         return $d[$group_id] ?? null;
     }

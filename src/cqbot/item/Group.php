@@ -10,10 +10,12 @@ class Group
 {
     private $group_id;
     private $group_name;
+    private $self_id;
     //private $prefix;
     private $members = [];
 
-    public function __construct($group_id, $info) {
+    public function __construct($group_id, $info, $self_id) {
+        $this->self_id = $self_id;
         $this->group_id = $group_id;
         $this->group_name = $info["group_name"];
         //$this->prefix = $info["prefix"];
@@ -82,9 +84,17 @@ class Group
      * @param bool $with_members
      */
     public function updateData($with_members = false) {
-        CQUtil::sendAPI(["action" => "get_group_list"], ["update_group_info", $this->getGroupId()]);
+        $connection = CQUtil::getApiConnectionByQQ($this->getSelfId());
+        CQUtil::sendAPI($connection->fd, ["action" => "get_group_list"], ["update_group_info", $this->getGroupId()]);
         if ($with_members) {
-            CQUtil::sendAPI(["action" => "get_group_member_list", "params" => ["group_id" => $this->getGroupId()]], ["update_group_member_list", strval($this->getGroupId())]);
+            CQUtil::sendAPI($connection->fd, ["action" => "get_group_member_list", "params" => ["group_id" => $this->getGroupId()]], ["update_group_member_list", strval($this->getGroupId())]);
         }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSelfId() {
+        return $this->self_id;
     }
 }

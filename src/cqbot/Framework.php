@@ -42,14 +42,15 @@ class Framework
 
     public function setInfoLevel($level){ $this->info_level = $level; }
 
+    public function setSuperUser($option) { self::$super_user = $option; }
+
     public function eventServerStart(){ $this->event->start(); }
 
     public static function getInstance(){ return self::$obj; }
 
-    public function init($option = []){
+    public function init() {
         $this->selfCheck();
         $this->checkFiles();
-        self::$super_user = $option;
         Console::info("CQBot Framework starting...");
         $this->event = new \swoole_websocket_server($this->host, $this->event_port);
 
@@ -96,15 +97,10 @@ class Framework
         self::$obj = $this;
         $this->run_time = time();
         Buffer::set("info_level", $this->info_level);//设置info等级
+        Buffer::$event = $server;
         require_once(WORKING_DIR . "src/cqbot/loader.php");
         new WorkerStartEvent($server, $worker_id);
     }
-
-    /**
-     * 回调函数：API连接升级为WebSocket时候调用，可用于成功和酷Qhttp建立连接的检测依据
-     * @param $cli
-     */
-    public function onUpgrade($cli){ new ApiUpgradeEvent($cli); }
 
     /**
      * 回调函数：有客户端或HTTP插件反向客户端连接时调用
@@ -113,7 +109,13 @@ class Framework
      */
     public function onEventOpen(\swoole_websocket_server $server, \swoole_http_request $request){ new WSOpenEvent($server, $request); }
 
+    /**
+     * 回调函数：断开连接时候回调的函数
+     * @param swoole_server $server
+     * @param int $fd
+     */
     public function onEventClose(\swoole_server $server, int $fd) { new WSCloseEvent($server, $fd); }
+
     /**
      * 回调函数：当HTTP插件发来json包后激活此函数
      * @param swoole_websocket_server $server
@@ -129,13 +131,6 @@ class Framework
      * @param swoole_http_response $response
      */
     public function onRequest($request, $response){ new HTTPEvent($request, $response); }
-
-    /**
-     * 回调函数：API响应函数，用于发送api请求后返回的状态包的检查，比如rescode = 200
-     * @param swoole_http_client $client
-     * @param $frame
-     */
-    public function onApiMessage($client, $frame){ new ApiMessageEvent($client, $frame); }
 
     /**
      * 回调函数：异步计时器，一秒执行一次。请勿在此使用过多的阻塞方法
