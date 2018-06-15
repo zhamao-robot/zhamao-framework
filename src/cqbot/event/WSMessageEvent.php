@@ -11,8 +11,10 @@ class WSMessageEvent extends Event
     public function __construct(swoole_websocket_server $server, swoole_websocket_frame $frame) {
         $req = json_decode($frame->data, true);
         if (isset($req["echo"])) if (APIHandler::execute($req["echo"], $req)) return;
-        if (isset($req["echo"]["type"]) && $req["echo"]["type"] === "handshake") {
+        //echo Console::setColor(json_encode($req, 128|256), "gold");
+        if (isset($req["echo"]["type"]) && $req["echo"]["type"] == "handshake") {
             $fd_id = $frame->fd;
+            $req["user_id"] = $req["data"]["user_id"];
             $connect = CQUtil::getConnection($fd_id);
             $connect->setQQ($req["user_id"]);
             $connect->setType(1);
@@ -30,11 +32,12 @@ class WSMessageEvent extends Event
                 foreach ($data as $e) {
                     $msg = $msg . $e . "\n";
                 }
-                CQUtil::sendDebugMsg($msg, $req["user_id"], 0);
+                CQUtil::sendDebugMsg($msg, strval($req["user_id"]), 0);
                 CQUtil::sendDebugMsg("[CQBot] 成功开启！", $req["user_id"], 0);
                 file_put_contents(CONFIG_DIR . "error_flag", time());
                 file_put_contents(CONFIG_DIR . "last_error.log", "");
             } else {
+                Console::info("监测到API连接，已经完成初始化！");
                 CQUtil::sendDebugMsg("[CQBot] 成功开启！", $req["user_id"], 0);
             }
             CQUtil::sendAPI($frame->fd, "_get_friend_list", ["get_friend_list"]);

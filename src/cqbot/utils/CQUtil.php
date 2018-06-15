@@ -62,7 +62,7 @@ class CQUtil
      * @return null
      */
     static function sendDebugMsg($msg, $self_id, $need_head = 1) {
-        if (Framework::$admin_group[$self_id] == "") return null;
+        if (Framework::$admin_group[strval($self_id)] == "") return null;
         if ($need_head)
             $data = CQMsg("[DEBUG] " . date("H:i:s") . ": " . $msg, "group", Framework::$admin_group);
         else
@@ -255,6 +255,7 @@ class CQUtil
      * @return WSConnection
      */
     static function getConnection($fd) {
+        //var_dump(Buffer::$connect);
         if (!isset(Buffer::$connect[$fd])) {
             $s = new WSConnection(Buffer::$event, $fd);
             Buffer::$connect[$fd] = $s;
@@ -420,7 +421,6 @@ class CQUtil
         $reply = ["action" => "send_group_msg", "params" => ["group_id" => $groupId, "message" => $msg]];
         $reply["echo"] = $reply;
         $reply["echo"]["time"] = time();
-        $reply = json_encode($reply);
         $connections = CQUtil::getApiConnectionByQQ($self_id);
         if ($connections === null) {
             Console::error("未找到qq号：" . $self_id . "的API连接");
@@ -450,7 +450,6 @@ class CQUtil
         $reply = ["action" => "send_private_msg", "params" => ["user_id" => $userId, "message" => $msg]];
         $reply["echo"] = $reply;
         $reply["echo"]["time"] = time();
-        $reply = json_encode($reply);
         $connections = CQUtil::getApiConnectionByQQ($self_id);
         if ($connections === null) {
             Console::error("未找到qq号：" . $self_id . "的API连接");
@@ -496,6 +495,7 @@ class CQUtil
             "params" => $rw
         ];
         $api["echo"] = $echo;
+        Console::info("将要发送的API包：" . json_encode($api, 128 | 256));
         return self::APIPush($fd, json_encode($api));
     }
 
