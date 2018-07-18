@@ -24,6 +24,7 @@ class CQBot
     public function __construct(Framework $framework, $package) {
         $this->starttime = microtime(true);
         $this->framework = $framework;
+        if ($package === null) return;
         $this->data = $package;
         $this->current_id = $this->data["self_id"];
         if ($package["post_type"] == "message") {

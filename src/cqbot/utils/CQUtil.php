@@ -19,6 +19,11 @@ class CQUtil
         Buffer::set("time_send", false);//发送Timing数据到管理群
         Buffer::set("cmd_prefix", DP::getJsonData("config.json")["cmd_prefix"] ?? "");//设置指令的前缀符号
         Buffer::set("res_code", file_get_contents(WORKING_DIR . "src/cqbot/Framework.php"));
+        foreach (self::getMods() as $v) {
+            if (in_array("initValues", get_class_methods($v))) {
+                $v::initValues();
+            }
+        }
     }
 
     public static function saveAllFiles() {
@@ -643,5 +648,22 @@ class CQUtil
     static function getGroup($group_id) {
         $d = Buffer::get("groups");
         return $d[$group_id] ?? null;
+    }
+
+    static function getCQ($msg) {
+        if (($start = mb_strpos($msg, '[')) === false) return null;
+        if (($end = mb_strpos($msg, ']')) === false) return null;
+        $msg = mb_substr($msg, $start + 1, $end - $start - 1);
+        if (mb_substr($msg, 0, 3) != "CQ:") return null;
+        $msg = mb_substr($msg, 3);
+        $msg2 = explode(",", $msg);
+        $type = array_shift($msg2);
+        $array = [];
+        foreach ($msg2 as $k => $v) {
+            $ss = explode("=", $v);
+            $sk = array_shift($ss);
+            $array[$sk] = implode("=", $ss);
+        }
+        return ["type" => $type, "params" => $array, "start" => $start, "end" => $end];
     }
 }
