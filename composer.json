@@ -1,0 +1,14 @@
+{
+    "require": {
+        "php": ">=7.2.0",
+        "eaglewu/swoole-ide-helper": "dev-master",
+        "ext-mbstring": "^7.1",
+        "ext-json": "*",
+        "ext-iconv": "*",
+        "ext-mysqli": "*",
+        "ext-dom": "20031129",
+        "ext-gd": "^7.1",
+        "ext-curl": "^7.1",
+        "ext-openssl": "^7.1"
+    }
+}
