@@ -20,46 +20,38 @@ class CQBot
     public $starttime;
     public $endtime;
     public $current_id;
+    public $circle;
 
-    public function __construct(Framework $framework, $package) {
+    public function __construct(Framework $framework, $circle, $package) {
+        $this->circle = $circle;
         $this->starttime = microtime(true);
         $this->framework = $framework;
-        if ($package === null) return;
         $this->data = $package;
         $this->current_id = $this->data["self_id"];
-        if ($package["post_type"] == "message") {
-            try {
-                $this->callTask($package);
-            } catch (\Exception $e) {
-                CQUtil::errorLog("请求执行任务时异常\n" . $e->getMessage(), $this->current_id);
-                CQUtil::sendDebugMsg("引起异常的消息：\n" . $package["message"], $this->current_id);
-            }
-        }
     }
 
-    public function execute($it) {
-
-    }
-
-    public function callTask($it){
-        if ($this->data["post_type"] == "message") {
-            foreach(Buffer::get("mods") as $v){
-                Console::info("Activating module ".$v);
-                /** @var ModBase $w */
-                $w = new $v($this, $this->data);
-                if($w->call_task === false){
-                    $msg = trim($this->data["message"]);
-                    $msg = explode(" ", $msg);
-                    $prefix = Buffer::get("cmd_prefix");
-                    if($prefix != ""){
-                        if(mb_substr($msg[0],0,mb_strlen($prefix)) == $prefix){
-                            $msg[0] = mb_substr($msg[0], mb_strlen($prefix));
-                        }
-                    }
-                    $w->execute($msg);
-                }
+    public function execute() {
+        if ($this->circle >= 5) return false;
+        if ($this->data === null) return false;
+        if (isset($it["user_id"]) && CQUtil::isRobot($this->data["user_id"])) return false;
+        if (isset($it["group_id"]) && $this->data["group_id"] == Buffer::get("admin_group")) {
+            if ($this->getRobotId() != Buffer::get("admin_active")) {
+                return false;
             }
         }
+        if ($this->data["message"] == "")
+            return false;
+        foreach (Buffer::get("mods") as $v) {
+            /** @var ModBase $r */
+            $r = new $v($this, $this->data);
+            if ($r->function_call === false) {
+                $msg = trim($this->data["message"]);
+                $msg = explode(" ", $msg);
+                $r->execute($msg);
+            }
+        }
+        $this->endtime = microtime(true);
+        return $this->function_called;
     }
 
     public function reply($msg){
@@ -102,7 +94,7 @@ class CQBot
     }
 
     public function isAdmin($user){
-        if (in_array($user, Buffer::get("su"))) return true;
+        if (in_array($user, Buffer::get("admin"))) return true;
         else return false;
     }
 
@@ -148,5 +140,13 @@ class CQBot
             }
         }
         return $msg;
+    }
+
+    /**
+     * 返回当前机器人的id
+     * @return string|null
+     */
+    public function getRobotId() {
+        return $this->data["self_id"] ?? null;
     }
 }

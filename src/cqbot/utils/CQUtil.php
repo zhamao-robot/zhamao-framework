@@ -12,13 +12,17 @@ class CQUtil
 {
     public static function loadAllFiles() {
         Console::debug("loading configs...");
-        Buffer::set("su", Framework::$super_user);//超级管理员用户列表
-
         Buffer::set("mods", self::getMods());//加载的模块列表
         Buffer::set("user", []);//清空用户列表
         Buffer::set("time_send", false);//发送Timing数据到管理群
-        Buffer::set("cmd_prefix", DP::getJsonData("config.json")["cmd_prefix"] ?? "");//设置指令的前缀符号
-        Buffer::set("res_code", file_get_contents(WORKING_DIR . "src/cqbot/Framework.php"));
+        Buffer::set("res_code", file_get_contents(WORKING_DIR . "src/framework/Framework.php"));
+        Buffer::set("group_list", DP::getJsonData("group_list.json"));//获取群组列表
+
+
+        //加载全局屏蔽的机器人列表
+        Buffer::set("bots", DP::getJsonData("bots.json"));
+
+        //调用各个模块单独的Buffer数据
         foreach (self::getMods() as $v) {
             if (in_array("initValues", get_class_methods($v))) {
                 $v::initValues();
@@ -29,11 +33,9 @@ class CQUtil
     public static function saveAllFiles() {
         Console::info("Saving files...");
 
-        //保存cmd_prefix（指令前缀）
-        $config = DP::getJsonData("config.json");
-        $config["cmd_prefix"] = Buffer::get("cmd_prefix");
-        $config["super_user"] = Buffer::get("su");
-        DP::setJsonData("config.json", $config);
+        DP::setJsonData("bots.json", Buffer::get("bots"));
+        DP::setJsonData("group_list.json", Buffer::get("group_list"));
+
 
         //保存用户数据
         foreach (self::getAllUsers() as $k => $v) {
@@ -46,17 +48,16 @@ class CQUtil
     /**
      * 生成报错日志
      * @param $log
-     * @param $self_id
      * @param string $head
      * @param int $send_debug_message
      */
-    public static function errorLog($log, $self_id, $head = "ERROR", $send_debug_message = 1) {
+    public static function errorLog($log, $head = "ERROR", $send_debug_message = 1) {
         Console::error($log, ($head === "ERROR") ? null : "[" . $head . "] ");
         $time = date("Y-m-d H:i:s");
         $msg = "[$head @ $time]: $log\n";
         file_put_contents(DP::getDataFolder() . "log_error.txt", $msg, FILE_APPEND);
         if ($send_debug_message)
-            self::sendDebugMsg($msg, $self_id);
+            self::sendDebugMsg($msg);
     }
 
     /**
@@ -66,14 +67,24 @@ class CQUtil
      * @param int $need_head
      * @return null
      */
-    static function sendDebugMsg($msg, $self_id, $need_head = 1) {
-        if (Framework::$admin_group[strval($self_id)] == "") return null;
+    static function sendDebugMsg($msg, $self_id = null, $need_head = 1) {
+        if ($self_id === null) $self_id = self::findRobot();
+        if ($self_id === null) return null;
+
+        if ((Buffer::get("admin_group") ?? "") == "") return null;
         if ($need_head)
-            $data = CQMsg("[DEBUG] " . date("H:i:s") . ": " . $msg, "group", Framework::$admin_group);
+            $data = CQMsg("[DEBUG] " . date("H:i:s") . ": " . $msg, "group", Buffer::get("admin_group"));
         else
-            $data = CQMsg($msg, "group", Framework::$admin_group);
+            $data = CQMsg($msg, "group", Buffer::get("admin_group"));
         $connect = CQUtil::getApiConnectionByQQ($self_id);
         return self::sendAPI($connect->fd, $data, ["send_debug_msg"]);
+    }
+
+    static function findRobot() {
+        foreach (self::getConnections("api") as $v) {
+            return $v->getQQ();
+        }
+        return null;
     }
 
     /**
@@ -98,9 +109,7 @@ class CQUtil
         }*/
         if (Buffer::$event->push($fd, $data) === false) {
             $data = self::unicodeDecode($data);
-            $connect = self::getConnection($fd);
-            self::errorlog("API推送失败，未发送的消息: \n" . $data, $connect->getQQ(), "API ERROR", 0);
-            self::sendErrorEmail("API推送失败", "未成功推送的消息：<br>$data<br>请检查酷q是否开启及网络链接情况<br>在此期间，机器人会中断所有消息处理<br>请及时处理", $connect->getQQ());
+            self::errorlog("API推送失败，未发送的消息: \n" . $data, "API ERROR", 0);
             return false;
         }
         return true;
@@ -218,7 +227,7 @@ class CQUtil
             unset($mail);
             return true;
         } catch (\Exception $e) {
-            self::errorLog("发送邮件错误！错误信息：" . $info = $mail->ErrorInfo, $self_id, "ERROR", $send_debug_message);
+            self::errorLog("发送邮件错误！错误信息：" . $info = $mail->ErrorInfo, "ERROR", 0);
             unset($mail);
             return $info;
         }
@@ -257,15 +266,22 @@ class CQUtil
 
     /**
      * @param $fd
+     * @param null $type
+     * @param null $qq
      * @return WSConnection
      */
-    static function getConnection($fd) {
+    static function getConnection($fd, $type = null, $qq = null) {
         //var_dump(Buffer::$connect);
-        if (!isset(Buffer::$connect[$fd])) {
-            $s = new WSConnection(Buffer::$event, $fd);
-            Buffer::$connect[$fd] = $s;
+        if (!isset(Buffer::$connect[$fd]) && $type !== null && $qq !== null) {
+            Console::info("创建连接 " . $fd . " 中...");
+            $s = new WSConnection(Buffer::$event, $fd, $type, $qq);
+            if ($s->create_success) {
+                Buffer::$connect[$fd] = $s;
+                Console::debug("创建成功！");
+                $s->initConnection();
+            } else return null;
         }
-        return Buffer::$connect[$fd];
+        return Buffer::$connect[$fd] ?? null;
     }
 
     static function getApiConnectionByQQ($qq) {
@@ -367,7 +383,7 @@ class CQUtil
      * 获取所有已经加载到内存的用户。
      * read_all为true时，会加载所有User.dat到内存中，false时仅会读取已经加载到内存的用户
      * @param bool $real_all
-     * @return array[User]
+     * @return User[]
      */
     static function getAllUsers($real_all = false): array {
         if ($real_all === true) {
@@ -640,16 +656,6 @@ class CQUtil
         }
     }
 
-    /**
-     * 返回群的类
-     * @param $group_id
-     * @return Group|null
-     */
-    static function getGroup($group_id) {
-        $d = Buffer::get("groups");
-        return $d[$group_id] ?? null;
-    }
-
     static function getCQ($msg) {
         if (($start = mb_strpos($msg, '[')) === false) return null;
         if (($end = mb_strpos($msg, ']')) === false) return null;
@@ -665,5 +671,42 @@ class CQUtil
             $array[$sk] = implode("=", $ss);
         }
         return ["type" => $type, "params" => $array, "start" => $start, "end" => $end];
+    }
+
+    static function isRobot($user_id) {
+        $robots = [];
+        foreach (Buffer::get("robots") as $v) {
+            $robots[] = $v["qq"];
+        }
+        foreach (Buffer::get("bots") as $v) {
+            $robots[] = $v;
+        }
+        return in_array($user_id, $robots);
+    }
+
+    static function getRobotNum($qq) {
+        $ls = Buffer::get("robots");
+        foreach ($ls as $k => $v) {
+            if ($v["qq"] == $qq)
+                return $k;
+        }
+        return null;
+    }
+
+    /**
+     * 刷新消息速率(每分钟)
+     * 当 $insert 为 true 时，表明运行此函数时收到了一条消息
+     * @param bool $insert
+     */
+    static function updateMsg($insert = true) {
+        $ls = Buffer::get("msg_speed");
+        if ($insert === true)
+            $ls [] = time();
+        foreach ($ls as $k => $v) {
+            if ((time() - $v) > 60) {
+                array_splice($ls, $k, 1);
+            }
+        }
+        Buffer::set("msg_speed", $ls);
     }
 }

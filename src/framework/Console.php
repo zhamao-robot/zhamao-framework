@@ -8,7 +8,7 @@
 
 class Console
 {
-    static function setColor($string, $color = ""){
+    static function setColor($string, $color = "") {
         switch ($color) {
             case "red":
                 return "\x1b[38;5;203m" . $string . "\x1b[m";
@@ -36,26 +36,30 @@ class Console
     }
 
 
-    static function debug($obj, $head = null){
-        if ($head === null) $head = "[DEBUG] " . date("H:i:s") . " ";
-        if (Buffer::get("info_level") < 2) return;
+    static function debug($obj, $head = null) {
+        if ($head === null) $head = "[" . date("H:i:s") . " DEBUG]";
+        if ((Buffer::get("info_level") ?? 0) < 2) return;
         if (!is_string($obj)) var_dump($obj);
         else echo(self::setColor($head . $obj, "green") . "\n");
     }
 
-    static function error($obj, $head = null){
-        if ($head === null) $head = "[ERROR] " . date("H:i:s") . " ";
+    static function error($obj, $head = null) {
+        if ($head === null) $head = "[" . date("H:i:s") . " ERROR]";
         if (!is_string($obj)) var_dump($obj);
         else echo(self::setColor($head . $obj, "red") . "\n");
     }
 
-    static function info($obj, $head = null){
-        if ($head === null) $head = "[INFO] " . date("H:i:s") . " ";
+    static function info($obj, $head = null) {
+        if ($head === null) $head = "[" . date("H:i:s") . " INFO] ";
         if (!is_string($obj)) var_dump($obj);
         else echo(self::setColor($head . $obj, "blue") . "\n");
     }
 
-    static function put($obj, $color = ""){
+    static function chatLog($head, $msg) {
+
+    }
+
+    static function put($obj, $color = "") {
         if (!is_string($obj)) var_dump($obj);
         else echo(self::setColor($obj, $color) . "\n");
     }

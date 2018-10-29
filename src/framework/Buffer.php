@@ -23,10 +23,10 @@ class Buffer
     static $in_count;//接收消息
     /** @var \swoole_atomic $out_count */
     static $out_count;//发送消息数量
-    /** @var \swoole_atomic $out_count */
-    static $api_id;//API调用ID
     /** @var WSConnection[] */
     static $connect = [];
+    /** @var swoole_atomic $reload_time */
+    static $reload_time;
 
     static function get($name){ return self::$data[$name] ?? null; }
 

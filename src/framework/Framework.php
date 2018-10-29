@@ -10,7 +10,6 @@ class Framework
 {
     public static $super_user;
     public $host = "127.0.0.1";
-    public $api_port = 10000;
     public $event_port = 20000;
 
     /** @var \swoole_websocket_server $event */
@@ -19,7 +18,6 @@ class Framework
     public static $obj = null;
 
     public $run_time;
-    public static $admin_group;
     public $info_level = 1;
 
     /** @var \swoole_http_client $api */
@@ -30,39 +28,26 @@ class Framework
     /** @var Scheduler */
     public $scheduler = null;
 
-    public function __construct(){ }
+    public function __construct($config) {
+        $this->host = $config["host"];
+        $this->event_port = $config["port"];
+        Buffer::set("access_token", $config["access_token"] ?? "");
+        Buffer::set("info_level", $config["info_level"]);
+        Buffer::set("admin_group", $config["admin_group"]);
 
-    public function setHost($host = ""){ $this->host = $host; }
-
-    public function setApiPort($port = 10000){ $this->api_port = $port; }
-
-    public function setEventPort($port = 20000){ $this->event_port = $port; }
-
-    public function setAdminGroup($group){ self::$admin_group = $group; }
-
-    public function setInfoLevel($level){ $this->info_level = $level; }
-
-    public function setSuperUser($option) { self::$super_user = $option; }
-
-    public function eventServerStart(){ $this->event->start(); }
-
-    public static function getInstance(){ return self::$obj; }
-
-    public function init() {
         $this->selfCheck();
-        $this->checkFiles();
-        Console::info("CQBot Framework starting...");
-        $this->event = new \swoole_websocket_server($this->host, $this->event_port);
 
-        Buffer::$log_file = CONFIG_DIR . "log/swoole.log";
-        Console::info("Current log file: " . Buffer::$log_file);
+        Console::info("CQBot Framework starting...");
+        $this->event = new swoole_websocket_server($this->host, $this->event_port);
+
+        Buffer::$log_file = CRASH_DIR . "swoole.log";
 
         //设置swoole基本参数
-        $worker_num = 1;
-        $dispatch_mode = 2;
+        $worker_num = 1;//进程数调整，默认为1，如果调整worker为多个，则需要自行修改Buffer类的储存方式到redis、或其他数据库等数据结构
+        $dispatch_mode = 2;//解析模式，详见wiki.swoole.com
         $this->event->set([
             "log_file" => Buffer::$log_file,
-            "worker_num" =>$worker_num,
+            "worker_num" => $worker_num,
             "dispatch_mode" => $dispatch_mode
         ]);
 
@@ -73,8 +58,8 @@ class Framework
         $this->event->on('message', [$this, 'onEventMessage']);
 
         //收到ws连接和断开连接回调的函数
-        $this->event->on('open', [$this, 'onEventOpen']);
-        $this->event->on('close', [$this, "onEventClose"]);
+        $this->event->on('open', function (\swoole_websocket_server $server, \swoole_http_request $request) { new WSOpenEvent($server, $request); });
+        $this->event->on('close', function (\swoole_server $server, int $fd) { new WSCloseEvent($server, $fd); });
 
         //设置接收HTTP接口接收的内容，兼容微信公众号和其他服务用
         $this->event->on("request", [$this, "onRequest"]);
@@ -82,8 +67,12 @@ class Framework
         //设置原子计数器
         Buffer::$in_count = new \swoole_atomic(1);
         Buffer::$out_count = new \swoole_atomic(1);
-        Buffer::$api_id = new \swoole_atomic(1);
+        Buffer::$reload_time = new \swoole_atomic(0);
     }
+
+    public function start() { $this->event->start(); }
+
+    public static function getInstance() { return self::$obj; }
 
     /* Callback function down here */
 
@@ -103,25 +92,11 @@ class Framework
     }
 
     /**
-     * 回调函数：有客户端或HTTP插件反向客户端连接时调用
-     * @param swoole_websocket_server $server
-     * @param swoole_http_request $request
-     */
-    public function onEventOpen(\swoole_websocket_server $server, \swoole_http_request $request){ new WSOpenEvent($server, $request); }
-
-    /**
-     * 回调函数：断开连接时候回调的函数
-     * @param swoole_server $server
-     * @param int $fd
-     */
-    public function onEventClose(\swoole_server $server, int $fd) { new WSCloseEvent($server, $fd); }
-
-    /**
      * 回调函数：当HTTP插件发来json包后激活此函数
      * @param swoole_websocket_server $server
      * @param $frame
      */
-    public function onEventMessage($server, $frame){ new WSMessageEvent($server, $frame); }
+    public function onEventMessage($server, $frame) { new WSMessageEvent($server, $frame); }
 
     /**
      * 回调函数：当IP:event端口收到相关HTTP请求时候调用
@@ -130,13 +105,13 @@ class Framework
      * @param swoole_http_request $request
      * @param swoole_http_response $response
      */
-    public function onRequest($request, $response){ new HTTPEvent($request, $response); }
+    public function onRequest($request, $response) { new HTTPEvent($request, $response); }
 
     /**
-     * 回调函数：异步计时器，一秒执行一次。请勿在此使用过多的阻塞方法
+     * 回调函数：异步计时器，一秒执行一次。请勿在此使用阻塞IO方法
      * @param $id
      */
-    public function processTick($id){ $this->scheduler->tick($id, ($this->tick_time = time())); }
+    public function processTick($id) { $this->scheduler->tick($id, ($this->tick_time = time())); }
 
     /**
      * 开启时候的自检模块
@@ -147,18 +122,8 @@ class Framework
         if (!function_exists("mb_substr")) die("无法找到mbstring扩展，请先安装.\n");
         if (substr(PHP_VERSION, 0, 1) != "7") die("PHP >=7 required.\n");
         if (!function_exists("curl_exec")) die("无法找到curl扩展，请先安装.\n");
-        if (!class_exists("ZipArchive")) die("无法找到zip扩展，请先安装.（如果不需要zip功能可以删除此条自检）\n");
+        //if (!class_exists("ZipArchive")) die("无法找到zip扩展，请先安装.（如果不需要zip功能可以删除此条自检）\n");
+        if (!is_file(CRASH_DIR . "swoole.log")) file_put_contents(CRASH_DIR . "swoole.log", "");
         return true;
-    }
-
-    /**
-     * 检查必需的文件是否存在
-     */
-    public function checkFiles(){
-        @mkdir(CONFIG_DIR."log/", 0777, true);
-        if(!is_file(CONFIG_DIR."log/last_error.log"))
-            file_put_contents(CONFIG_DIR."log/last_error.log", "");
-        if(!is_file(CONFIG_DIR."log/error_flag"))
-            file_put_contents(CONFIG_DIR."log/error_flag", time());
     }
 }

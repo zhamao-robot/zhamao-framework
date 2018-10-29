@@ -1,0 +1,15 @@
+{
+    "robot_name": "CQBot",
+    "framework_version": "1.0.0",
+    "cqbot_version": "1.0.0",
+    "config_dir": "cq_data\/config\/",
+    "crash_dir": "cq_data\/crash\/",
+    "user_dir": "cq_data/users\/",
+    "cq_data": "cq_data\/",
+    "admin_group": "",
+    "host": "",
+    "port": "",
+    "access_token": "",
+    "info_level": 0,
+    "admin": []
+}

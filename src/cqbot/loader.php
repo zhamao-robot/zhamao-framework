@@ -6,20 +6,6 @@
  * Time: 10:32
  */
 
-function loadAllClass($dir){
-    $dir_obj = scandir($dir);
-    unset($dir_obj[0], $dir_obj[1]);
-    foreach ($dir_obj as $m) {
-        $taskFileName = explode(".", $m);
-        if (is_dir($dir . $m . "/")) loadAllClass($dir . $m . "/");
-        else {
-            if (count($taskFileName) < 2 || $taskFileName[1] != "php") continue;
-            require_once($dir . $m);
-            Console::debug("Loading PHP file ".$dir.$m);
-        }
-    }
-}
-
 //加载需要优先加载的文件
 require_once(WORKING_DIR."src/cqbot/mods/ModBase.php");
 require_once(WORKING_DIR."src/cqbot/item/User.php");

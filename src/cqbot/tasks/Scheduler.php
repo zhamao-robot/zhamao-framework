@@ -27,9 +27,12 @@ class Scheduler
     }
 
     public function tick($id, $tick_time) {
-        //900秒执行一次文件保存功能
-        if($tick_time - $this->framework->run_time % 900 == 0) CQUtil::saveAllFiles();
-
-        //这里添加计时器上处理的内容
+        /** @var array $ls */
+        $ls = Buffer::get("mods");
+        foreach ($ls as $v) {
+            if (in_array("onTick", get_class_methods($v))) {
+                $v::onTick($tick_time - $this->framework->run_time);
+            }
+        }
     }
 }
