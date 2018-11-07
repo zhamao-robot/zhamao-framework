@@ -4,6 +4,7 @@ A fast and multi-task framework for Coolq-HTTP-API<br>
 <br>
 <br>
 [![作者QQ](https://img.shields.io/badge/作者QQ-627577391-orange.svg)]()<br>
+## 作者正在肝重构之后的一些依赖性问题，很快就好！具体重构进度请看Project
 <h2>什么是swoole</h2>
 Swoole是一个C编写的、高性能的PHP扩展。支持多线程、多进程、同步、异步、协程、SQL等。<br>
 Swoole的用处最简单可以理解为，只需要简单几行代码即可运行一个HTTP服务器，比python等同类型解释型语言快非常多。<br>
