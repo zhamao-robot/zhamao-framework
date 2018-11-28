@@ -5,24 +5,26 @@
  * 然后修改其class的名字（注意要和.php文件的文件名相同）
  * 例如，新建一个Mailer模块，则Mailer模块的文件名字为
  * Mailer.php
- * 然后更改class Entertain为class Mailer即可
- * 功能在execute中编写即可
- * 如果需要写判断所有文本的功能，则直接在__construct的parent::__construct下方编写自己的内容即可
+ * 如果要开启框架的切割函数激活，请在__construct构造函数中
+ * 添加一句：$this->split_execute = true;
+ * 默认不会执行execute函数
  */
 class Example extends ModBase
 {
-    protected $cmds;
-
     public function __construct(CQBot $main, $data) {
         parent::__construct($main, $data);
-        $message = $data["message"];
-
-        //这里可以写一些匹配所有文本的功能，例如下面的一个简单的debug
-        if (mb_substr($message, 0, 3) == "dbg") {
-            $this->reply("你输入了：" . mb_substr($message, 3));
-        }
+        //$data为CQHTTP插件上报的消息事件数组
+        //这里编写你的内容
+        $this->split_execute = true;
     }
 
+    /**
+     * 分词函数，如果开启分词模式的话将调用此数组。
+     * 如果将一句话使用空格、换行和Tab进行分割，用来处理多项参数的功能指令
+     * 例如："随机数   1    100" 将被分割成数组$it ["随机数","1","100"]
+     * @param $it
+     * @return bool
+     */
     public function execute($it) {
         switch ($it[0]) {
             case "ping":

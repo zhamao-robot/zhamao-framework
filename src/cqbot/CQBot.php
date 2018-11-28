@@ -19,7 +19,7 @@ class CQBot
 
     public $starttime;
     public $endtime;
-    public $current_id;
+    public $self_id;
     public $circle;
 
     public function __construct(Framework $framework, $circle, $package) {
@@ -27,26 +27,26 @@ class CQBot
         $this->starttime = microtime(true);
         $this->framework = $framework;
         $this->data = $package;
-        $this->current_id = $this->data["self_id"];
+        $this->self_id = $this->data["self_id"];
     }
 
     public function execute() {
         if ($this->circle >= 5) return false;
         if ($this->data === null) return false;
         if (isset($it["user_id"]) && CQUtil::isRobot($this->data["user_id"])) return false;
-        if (isset($it["group_id"]) && $this->data["group_id"] == Buffer::get("admin_group")) {
-            if ($this->getRobotId() != Buffer::get("admin_active")) {
+        if (isset($it["group_id"]) && $this->data["group_id"] == Cache::get("admin_group")) {
+            if ($this->getRobotId() != Cache::get("admin_active")) {
                 return false;
             }
         }
         if ($this->data["message"] == "")
             return false;
-        foreach (Buffer::get("mods") as $v) {
+        foreach (Cache::get("mods") as $v) {
             /** @var ModBase $r */
             $r = new $v($this, $this->data);
-            if ($r->function_call === false) {
+            if ($r->split_execute === true) {
                 $msg = trim($this->data["message"]);
-                $msg = explode(" ", $msg);
+                $msg = explodeMsg($msg);
                 $r->execute($msg);
             }
         }
@@ -54,51 +54,41 @@ class CQBot
         return $this->function_called;
     }
 
-    public function reply($msg){
+    /**
+     * 快速回复消息
+     * @param $msg
+     * @param callable|null $callback
+     * @param bool $async
+     * @return bool
+     */
+    public function reply($msg, callable $callback = null, $async = false) {
         $this->function_called = true;
         switch ($this->data["message_type"]) {
             case "group":
-                $this->sendGroupMsg($this->data["group_id"], $msg);
-                break;
+                $this->function_called = true;
+                if (!$async) return CQAPI::send_group_msg($this->getRobotId(), ["group_id" => $this->data["group_id"], "message" => $msg], $callback);
+                else return CQAPI::send_group_msg_async($this->getRobotId(), ["group_id" => $this->data["group_id"], "message" => $msg], $callback);
             case "private":
-                $this->sendPrivateMsg($this->data["user_id"], $msg);
-                break;
+                $this->function_called = true;
+                if (!$async) return CQAPI::send_private_msg($this->getRobotId(), ["user_id" => $this->data["user_id"], "message" => $msg], $callback);
+                else return CQAPI::send_private_msg_async($this->getRobotId(), ["user_id" => $this->data["user_id"], "message" => $msg], $callback);
             case "discuss":
-                $reply = json_encode(["action" => "send_discuss_msg", "params" => ["discuss_id" => $this->data["discuss_id"], "message" => $msg]]);
-                $connect = CQUtil::getApiConnectionByQQ($this->current_id);
-                if (CQUtil::sendAPI($connect->fd, $reply, ["send_discuss_msg"])) {
-                    $out_count = Buffer::$out_count->get();
-                    if (Buffer::$data["info_level"] == 2) {
-                        Console::put("************API PUSHED***********");
-                    }
-                    if (Buffer::$data["info_level"] >= 1) {
-                        Console::put(Console::setColor(date("H:i:s "), "lightpurple") . Console::setColor("[$out_count]REPLY", "blue") . Console::setColor(" > ", "gray") . json_decode($reply, true)['params']["message"]);
-                    }
-                    Buffer::$out_count->add(1);
-                }
-                break;
+                $this->function_called = true;
+                if (!$async) return CQAPI::send_discuss_msg($this->getRobotId(), ["discuss_id" => $this->data["discuss_id"], "message" => $msg], $callback);
+                else return CQAPI::send_discuss_msg_async($this->getRobotId(), ["discuss_id" => $this->data["discuss_id"], "message" => $msg], $callback);
             case "wechat":
                 //TODO: add wechat account support in the future
                 break;
         }
+        return false;
     }
 
-    public function sendGroupMsg($groupId, $msg){
-        $this->function_called = true;
-        CQUtil::sendGroupMsg($groupId, $msg, $this->current_id);
-    }
-
-    public function sendPrivateMsg($userId, $msg){
-        $this->function_called = true;
-        CQUtil::sendPrivateMsg($userId, $msg, $this->current_id);
-    }
-
-    public function isAdmin($user){
-        if (in_array($user, Buffer::get("admin"))) return true;
+    public function isAdmin($user) {
+        if (in_array($user, Cache::get("admin"))) return true;
         else return false;
     }
 
-    public function replace($msg, $dat){
+    public function replace($msg, $dat) {
         $msg = str_replace("{at}", '[CQ:at,qq=' . $dat["user_id"] . ']', $msg);
         $msg = str_replace("{and}", '&', $msg);
         while (strpos($msg, '{') !== false && strpos($msg, '}') !== false) {
