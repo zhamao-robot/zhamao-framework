@@ -42,10 +42,10 @@ class DataProvider
      * 储存PHP数组为json文件，文件不存在则会创建文件。
      * 此方式为同步阻塞执行，可能会阻塞worker进程。
      * @param $filename
-     * @param array $args
+     * @param array $arg
      */
-    static function setJsonData($filename, array $args) {
-        file_put_contents(self::getDataFolder() . $filename, json_encode($args, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_BIGINT_AS_STRING));
+    static function setJsonData($filename, array $arg) {
+        file_put_contents(self::getDataFolder() . $filename, json_encode($arg, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_BIGINT_AS_STRING));
     }
 
     /**
