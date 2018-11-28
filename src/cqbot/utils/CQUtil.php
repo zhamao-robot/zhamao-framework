@@ -24,7 +24,7 @@ class CQUtil
 
     public static function loadAllFiles() {
         Cache::set("info_level", settings()["info_level"]);
-        Console::debug("loading configs...");
+        Console::info("loading configs...");
         self::initEmptyCaches();
         Cache::set("mods", self::getMods());//加载的模块列表
         Cache::set("group_list", DP::getJsonData("group_list.json"));//获取群组列表
@@ -235,7 +235,7 @@ class CQUtil
         Console::info("Reloading server");
         self::saveAllFiles();
         Cache::$data = [];
-        foreach(ConnectionManager::getAll() as $v){
+        foreach (ConnectionManager::getAll() as $v) {
             $v->close();
         }
         Cache::$server->reload();
@@ -344,8 +344,10 @@ class CQUtil
             if (!in_array($v->getQQ(), $robots))
                 $robots[] = $v->getQQ();
         }
-        foreach (Cache::get("bots") as $v) {
-            $robots[] = $v;
+        if ((Cache::get("bots") ?? []) != []) {
+            foreach (Cache::get("bots") as $v) {
+                $robots[] = $v;
+            }
         }
         return in_array($user_id, $robots);
     }

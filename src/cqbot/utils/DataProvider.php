@@ -16,7 +16,7 @@ class DataProvider
      * 获取config文件夹
      * @return string
      */
-    public static function getDataFolder(){
+    public static function getDataFolder() {
         return CONFIG_DIR;
     }
 
@@ -24,7 +24,7 @@ class DataProvider
      * 获取用户数据的文件夹
      * @return string
      */
-    public static function getUserFolder(){
+    public static function getUserFolder() {
         return USER_DIR;
     }
 
@@ -33,7 +33,7 @@ class DataProvider
      * @param $filename
      * @return array|mixed
      */
-    static function getJsonData($filename){
+    static function getJsonData($filename) {
         if (!file_exists(self::getDataFolder() . $filename)) return array();
         return json_decode(file_get_contents(self::getDataFolder() . $filename), true);
     }
@@ -44,7 +44,7 @@ class DataProvider
      * @param $filename
      * @param array $args
      */
-    static function setJsonData($filename, array $args){
+    static function setJsonData($filename, array $args) {
         file_put_contents(self::getDataFolder() . $filename, json_encode($args, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_BIGINT_AS_STRING));
     }
 
