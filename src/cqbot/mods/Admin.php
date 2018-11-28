@@ -59,8 +59,6 @@ class Admin extends ModBase
         switch ($it[0]) {
             case "reload":  //管理员重载代码
                 $this->reply("正在重新启动...");
-                if (file_get_contents("/home/ubuntu/CrazyBotFramework/src/Framework.php") != Cache::get("res_code"))
-                    $this->reply("检测到改变了Framework文件的内容！如需完全重载，请重启完整进程！");
                 CQUtil::reload();
                 return true;
             case "stop":    //管理员停止server

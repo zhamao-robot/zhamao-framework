@@ -25,6 +25,7 @@ class CQUtil
     public static function loadAllFiles() {
         Cache::set("info_level", settings()["info_level"]);
         Console::debug("loading configs...");
+        self::initEmptyCaches();
         Cache::set("mods", self::getMods());//加载的模块列表
         Cache::set("group_list", DP::getJsonData("group_list.json"));//获取群组列表
         Cache::set("admin_group", settings()["admin_group"]);
