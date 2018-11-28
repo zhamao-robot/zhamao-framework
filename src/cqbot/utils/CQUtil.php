@@ -44,8 +44,8 @@ class CQUtil
     public static function saveAllFiles() {
         Console::info("Saving files...   ", null, "");
 
-        DP::setJsonDataAsync("bots.json", Cache::get("bots"));
-        DP::setJsonDataAsync("group_list.json", Cache::get("group_list"));
+        DP::setJsonData("bots.json", Cache::get("bots"));
+        DP::setJsonData("group_list.json", Cache::get("group_list"));
 
         //保存用户数据
         if (settings()["save_user_data"]) {

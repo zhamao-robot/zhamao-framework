@@ -34,7 +34,7 @@ class DataProvider
      * @return array|mixed
      */
     static function getJsonData($filename){
-        if (!file_exists(self::getDataFolder() . $filename)) return [];
+        if (!file_exists(self::getDataFolder() . $filename)) return array();
         return json_decode(file_get_contents(self::getDataFolder() . $filename), true);
     }
 
@@ -52,11 +52,11 @@ class DataProvider
      * 储存PHP数组为json文件，文件不存在会创建文件
      * 此方式为异步非阻塞执行，不会对worker造成阻塞。
      * @param $filename
-     * @param array $args
+     * @param array $arg
      * @param callable|null $function
      */
-    static function setJsonDataAsync($filename, array $args, callable $function = null) {
-        $data = json_encode($args, 128 | 256);
+    static function setJsonDataAsync($filename, array $arg, callable $function = null) {
+        $data = json_encode($arg, 128 | 256);
         $filename = self::getDataFolder() . $filename;
         if ($function === null) swoole_async_writefile($filename, $data, function () { });
         else swoole_async_writefile($filename, $data, $function);
