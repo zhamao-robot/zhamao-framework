@@ -34,7 +34,7 @@ class RobotWSConnection extends WSConnection
                 Cache::set("version_info", $response["data"]);
             });
             if ($r)
-                $this->create_success = $this->sendAPI("send_group_msg", ["message" => "[CrazyBot] 机器人 " . $this->getAlias() . " 已连接，链接fd：" . $this->fd, "group_id" => Cache::get("admin_group")]);
+                $this->create_success = $this->sendAPI("send_group_msg", ["message" => "[CQBot] 机器人 " . $this->getAlias() . " 已连接，链接fd：" . $this->fd, "group_id" => Cache::get("admin_group")]);
         } else $this->create_success = true;
     }
 
