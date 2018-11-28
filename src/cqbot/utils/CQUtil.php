@@ -234,6 +234,10 @@ class CQUtil
     static function reload() {
         Console::info("Reloading server");
         self::saveAllFiles();
+        Cache::$data = [];
+        foreach(ConnectionManager::getAll() as $v){
+            $v->close();
+        }
         Cache::$server->reload();
     }
 
