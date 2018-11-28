@@ -3,8 +3,9 @@
 if [[ ! -d "coolq-data" ]]; then
   mkdir coolq-data
 fi
+sudo docker start coolq >/dev/null 2>&1
 
-if [[ ! sudo docker start coolq ]]; then
+if [[ ! $? -eq 0 ]]; then
     echo -n "请输入你的VNC登陆密码: "
     read vnc_pwd
     echo -n "请输入你的反向ws连接地址(默认ws://127.0.0.1:20000/): "
