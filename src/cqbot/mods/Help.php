@@ -8,7 +8,10 @@
 
 class Help extends ModBase
 {
-    public function __construct(CQBot $main, $data) { parent::__construct($main, $data); }
+    public function __construct(CQBot $main, $data) {
+        parent::__construct($main, $data);
+        $this->split_execute = true;
+    }
 
     public function execute($it) {
         switch ($it[0]) {
@@ -22,7 +25,6 @@ class Help extends ModBase
                 $msg .= "\nCQBot采用关键词系统，你可以直接像现有源码一样添加case在switch里面，";
                 $msg .= "\n也可以自己新建一个任意名称的Mod名称，例如Entertain.php，你可以在里面编写娱乐功能。";
                 $msg .= "\n你可以直接复制框架中Example.php文件的内容进行编辑。";
-                $msg .= "\n你也可以在tasks/Scheduler.php中tick函数里添加自己的定时执行的功能。";
                 $msg .= "\n预先封装好的机器人函数均在CQUtil类中，只需直接使用静态方法调用即可！";
                 $msg .= "\n更多示例功能会逐渐添加到框架中，记得更新哦～";
                 $this->reply($msg);

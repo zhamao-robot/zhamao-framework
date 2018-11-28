@@ -13,25 +13,30 @@ class Scheduler
 
     private $framework;
 
+    private $start_time;
+
     /**
      * ScheduleTask constructor.
      * @param Framework $framework
+     * @param $start_time
      */
-    public function __construct(Framework $framework) {
+    public function __construct(Framework $framework, $start_time) {
         $this->framework = $framework;
         self::$obj = $this;
+        $this->start_time = $start_time;
     }
 
     public static function getInstance() {
         return self::$obj;
     }
 
-    public function tick($id, $tick_time) {
+    public function tick($id) {
+        //Console::info("Timer ".Console::setColor("#".$id, "gold").":".Cache::$server->worker_id." ticking at ".time());
         /** @var array $ls */
-        $ls = Buffer::get("mods");
+        $ls = Cache::get("mods");
         foreach ($ls as $v) {
             if (in_array("onTick", get_class_methods($v))) {
-                $v::onTick($tick_time - $this->framework->run_time);
+                $v::onTick(time() - $this->start_time, $id);
             }
         }
     }

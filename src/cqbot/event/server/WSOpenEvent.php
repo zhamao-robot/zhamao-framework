@@ -6,9 +6,10 @@
  * Time: 下午4:10
  */
 
-class WSOpenEvent extends Event
+class WSOpenEvent extends ServerEvent
 {
     public function __construct(swoole_websocket_server $server, swoole_http_request $request) {
+        parent::__construct($server);
         $fd = $request->fd;
         $get = $request->get;
         $header = $request->header;
@@ -21,15 +22,10 @@ class WSOpenEvent extends Event
             $server->close($fd);
             return;
         }
-        if ($access_token == "") {
-            Console::info("未指定连接token，关闭连接.");
-            $server->close($fd);
-            return;
-        }
         //if (isset($request->header["authorization"])) {
         //$tokens = explode(" ", $request->header["authorization"]);
         //$tokens = trim($tokens[1]);
-        if ($access_token !== Buffer::get("access_token")) {
+        if ($access_token !== Cache::get("access_token") && Cache::get("access_token") != "") {
             Console::info("监测到WS连接，但是token不对，无法匹配。");
             $server->close($fd);
             return;
@@ -37,17 +33,24 @@ class WSOpenEvent extends Event
         switch ($connect_type) {
             case "event":
             case "api":
+            case "universal":
                 $self_id = $get["qq"] ?? ($header["x-self-id"] ?? "");
                 Console::info("收到 " . $connect_type . " 连接，来自机器人：" . $self_id . "，fd：" . $fd);
-                CQUtil::getConnection($fd, $connect_type, $self_id);
-                $robots = [];
-                foreach (Buffer::get("robots") as $v) {
-                    $robots[] = $v["qq"];
-                }
-                if (!in_array($self_id, $robots)) {
-                    Buffer::append("robots", ["qq" => $self_id, "addr" => $request->server["remote_addr"]]);
+                $conn = new RobotWSConnection($server, $fd, $self_id, $request, $connect_type);
+                if($conn->create_success) ConnectionManager::set($fd, $conn);
+                else {
+                    Console::error("初始化WS连接失败！fd：".$fd."，QQ：".$self_id);
+                    $server->close($fd);
+                    return;
                 }
                 break;
+            case "custom":
+                $conn = new CustomWSConnection($server, $fd, $request);
+                if($conn->create_success) ConnectionManager::set($fd, $conn);
+                break;
+            default:
+                Console::info("Unknown WS Connection connected. I will close it.");
+                $server->close($fd);
         }
     }
 }

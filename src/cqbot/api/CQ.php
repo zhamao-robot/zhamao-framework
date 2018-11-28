@@ -209,4 +209,23 @@ class CQ
         $str = str_replace("}}", "]", $str);
         return $str;
     }
+
+
+    static function getCQ($msg) {
+        if (($start = mb_strpos($msg, '[')) === false) return null;
+        if (($end = mb_strpos($msg, ']')) === false) return null;
+        $msg = mb_substr($msg, $start + 1, $end - $start - 1);
+        if (mb_substr($msg, 0, 3) != "CQ:") return null;
+        $msg = mb_substr($msg, 3);
+        $msg2 = explode(",", $msg);
+        $type = array_shift($msg2);
+        $array = [];
+        foreach ($msg2 as $k => $v) {
+            $ss = explode("=", $v);
+            $sk = array_shift($ss);
+            $array[$sk] = implode("=", $ss);
+        }
+        return ["type" => $type, "params" => $array, "start" => $start, "end" => $end];
+    }
+
 }

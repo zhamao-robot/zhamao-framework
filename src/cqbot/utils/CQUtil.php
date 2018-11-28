@@ -10,17 +10,27 @@ use DataProvider as DP;
 
 class CQUtil
 {
-    public static function loadAllFiles() {
-        Console::debug("loading configs...");
-        Buffer::set("mods", self::getMods());//加载的模块列表
-        Buffer::set("user", []);//清空用户列表
-        Buffer::set("time_send", false);//发送Timing数据到管理群
-        Buffer::set("res_code", file_get_contents(WORKING_DIR . "src/framework/Framework.php"));
-        Buffer::set("group_list", DP::getJsonData("group_list.json"));//获取群组列表
+    public static function initEmptyCaches() {
+        $ls = [
+            "user",         // 储存用户对象的数组
+            "sent_api",     // 储存每条API请求的会调函数Closure等原始内容
+            "msg_speed",    // 储存记录消息速度的数组
+            "bug_msg_list"  // 储存当前状态下所有未发出去的消息列表
+        ];
+        foreach ($ls as $v) {
+            Cache::set($v, []);
+        }
+    }
 
+    public static function loadAllFiles() {
+        Cache::set("info_level", settings()["info_level"]);
+        Console::debug("loading configs...");
+        Cache::set("mods", self::getMods());//加载的模块列表
+        Cache::set("group_list", DP::getJsonData("group_list.json"));//获取群组列表
+        Cache::set("admin_group", settings()["admin_group"]);
 
         //加载全局屏蔽的机器人列表
-        Buffer::set("bots", DP::getJsonData("bots.json"));
+        Cache::set("bots", DP::getJsonData("bots.json"));
 
         //调用各个模块单独的Buffer数据
         foreach (self::getMods() as $v) {
@@ -31,18 +41,20 @@ class CQUtil
     }
 
     public static function saveAllFiles() {
-        Console::info("Saving files...");
+        Console::info("Saving files...   ", null, "");
 
-        DP::setJsonData("bots.json", Buffer::get("bots"));
-        DP::setJsonData("group_list.json", Buffer::get("group_list"));
-
+        DP::setJsonDataAsync("bots.json", Cache::get("bots"));
+        DP::setJsonDataAsync("group_list.json", Cache::get("group_list"));
 
         //保存用户数据
-        foreach (self::getAllUsers() as $k => $v) {
-            $serial = serialize($v);
-            file_put_contents(DP::getUserFolder() . $k . ".dat", $serial);
+        if (settings()["save_user_data"]) {
+            foreach (self::getAllUsers() as $k => $v) {
+                $serial = serialize($v);
+                file_put_contents(DP::getUserFolder() . $k . ".dat", $serial);
+            }
         }
-        Console::info("Saved files");
+
+        Console::put("Saved files.");
     }
 
     /**
@@ -56,239 +68,12 @@ class CQUtil
         $time = date("Y-m-d H:i:s");
         $msg = "[$head @ $time]: $log\n";
         file_put_contents(DP::getDataFolder() . "log_error.txt", $msg, FILE_APPEND);
-        if ($send_debug_message)
-            self::sendDebugMsg($msg);
-    }
-
-    /**
-     * 发送调试信息到管理群（需先设置管理群号）
-     * @param $msg
-     * @param $self_id
-     * @param int $need_head
-     * @return null
-     */
-    static function sendDebugMsg($msg, $self_id = null, $need_head = 1) {
-        if ($self_id === null) $self_id = self::findRobot();
-        if ($self_id === null) return null;
-
-        if ((Buffer::get("admin_group") ?? "") == "") return null;
-        if ($need_head)
-            $data = CQMsg("[DEBUG] " . date("H:i:s") . ": " . $msg, "group", Buffer::get("admin_group"));
-        else
-            $data = CQMsg($msg, "group", Buffer::get("admin_group"));
-        $connect = CQUtil::getApiConnectionByQQ($self_id);
-        return self::sendAPI($connect->fd, $data, ["send_debug_msg"]);
+        if ($send_debug_message) CQAPI::debug($msg);
     }
 
     static function findRobot() {
-        foreach (self::getConnections("api") as $v) {
+        foreach (ConnectionManager::getAll("robot") as $v) {
             return $v->getQQ();
-        }
-        return null;
-    }
-
-    /**
-     * 推送API，给API端口
-     * @param $fd
-     * @param $data
-     * @return bool
-     */
-    static function APIPush($fd, $data) {
-        if ($data == null || $data == "") {
-            Console::error("EMPTY DATA PUSH");
-            return false;
-        }
-        /*if (self::checkAPIConnection() === -1) {
-            //忽略掉framework链接API之前的消息
-            self::errorlog("API推送失败，未发送的消息: \n" . $data, "API ERROR", 0);
-            return false;
-        }
-        if (self::checkAPIConnection() === 0) {
-            self::APIPushAfterConnected($data);
-            return true;
-        }*/
-        if (Buffer::$event->push($fd, $data) === false) {
-            $data = self::unicodeDecode($data);
-            self::errorlog("API推送失败，未发送的消息: \n" . $data, "API ERROR", 0);
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * 延迟推送在API连接断开后收到的消息函数//待定
-     */
-    /*static function APIPushDelayMsg() {
-        $delay_push_list = Buffer::get("delay_push");
-        $cur_time = time();
-        foreach ($delay_push_list as $item) {
-            $data = $item["data"];
-            $time = $item["time"];
-            if ($cur_time - $time <= 10) {
-                self::APIPush($data);
-            }
-        }
-        Buffer::set("delay_push", []);
-    }*/
-
-    /**
-     * 推迟推送API，用于酷Q重启后的重新连接API//待定
-     * @param $data
-     */
-    static function APIPushAfterConnected($data) {
-        $delay_push_list = Buffer::get("delay_push");
-        $delay_push_list[] = ["data" => $data, "time" => time()];
-        Buffer::set("delay_push", $delay_push_list);
-    }
-
-    /**
-     * 解码unicode中文编码
-     * @param $str
-     * @return null|string|string[]
-     */
-    static function unicodeDecode($str) {
-        return preg_replace_callback('/\\\\u([0-9a-f]{4})/i', function ($matches) {
-            return mb_convert_encoding(pack("H*", $matches[1]), "UTF-8", "UCS-2BE");
-        },
-            $str);
-    }
-
-    /**
-     * 模拟发送一个HTML-get请求
-     * @param $url
-     * @return mixed
-     */
-    static function getHTML($url) {
-        $ch = curl_init();
-        $timeout = 5;
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_HEADER, 1);
-        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:39.0) Gecko/20100101 Firefox/39.0');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
-        $r = curl_exec($ch);
-        curl_close($ch);
-        return $r;
-    }
-
-    /**
-     * 获取字符串的反转结果
-     * @param $str
-     * @param string $encoding
-     * @return string
-     */
-    static public function getRev($str, $encoding = 'utf-8') {
-        $result = '';
-        $len = mb_strlen($str);
-        for ($i = $len - 1; $i >= 0; $i--) {
-            $result .= mb_substr($str, $i, 1, $encoding);
-        }
-        return $result;
-    }
-
-    /**
-     * 发送邮件功能，基于PHPMailer模块，需先安装phpmailer。默认此工程demo里已包含有phpmailer了。
-     * 请根据实际自己的邮箱更新下面的用户名、密码、smtp服务器地址、端口等。
-     * 此功能非基于本作者编写的代码，如有问题请在github上找PHPMailer项目进行反馈
-     * @param $address
-     * @param $title
-     * @param $content
-     * @param $self_id
-     * @param string $name
-     * @param int $send_debug_message
-     * @return bool|string
-     */
-    static function sendEmail($address, $title, $content, $self_id, $name = "CQ开发团队", $send_debug_message = 1) {
-        $mail = new \PHPMailer(true);
-        try {
-            $mail->isSMTP();
-            $mail->Host = 'here your smtp host';
-            $mail->SMTPAuth = true;
-            $mail->Username = 'here your mailbox address';
-            $mail->Password = 'here your password';
-            $mail->SMTPSecure = 'ssl';
-            $mail->Port = 465;
-            $mail->setFrom('here your mailbox address', $name);
-            if (is_array($address)) {
-                foreach ($address as $item)
-                    $mail->addAddress($item);
-            } else {
-                $mail->addAddress($address);
-            }
-            //Content
-            $mail->isHTML(true);
-            $mail->Subject = $title;
-            $mail->CharSet = "UTF-8";
-            $mail->Body = $content;
-            $mail->send();
-            if (is_array($address))
-                $address = implode("，", $address);
-            Console::info("向 $address 发送的邮件完成");
-            unset($mail);
-            return true;
-        } catch (\Exception $e) {
-            self::errorLog("发送邮件错误！错误信息：" . $info = $mail->ErrorInfo, "ERROR", 0);
-            unset($mail);
-            return $info;
-        }
-    }
-
-    /**
-     * 返回所有api、event连接
-     * @param string $type
-     * @return WSConnection[]
-     */
-    static function getConnections($type = "all") {
-        switch ($type) {
-            case "all":
-                return Buffer::$connect;
-            case "event":
-                $ls = [];
-                foreach (Buffer::$connect as $fd => $connection) {
-                    if ($connection->getType() === 0) {
-                        $ls[$fd] = $connection;
-                    }
-                }
-                return $ls;
-            case "api":
-                $ls = [];
-                foreach (Buffer::$connect as $fd => $connection) {
-                    if ($connection->getType() === 1) {
-                        $ls[$fd] = $connection;
-                    }
-                }
-                return $ls;
-            default:
-                Console::error("寻找连接时链接类型传入错误！");
-                return [];
-        }
-    }
-
-    /**
-     * @param $fd
-     * @param null $type
-     * @param null $qq
-     * @return WSConnection
-     */
-    static function getConnection($fd, $type = null, $qq = null) {
-        //var_dump(Buffer::$connect);
-        if (!isset(Buffer::$connect[$fd]) && $type !== null && $qq !== null) {
-            Console::info("创建连接 " . $fd . " 中...");
-            $s = new WSConnection(Buffer::$event, $fd, $type, $qq);
-            if ($s->create_success) {
-                Buffer::$connect[$fd] = $s;
-                Console::debug("创建成功！");
-                $s->initConnection();
-            } else return null;
-        }
-        return Buffer::$connect[$fd] ?? null;
-    }
-
-    static function getApiConnectionByQQ($qq) {
-        foreach (self::getConnections() as $fd => $c) {
-            if ($c->getType() === 1 && $c->getQQ() == $qq) {
-                return $c;
-            }
         }
         return null;
     }
@@ -348,38 +133,6 @@ class CQUtil
     }
 
     /**
-     * 检查是否为群组管理员或群主功能，此功能需要先获取群组列表，否则会产生一个warning
-     * @param $group
-     * @param $user_id
-     * @return bool
-     */
-    static function isGroupAdmin($group, $user_id) {
-        $ls = Buffer::get("group_list")[$group]["member"];
-        $is_admin = false;
-        foreach ($ls as $k => $v) {
-            if ($v["user_id"] == $user_id) {
-                if ($v["role"] == "admin" || $v["role"] == "owner") {
-                    $is_admin = true;
-                    break;
-                }
-            }
-        }
-        return $is_admin;
-    }
-
-    /**
-     * 用于发送错误日志邮件的功能，请根据实际情况填写邮箱。
-     * 此功能基于sendMail，请看上方sendMail函数的介绍
-     * @param $title
-     * @param $content
-     * @param $self_id
-     * @param string $name
-     */
-    static function sendErrorEmail($title, $content, $self_id, $name = "机器人错误提示") {
-        self::sendEmail(["here your receive email address"], $title, $content, $self_id, $name, 0);
-    }
-
-    /**
      * 获取所有已经加载到内存的用户。
      * read_all为true时，会加载所有User.dat到内存中，false时仅会读取已经加载到内存的用户
      * @param bool $real_all
@@ -393,25 +146,27 @@ class CQUtil
                 $vs = explode(".", $v);
                 if (array_pop($vs) == "dat") {
                     $class = unserialize(file_get_contents(DP::getUserFolder() . $v));
-                    if (!Buffer::array_key_exists("user", $vs[0])) {
-                        Buffer::appendKey("user", $vs[0], $class);
+                    if (!Cache::array_key_exists("user", $vs[0])) {
+                        Cache::appendKey("user", $vs[0], $class);
                     }
                 }
             }
         }
-        return Buffer::get("user");
+        return Cache::get("user");
     }
 
     /**
      * 获取用户实例
      * @param $id
+     * @param bool $enable_init
      * @return User
      */
-    static function getUser($id) {
-        $d = Buffer::get("user");
+    static function getUser($id, $enable_init = true) {
+        $d = Cache::get("user");
         if (!isset($d[$id])) {
-            self::initUser($id);
-            $d = Buffer::get("user");
+            $r = self::initUser($id, $enable_init);
+            if (!$r) return null;
+            $d = Cache::get("user");
         }
         /** @var User $class */
         $class = $d[$id];
@@ -421,103 +176,19 @@ class CQUtil
     /**
      * 初始化用户实例。如果没有此用户的实例数据，会创建
      * @param $id
+     * @param bool $enable_init
+     * @return bool
      */
-    static function initUser($id) {
+    static function initUser($id, $enable_init = true) {
         if (file_exists(DP::getUserFolder() . $id . ".dat")) $class = unserialize(file_get_contents(DP::getUserFolder() . $id . ".dat"));
         else {
-            Console::info("无法找到用户 " . $id . " 的数据，正在创建...");
-            $class = new User($id);
+            if ($enable_init) {
+                Console::info("无法找到用户 " . $id . " 的数据，正在创建...");
+                $class = new User($id);
+            } else return false;
         }
-        Buffer::appendKey("user", $id, $class);
-    }
-
-    /**
-     * 发送群组消息，含控制台推出
-     * @param $groupId
-     * @param $msg
-     * @param string $self_id
-     * @return bool
-     */
-    static function sendGroupMsg($groupId, $msg, $self_id) {
-        $reply = ["action" => "send_group_msg", "params" => ["group_id" => $groupId, "message" => $msg]];
-        $reply["echo"] = $reply;
-        $reply["echo"]["time"] = time();
-        $connections = CQUtil::getApiConnectionByQQ($self_id);
-        if ($connections === null) {
-            Console::error("未找到qq号：" . $self_id . "的API连接");
-            return false;
-        } else {
-            $api_fd = $connections->fd;
-        }
-        if (self::sendAPI($api_fd, $reply, ["send_group_msg"])) {
-            if (Buffer::$data["info_level"] == 1) {
-                $out_count = Buffer::$out_count->get();
-                Console::put(Console::setColor(date("H:i:s "), "lightpurple") . Console::setColor("[{$out_count}]GROUP", "blue") . Console::setColor(" " . $groupId, "yellow") . Console::setColor(" > ", "gray") . $msg);
-                Buffer::$out_count->add(1);
-            }
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * 发送私聊消息
-     * @param $userId
-     * @param $msg
-     * @param $self_id
-     * @return bool
-     */
-    static function sendPrivateMsg($userId, $msg, $self_id) {
-        $reply = ["action" => "send_private_msg", "params" => ["user_id" => $userId, "message" => $msg]];
-        $reply["echo"] = $reply;
-        $reply["echo"]["time"] = time();
-        $connections = CQUtil::getApiConnectionByQQ($self_id);
-        if ($connections === null) {
-            Console::error("未找到qq号：" . $self_id . "的API连接");
-            return false;
-        } else {
-            $api_fd = $connections->fd;
-        }
-        if (self::sendAPI($api_fd, $reply, ["send_private_msg"])) {
-            if (Buffer::$data["info_level"] == 1) {
-                $out_count = Buffer::$out_count->get();
-                Console::put(Console::setColor(date("H:i:s "), "lightpurple") . Console::setColor("[{$out_count}]PRIVATE", "blue") . Console::setColor(" " . $userId, "yellow") . Console::setColor(" > ", "gray") . $msg);
-                Buffer::$out_count->add(1);
-            }
-            return true;
-        }
-        return false;
-    }
-
-
-    static function getFriendName($qq) { return Buffer::get("friend_list")[$qq]["nickname"] ?? "unknown"; }
-
-    static function getGroupName($group) { return Buffer::get("group_list")[$group]["group_name"] ?? "unknown"; }
-
-    /**
-     * 发送其他API，HTTP插件支持的其他API都可以发送。
-     * echo是返回内容，可以在APIHandler.php里面解析
-     * @param $fd
-     * @param $data
-     * @param $echo
-     * @return bool
-     */
-    static function sendAPI($fd, $data, $echo) {
-        if (!is_array($data)) {
-            $api = [];
-            $api["action"] = $data;
-        } else {
-            $api = $data;
-        }
-        $rw = $echo;
-        $echo = [
-            "self_id" => self::getConnection($fd)->getQQ(),
-            "type" => array_shift($rw),
-            "params" => $rw
-        ];
-        $api["echo"] = $echo;
-        Console::info("将要发送的API包：" . json_encode($api, 128 | 256));
-        return self::APIPush($fd, json_encode($api));
+        Cache::appendKey("user", $id, $class);
+        return true;
     }
 
     /**
@@ -536,17 +207,24 @@ class CQUtil
                 Console::debug("loading mod: " . $name);
             }
         }
+        /** @var ModBase[] $ls */
+        for ($i = 0; $i < count($ls) - 1; $i++) {
+            for ($j = 0; $j < count($ls) - $i - 1; $j++) {
+                $s = defined($ls[$j] . "::mod_level") ? $ls[$j]::mod_level : 10;
+                $s1 = defined($ls[$j + 1] . "::mod_level") ? $ls[$j + 1]::mod_level : 10;
+                //Console::info("Comparing mod " . $ls[$j] . " with " . $ls[$j + 1] . ", level are " . $s . ", " . $s1);
+                if ($s < $s1) {
+                    $t = $ls[$j + 1];
+                    $ls[$j + 1] = $ls[$j];
+                    $ls[$j] = $t;
+                }
+            }
+        }
+        for ($i = count($ls) - 1; $i >= 0; $i--) {
+            $s = defined($ls[$i] . "::mod_level") ? $ls[$i]::mod_level : 10;
+            if ($s === 0) unset($ls[$i]);
+        }
         return $ls;
-    }
-
-    /**
-     * 判断模块是否存在
-     * @param $mod_name
-     * @return bool
-     */
-    static function isModExists($mod_name) {
-        $ls = self::getMods();
-        return in_array($mod_name, $ls);
     }
 
     /**
@@ -555,7 +233,7 @@ class CQUtil
     static function reload() {
         Console::info("Reloading server");
         self::saveAllFiles();
-        Buffer::$event->reload();
+        Cache::$server->reload();
     }
 
     /**
@@ -564,8 +242,7 @@ class CQUtil
     static function stop() {
         Console::info("Stopping server...");
         self::saveAllFiles();
-        Buffer::$api->close();
-        Buffer::$event->shutdown();
+        Cache::$server->shutdown();
     }
 
     /**
@@ -656,41 +333,20 @@ class CQUtil
         }
     }
 
-    static function getCQ($msg) {
-        if (($start = mb_strpos($msg, '[')) === false) return null;
-        if (($end = mb_strpos($msg, ']')) === false) return null;
-        $msg = mb_substr($msg, $start + 1, $end - $start - 1);
-        if (mb_substr($msg, 0, 3) != "CQ:") return null;
-        $msg = mb_substr($msg, 3);
-        $msg2 = explode(",", $msg);
-        $type = array_shift($msg2);
-        $array = [];
-        foreach ($msg2 as $k => $v) {
-            $ss = explode("=", $v);
-            $sk = array_shift($ss);
-            $array[$sk] = implode("=", $ss);
-        }
-        return ["type" => $type, "params" => $array, "start" => $start, "end" => $end];
-    }
-
     static function isRobot($user_id) {
         $robots = [];
-        foreach (Buffer::get("robots") as $v) {
-            $robots[] = $v["qq"];
+        foreach (ConnectionManager::getAll("robot") as $v) {
+            if (!in_array($v->getQQ(), $robots))
+                $robots[] = $v->getQQ();
         }
-        foreach (Buffer::get("bots") as $v) {
+        foreach (Cache::get("bots") as $v) {
             $robots[] = $v;
         }
         return in_array($user_id, $robots);
     }
 
-    static function getRobotNum($qq) {
-        $ls = Buffer::get("robots");
-        foreach ($ls as $k => $v) {
-            if ($v["qq"] == $qq)
-                return $k;
-        }
-        return null;
+    static function getRobotAlias($qq) {
+        return RobotWSConnection::ALIAS_LIST[$qq] ?? "机器人";
     }
 
     /**
@@ -699,7 +355,7 @@ class CQUtil
      * @param bool $insert
      */
     static function updateMsg($insert = true) {
-        $ls = Buffer::get("msg_speed");
+        $ls = Cache::get("msg_speed");
         if ($insert === true)
             $ls [] = time();
         foreach ($ls as $k => $v) {
@@ -707,6 +363,6 @@ class CQUtil
                 array_splice($ls, $k, 1);
             }
         }
-        Buffer::set("msg_speed", $ls);
+        Cache::set("msg_speed", $ls);
     }
 }

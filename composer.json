@@ -1,6 +1,9 @@
 {
+    "description": "high-performance intelligent assistant",
+    "minimum-stability": "stable",
+    "license": "proprietary",
     "require": {
-        "php": ">=7.2.0",
+        "php": ">=7.0.0",
         "eaglewu/swoole-ide-helper": "dev-master",
         "ext-mbstring": "^7.1",
         "ext-json": "*",

@@ -9,6 +9,11 @@
 class NoticeEvent extends Event
 {
     public function __construct($req) {
-
+        foreach(Cache::get("mods") as $k => $v){
+            if(in_array("onNotice", get_class_methods($v))){
+                /** @var ModBase $v */
+                $v::onNotice($req);
+            }
+        }
     }
 }
