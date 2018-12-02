@@ -15,8 +15,6 @@ class Cache
     static $data = [];
     /** @var \swoole_websocket_server $server */
     static $server;
-    /** @var swoole_http_client $http_client */
-    static $http_client;
     /** @var Scheduler $scheduler */
     static $scheduler;
 
@@ -33,27 +31,29 @@ class Cache
     /** @var WSConnection[] $connect */
     static $connect = [];
 
-    static function get($name){ return self::$data[$name] ?? null; }
+    static function get($name) { return self::$data[$name] ?? null; }
 
-    static function set($name, $value){ self::$data[$name] = $value; }
+    static function set($name, $value) { self::$data[$name] = $value; }
 
-    static function append($name, $value){ self::$data[$name][] = $value; }
+    static function append($name, $value) { self::$data[$name][] = $value; }
 
-    static function appendKey($name, $key, $value){ self::$data[$name][$key] = $value; }
+    static function appendKey($name, $key, $value) { self::$data[$name][$key] = $value; }
 
-    static function unset($name, $key){ unset(self::$data[$name][$key]); }
+    static function removeKey($name, $key) { unset(self::$data[$name][$key]); }
 
-    static function unsetByValue($name, $vale){
+    static function removeValue($name, $vale) {
         $key = array_search($vale, self::$data[$name]);
         array_splice(self::$data[$name], $key, 1);
     }
 
-    static function isset($name){ return isset(self::$data[$name]); }
+    static function unset($name) { unset(self::$data[$name]); }
 
-    static function array_key_exists($name, $key){ return isset(self::$data[$name][$key]); }
+    static function isset($name) { return isset(self::$data[$name]); }
 
-    static function in_array($name, $value){
-        if(!is_array((self::$data[$name] ?? 1))) return false;
+    static function array_key_exists($name, $key) { return isset(self::$data[$name][$key]); }
+
+    static function in_array($name, $value) {
+        if (!is_array((self::$data[$name] ?? 1))) return false;
         return in_array($value, self::$data[$name]);
     }
 }

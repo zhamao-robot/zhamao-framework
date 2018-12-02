@@ -87,7 +87,7 @@ class RobotWSConnection extends WSConnection
                         StatusParser::parse($response, $data);
                         if ($s["func"] !== null)
                             call_user_func($s["func"], $response, $data);
-                        Cache::unset("sent_api", $data["echo"]);
+                        Cache::removeKey("sent_api", $data["echo"]);
                         return false;
                     }
                 }
@@ -120,7 +120,7 @@ class RobotWSConnection extends WSConnection
             StatusParser::parse($response, $data);
             if ($s["func"] !== null)
                 call_user_func($s["func"], $response, $data);
-            Cache::unset("sent_api", $data["echo"]);
+            Cache::removeKey("sent_api", $data["echo"]);
             return false;
         }
     }

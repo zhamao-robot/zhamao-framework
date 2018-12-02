@@ -19,9 +19,12 @@ Swoole的用处最简单可以理解为，只需要简单几行代码即可运�
 [Swoole官网](https://www.swoole.com/)
 
 
+## CQBot-swoole 文档
+本项目的文档正在努力编写中：[https://cqbot.crazywhale.org/](https://cqbot.crazywhale.org/)
+
 
 ## 框架简介
-本机器人框架是基于PHP Swoole框架而写的一个CQHTTPAPI SDK，具有高性能、高并发和多机器人连接的特性。框架本身常驻内存的特性解决了读写文件、读写数据库等造成的性能问题。
+本机器人框架是基于PHP Swoole框架而写的一个CQ-HTTP-API SDK，具有高性能、高并发和多机器人连接的特性。框架本身常驻内存的特性解决了读写文件、读写数据库等造成的性能问题。
 
 框架自身作为一个高性能的Swoole **WebSocket**兼容HTTP服务器，可以同时完成更多websocket和HTTP环境的业务逻辑。此外还保留了微信公众号接口，未来可以与微信公众号开发者平台对接。
 
@@ -29,7 +32,7 @@ Swoole的用处最简单可以理解为，只需要简单几行代码即可运�
 ## 环境部署
 由于框架是独立于酷Q和HTTPAPI插件运行的，故你可以在多台主机上部署酷Q的docker。
 
-如果你是新用户或重新安装含有HTTPAPI插件的**酷Q-Docker**的话，可以在你需要部署酷Q的Linux主机下使用下面的脚本快速构建酷Q环境。
+如果你是新用户或重新安装含有HTTPAPI插件的**酷Q-Docker**的话，可以在你需要部署酷Q的Linux主机下使用下面的脚本快速构建酷Q环境，此脚本会引导进行相关的cqhttp插件设置。每台部署酷Q的主机均可直接使用此条命令（服务器需要提前安装Docker）
 
 ```shell
 curl -O https://raw.githubusercontent.com/crazywhalecc/CQBot-swoole/master/start-coolq.sh
@@ -68,7 +71,7 @@ chmod +x start-docker.sh
 ```
 
 
-## 启动框架
+## 启动
 #### 直接安装后启动框架（第一次会有初始化设置）
 
 ```shell
@@ -88,6 +91,9 @@ chmod +x start-screen.sh
 
 ```shell
 sudo docker run -it --rm --name cqbot -v $(pwd)/cqbot/:/root/ jesse2061/cqbot-swoole
+
+# 进入docker后输入
+php start.php
 ```
 
 #### 使用Docker在screen中运行框架

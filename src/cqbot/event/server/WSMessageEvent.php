@@ -55,7 +55,7 @@ class WSMessageEvent extends ServerEvent
                         StatusParser::parse($response, $origin);
                         if ($origin["func"] !== null)
                             call_user_func($origin["func"], $response, $origin);
-                        Cache::unset("sent_api", $req["echo"]);
+                        Cache::removeKey("sent_api", $req["echo"]);
                     }
                 }
                 break;
