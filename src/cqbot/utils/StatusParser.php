@@ -25,7 +25,6 @@ class StatusParser
                 break;
             default:
                 CQUtil::errorLog("API推送失败, retcode = " . $response["retcode"] . "\n说明  = " . ErrorStatus::getMessage($response["retcode"]) . "\n" . json_encode($origin, 128 | 256), "API ERROR");
-
         }
     }
 }
