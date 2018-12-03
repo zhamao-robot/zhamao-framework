@@ -40,4 +40,8 @@ class Scheduler
             }
         }
     }
+
+    public static function after($ms, callable $callback){
+        return swoole_timer_after($ms, $callback);
+    }
 }

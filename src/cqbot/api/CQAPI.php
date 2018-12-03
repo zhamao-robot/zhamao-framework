@@ -75,6 +75,28 @@ class CQAPI
     }
 
     public static function __callStatic($name, $arg) {
+        if(mb_substr($name, -6) == "_after"){
+            $all = self::getSupportedAPIs();
+            $find = null;
+            $true_name = mb_substr($name, 0, -6);
+            if(!in_array($true_name, $all)){
+                Console::error("Unknown API " . $name);
+                return false;
+            }
+            $ms = array_shift($arg);
+            Scheduler::after($ms, function() use ($true_name, $arg){
+                $reply = ["action" => $true_name];
+                if (!is_array($arg[1])) {
+                    Console::error("Error when parsing params. Please make sure your params is an array.");
+                    return false;
+                }
+                if ($arg[1] != []) {
+                    $reply["params"] = $arg[1];
+                }
+                return self::processAPI($arg[0], $reply, $arg[2]);
+            });
+            return true;
+        }
         $all = self::getSupportedAPIs();
         $find = null;
         if (in_array($name, $all)) $find = $name;
