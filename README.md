@@ -12,9 +12,11 @@ A fast and multi-task framework for Coolq-HTTP-API
 ## 什么是Swoole
 Swoole是一个C编写的、高性能的PHP扩展。支持多线程、多进程、同步、异步、协程、SQL等。
 
-Swoole的用处最简单可以理解为，只需要简单几行代码即可运行一个HTTP服务器，比python等同类型解释型语言快非常多。
+众所周知，PHP原生对多线程、多进程、异步等特性支持不是很好，但有了Swoole，你可以非常简单自由地写出优雅的高性能服务器。
 
-此外小声说Swoole官方声明Swoole将重新定义PHP。
+框架使用Swoole Websocket Server为基础，借助PHP语言便捷的优势，易于上手。
+
+本项目原生支持多机器人连接，故选择了反向Websocket连接方式。同时更适用于高并发、多机器人同时连接以及对接**微信公众号**和**web前端**等场景。
 
 [Swoole官网](https://www.swoole.com/)
 
