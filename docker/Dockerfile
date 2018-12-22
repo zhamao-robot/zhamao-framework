@@ -1,5 +1,6 @@
 FROM php:7.2
 WORKDIR /root
+ENV LANG="en_US.UTF-8"
 RUN apt-get update && apt-get upgrade -y && apt-get install curl libxml2 libzip-dev git -y
 
 # Install php extensions
