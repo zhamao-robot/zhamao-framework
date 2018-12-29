@@ -47,18 +47,25 @@ chmod +x start-coolq.sh
 ## 框架部署
 ### 手动安装到Linux主机上
 ``` shell
-# 安装PHP
+# 安装PHP（ubuntu/debian）
+apt-get install software-properties-common
+add-apt-repository ppa:ondrej/php
 apt-get update
 apt-get install php7.2 php7.2-dev php7.2 php7.2-mbstring php7.2-json php7.2 php-pear
 
+#安装PHP（CentOS）
+rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
+yum makecache fast
+yum install php72w-devel.x86_64 php72w-mbstring.x86_64 php72w-pear.noarch gcc gcc-c++ -y
+
+
 # 安装Swoole
 pecl install swoole
-echo 'extension=swoole.so' >> /etc/php/7.2/cli/php.ini
+echo "extension=swoole.so" >> $(php -i | grep "Loaded Configuration File" | awk '{print $5}')
 
 # 部署框架
 git clone https://github.com/crazywhalecc/CQBot-swoole.git
-cd CQBot-swoole/
-
 
 # 以上指令可能需要sudo执行
 ```
@@ -74,7 +81,7 @@ chmod +x start-docker.sh
 
 
 ## 启动
-#### 直接安装后启动框架（第一次会有初始化设置）
+#### 直接安装后启动框架
 
 ```shell
 cd CQBot-swoole/
@@ -92,7 +99,7 @@ chmod +x start-screen.sh
 #### 使用Docker构建下启动框架
 
 ```shell
-sudo docker run -it --rm --name cqbot -v $(pwd)/cqbot/:/root/ jesse2061/cqbot-swoole
+sudo docker run -it --rm --net=host --name cqbot -v $(pwd)/cqbot/:/root/ jesse2061/cqbot-swoole
 
 # 进入docker后输入
 php start.php
