@@ -34,12 +34,18 @@ Swoole是一个C编写的、高性能的PHP扩展。支持多线程、多进程�
 ## 环境部署
 由于框架是独立于酷Q和HTTPAPI插件运行的，故你可以在多台主机上部署酷Q的docker。
 
-如果你是新用户或重新安装含有HTTPAPI插件的**酷Q-Docker**的话，可以在你需要部署酷Q的Linux主机下使用下面的脚本快速构建酷Q环境，此脚本会引导进行相关的cqhttp插件设置。每台部署酷Q的主机均可直接使用此条命令（服务器需要提前安装Docker）
+如果你是新用户或重新安装含有HTTPAPI插件的**酷Q-Docker**的话，可以在你需要部署酷Q的Linux主机下使用下面的脚本快速构建酷Q环境，此脚本会引导进行相关的cqhttp插件设置。每台部署酷Q的主机均可直接使用下方的命令（服务器需要提前安装Docker）
 
 ```shell
-curl -O https://raw.githubusercontent.com/crazywhalecc/CQBot-swoole/master/start-coolq.sh
-chmod +x start-coolq.sh
-./start-coolq.sh
+#第一次部署酷Q-httpapi docker运行下面的代码
+sh -c "$(wget https://raw.githubusercontent.com/crazywhalecc/CQBot-swoole/master/start-coolq.sh -O -)"
+
+#以后每次启动/停止/重启酷Q容器执行的命令
+docker start coolq
+docker stop coolq
+docker restart coolq
+
+#以上指令非root用户可能需要sudo
 ```
 
 
