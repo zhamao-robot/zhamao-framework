@@ -33,12 +33,7 @@ if [[ ! $? -eq 0 ]]; then
             continue
         fi
     done
-    echo "是否使用主机模式(将docker的端口完全映射到宿主机) [y/n] : "
-    read host_mode
-    host_mode_line="-p 9000:9000 -p 20000:20000"
-    if [[ ${host_mode} = "y" ]]; then
-        host_mode_line="--net=host"
-    fi
+    host_mode_line="--net=host"
     sudo docker run --name coolq -d -v $(pwd)/coolq-data:/home/user/coolq \
     ${host_mode_line} \
     -e VNC_PASSWD=${vnc_pwd} \
