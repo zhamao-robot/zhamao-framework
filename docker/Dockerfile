@@ -15,4 +15,4 @@ RUN docker-php-ext-enable swoole
 
 VOLUME ["/root/"]
 
-CMD if [ ! -d "CQBot-swoole" ]; then git clone https://github.com/crazywhalecc/CQBot-swoole.git; fi && cd CQBot-swoole/ && bash
+CMD if [ ! -d "CQBot-swoole" ]; then git clone https://github.com/crazywhalecc/CQBot-swoole.git; fi && cd CQBot-swoole/ && bash -c "php start.php"
