@@ -1,15 +1,16 @@
 FROM php:7.2
 WORKDIR /root
-ENV LANG="en_US.UTF-8"
-RUN apt-get update && apt-get upgrade -y && apt-get install curl libxml2 libzip-dev git -y
+RUN echo "Asia/Shanghai" > /etc/timezone
+RUN dpkg-reconfigure -f noninteractive tzdata
+ENV LANG C.UTF-8
+RUN apt-get update && apt-get install curl libxml2 libzip-dev openssl git -y
 
 # Install php extensions
-RUN docker-php-ext-install zip mysqli iconv mbstring json
+RUN docker-php-ext-install zip
+RUN docker-php-ext-install mysqli
+RUN docker-php-ext-install iconv
+RUN docker-php-ext-install mbstring
 
-# Install swoole
-#ADD https://github.com/swoole/swoole-src/archive/v4.2.9.tar.gz /root/v4.2.9.tar.gz
-#RUN cd /root/ && tar -zxvf v4.2.9.tar.gz && cd swoole-src-4.2.9/ && phpize && \
-#    ./configure && make && make install
 RUN pecl install swoole
 RUN docker-php-ext-enable swoole
 
