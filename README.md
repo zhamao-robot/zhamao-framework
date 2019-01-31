@@ -7,14 +7,14 @@
 
 A fast and multi-task framework for Coolq-HTTP-API
 
-一个异步、多进程的[CQ-HTTP-API插件](https://cqhttp.cc/)框架 made by php-swoole
+一个异步、高性能的[CQ-HTTP-API插件](https://cqhttp.cc/)协程PHP框架。
 
 ## 什么是Swoole
 Swoole是一个C编写的、高性能的PHP扩展。支持多线程、多进程、同步、异步、协程、SQL等。
 
 众所周知，PHP原生对多线程、多进程、异步等特性支持不是很好，但有了Swoole，你可以非常简单自由地写出优雅的高性能服务器。
 
-框架使用Swoole Websocket Server为基础，借助PHP语言便捷的优势，易于上手。
+框架使用Swoole Websocket Server为基础，借助PHP语言便捷的优势，同时风格和go语言协程相似，易于上手。
 
 本项目原生支持多机器人连接，故选择了反向Websocket连接方式。同时更适用于高并发、多机器人同时连接以及对接**微信公众号**和**web前端**等场景。
 
@@ -26,7 +26,7 @@ Swoole是一个C编写的、高性能的PHP扩展。支持多线程、多进程�
 
 
 ## 框架简介
-本机器人框架是基于PHP Swoole框架而写的一个CQ-HTTP-API SDK，具有高性能、高并发和多机器人连接的特性。框架本身常驻内存的特性解决了读写文件、读写数据库等造成的性能问题。
+本机器人框架是基于PHP Swoole框架而写的一个CQ-HTTP-API SDK，具有高性能、高并发和多机器人连接的特性。框架本身常驻内存以及协程运行的特性解决了读写文件、读写数据库等造成的性能问题。
 
 框架自身作为一个高性能的Swoole **WebSocket**兼容HTTP服务器，可以同时完成更多websocket和HTTP环境的业务逻辑。此外还保留了微信公众号接口，未来可以与微信公众号开发者平台对接。
 
@@ -108,8 +108,19 @@ sudo docker run -it --rm --net=host --name cqbot -v $(pwd)/cqbot/:/root/ jesse20
 # Ctrl A + D 将screen放到后台运行
 ```
 
+## MacOS与Windows兼容性
+#### MacOS下运行CQBot-swoole
+mac下运行和Linux整体相同，使用brew安装好PHP后通过源码编译`swoole`组件安装，或使用docker。
+> Docker for mac 运行需要手动指定端口`-p 20000:20000`，不能使用`--net=host`网络模式。
+
+#### Windows下运行CQBot-swoole
+因为swoole使用了Linux的特性，故**不推荐**在Windows电脑或服务器使用，Windows可以使用Docker运行或使用`cygwin`环境。
+> 不推荐原因有不能使用`reload`指令进行重启服务和不能使用全部的swoole特性。
+
 ## 关于
 
-框架和SDK部分代码直接从`炸毛机器人`中移植而来，炸毛机器人（2230833894）是作者写的一个高性能的机器人，曾获全国计算机设计大赛一等奖。
+框架和SDK部分代码直接从**炸毛机器人**中移植而来，炸毛机器人（3290004669）是作者写的一个高性能的机器人，曾获全国计算机设计大赛一等奖。
 
 欢迎随时在HTTP-API插件群提问，当然更好的话可以加作者QQ（627577391）或提交issue进行疑难解答。
+
+本项目在有更新内容时，请及时关注GitHub的动态，更新前请将自己的模块代码做好备份。
