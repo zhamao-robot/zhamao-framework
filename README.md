@@ -77,12 +77,9 @@ git clone https://github.com/crazywhalecc/CQBot-swoole.git
 ```
 
 
-### 使用Docker快速构建
+### 使用Docker快速构建并启动
 ``` shell
-docker pull jesse2061/cqbot-swoole
-mkdir cqbot && cd cqbot
-curl -O https://raw.githubusercontent.com/crazywhalecc/CQBot-swoole/master/start-docker.sh
-chmod +x start-docker.sh
+sudo docker run -it --rm --net=host --name cqbot -v $(pwd)/cqbot/:/root/ jesse2061/cqbot-swoole
 ```
 
 
@@ -97,26 +94,18 @@ php start.php
 #### 在screen中运行框架
 
 ```shell
+screen -R cqbot
 cd CQBot-swoole/
-chmod +x start-screen.sh
-./start-screen.sh
-```
-
-#### 使用Docker构建下启动框架
-
-```shell
-sudo docker run -it --rm --net=host --name cqbot -v $(pwd)/cqbot/:/root/ jesse2061/cqbot-swoole
-
-# 进入docker后输入
 php start.php
+# Ctrl A + D 将screen放到后台运行
 ```
 
 #### 使用Docker在screen中运行框架
 
 ```shell
-curl -O https://raw.githubusercontent.com/crazywhalecc/CQBot-swoole/master/start-docker-screen.sh
-chmod +x start-docker-screen.sh
-./start-docker-screen.sh
+screen -R cqbot
+sudo docker run -it --rm --net=host --name cqbot -v $(pwd)/cqbot/:/root/ jesse2061/cqbot-swoole
+# Ctrl A + D 将screen放到后台运行
 ```
 
 ## 关于
