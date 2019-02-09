@@ -1,10 +1,9 @@
 {
     "description": "high-performance intelligent assistant",
     "minimum-stability": "stable",
-    "license": "proprietary",
+    "license": "MIT",
     "require": {
         "php": ">=7.0.0",
-        "eaglewu/swoole-ide-helper": "dev-master",
         "ext-mbstring": "^7.1",
         "ext-json": "*",
         "ext-iconv": "*",
@@ -13,5 +12,8 @@
         "ext-gd": "^7.1",
         "ext-curl": "^7.1",
         "ext-openssl": "^7.1"
+    },
+    "require-dev": {
+        "eaglewu/swoole-ide-helper": "dev-master"
     }
 }
