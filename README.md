@@ -83,8 +83,8 @@ git clone https://github.com/crazywhalecc/cqbot-swoole.git
 sudo docker run -it --rm --net=host --name cqbot -v $(pwd)/cqbot/:/root/ jesse2061/cqbot-swoole
 
 # 可以将命令添加为alias方便以后快速启动
-echo "alias cqbot='sudo docker run -it --rm --net=host --name cqbot -v $(pwd)/cqbot/:/root/ jesse2061/cqbot-swoole'" >> .bash_profile
-source .bash_profile
+echo "alias cqbot='sudo docker run -it --rm --net=host --name cqbot -v $(pwd)/cqbot/:/root/ jesse2061/cqbot-swoole'" >> ~/.bash_profile
+source ~/.bash_profile
 cqbot
 ```
 
