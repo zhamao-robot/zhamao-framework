@@ -6,15 +6,15 @@ fi
 sudo docker start coolq >/dev/null 2>&1
 
 if [[ ! $? -eq 0 ]]; then
-    echo -n "请输入你的VNC登陆密码: "
-    read vnc_pwd
+    echo -n "请输入你的VNC登陆密码(无回显): "
+    read -s vnc_pwd
     echo -n "请输入你的反向ws连接地址(默认ws://127.0.0.1:20000/): "
     read reverse_url
     if [[ ${reverse_url} = "" ]]; then
         reverse_url="ws://127.0.0.1:20000/"
         echo "使用默认ws地址。"
     fi
-    echo -n "请输入连接CQBot-swoole框架的token（没有请回车）："
+    echo -n "请输入连接CQBot-swoole框架的token（没有请回车,无回显）："
     read access_token
     while :
     do
