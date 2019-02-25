@@ -43,7 +43,7 @@ cqbot-swwole是一个聊天机器人框架，同时兼容酷Q（需安装[cqhttp
 
 ```shell
 #第一次部署酷Q-httpapi docker运行下面的代码
-sh -c "$(wget https://raw.githubusercontent.com/crazywhalecc/cqbot-swoole/master/start-coolq.sh -O -)"
+bash -c "$(wget https://raw.githubusercontent.com/crazywhalecc/cqbot-swoole/master/start-coolq.sh -O -)"
 
 #以后每次启动/停止/重启酷Q容器执行的命令
 docker start coolq
