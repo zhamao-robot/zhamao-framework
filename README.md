@@ -128,7 +128,7 @@ mac下运行和Linux整体相同，使用brew安装好PHP后通过源码编译`s
 > Docker for mac 运行需要手动指定端口`-p 20000:20000`，不能使用`--net=host`网络模式。
 
 #### Windows下运行cqbot-swoole
-因为swoole使用了Linux的特性，故**不推荐**在Windows电脑或服务器使用，Windows可以使用Docker运行或使用`cygwin`环境。
+因为swoole使用了Linux的特性，故**不推荐**在Windows电脑或服务器使用，Windows可以使用Docker运行，使用 `cygwin` 环境或 `WSL` 环境。
 > 不推荐原因有不能使用`reload`指令进行重启服务和不能使用全部的swoole特性。
 
 ## 关于
