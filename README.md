@@ -21,7 +21,7 @@ PHP原生对多线程、多进程、异步等特性支持不是很好，有了Sw
 [Swoole官网](https://www.swoole.com/)
 
 ## 框架简介
-cqbot-swwole是一个聊天机器人框架，同时兼容酷Q（需安装[cqhttp插件](https://cqhttp.cc)），微信公众号，支持多QQ账号对接。
+cqbot-swoole是一个聊天机器人框架，同时兼容酷Q（需安装[cqhttp插件](https://cqhttp.cc)），微信公众号，支持多QQ账号对接。
 
 ## 说在前面
 本框架目前还有一些缺陷，说在前面的原因是如果你有更好的想法或发现的问题，可以提issue或联系作者。
