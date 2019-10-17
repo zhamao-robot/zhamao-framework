@@ -24,8 +24,7 @@ class RobotWSConnection extends WSConnection
         $this->sub_type = $sub_type;
         foreach (ConnectionManager::getAll("robot") as $k => $v) {
             if ($v->getQQ() == $this->getQQ() && $k != $this->fd && $v->getSubType() == $this->getSubType()) {
-                $this->getServer()->close($k);
-                ConnectionManager::remove($k);
+                $v->close();
             }
         }
         if ($sub_type != "event") {
