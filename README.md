@@ -8,8 +8,8 @@
 
 一个异步、多平台兼容的**聊天机器人**框架。
 
-> 当前正在重构，框架可能会有很大的变化，旧框架将创建old分支，重构完成后新款框架为master分支。
-> 重构进度请查看 project 栏目。
+**当前正在重构，框架可能会有很大的变化，旧框架将创建old分支，重构完成后新款框架为master分支。**
+**框架同时将更名为zhamao-framework(炸毛框架)，与旧版本兼容性不并存，届时需要根据文档进行模块的升级。**
 
 ## CQBot-swoole 文档
 本项目的文档正在努力编写中：[https://cqbot.crazywhale.org/](https://cqbot.crazywhale.org/)
