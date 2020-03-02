@@ -4,6 +4,8 @@
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)]()
 [![版本](https://img.shields.io/badge/version-2020.3.2-green.svg)]()
 
+[![this counter](https://img.shields.io/github/search/zhamao-robot/zhamao-framework/this.svg)](https://github.com/zhamao-robot/zhamao-framework/search?q=this)
+[![TODO counter](https://img.shields.io/github/search/zhamao-robot/zhamao-framework/TODO.svg)](https://github.com/zhamao-robot/zhamao-framework/search?q=TODO)
 
 一个异步、多平台兼容的 **聊天机器人** 框架。
 
