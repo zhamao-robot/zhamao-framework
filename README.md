@@ -12,6 +12,8 @@
 ## 简介
 zhamao-framework 是一个基于 酷Q 的 PHP 机器人框架，它会对 QQ 机器人收到的消息进行解析处理，并以模块化的形式进行开发，来完成机器人的自然语言对话等功能。
 
+框架对接 酷Q 的桥梁是 **CQHTTP** 插件，这里是它的[项目地址](https://github.com/richardchien/coolq-http-api/)。
+
 除了起到解析消息的作用，炸毛框架 还提供了完整的 WebSocket + HTTP 服务器，你还能用此框架构建出高性能的 API 接口服务器。
 
 ## 文档
