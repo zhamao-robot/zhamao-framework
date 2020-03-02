@@ -2,7 +2,7 @@
 
 [![作者QQ](https://img.shields.io/badge/作者QQ-627577391-orange.svg)]()
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)]()
-[![版本](https://img.shields.io/badge/version-2019.2.9-green.svg)]()
+[![版本](https://img.shields.io/badge/version-2020.3.2-green.svg)]()
 
 
 一个异步、多平台兼容的 **聊天机器人** 框架。
