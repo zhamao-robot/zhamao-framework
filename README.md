@@ -7,7 +7,7 @@
 
 一个异步、多平台兼容的 **聊天机器人** 框架。
 
- ![](resources/images/logo.png)
+ ![](resources/images/logo2.png)
 
 ## 简介
 zhamao-framework 是一个基于 酷Q 的 PHP 机器人框架，它会对 QQ 机器人收到的消息进行解析处理，并以模块化的形式进行开发，来完成机器人的自然语言对话等功能。
