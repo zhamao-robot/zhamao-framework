@@ -1,5 +1,6 @@
 # CQBot-swoole
 
+## 此分支停止维护！
 
 [![作者QQ](https://img.shields.io/badge/作者QQ-627577391-orange.svg)]()
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)]()
