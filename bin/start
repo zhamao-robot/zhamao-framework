@@ -1,0 +1,44 @@
+#!/usr/bin/env php
+<?php
+
+use Framework\FrameworkLoader;
+use Scheduler\Scheduler;
+
+require __DIR__ . '/../src/Framework/FrameworkLoader.php';
+require __DIR__ . '/../src/Scheduler/Scheduler.php';
+
+Swoole\Coroutine::set([
+    'max_coroutine' => 30000,
+]);
+
+date_default_timezone_set("Asia/Shanghai");
+
+switch ($argv[1] ?? '') {
+    case 'scheduler':
+    case 'timer':
+        go(function () {
+            try {
+                new Scheduler(Scheduler::REMOTE);
+            } catch (Exception $e) {
+                die($e->getMessage());
+            }
+        });
+        break;
+    case '':
+    case 'framework':
+    case 'server':
+        if(!is_dir(__DIR__.'/../vendor/')){
+            echo "Warning: you have not update composer!\n";
+            echo "You need to run \"composer update\" at root of zhamao-framework!\n";
+            echo "Or if you are using docker or composer installed, just run \"sh bin/update-composer\"\n";
+            echo "In China, if your composer downloading slowly, you can get latest vendor.tar.gz from HERE:\n";
+            echo "https://dl2.zhamao.xin/zhamao-framework/vendor.tar.gz\n";
+            die;
+        }
+        $loader = new FrameworkLoader($argv);
+        break;
+    default:
+        echo "Unknown option \"{$argv[1]}\"!\n";
+        break;
+}
+

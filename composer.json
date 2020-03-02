@@ -1,19 +1,31 @@
 {
+    "name": "zhamao/framework",
     "description": "high-performance intelligent assistant",
     "minimum-stability": "stable",
-    "license": "MIT",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "whale",
+            "email": "crazysnowcc@gmail.com"
+        },
+        {
+            "name": "swift",
+            "email": "hugo_swift@yahoo.com"
+        }
+    ],
     "require": {
-        "php": ">=7.0.0",
-        "ext-mbstring": "^7.1",
+        "swoole/ide-helper": "@dev",
+        "ext-mbstring": "*",
+        "swlib/saber": "^1.0",
+        "doctrine/annotations": "^1.8",
         "ext-json": "*",
-        "ext-iconv": "*",
-        "ext-mysqli": "*",
-        "ext-dom": "20031129",
-        "ext-gd": "^7.1",
-        "ext-curl": "^7.1",
-        "ext-openssl": "^7.1"
+        "ext-posix": "*",
+        "ext-ctype": "*"
     },
-    "require-dev": {
-        "eaglewu/swoole-ide-helper": "dev-master"
+    "repositories": {
+        "packagist": {
+            "type": "composer",
+            "url": "https://mirrors.aliyun.com/composer/"
+        }
     }
 }
