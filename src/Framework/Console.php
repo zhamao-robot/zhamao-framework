@@ -14,7 +14,8 @@ use Exception;
 
 class Console
 {
-    static function setColor($string, $color = "") {
+    static function setColor($string, $color = "")
+    {
         switch ($color) {
             case "red":
                 return "\x1b[38;5;203m" . $string . "\x1b[m";
@@ -41,7 +42,8 @@ class Console
         }
     }
 
-    static function error($obj, $head = null) {
+    static function error($obj, $head = null)
+    {
         if ($head === null) $head = date("[H:i:s ") . "ERROR] ";
         if (ZMBuf::$info_level !== null && in_array(ZMBuf::$info_level->get(), [1, 2])) {
             $trace = debug_backtrace()[1] ?? ['file' => '', 'function' => ''];
@@ -56,7 +58,8 @@ class Console
         echo(self::setColor($head . ($trace ?? "") . $obj, "red") . "\n");
     }
 
-    static function warning($obj, $head = null) {
+    static function warning($obj, $head = null)
+    {
         if ($head === null) $head = date("[H:i:s") . " WARN] ";
         if (ZMBuf::$info_level !== null && in_array(ZMBuf::$info_level->get(), [1, 2])) {
             $trace = debug_backtrace()[1] ?? ['file' => '', 'function' => ''];
@@ -71,7 +74,8 @@ class Console
         echo(self::setColor($head . ($trace ?? "") . $obj, "yellow") . "\n");
     }
 
-    static function info($obj, $head = null) {
+    static function info($obj, $head = null)
+    {
         if ($head === null) $head = date("[H:i:s ") . "INFO] ";
         if (ZMBuf::$info_level !== null && in_array(ZMBuf::$info_level->get(), [1, 2])) {
             $trace = debug_backtrace()[1] ?? ['file' => '', 'function' => ''];
@@ -86,12 +90,14 @@ class Console
         echo(self::setColor($head . ($trace ?? "") . $obj, "lightblue") . "\n");
     }
 
-    static function log($obj, $color = "") {
+    static function log($obj, $color = "")
+    {
         if (!is_string($obj)) var_dump($obj);
         else echo(self::setColor($obj, $color) . "\n");
     }
 
-    static function msg($obj, $self_id = "") {
+    static function msg($obj, $self_id = "")
+    {
         if (ZMBuf::$info_level !== null && ZMBuf::$info_level->get() == 3) {
             if (!isset($obj["post_type"])) {
                 switch ($obj["action"]) {
@@ -134,7 +140,8 @@ class Console
         }
     }
 
-    static function stackTrace(){
+    static function stackTrace()
+    {
         $log = "Stack trace:\n";
         $trace = debug_backtrace();
         //array_shift($trace);
@@ -158,7 +165,12 @@ class Console
         echo $log;
     }
 
-    static function listenConsole(){
+    static function listenConsole()
+    {
+        if (in_array('--disable-console-input', FrameworkLoader::$argv)) {
+            self::info("ConsoleCommand disabled.");
+            return;
+        }
         go(function () {
             while (true) {
                 $cmd = trim(co::fread(STDIN));
@@ -171,14 +183,15 @@ class Console
      * @param string $cmd
      * @return bool
      */
-    private static function executeCommand(string $cmd) {
+    private static function executeCommand(string $cmd)
+    {
         $it = explodeMsg($cmd);
         switch ($it[0] ?? '') {
             case 'call':
                 $class_name = $it[1];
                 $function_name = $it[2];
                 $class = new $class_name([]);
-                call_user_func_array([$class, $function_name],[]);
+                call_user_func_array([$class, $function_name], []);
                 return true;
             case 'bc':
                 $code = base64_decode($it[1] ?? '', true);
@@ -205,7 +218,8 @@ class Console
         }
     }
 
-    public static function withSleep(string $string, int $int) {
+    public static function withSleep(string $string, int $int)
+    {
         self::info($string);
         sleep($int);
     }

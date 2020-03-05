@@ -23,6 +23,10 @@ class FrameworkLoader
 
     /**  @var float|string */
     public static $run_time;
+    /**
+     * @var array
+     */
+    public static $argv;
 
     /** @var Server */
     private $server;
@@ -30,6 +34,7 @@ class FrameworkLoader
     public function __construct($args = []) {
         if (self::$instance !== null) die("Cannot run two FrameworkLoader in one process!");
         self::$instance = $this;
+        self::$argv = $args;
 
         chdir(__DIR__ . '/../..');
         define('WORKING_DIR', getcwd());
