@@ -13,7 +13,6 @@ use ZM\Annotation\AnnotationParser;
 use ZM\Annotation\Swoole\SwooleEventAfter;
 use ZM\Connection\ConnectionManager;
 use ZM\DB\DB;
-use ZM\DBCache\DBCacheManager;
 use Framework\Console;
 use Framework\GlobalConfig;
 use Framework\ZMBuf;
@@ -45,7 +44,6 @@ class WorkerStartEvent implements SwooleEvent
         Console::info("Worker启动中");
         ZMBuf::resetCache(); //清空变量缓存
         ZMBuf::set("wait_start", []); //添加队列，在workerStart运行完成前先让其他协程等待执行
-        DBCacheManager::freeAllCache(); // 清空数据库缓存
         $this->resetConnections();//释放所有与framework的连接
 
         //设置炸毛buf中储存的对象
