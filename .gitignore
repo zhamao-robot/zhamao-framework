@@ -4,3 +4,4 @@
 /vendor/
 zm.json
 /zm_data/
+composer.lock

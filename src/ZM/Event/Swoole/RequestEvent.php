@@ -25,17 +25,12 @@ class RequestEvent implements SwooleEvent
      */
     private $response;
 
-    public function __construct(Request $request, Response $response)
-    {
+    public function __construct(Request $request, Response $response) {
         $this->request = $request;
         $this->response = $response;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function onActivate()
-    {
+    public function onActivate() {
         ZMUtil::checkWait();
         foreach (ZMBuf::globals("http_header") as $k => $v) {
             $this->response->setHeader($k, $v);
@@ -48,7 +43,7 @@ class RequestEvent implements SwooleEvent
         while (true) {
             $r = array_shift($uri);
             if ($r === null) break;
-            if (($cnt = count($node["son"])) == 1) {
+            if (($cnt = count($node["son"] ?? [])) == 1) {
                 if (isset($node["param_route"])) {
                     foreach ($node["son"] as $k => $v) {
                         if ($v["id"] == $node["param_route"]) {
@@ -114,8 +109,7 @@ class RequestEvent implements SwooleEvent
     /**
      * @inheritDoc
      */
-    public function onAfter()
-    {
+    public function onAfter() {
         foreach (ZMBuf::$events[SwooleEventAfter::class] ?? [] as $v) {
             if (strtolower($v->type) == "request" && $this->parseSwooleRule($v)) {
                 $c = $v->class;
@@ -127,14 +121,12 @@ class RequestEvent implements SwooleEvent
         return $this;
     }
 
-    private function responseStatus(int $int)
-    {
+    private function responseStatus(int $int) {
         $this->response->status($int);
         $this->response->end();
     }
 
-    private function parseSwooleRule($v)
-    {
+    private function parseSwooleRule($v) {
         switch ($v->rule) {
             case "containsGet":
             case "containsPost":

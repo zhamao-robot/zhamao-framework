@@ -4,13 +4,12 @@ RUN echo "Asia/Shanghai" > /etc/timezone
 #RUN dpkg-configure -f noninteractive tzdata
 ENV LANG C.UTF_8
 
-RUN apt update && apt install wget -y
-VOLUME ["/app/"]
+VOLUME ["/app/zhamao-framework/"]
 ADD . /app/zhamao-framework
-RUN cd /app/zhamao-framework && composer update && composer clearcache
+ADD . /app/zhamao-framework-bak
+#RUN cd /app/zhamao-framework && composer update && composer clearcache
 #RUN mv zhamao-framework-master zhamao-framework
 WORKDIR /app/zhamao-framework
 
 EXPOSE 20001
-
-CMD ["php", "/app/zhamao-framework/bin/start", "framework", "--disable-console-input"]
+CMD ["bash", "/app/zhamao-framework-bak/.entry.sh"]
