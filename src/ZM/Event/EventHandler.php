@@ -51,7 +51,7 @@ class EventHandler
                 (new WSCloseEvent($param0, $param1))->onActivate()->onAfter();
                 break;
         }
-        Console::info(Console::setColor("Event: " . $event_name . " 运行了 " . round(microtime(true) - $starttime, 5) . " 秒", "gold"));
+        //Console::info(Console::setColor("Event: " . $event_name . " 运行了 " . round(microtime(true) - $starttime, 5) . " 秒", "gold"));
     }
 
     public static function callCQEvent($event_data, MessageEvent $event, $level = 0) {
