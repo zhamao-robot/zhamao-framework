@@ -29,8 +29,8 @@ switch ($argv[1] ?? '') {
     case 'server':
         if(!is_dir(__DIR__.'/../vendor/')){
             echo "Warning: you have not update composer!\n";
-            $r = Co::exec("composer update");
-            if($r['code'] != 0) {
+            exec("composer update", $out, $var);
+            if($var != 0) {
                 echo "You need to run \"composer update\" at root of zhamao-framework!\n";
                 die;
             }

@@ -74,10 +74,7 @@ class AnnotationParser
                 }
             }
         }
-        echo json_encode(ZMBuf::$req_mapping, 128 | 256);
-
         $tree = self::genTree(ZMBuf::$req_mapping);
-        echo json_encode($tree, 128 | 256);
         ZMBuf::$req_mapping = $tree[0];
         //给支持level的排个序
         foreach (ZMBuf::$events as $class_name => $v) {
@@ -222,7 +219,6 @@ class AnnotationParser
                     continue 2;
                 }
             }
-            Console::info('Adding prefix "' . $shift . "\", " . json_encode($array[$uid - 1]));
             $array[$uid++] = [
                 'id' => $uid - 1,
                 'pid' => $pid,
