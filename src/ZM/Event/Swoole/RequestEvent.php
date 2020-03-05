@@ -25,7 +25,8 @@ class RequestEvent implements SwooleEvent
      */
     private $response;
 
-    public function __construct(Request $request, Response $response) {
+    public function __construct(Request $request, Response $response)
+    {
         $this->request = $request;
         $this->response = $response;
     }
@@ -33,60 +34,76 @@ class RequestEvent implements SwooleEvent
     /**
      * @inheritDoc
      */
-    public function onActivate() {
+    public function onActivate()
+    {
         ZMUtil::checkWait();
         foreach (ZMBuf::globals("http_header") as $k => $v) {
             $this->response->setHeader($k, $v);
         }
         $uri = $this->request->server["request_uri"];
-        if ($uri != "/") {
-            $uri = explode("/", $uri);
-            $uri = array_diff($uri, ["..", "", "."]);
-            $node = ZMBuf::$req_mapping_node;
-            $params = [];
-            while (true) {
-                $r = array_shift($uri);
-                if ($r === null) break;
-                if (($node2 = $node->getRealRoute($r, $params)) !== null) {
-                    $node = $node2;
+        $uri = explode("/", $uri);
+        $uri = array_diff($uri, ["..", "", "."]);
+        $node = ZMBuf::$req_mapping;
+        $params = [];
+        while (true) {
+            $r = array_shift($uri);
+            if ($r === null) break;
+            if (($cnt = count($node["son"])) == 1) {
+                if (isset($node["param_route"])) {
+                    foreach ($node["son"] as $k => $v) {
+                        if ($v["id"] == $node["param_route"]) {
+                            $node = $v;
+                            $params[mb_substr($v["name"], 1, -1)] = $r;
+                            continue 2;
+                        }
+                    }
+                } elseif ($node["son"][0]["name"] == $r) {
+                    $node = $node["son"][0];
                     continue;
                 } else {
                     $this->responseStatus(404);
                     return $this;
                 }
-            }
-            if ($node->getRule() === null || call_user_func($node->getRule(), $this->request) === true) { //判断规则是否存在，如果有规则则走一遍规则
-                if (in_array(strtoupper($this->request->server["request_method"]), $node->getRequestMethod())) { //判断目标方法在不在里面
-                    $c_name = $node->getClass();
-                    /** @var ModBase $class */
-                    $class = new $c_name(["request" => $this->request, "response" => $this->response, "params" => $params], ModHandleType::SWOOLE_REQUEST);
-                    $r = call_user_func_array([$class, $node->getMethod()], [$params]);
-                    if (is_string($r) && !$this->response->isEnd()) $this->response->end($r);
-                    if ($class->block_continue) return $this;
-                    if ($this->response->isEnd()) return $this;
+            } elseif ($cnt >= 1) {
+                if (isset($node["param_route"])) {
+                    foreach ($node["son"] as $k => $v) {
+                        if ($v["id"] == $node["param_route"]) {
+                            $node = $v;
+                            $params[mb_substr($v["name"], 1, -1)] = $r;
+                            continue 2;
+                        }
+                    }
+                }
+                foreach ($node["son"] as $k => $v) {
+                    if ($v["name"] == $r) {
+                        $node = $v;
+                        continue 2;
+                    }
                 }
             }
-        } else {
-            if (($node = ZMBuf::$req_mapping_node)->getMethod() !== null) {
-                if (in_array(strtoupper($this->request->server["request_method"]), $node->getRequestMethod())) { //判断目标方法在不在里面
-                    $c_name = $node->getClass();
-                    /** @var ModBase $class */
-                    $class = new $c_name(["request" => $this->request, "response" => $this->response], ModHandleType::SWOOLE_REQUEST);
-                    $r = call_user_func_array([$class, $node->getMethod()], []);
-                    if (is_string($r) && !$this->response->isEnd()) $this->response->end($r);
-                    if ($class->block_continue) return $this;
-                    if ($this->response->isEnd()) return $this;
-                }
-            }
-            foreach (ZMBuf::$events[SwooleEventAt::class] ?? [] as $v) {
-                if (strtolower($v->type) == "request" && $this->parseSwooleRule($v)) {
-                    $c = $v->class;
-                    $class = new $c(["request" => $this->request, "response" => $this->response]);
-                    $r = call_user_func_array([$class, $v->method], []);
-                    if ($class->block_continue) break;
-                }
+            $this->responseStatus(404);
+            return $this;
+        }
+
+        if (in_array(strtoupper($this->request->server["request_method"]), $node["request_method"] ?? [])) { //判断目标方法在不在里面
+            $c_name = $node["class"];
+            /** @var ModBase $class */
+            $class = new $c_name(["request" => $this->request, "response" => $this->response, "params" => $params], ModHandleType::SWOOLE_REQUEST);
+            $r = call_user_func_array([$class, $node["method"]], [$params]);
+            if (is_string($r) && !$this->response->isEnd()) $this->response->end($r);
+            if ($class->block_continue) return $this;
+            if ($this->response->isEnd()) return $this;
+        }
+
+        foreach (ZMBuf::$events[SwooleEventAt::class] ?? [] as $v) {
+            if (strtolower($v->type) == "request" && $this->parseSwooleRule($v)) {
+                $c = $v->class;
+                $class = new $c(["request" => $this->request, "response" => $this->response]);
+                $r = call_user_func_array([$class, $v->method], []);
+                if ($class->block_continue) break;
             }
         }
+
         if (!$this->response->isEnd()) {
             $this->response->status(404);
             $this->response->end(ZMUtil::getHttpCodePage(404));
@@ -97,7 +114,8 @@ class RequestEvent implements SwooleEvent
     /**
      * @inheritDoc
      */
-    public function onAfter() {
+    public function onAfter()
+    {
         foreach (ZMBuf::$events[SwooleEventAfter::class] ?? [] as $v) {
             if (strtolower($v->type) == "request" && $this->parseSwooleRule($v)) {
                 $c = $v->class;
@@ -109,12 +127,14 @@ class RequestEvent implements SwooleEvent
         return $this;
     }
 
-    private function responseStatus(int $int) {
+    private function responseStatus(int $int)
+    {
         $this->response->status($int);
         $this->response->end();
     }
 
-    private function parseSwooleRule($v) {
+    private function parseSwooleRule($v)
+    {
         switch ($v->rule) {
             case "containsGet":
             case "containsPost":

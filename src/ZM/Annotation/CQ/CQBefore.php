@@ -35,7 +35,7 @@ class CQBefore extends AnnotationBase implements Level
     /**
      * @param mixed $level
      */
-    public function setLevel($level): void {
+    public function setLevel($level) {
         $this->level = $level;
     }
 

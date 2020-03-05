@@ -10,7 +10,6 @@ namespace Framework;
 
 use Swoole\Atomic;
 use swoole_atomic;
-use ZM\Annotation\MappingNode;
 use ZM\connection\WSConnection;
 use ZM\Utils\Scheduler;
 use ZM\Utils\SQLPool;
@@ -37,7 +36,7 @@ class ZMBuf
     // swoole server操作对象，每个进程均分配
     /** @var swoole_websocket_server $server */
     static $server;
-    /** @var MappingNode Http请求uri路径根节点 */
+    /** @var array Http请求uri路径根节点 */
     public static $req_mapping_node;
     /** @var mixed TimeNLP初始化后的对象，每个进程均可初始化 */
     public static $time_nlp;
@@ -52,6 +51,7 @@ class ZMBuf
     public static $events = [];
     /** @var Atomic[] */
     public static $atomics;
+    public static $req_mapping = [];
 
     static function get($name, $default = null) { return self::$cache[$name] ?? $default; }
 

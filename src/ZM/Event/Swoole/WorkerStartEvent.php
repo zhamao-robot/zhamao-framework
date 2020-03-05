@@ -10,7 +10,6 @@ use Swoole\Coroutine;
 use Swoole\Timer;
 use ZM\Annotation\AnnotationBase;
 use ZM\Annotation\AnnotationParser;
-use ZM\Annotation\MappingNode;
 use ZM\Annotation\Swoole\SwooleEventAfter;
 use ZM\Connection\ConnectionManager;
 use ZM\DB\DB;
@@ -58,7 +57,6 @@ class WorkerStartEvent implements SwooleEvent
         }
         ZMBuf::$server = $this->server;
         ZMBuf::$atomics['reload_time']->add(1);
-        ZMBuf::$req_mapping_node = new MappingNode("/");
 
         Console::info("监听console输入");
         Console::listenConsole(); //这个方法只能在这里调用，且如果worker_num不为1的话，此功能不可用

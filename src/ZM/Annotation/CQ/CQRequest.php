@@ -36,7 +36,7 @@ class CQRequest extends AnnotationBase implements Level
     /**
      * @param int $level
      */
-    public function setLevel(int $level): void {
+    public function setLevel(int $level) {
         $this->level = $level;
     }
 }

@@ -40,7 +40,7 @@ class SwooleEventAfter extends AnnotationBase implements Rule, Level
     /**
      * @param string $type
      */
-    public function setType(string $type): void {
+    public function setType(string $type) {
         $this->type = $type;
     }
 
@@ -54,7 +54,7 @@ class SwooleEventAfter extends AnnotationBase implements Rule, Level
     /**
      * @param string $rule
      */
-    public function setRule(string $rule): void {
+    public function setRule(string $rule) {
         $this->rule = $rule;
     }
 
@@ -68,7 +68,7 @@ class SwooleEventAfter extends AnnotationBase implements Rule, Level
     /**
      * @param int $level
      */
-    public function setLevel(int $level): void {
+    public function setLevel(int $level) {
         $this->level = $level;
     }
 

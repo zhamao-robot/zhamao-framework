@@ -5,6 +5,7 @@ namespace ZM\Annotation;
 
 use Doctrine\Common\Annotations\AnnotationException;
 use Doctrine\Common\Annotations\AnnotationReader;
+use Framework\Console;
 use Framework\ZMBuf;
 use ReflectionClass;
 use ReflectionException;
@@ -29,9 +30,15 @@ class AnnotationParser
      * @throws ReflectionException
      * @throws AnnotationException
      */
-    public static function registerMods() {
+    public static function registerMods()
+    {
         self::loadAnnotationClasses();
         $all_class = getAllClasses(WORKING_DIR . "/src/Module/", "Module");
+        ZMBuf::$req_mapping[0] = [
+            'id' => 0,
+            'pid' => -1,
+            'name' => '/'
+        ];
         $reader = new AnnotationReader();
         foreach ($all_class as $v) {
             $reflection_class = new ReflectionClass($v);
@@ -53,21 +60,25 @@ class AnnotationParser
                     if ($vss instanceof Rule) $vss = self::registerRuleEvent($vss, $vs, $reflection_class);
                     else $vss = self::registerMethod($vss, $vs, $reflection_class);
 
-                    if ($vss instanceof SwooleEventAt)              ZMBuf::$events[SwooleEventAt::class][] = $vss;
-                    elseif ($vss instanceof SwooleEventAfter)       ZMBuf::$events[SwooleEventAfter::class][] = $vss;
-                    elseif ($vss instanceof CQMessage)              ZMBuf::$events[CQMessage::class][] = $vss;
-                    elseif ($vss instanceof CQNotice)               ZMBuf::$events[CQNotice::class][] = $vss;
-                    elseif ($vss instanceof CQRequest)              ZMBuf::$events[CQRequest::class][] = $vss;
-                    elseif ($vss instanceof CQMetaEvent)            ZMBuf::$events[CQMetaEvent::class][] = $vss;
-                    elseif ($vss instanceof CQCommand)              ZMBuf::$events[CQCommand::class][] = $vss;
-                    elseif ($vss instanceof RequestMapping)         self::registerRequestMapping($vss, $vs, $reflection_class, $class_prefix);
-                    elseif ($vss instanceof CustomAnnotation)       ZMBuf::$events[get_class($vss)][] = $vss;
-                    elseif ($vss instanceof CQBefore)               ZMBuf::$events[CQBefore::class][$vss->cq_event][] = $vss;
-                    elseif ($vss instanceof CQAfter)                ZMBuf::$events[CQAfter::class][$vss->cq_event][] = $vss;
+                    if ($vss instanceof SwooleEventAt) ZMBuf::$events[SwooleEventAt::class][] = $vss;
+                    elseif ($vss instanceof SwooleEventAfter) ZMBuf::$events[SwooleEventAfter::class][] = $vss;
+                    elseif ($vss instanceof CQMessage) ZMBuf::$events[CQMessage::class][] = $vss;
+                    elseif ($vss instanceof CQNotice) ZMBuf::$events[CQNotice::class][] = $vss;
+                    elseif ($vss instanceof CQRequest) ZMBuf::$events[CQRequest::class][] = $vss;
+                    elseif ($vss instanceof CQMetaEvent) ZMBuf::$events[CQMetaEvent::class][] = $vss;
+                    elseif ($vss instanceof CQCommand) ZMBuf::$events[CQCommand::class][] = $vss;
+                    elseif ($vss instanceof RequestMapping) self::registerRequestMapping($vss, $vs, $reflection_class, $class_prefix);
+                    elseif ($vss instanceof CustomAnnotation) ZMBuf::$events[get_class($vss)][] = $vss;
+                    elseif ($vss instanceof CQBefore) ZMBuf::$events[CQBefore::class][$vss->cq_event][] = $vss;
+                    elseif ($vss instanceof CQAfter) ZMBuf::$events[CQAfter::class][$vss->cq_event][] = $vss;
                 }
             }
         }
+        echo json_encode(ZMBuf::$req_mapping, 128 | 256);
 
+        $tree = self::genTree(ZMBuf::$req_mapping);
+        echo json_encode($tree, 128 | 256);
+        ZMBuf::$req_mapping = $tree[0];
         //给支持level的排个序
         foreach (ZMBuf::$events as $class_name => $v) {
             if ((new $class_name()) instanceof Level) {
@@ -86,7 +97,8 @@ class AnnotationParser
         }
     }
 
-    private static function getRuleCallback($rule_str) {
+    private static function getRuleCallback($rule_str)
+    {
         $func = null;
         $rule = $rule_str;
         if ($rule != "") {
@@ -142,15 +154,21 @@ class AnnotationParser
                     };
                     break;
                 case "dataEqual": //handle websocket message事件时才能用
-                    $func = function ($data) use ($rest) { return $data == $rest; };
+                    $func = function ($data) use ($rest) {
+                        return $data == $rest;
+                    };
                     break;
             }
             switch ($asp_name) {
                 case "msgMatch": //handle cq message事件时才能用
-                    $func = function ($msg) use ($rest) { return matchPattern($rest, $msg); };
+                    $func = function ($msg) use ($rest) {
+                        return matchPattern($rest, $msg);
+                    };
                     break;
                 case "msgEqual": //handle cq message事件时才能用
-                    $func = function ($msg) use ($rest) { return trim($msg) == $rest; };
+                    $func = function ($msg) use ($rest) {
+                        return trim($msg) == $rest;
+                    };
                     break;
 
             }
@@ -158,20 +176,25 @@ class AnnotationParser
         return $func;
     }
 
-    private static function registerRuleEvent(?AnnotationBase $vss, ReflectionMethod $method, ReflectionClass $class) {
+    private static function registerRuleEvent(?AnnotationBase $vss, ReflectionMethod $method, ReflectionClass $class)
+    {
         $vss->callback = self::getRuleCallback($vss->getRule());
         $vss->method = $method->getName();
         $vss->class = $class->getName();
         return $vss;
     }
 
-    private static function registerMethod(?AnnotationBase $vss, ReflectionMethod $method, ReflectionClass $class) {
+    private static function registerMethod(?AnnotationBase $vss, ReflectionMethod $method, ReflectionClass $class)
+    {
         $vss->method = $method->getName();
         $vss->class = $class->getName();
         return $vss;
     }
 
-    private static function registerRequestMapping(RequestMapping $vss, ReflectionMethod $method, ReflectionClass $class, string $prefix) {
+    private static function registerRequestMapping(RequestMapping $vss, ReflectionMethod $method, ReflectionClass $class, string $prefix)
+    {
+        $array = ZMBuf::$req_mapping;
+        $uid = count($array);
         $prefix_exp = explode("/", $prefix);
         $route_exp = explode("/", $vss->route);
         foreach ($prefix_exp as $k => $v) {
@@ -184,31 +207,62 @@ class AnnotationParser
                 unset($route_exp[$k]);
             }
         }
-        $a = ZMBuf::$req_mapping_node;
-        $p = $a;
         if ($prefix_exp == [] && $route_exp == []) {
-            $p->setMethod($method->getName());
-            $p->setClass($class->getName());
-            $p->setRequestMethod($vss->request_method);
+            $array[$uid - 1]['method'] = $method->getName();
+            $array[$uid - 1]['class'] = $class->getName();
+            $array[$uid - 1]['request_method'] = $vss->request_method;
+            ZMBuf::$req_mapping = $array;
             return;
         }
+        $pid = 0;
         while (($shift = array_shift($prefix_exp)) !== null) {
-            $p->addRoute($shift, new MappingNode($shift));
-            $p = $p->getRoute($shift);
+            foreach ($array as $k => $v) {
+                if ($v["name"] == $shift && $pid == ($v["pid"] ?? -1)) {
+                    $pid = $v["id"];
+                    continue 2;
+                }
+            }
+            Console::info('Adding prefix "' . $shift . "\", " . json_encode($array[$uid - 1]));
+            $array[$uid++] = [
+                'id' => $uid - 1,
+                'pid' => $pid,
+                'name' => $shift
+            ];
+            $pid = $uid - 1;
         }
         while (($shift = array_shift($route_exp)) !== null) {
-            if (mb_substr($shift, 0, 1) == "{" && mb_substr($shift, -1, 1) == "}") {
+            /*if (mb_substr($shift, 0, 1) == "{" && mb_substr($shift, -1, 1) == "}") {
                 $p->removeAllRoute();
+                Console::info("移除本节点其他所有路由中");
+            }*/
+            foreach ($array as $k => $v) {
+                if ($v["name"] == $shift && $pid == ($v["pid"] ?? -1)) {
+                    $pid = $v["id"];
+                    continue 2;
+                }
             }
-            $p->addRoute($shift, new MappingNode($shift));
-            $p = $p->getRoute($shift);
+            if (mb_substr($shift, 0, 1) == "{" && mb_substr($shift, -1, 1) == "}") {
+                foreach ($array as $k => $v) {
+                    if ($pid == $v["id"]) {
+                        $array[$k]["param_route"] = $uid;
+                    }
+                }
+            }
+            $array[$uid++] = [
+                'id' => $uid - 1,
+                'pid' => $pid,
+                'name' => $shift
+            ];
+            $pid = $uid - 1;
         }
-        $p->setMethod($method->getName());
-        $p->setClass($class->getName());
-        $p->setRequestMethod($vss->request_method);
+        $array[$uid - 1]['method'] = $method->getName();
+        $array[$uid - 1]['class'] = $class->getName();
+        $array[$uid - 1]['request_method'] = $vss->request_method;
+        ZMBuf::$req_mapping = $array;
     }
 
-    private static function loadAnnotationClasses() {
+    private static function loadAnnotationClasses()
+    {
         $class = getAllClasses(WORKING_DIR . "/src/ZM/Annotation/", "ZM\\Annotation");
         foreach ($class as $v) {
             $s = WORKING_DIR . '/src/' . str_replace("\\", "/", $v) . ".php";
@@ -219,5 +273,16 @@ class AnnotationParser
             $s = WORKING_DIR . '/src/' . str_replace("\\", "/", $v) . ".php";
             require_once $s;
         }
+    }
+
+    public static function genTree($items)
+    {
+        $tree = array();
+        foreach ($items as $item)
+            if (isset($items[$item['pid']]))
+                $items[$item['pid']]['son'][] = &$items[$item['id']];
+            else
+                $tree[] = &$items[$item['id']];
+        return $tree;
     }
 }
