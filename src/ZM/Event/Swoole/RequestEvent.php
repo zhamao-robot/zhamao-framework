@@ -127,7 +127,7 @@ class RequestEvent implements SwooleEvent
     }
 
     private function parseSwooleRule($v) {
-        switch ($v->rule) {
+        switch (explode(":",$v->rule)[0]) {
             case "containsGet":
             case "containsPost":
                 if ($v->callback instanceof Closure) return call_user_func($v->callback, $this->request);
