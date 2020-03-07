@@ -20,6 +20,6 @@ class SaveBuffer
      *@Required()
      */
     public $buf_name;
-    /** @var string|null $sub_folder */
+    /** @var string $sub_folder */
     public $sub_folder = null;
 }

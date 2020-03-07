@@ -4,6 +4,7 @@
 namespace ZM\Event\Swoole;
 
 
+use Co;
 use Doctrine\Common\Annotations\AnnotationException;
 use ReflectionException;
 use Swoole\Coroutine;
@@ -48,6 +49,21 @@ class WorkerStartEvent implements SwooleEvent
 
         //设置炸毛buf中储存的对象
         ZMBuf::$globals = new GlobalConfig();
+        ZMBuf::$config = [];
+        $file = scandir(WORKING_DIR . '/config/');
+        unset($file[0], $file[1]);
+        foreach ($file as $k => $v) {
+            if ($v == "global.php") continue;
+            $name = explode(".", $v);
+            if (($prefix = end($name)) == "json") {
+                ZMBuf::$config[$name[0]] = json_decode(Co::readFile(WORKING_DIR . '/config/' . $v), true);
+                Console::info("已读取配置文件(json)：" . $prefix);
+            } elseif ($prefix == "php") {
+                ZMBuf::$config[$name[0]] = include_once WORKING_DIR . '/config/' . $v;
+                if (is_array(ZMBuf::$config[$name[0]]))
+                    Console::info("已读取配置文件(php)：" . $prefix);
+            }
+        }
         if (ZMBuf::globals("sql_config")["sql_host"] != "") {
             Console::info("新建SQL连接池中");
             ZMBuf::$sql_pool = new SQLPool();
@@ -113,7 +129,6 @@ class WorkerStartEvent implements SwooleEvent
 
         //加载composer类
         Console::info("加载composer资源中");
-        /** @noinspection PhpIncludeInspection */
         require_once WORKING_DIR . "/vendor/autoload.php";
 
         //加载各个模块的注解类，以及反射
@@ -126,7 +141,7 @@ class WorkerStartEvent implements SwooleEvent
 
     private function setAutosaveTimer($globals) {
         DataProvider::$buffer_list = [];
-        Timer::tick($globals * 1000, function() {
+        Timer::tick($globals * 1000, function () {
             DataProvider::saveBuffer();
         });
     }

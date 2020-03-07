@@ -34,7 +34,7 @@ class ZMBuf
     static $globals = null;
 
     // swoole server操作对象，每个进程均分配
-    /** @var swoole_websocket_server $server */
+    /** @var \swoole_websocket_server $server */
     static $server;
     /** @var array Http请求uri路径根节点 */
     public static $req_mapping_node;
@@ -52,31 +52,56 @@ class ZMBuf
     /** @var Atomic[] */
     public static $atomics;
     public static $req_mapping = [];
+    public static $config = [];
 
-    static function get($name, $default = null) { return self::$cache[$name] ?? $default; }
+    static function get($name, $default = null) {
+        return self::$cache[$name] ?? $default;
+    }
 
-    static function set($name, $value) { self::$cache[$name] = $value; }
+    static function set($name, $value) {
+        self::$cache[$name] = $value;
+    }
 
-    static function append($name, $value) { self::$cache[$name][] = $value; }
+    static function append($name, $value) {
+        self::$cache[$name][] = $value;
+    }
 
-    static function appendKey($name, $key, $value) { self::$cache[$name][$key] = $value; }
+    static function appendKey($name, $key, $value) {
+        self::$cache[$name][$key] = $value;
+    }
 
-    static function appendKeyInKey($name, $key, $value) { self::$cache[$name][$key][] = $value; }
+    static function appendKeyInKey($name, $key, $value) {
+        self::$cache[$name][$key][] = $value;
+    }
 
-    static function unsetCache($name) { unset(self::$cache[$name]); }
+    static function unsetCache($name) {
+        unset(self::$cache[$name]);
+    }
 
     static function unsetByValue($name, $vale) {
         $key = array_search($vale, self::$cache[$name]);
         array_splice(self::$cache[$name], $key, 1);
     }
 
-    static function isset($name) { return isset(self::$cache[$name]); }
+    static function isset($name) {
+        return isset(self::$cache[$name]);
+    }
 
-    static function array_key_exists($name, $key) { return isset(self::$cache[$name][$key]); }
+    static function array_key_exists($name, $key) {
+        return isset(self::$cache[$name][$key]);
+    }
 
-    static function in_array($name, $val) { return in_array($val, self::$cache[$name]); }
+    static function in_array($name, $val) {
+        return in_array($val, self::$cache[$name]);
+    }
 
-    static function globals($key) { return self::$globals->get($key); }
+    static function globals($key) {
+        return self::$globals->get($key);
+    }
+
+    static function config($config_name) {
+        return self::$config ?? null;
+    }
 
     public static function resetCache() {
         self::$cache = [];
@@ -88,7 +113,7 @@ class ZMBuf
      * 初始化atomic计数器
      */
     public static function initAtomic() {
-        foreach(ZMBuf::globals("init_atomics") as $k => $v) {
+        foreach (ZMBuf::globals("init_atomics") as $k => $v) {
             self::$atomics[$k] = new Atomic($v);
         }
     }
