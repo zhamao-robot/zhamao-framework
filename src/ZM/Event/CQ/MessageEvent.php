@@ -5,13 +5,15 @@ namespace ZM\Event\CQ;
 
 
 use Co;
+use Framework\Console;
 use Framework\ZMBuf;
 use ZM\Annotation\CQ\CQAfter;
 use ZM\Annotation\CQ\CQBefore;
 use ZM\Annotation\CQ\CQCommand;
 use ZM\Annotation\CQ\CQMessage;
-use ZM\Connection\ConnectionManager;
+use ZM\Connection\WSConnection;
 use ZM\Exception\WaitTimeoutException;
+use ZM\Http\Response;
 use ZM\ModBase;
 use ZM\ModHandleType;
 
@@ -20,25 +22,21 @@ class MessageEvent
     private $function_call = false;
     private $data;
     private $circle;
-    /**
-     * @var \ZM\Event\Swoole\MessageEvent
-     */
-    private $swoole_event;
+    /** @var WSConnection|Response */
+    private $connection;
 
-    public function __construct($data, \ZM\Event\Swoole\MessageEvent $event, $circle = 0) {
+    public function __construct($data, $conn_or_response, $circle = 0) {
         $this->data = $data;
-        $this->swoole_event = $event;
+        $this->connection = $conn_or_response;
         $this->circle = $circle;
     }
 
     public function onBefore() {
-        foreach (ZMBuf::$events[CQBefore::class][CQMessage::class] ?? [] as $v) {
+        foreach (ZMBuf::$events[CQBefore::class]["message"] ?? [] as $v) {
             $c = $v->class;
             $class = new $c([
                 "data" => $this->data,
-                "frame" => $this->swoole_event->frame,
-                "server" => $this->swoole_event->server,
-                "connection" => ConnectionManager::get($this->swoole_event->frame->fd)
+                "connection" => $this->connection
             ], ModHandleType::CQ_MESSAGE);
             $r = call_user_func_array([$class, $v->method], []);
             if (!$r || $class->block_continue) return false;
@@ -80,9 +78,7 @@ class MessageEvent
                     if (!isset($obj[$c]))
                         $obj[$c] = new $c([
                             "data" => $this->data,
-                            "frame" => $this->swoole_event->frame,
-                            "server" => $this->swoole_event->server,
-                            "connection" => ConnectionManager::get($this->swoole_event->frame->fd)
+                            "connection" => $this->connection
                         ], ModHandleType::CQ_MESSAGE);
                     if ($word[0] != "" && $v->match == $word[0]) {
                         $r = call_user_func([$obj[$c], $v->method], $word);
@@ -110,9 +106,7 @@ class MessageEvent
                     if (!isset($obj[$c]))
                         $obj[$c] = new $c([
                             "data" => $this->data,
-                            "frame" => $this->swoole_event->frame,
-                            "server" => $this->swoole_event->server,
-                            "connection" => ConnectionManager::get($this->swoole_event->frame->fd)
+                            "connection" => $this->connection
                         ], ModHandleType::CQ_MESSAGE);
                     $r = call_user_func([$obj[$c], $v->method], $this->data["message"]);
                     if (is_string($r)) $obj[$c]->reply($r);
@@ -129,13 +123,11 @@ class MessageEvent
      * 在调用完事件后执行的
      */
     public function onAfter() {
-        foreach (ZMBuf::$events[CQAfter::class][CQMessage::class] ?? [] as $v) {
+        foreach (ZMBuf::$events[CQAfter::class]["message"] ?? [] as $v) {
             $c = $v->class;
             $class = new $c([
                 "data" => $this->data,
-                "frame" => $this->swoole_event->frame,
-                "server" => $this->swoole_event->server,
-                "connection" => ConnectionManager::get($this->swoole_event->frame->fd)
+                "connection" => $this->connection
             ], ModHandleType::CQ_MESSAGE);
             $r = call_user_func_array([$class, $v->method], []);
             if (!$r || $class->block_continue) return false;

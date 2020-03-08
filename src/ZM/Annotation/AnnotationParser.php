@@ -5,7 +5,6 @@ namespace ZM\Annotation;
 
 use Doctrine\Common\Annotations\AnnotationException;
 use Doctrine\Common\Annotations\AnnotationReader;
-use Framework\Console;
 use Framework\ZMBuf;
 use ReflectionClass;
 use ReflectionException;

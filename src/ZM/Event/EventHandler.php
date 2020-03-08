@@ -15,7 +15,6 @@ use ZM\Utils\ZMUtil;
 class EventHandler
 {
     public static function callSwooleEvent($event_name, $param0, $param1 = null) {
-        $starttime = microtime(true);
         $event_name = strtolower($event_name);
         switch ($event_name) {
             case "workerstart":
@@ -54,7 +53,7 @@ class EventHandler
         //Console::info(Console::setColor("Event: " . $event_name . " 运行了 " . round(microtime(true) - $starttime, 5) . " 秒", "gold"));
     }
 
-    public static function callCQEvent($event_data, MessageEvent $event, $level = 0) {
+    public static function callCQEvent($event_data, $conn_or_response, int $level = 0) {
         if ($level >= 5) {
             Console::warning("Recursive call reached " . $level . " times");
             Console::stackTrace();
@@ -63,24 +62,24 @@ class EventHandler
         $starttime = microtime(true);
         switch ($event_data["post_type"]) {
             case "message":
-                $event = new CQ\MessageEvent($event_data, $event, $level);
+                $event = new CQ\MessageEvent($event_data, $conn_or_response, $level);
                 if ($event->onBefore()) $event->onActivate();
                 $event->onAfter();
                 return $event->hasReply();
                 break;
             case "notice":
-                $event = new CQ\NoticeEvent($event_data, $event, $level);
-                if($event->onBefore()) $event->onActivate();
+                $event = new CQ\NoticeEvent($event_data, $conn_or_response, $level);
+                if ($event->onBefore()) $event->onActivate();
                 $event->onAfter();
                 return true;
             case "request":
-                $event = new CQ\RequestEvent($event_data, $event, $level);
-                if($event->onBefore()) $event->onActivate();
+                $event = new CQ\RequestEvent($event_data, $conn_or_response, $level);
+                if ($event->onBefore()) $event->onActivate();
                 $event->onAfter();
                 return true;
             case "meta_event":
-                $event = new CQ\MetaEvent($event_data, $event, $level);
-                if($event->onBefore()) $event->onActivate();
+                $event = new CQ\MetaEvent($event_data, $conn_or_response, $level);
+                if ($event->onBefore()) $event->onActivate();
                 return true;
         }
         unset($starttime);
@@ -89,7 +88,7 @@ class EventHandler
 
     public static function callCQResponse($req) {
         //Console::info("收到来自API连接的回复：".json_encode($req, 128|256));
-        if(isset($req["echo"]) && ZMBuf::array_key_exists("sent_api", $req["echo"])) {
+        if (isset($req["echo"]) && ZMBuf::array_key_exists("sent_api", $req["echo"])) {
             $status = $req["status"];
             $retcode = $req["retcode"];
             $data = $req["data"];

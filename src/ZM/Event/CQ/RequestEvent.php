@@ -8,7 +8,7 @@ use Framework\ZMBuf;
 use ZM\Annotation\CQ\CQAfter;
 use ZM\Annotation\CQ\CQBefore;
 use ZM\Annotation\CQ\CQRequest;
-use ZM\Connection\ConnectionManager;
+use ZM\Connection\CQConnection;
 use ZM\Exception\WaitTimeoutException;
 use ZM\ModBase;
 use ZM\ModHandleType;
@@ -16,25 +16,23 @@ use ZM\ModHandleType;
 class RequestEvent
 {
     private $data;
-    /** @var \ZM\Event\Swoole\MessageEvent */
-    private $swoole_event;
+    /** @var CQConnection */
+    private $connection;
     private $circle;
 
-    public function __construct($data, \ZM\Event\Swoole\MessageEvent $event, $circle = 0) {
+    public function __construct($data, $connection, $circle = 0) {
         $this->data = $data;
-        $this->swoole_event = $event;
+        $this->connection = $connection;
         $this->circle = $circle;
     }
 
     public function onBefore() {
-        foreach (ZMBuf::$events[CQBefore::class][CQRequest::class] ?? [] as $v) {
+        foreach (ZMBuf::$events[CQBefore::class]["request"] ?? [] as $v) {
             $c = $v->class;
             /** @var CQRequest $v */
             $class = new $c([
                 "data" => $this->data,
-                "frame" => $this->swoole_event->frame,
-                "server" => $this->swoole_event->server,
-                "connection" => ConnectionManager::get($this->swoole_event->frame->fd)
+                "connection" => $this->connection
             ], ModHandleType::CQ_REQUEST);
             $r = call_user_func_array([$class, $v->method], []);
             if (!$r || $class->block_continue) return false;
@@ -58,9 +56,7 @@ class RequestEvent
                     if (!isset($obj[$c]))
                         $obj[$c] = new $c([
                             "data" => $this->data,
-                            "frame" => $this->swoole_event->frame,
-                            "server" => $this->swoole_event->server,
-                            "connection" => ConnectionManager::get($this->swoole_event->frame->fd)
+                            "connection" => $this->connection
                         ], ModHandleType::CQ_REQUEST);
                     $r = call_user_func([$obj[$c], $v->method]);
                     if (is_string($r)) $obj[$c]->reply($r);
@@ -73,13 +69,11 @@ class RequestEvent
     }
 
     public function onAfter() {
-        foreach (ZMBuf::$events[CQAfter::class][CQRequest::class] ?? [] as $v) {
+        foreach (ZMBuf::$events[CQAfter::class]["request"] ?? [] as $v) {
             $c = $v->class;
             $class = new $c([
                 "data" => $this->data,
-                "frame" => $this->swoole_event->frame,
-                "server" => $this->swoole_event->server,
-                "connection" => ConnectionManager::get($this->swoole_event->frame->fd)
+                "connection" => $this->connection
             ], ModHandleType::CQ_REQUEST);
             $r = call_user_func_array([$class, $v->method], []);
             if (!$r || $class->block_continue) return false;

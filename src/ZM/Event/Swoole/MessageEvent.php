@@ -42,9 +42,9 @@ class MessageEvent implements SwooleEvent
         try {
             if (ConnectionManager::get($this->frame->fd)->getType() == "qq") {
                 $data = json_decode($this->frame->data, true);
-                if (isset($data["post_type"]))
-                    EventHandler::callCQEvent($data, $this, 0);
-                else
+                if (isset($data["post_type"])) {
+                    EventHandler::callCQEvent($data, ConnectionManager::get($this->frame->fd), 0);
+                } else
                     EventHandler::callCQResponse($data);
             }
             foreach (ZMBuf::$events[SwooleEventAt::class] ?? [] as $v) {
