@@ -5,11 +5,9 @@ namespace Module\Example;
 
 
 use Framework\Console;
-use Framework\ZMBuf;
 use ZM\Annotation\CQ\CQCommand;
 use ZM\Annotation\Http\Controller;
 use ZM\Annotation\Http\RequestMapping;
-use ZM\Annotation\Module\Closed;
 use ZM\Annotation\Swoole\SwooleEventAt;
 use ZM\Connection\CQConnection;
 use ZM\ModBase;
@@ -47,5 +45,13 @@ class Hello extends ModBase
      */
     public function pong(){
         $this->response->end("ping");
+    }
+
+    /**
+     * @SwooleEventAt(type="open",rule="connectType:unknown")
+     */
+    public function closeUnknownConn(){
+        Console::info("Unknown connection , I will close it.");
+        $this->connection->close();
     }
 }
