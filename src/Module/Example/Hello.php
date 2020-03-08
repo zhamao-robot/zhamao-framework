@@ -5,7 +5,10 @@ namespace Module\Example;
 
 
 use Framework\Console;
+use Framework\ZMBuf;
 use ZM\Annotation\CQ\CQCommand;
+use ZM\Annotation\Http\Controller;
+use ZM\Annotation\Http\RequestMapping;
 use ZM\Annotation\Module\Closed;
 use ZM\Annotation\Swoole\SwooleEventAt;
 use ZM\Connection\CQConnection;
@@ -14,7 +17,7 @@ use ZM\ModBase;
 /**
  * Class Hello
  * @package Module\Example
- * @Closed()
+ * @Controller("/view")
  */
 class Hello extends ModBase
 {
@@ -30,5 +33,19 @@ class Hello extends ModBase
      */
     public function hello(){
         return "你好啊，我是由炸毛框架构建的机器人！";
+    }
+
+    /**
+     * @RequestMapping("/test/{ping}")
+     */
+    public function ping($param){
+        return "You input id is: ".$param["ping"];
+    }
+
+    /**
+     * @RequestMapping("/test/pong")
+     */
+    public function pong(){
+        $this->response->end("ping");
     }
 }

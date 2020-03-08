@@ -4,6 +4,7 @@
 namespace Module\TestMod;
 
 use Framework\Console;
+use ZM\Annotation\Http\RequestMapping;
 use ZM\Annotation\Swoole\SwooleEventAt;
 use ZM\Connection\WSConnection;
 use ZM\ModBase;
@@ -24,5 +25,10 @@ class Hola extends ModBase
         Console::warning("Unknown websocket has been shutdown.");
         Console::stackTrace();
         $this->connection->close();
+    }
+
+    /** @RequestMapping("/ping") */
+    public function ping(){
+        return "OKK";
     }
 }

@@ -16,6 +16,7 @@ use ZM\Annotation\Http\RequestMapping;
 use ZM\Annotation\Interfaces\CustomAnnotation;
 use ZM\Annotation\Interfaces\Level;
 use ZM\Annotation\Module\Closed;
+use ZM\Annotation\Module\InitBuffer;
 use ZM\Annotation\Module\SaveBuffer;
 use ZM\Annotation\Swoole\SwooleEventAfter;
 use ZM\Annotation\Swoole\SwooleEventAt;
@@ -52,6 +53,8 @@ class AnnotationParser
                     $class_prefix = $vs->prefix;
                 } elseif ($vs instanceof SaveBuffer) {
                     DataProvider::addSaveBuffer($vs->buf_name, $vs->sub_folder);
+                } elseif ($vs instanceof InitBuffer) {
+                    ZMBuf::set($vs->buf_name, []);
                 }
             }
             foreach ($methods as $vs) {

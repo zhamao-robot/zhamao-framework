@@ -7,6 +7,8 @@ namespace Module\TestMod;
 use Framework\Console;
 use ZM\Annotation\CQ\CQCommand;
 use ZM\Annotation\CQ\CQNotice;
+use ZM\Annotation\Http\Controller;
+use ZM\Annotation\Http\RequestMapping;
 use ZM\Annotation\Swoole\SwooleEventAt;
 use ZM\Connection\CQConnection;
 use ZM\ModBase;
@@ -14,6 +16,7 @@ use ZM\ModBase;
 /**
  * Class CQTest
  * @package Module\TestMod
+ * @Controller("/view/test2")
  */
 class CQTest extends ModBase
 {
@@ -35,6 +38,16 @@ class CQTest extends ModBase
     public function hello($arg) {
         return "我也不知道".$arg[0]."是什么呀";
     }
+
+    /**
+     * @RequestMapping("/ping")
+     */
+    public function ping(){}
+
+    /**
+     * @RequestMapping("/pong")
+     */
+    public function pong(){}
 
     /**
      * @CQNotice(notice_type="group_admin")
