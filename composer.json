@@ -3,6 +3,7 @@
     "description": "high-performance intelligent assistant",
     "minimum-stability": "stable",
     "license": "proprietary",
+    "version": "1.0",
     "authors": [
         {
             "name": "whale",
