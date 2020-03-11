@@ -1,7 +1,7 @@
 # zhamao-framework
 
 [![作者QQ](https://img.shields.io/badge/作者QQ-627577391-orange.svg)]()
-[![license](https://img.shields.io/badge/license-MIT-blue.svg)]()
+[![license](https://img.shields.io/badge/license-Apache-blue.svg)]()
 [![版本](https://img.shields.io/badge/version-2020.3.2-green.svg)]()
 
 [![this counter](https://img.shields.io/github/search/zhamao-robot/zhamao-framework/this.svg)](https://github.com/zhamao-robot/zhamao-framework/search?q=this)
