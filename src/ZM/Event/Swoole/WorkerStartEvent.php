@@ -11,6 +11,7 @@ use Swoole\Coroutine;
 use Swoole\Timer;
 use ZM\Annotation\AnnotationBase;
 use ZM\Annotation\AnnotationParser;
+use ZM\Annotation\Swoole\OnStart;
 use ZM\Annotation\Swoole\SwooleEventAfter;
 use ZM\Connection\ConnectionManager;
 use ZM\DB\DB;
@@ -87,6 +88,12 @@ class WorkerStartEvent implements SwooleEvent
             Coroutine::resume($v);
         }
         ZMBuf::unsetCache("wait_start");
+        foreach(ZMBuf::$events[OnStart::class] ?? [] as $v) {
+            $class_name = $v->class;
+            /** @var ModBase $class */
+            $class = new $class_name(["server" => $this->server, "worker_id" => $this->worker_id], ModHandleType::SWOOLE_WORKER_START);
+            call_user_func_array([$class, $v->method], []);
+        }
         foreach (ZMBuf::$events[SwooleEventAfter::class] ?? [] as $v) {
             /** @var AnnotationBase $v */
             if (strtolower($v->type) == "workerstart") {

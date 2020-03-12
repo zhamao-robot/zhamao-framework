@@ -17,6 +17,7 @@ use ZM\Annotation\Interfaces\Level;
 use ZM\Annotation\Module\Closed;
 use ZM\Annotation\Module\InitBuffer;
 use ZM\Annotation\Module\SaveBuffer;
+use ZM\Annotation\Swoole\OnStart;
 use ZM\Annotation\Swoole\SwooleEventAfter;
 use ZM\Annotation\Swoole\SwooleEventAt;
 use ZM\Annotation\Interfaces\Rule;
@@ -73,6 +74,9 @@ class AnnotationParser
                     elseif ($vss instanceof CustomAnnotation) ZMBuf::$events[get_class($vss)][] = $vss;
                     elseif ($vss instanceof CQBefore) ZMBuf::$events[CQBefore::class][$vss->cq_event][] = $vss;
                     elseif ($vss instanceof CQAfter) ZMBuf::$events[CQAfter::class][$vss->cq_event][] = $vss;
+                    elseif ($vss instanceof OnStart) {
+                        ZMBuf::$events[OnStart::class][]=$vss;
+                    }
                 }
             }
         }
