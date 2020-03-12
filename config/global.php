@@ -7,6 +7,9 @@ $config['host'] = '0.0.0.0';
 /** bind port */
 $config['port'] = 20001;
 
+/** 框架开到公网或外部的HTTP访问链接，通过 DataProvider::getFrameworkLink() 获取 */
+$config['http_reverse_link'] = "http://127.0.0.1:".$config['port'];
+
 /** 存放框架内文件数据的目录 */
 $config['zm_data'] = WORKING_DIR.'/zm_data/';
 

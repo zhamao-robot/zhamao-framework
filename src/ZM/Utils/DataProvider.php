@@ -31,6 +31,10 @@ class DataProvider
         echo Console::setColor("saved", "lightblue").PHP_EOL;
     }
 
+    public static function getFrameworkLink(){
+        return ZMBuf::globals("http_reverse_link");
+    }
+
     private static function getJsonData(string $string) {
         if(!file_exists(self::getDataFolder().$string)) return [];
         return json_decode(Co::readFile(self::getDataFolder().$string), true);

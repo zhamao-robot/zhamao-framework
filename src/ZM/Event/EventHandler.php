@@ -15,6 +15,7 @@ use ZM\Utils\ZMUtil;
 class EventHandler
 {
     public static function callSwooleEvent($event_name, $param0, $param1 = null) {
+        //$starttime = microtime(true);
         $event_name = strtolower($event_name);
         switch ($event_name) {
             case "workerstart":
