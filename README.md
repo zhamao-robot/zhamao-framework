@@ -55,7 +55,7 @@ Pages：[https://framework.zhamao.xin/](https://framework.zhamao.xin/)
 我们会将捐赠的资金用于本项目驱动的炸毛机器人和框架文档的服务器开销上。
 
 ### 支付宝
-![支付宝二维码](/resources/images/alipay.jpg)
+![支付宝二维码](/resources/images/alipay_img.jpg)
 
 ## 关于
 框架和 SDK 是 炸毛机器人 项目的核心框架开源部分。炸毛机器人（3276124472）是作者写的一个高性能机器人，曾获全国计算机设计大赛一等奖。
