@@ -144,6 +144,10 @@ class WorkerStartEvent implements SwooleEvent
 
         //加载Custom目录下的自定义的内部类
         ConnectionManager::registerCustomClass();
+
+        //加载自定义的全局函数
+        if(file_exists(WORKING_DIR."/src/Custom/global_function.php"))
+            require_once WORKING_DIR."/src/Custom/global_function.php";
     }
 
     private function setAutosaveTimer($globals) {
