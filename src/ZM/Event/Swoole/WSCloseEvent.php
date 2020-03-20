@@ -8,6 +8,7 @@ use Framework\ZMBuf;
 use Swoole\Server;
 use ZM\Annotation\Swoole\SwooleEventAfter;
 use ZM\Annotation\Swoole\SwooleEventAt;
+use ZM\Connection\ConnectionManager;
 use ZM\ModBase;
 use ZM\ModHandleType;
 use ZM\Utils\ZMUtil;
@@ -28,6 +29,7 @@ class WSCloseEvent implements SwooleEvent
      */
     public function onActivate() {
         ZMUtil::checkWait();
+        ConnectionManager::close($this->fd);
         foreach(ZMBuf::$events[SwooleEventAt::class] ?? [] as $v) {
             if(strtolower($v->type) == "close" && $this->parseSwooleRule($v)) {
                 $c = $v->class;
