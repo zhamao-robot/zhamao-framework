@@ -40,7 +40,7 @@ class DataProvider
         return ZMBuf::globals("http_reverse_link");
     }
 
-    private static function getJsonData(string $string) {
+    public static function getJsonData(string $string) {
         if(!file_exists(self::getDataConfig().$string)) return [];
         return json_decode(Co::readFile(self::getDataConfig().$string), true);
     }

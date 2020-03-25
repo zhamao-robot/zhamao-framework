@@ -10,7 +10,12 @@ use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
 use ZM\Annotation\CQ\{CQAfter, CQBefore, CQCommand, CQMessage, CQMetaEvent, CQNotice, CQRequest};
+use ZM\Annotation\Http\After;
+use ZM\Annotation\Http\Before;
 use ZM\Annotation\Http\Controller;
+use ZM\Annotation\Http\HandleException;
+use ZM\Annotation\Http\Middleware;
+use ZM\Annotation\Http\MiddlewareClass;
 use ZM\Annotation\Http\RequestMapping;
 use ZM\Annotation\Interfaces\CustomAnnotation;
 use ZM\Annotation\Interfaces\Level;
@@ -22,6 +27,7 @@ use ZM\Annotation\Swoole\SwooleEventAfter;
 use ZM\Annotation\Swoole\SwooleEventAt;
 use ZM\Annotation\Interfaces\Rule;
 use ZM\Connection\WSConnection;
+use ZM\Http\MiddlewareInterface;
 use ZM\Utils\DataProvider;
 
 class AnnotationParser
@@ -31,8 +37,7 @@ class AnnotationParser
      * @throws ReflectionException
      * @throws AnnotationException
      */
-    public static function registerMods()
-    {
+    public static function registerMods() {
         self::loadAnnotationClasses();
         $all_class = getAllClasses(WORKING_DIR . "/src/Module/", "Module");
         ZMBuf::$req_mapping[0] = [
@@ -55,6 +60,26 @@ class AnnotationParser
                     DataProvider::addSaveBuffer($vs->buf_name, $vs->sub_folder);
                 } elseif ($vs instanceof InitBuffer) {
                     ZMBuf::set($vs->buf_name, []);
+                } elseif ($vs instanceof MiddlewareClass) {
+                    $result = [
+                        "class" => "\\".$reflection_class->getName()
+                    ];
+                    foreach ($methods as $vss) {
+                        $method_annotations = $reader->getMethodAnnotations($vss);
+                        foreach ($method_annotations as $vsss) {
+                            if ($vss instanceof Rule) $vss = self::registerRuleEvent($vsss, $vss, $reflection_class);
+                            else $vss = self::registerMethod($vsss, $vss, $reflection_class);
+                            echo get_class($vsss).PHP_EOL;
+                            if ($vsss instanceof Before) $result["before"] = $vsss->method;
+                            if ($vsss instanceof After) $result["after"] = $vsss->method;
+                            if ($vsss instanceof HandleException) {
+                                $result["exception"] = $vsss->class_name;
+                                $result["exception_method"] = $vsss->method;
+                            }
+                        }
+                    }
+                    ZMBuf::$events[MiddlewareClass::class]["\\".$reflection_class->getName()] = $result;
+                    continue 2;
                 }
             }
             foreach ($methods as $vs) {
@@ -74,8 +99,9 @@ class AnnotationParser
                     elseif ($vss instanceof CustomAnnotation) ZMBuf::$events[get_class($vss)][] = $vss;
                     elseif ($vss instanceof CQBefore) ZMBuf::$events[CQBefore::class][$vss->cq_event][] = $vss;
                     elseif ($vss instanceof CQAfter) ZMBuf::$events[CQAfter::class][$vss->cq_event][] = $vss;
-                    elseif ($vss instanceof OnStart) {
-                        ZMBuf::$events[OnStart::class][]=$vss;
+                    elseif ($vss instanceof OnStart) ZMBuf::$events[OnStart::class][] = $vss;
+                    elseif ($vss instanceof Middleware){
+                        ZMBuf::$events[MiddlewareInterface::class][$vss->class][$vss->method] = $vss->middleware;
                     }
                 }
             }
@@ -84,7 +110,7 @@ class AnnotationParser
         ZMBuf::$req_mapping = $tree[0];
         //给支持level的排个序
         foreach (ZMBuf::$events as $class_name => $v) {
-            if ((new $class_name()) instanceof Level) {
+            if (is_a($class_name, Level::class, true)) {
                 for ($i = 0; $i < count(ZMBuf::$events[$class_name]) - 1; ++$i) {
                     for ($j = 0; $j < count(ZMBuf::$events[$class_name]) - $i - 1; ++$j) {
                         $l1 = ZMBuf::$events[$class_name][$j]->level;
@@ -100,8 +126,7 @@ class AnnotationParser
         }
     }
 
-    private static function getRuleCallback($rule_str)
-    {
+    private static function getRuleCallback($rule_str) {
         $func = null;
         $rule = $rule_str;
         if ($rule != "") {
@@ -179,23 +204,20 @@ class AnnotationParser
         return $func;
     }
 
-    private static function registerRuleEvent(?AnnotationBase $vss, ReflectionMethod $method, ReflectionClass $class)
-    {
+    private static function registerRuleEvent(?AnnotationBase $vss, ReflectionMethod $method, ReflectionClass $class) {
         $vss->callback = self::getRuleCallback($vss->getRule());
         $vss->method = $method->getName();
         $vss->class = $class->getName();
         return $vss;
     }
 
-    private static function registerMethod(?AnnotationBase $vss, ReflectionMethod $method, ReflectionClass $class)
-    {
+    private static function registerMethod(?AnnotationBase $vss, ReflectionMethod $method, ReflectionClass $class) {
         $vss->method = $method->getName();
         $vss->class = $class->getName();
         return $vss;
     }
 
-    private static function registerRequestMapping(RequestMapping $vss, ReflectionMethod $method, ReflectionClass $class, string $prefix)
-    {
+    private static function registerRequestMapping(RequestMapping $vss, ReflectionMethod $method, ReflectionClass $class, string $prefix) {
         $array = ZMBuf::$req_mapping;
         $uid = count($array);
         $prefix_exp = explode("/", $prefix);
@@ -263,8 +285,7 @@ class AnnotationParser
         ZMBuf::$req_mapping = $array;
     }
 
-    private static function loadAnnotationClasses()
-    {
+    private static function loadAnnotationClasses() {
         $class = getAllClasses(WORKING_DIR . "/src/ZM/Annotation/", "ZM\\Annotation");
         foreach ($class as $v) {
             $s = WORKING_DIR . '/src/' . str_replace("\\", "/", $v) . ".php";
@@ -277,8 +298,7 @@ class AnnotationParser
         }
     }
 
-    public static function genTree($items)
-    {
+    public static function genTree($items) {
         $tree = array();
         foreach ($items as $item)
             if (isset($items[$item['pid']]))

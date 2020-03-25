@@ -5,10 +5,13 @@ namespace ZM\Event\Swoole;
 
 
 use Closure;
+use Exception;
 use Framework\ZMBuf;
 use Swoole\Http\Request;
+use ZM\Annotation\Http\MiddlewareClass;
 use ZM\Annotation\Swoole\SwooleEventAfter;
 use ZM\Annotation\Swoole\SwooleEventAt;
+use ZM\Http\MiddlewareInterface;
 use ZM\Http\Response;
 use ZM\ModBase;
 use ZM\ModHandleType;
@@ -30,6 +33,10 @@ class RequestEvent implements SwooleEvent
         $this->response = $response;
     }
 
+    /**
+     * @return $this|SwooleEvent
+     * @throws Exception
+     */
     public function onActivate() {
         ZMUtil::checkWait();
         foreach (ZMBuf::globals("http_header") as $k => $v) {
@@ -82,14 +89,44 @@ class RequestEvent implements SwooleEvent
 
         if (in_array(strtoupper($this->request->server["request_method"]), $node["request_method"] ?? [])) { //判断目标方法在不在里面
             $c_name = $node["class"];
-            /** @var ModBase $class */
-            $class = new $c_name(["request" => $this->request, "response" => $this->response, "params" => $params], ModHandleType::SWOOLE_REQUEST);
-            $r = call_user_func_array([$class, $node["method"]], [$params]);
-            if (is_string($r) && !$this->response->isEnd()) $this->response->end($r);
-            if ($class->block_continue) return $this;
-            if ($this->response->isEnd()) return $this;
+            if (isset(ZMBuf::$events[MiddlewareInterface::class][$c_name][$node["method"]])) {
+                $middleware = ZMBuf::$events[MiddlewareInterface::class][$c_name][$node["method"]];
+                $middleware = ZMBuf::$events[MiddlewareClass::class][$middleware];
+                $before = $middleware["class"];
+                $r = new $before();
+                $before_result = true;
+                if (isset($middleware["before"])) {
+                    $before_result = call_user_func([$r, $middleware["before"]], $this->request, $this->response, $params);
+                    if ($before_result !== false) $before_result = true;
+                }
+                if ($before_result) {
+                    try {
+                        /** @var ModBase $class */
+                        $class = new $c_name(["request" => $this->request, "response" => $this->response, "params" => $params], ModHandleType::SWOOLE_REQUEST);
+                        $result = call_user_func_array([$class, $node["method"]], [$params]);
+                        if (is_string($result) && !$this->response->isEnd()) $this->response->end($result);
+                        if (!$this->response->isEnd()) goto eventCall;
+                    } catch (Exception $e) {
+                        if (!isset($middleware["exception"])) throw $e;
+                        if ($e instanceof $middleware["exception"]) {
+                            call_user_func([$r, $middleware["exception_method"]], $e, $this->request, $this->response, $params);
+                            return $this;
+                        } else throw $e;
+                    }
+                }
+                if (isset($middleware["after"])) {
+                    call_user_func([$r, $middleware["after"]], $this->request, $this->response, $params);
+                    return $this;
+                }
+            } else {
+                /** @var ModBase $class */
+                $class = new $c_name(["request" => $this->request, "response" => $this->response, "params" => $params], ModHandleType::SWOOLE_REQUEST);
+                $r = call_user_func_array([$class, $node["method"]], [$params]);
+                if (is_string($r) && !$this->response->isEnd()) $this->response->end($r);
+                if (!$this->response->isEnd()) goto eventCall;
+            }
         }
-
+        eventCall:
         foreach (ZMBuf::$events[SwooleEventAt::class] ?? [] as $v) {
             if (strtolower($v->type) == "request" && $this->parseSwooleRule($v)) {
                 $c = $v->class;
@@ -127,7 +164,7 @@ class RequestEvent implements SwooleEvent
     }
 
     private function parseSwooleRule($v) {
-        switch (explode(":",$v->rule)[0]) {
+        switch (explode(":", $v->rule)[0]) {
             case "containsGet":
             case "containsPost":
                 if ($v->callback instanceof Closure) return call_user_func($v->callback, $this->request);

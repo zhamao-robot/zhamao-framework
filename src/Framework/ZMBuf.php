@@ -46,8 +46,6 @@ class ZMBuf
     // Atomic：可跨进程读写的原子计数，任何地方均可使用
     /** @var null|swoole_atomic */
     static $info_level = null;//保存log等级的原子计数
-    /** @var swoole_atomic $reload_time */
-
     public static $events = [];
     /** @var Atomic[] */
     public static $atomics;

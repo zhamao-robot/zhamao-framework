@@ -6,7 +6,6 @@ namespace Module\Example;
 
 use Framework\Console;
 use ZM\Annotation\CQ\CQCommand;
-use ZM\Annotation\Http\Controller;
 use ZM\Annotation\Http\RequestMapping;
 use ZM\Annotation\Swoole\SwooleEventAt;
 use ZM\Connection\CQConnection;
@@ -15,7 +14,6 @@ use ZM\ModBase;
 /**
  * Class Hello
  * @package Module\Example
- * @Controller("/view")
  */
 class Hello extends ModBase
 {
@@ -34,17 +32,10 @@ class Hello extends ModBase
     }
 
     /**
-     * @RequestMapping("/test/{ping}")
-     */
-    public function ping($param){
-        return "You input id is: ".$param["ping"];
-    }
-
-    /**
-     * @RequestMapping("/test/pong")
+     * @RequestMapping("/test/ping")
      */
     public function pong(){
-        $this->response->end("ping");
+        return "pong";
     }
 
     /**
