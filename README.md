@@ -4,7 +4,7 @@
 [![zhamao License](https://img.shields.io/hexpm/l/plug.svg?maxAge=2592000)](https://github.com/zhamao-robot/zhamao-framework/blob/master/LICENSE)
 [![版本](https://img.shields.io/badge/version-2020.3.2-green.svg)]()
 
-[![this counter](https://img.shields.io/github/search/zhamao-robot/zhamao-framework/this.svg)](https://github.com/zhamao-robot/zhamao-framework/search?q=this)
+[![goto counter](https://img.shields.io/github/search/zhamao-robot/zhamao-framework/goto.svg)](https://github.com/zhamao-robot/zhamao-framework/search?q=goto)
 [![TODO counter](https://img.shields.io/github/search/zhamao-robot/zhamao-framework/TODO.svg)](https://github.com/zhamao-robot/zhamao-framework/search?q=TODO)
 
 一个异步、多平台兼容的 **聊天机器人** 框架。
