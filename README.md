@@ -2,7 +2,7 @@
 
 [![作者QQ](https://img.shields.io/badge/作者QQ-627577391-orange.svg)]()
 [![zhamao License](https://img.shields.io/hexpm/l/plug.svg?maxAge=2592000)](https://github.com/zhamao-robot/zhamao-framework/blob/master/LICENSE)
-[![版本](https://img.shields.io/badge/version-2020.3.2-green.svg)]()
+[![版本](https://img.shields.io/badge/version-1.1-green.svg)]()
 
 [![goto counter](https://img.shields.io/github/search/zhamao-robot/zhamao-framework/goto.svg)](https://github.com/zhamao-robot/zhamao-framework/search?q=goto)
 [![TODO counter](https://img.shields.io/github/search/zhamao-robot/zhamao-framework/TODO.svg)](https://github.com/zhamao-robot/zhamao-framework/search?q=TODO)
