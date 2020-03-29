@@ -51,6 +51,7 @@ class ZMBuf
     public static $atomics;
     public static $req_mapping = [];
     public static $config = [];
+    public static $context = [];
 
     static function get($name, $default = null) {
         return self::$cache[$name] ?? $default;

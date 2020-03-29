@@ -1,5 +1,8 @@
 <?php
 
+use Framework\ZMBuf;
+use ZM\Utils\Context;
+
 function classLoader($p) {
     $filepath = getClassPath($p);
     if ($filepath === null)
@@ -143,4 +146,20 @@ function matchArgs($pattern, $context) {
         }
         return $result;
     } else return false;
+}
+
+function set_coroutine_params($array){
+    $cid = Co::getCid();
+    if($cid == -1) die("Cannot set coroutine params at none coroutine mode.");
+    ZMBuf::$context[$cid] = $array;
+    foreach(ZMBuf::$context as $c => $v) {
+        if(!Co::exists($c)) unset(ZMBuf::$context[$c]);
+    }
+}
+
+function context(){
+    $cid = Co::getCid();
+    if(isset(ZMBuf::$context[$cid])) {
+        return new Context(ZMBuf::$context[$cid], $cid);
+    } else return null;
 }

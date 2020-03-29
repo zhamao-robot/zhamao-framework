@@ -5,6 +5,7 @@ namespace ZM\Event;
 
 
 use Co;
+use Error;
 use Exception;
 use Framework\Console;
 use Framework\ZMBuf;
@@ -28,6 +29,9 @@ class EventHandler
 
                     ZMUtil::stop();
                     return;
+                } catch(Error $e) {
+                    var_export($e);
+                    ZMUtil::stop();
                 }
                 break;
             case "message":

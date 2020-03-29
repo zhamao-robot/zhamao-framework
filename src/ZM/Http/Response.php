@@ -157,6 +157,11 @@ class Response
 
     public function isEnd() { return $this->is_end; }
 
+    public function endWithStatus($status_code = 200, $content = null){
+        $this->status($status_code);
+        $this->end($content);
+    }
+
     /**
      * @param $filename
      * @param $offset

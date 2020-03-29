@@ -5,6 +5,7 @@ namespace ZM\Annotation;
 
 use Doctrine\Common\Annotations\AnnotationException;
 use Doctrine\Common\Annotations\AnnotationReader;
+use Framework\Console;
 use Framework\ZMBuf;
 use ReflectionClass;
 use ReflectionException;
@@ -61,24 +62,30 @@ class AnnotationParser
                 } elseif ($vs instanceof InitBuffer) {
                     ZMBuf::set($vs->buf_name, []);
                 } elseif ($vs instanceof MiddlewareClass) {
+                    Console::info("正在注册中间件 ".$vs->class);
                     $result = [
-                        "class" => "\\".$reflection_class->getName()
+                        "class" => "\\" . $reflection_class->getName()
                     ];
                     foreach ($methods as $vss) {
+                        if ($vss->getName() == "getName") {
+                            /** @var MiddlewareInterface $tmp */
+                            $tmp = new $v();
+                            $result["name"] = $tmp->getName();
+                            continue;
+                        }
                         $method_annotations = $reader->getMethodAnnotations($vss);
                         foreach ($method_annotations as $vsss) {
                             if ($vss instanceof Rule) $vss = self::registerRuleEvent($vsss, $vss, $reflection_class);
                             else $vss = self::registerMethod($vsss, $vss, $reflection_class);
-                            echo get_class($vsss).PHP_EOL;
+                            //echo get_class($vsss) . PHP_EOL;
                             if ($vsss instanceof Before) $result["before"] = $vsss->method;
                             if ($vsss instanceof After) $result["after"] = $vsss->method;
                             if ($vsss instanceof HandleException) {
-                                $result["exception"] = $vsss->class_name;
-                                $result["exception_method"] = $vsss->method;
+                                $result["exceptions"][$vsss->class_name] = $vsss->method;
                             }
                         }
                     }
-                    ZMBuf::$events[MiddlewareClass::class]["\\".$reflection_class->getName()] = $result;
+                    ZMBuf::$events[MiddlewareClass::class][$result["name"]] = $result;
                     continue 2;
                 }
             }
@@ -100,7 +107,7 @@ class AnnotationParser
                     elseif ($vss instanceof CQBefore) ZMBuf::$events[CQBefore::class][$vss->cq_event][] = $vss;
                     elseif ($vss instanceof CQAfter) ZMBuf::$events[CQAfter::class][$vss->cq_event][] = $vss;
                     elseif ($vss instanceof OnStart) ZMBuf::$events[OnStart::class][] = $vss;
-                    elseif ($vss instanceof Middleware){
+                    elseif ($vss instanceof Middleware) {
                         ZMBuf::$events[MiddlewareInterface::class][$vss->class][$vss->method] = $vss->middleware;
                     }
                 }

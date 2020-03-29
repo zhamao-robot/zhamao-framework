@@ -6,6 +6,7 @@ namespace Module\Example;
 
 use Framework\Console;
 use ZM\Annotation\CQ\CQCommand;
+use ZM\Annotation\Http\Middleware;
 use ZM\Annotation\Http\RequestMapping;
 use ZM\Annotation\Swoole\SwooleEventAt;
 use ZM\Connection\CQConnection;
@@ -33,6 +34,7 @@ class Hello extends ModBase
 
     /**
      * @RequestMapping("/test/ping")
+     * @Middleware("timer")
      */
     public function pong(){
         return "pong";

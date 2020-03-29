@@ -5,6 +5,7 @@ namespace ZM\Event\Swoole;
 
 
 use Closure;
+use Doctrine\Common\Annotations\AnnotationException;
 use Exception;
 use Framework\ZMBuf;
 use Swoole\Http\Request;
@@ -87,10 +88,13 @@ class RequestEvent implements SwooleEvent
             return $this;
         }
 
+        set_coroutine_params(["request" => $this->request, "response" => $this->response, "params" => $params]);
+
         if (in_array(strtoupper($this->request->server["request_method"]), $node["request_method"] ?? [])) { //判断目标方法在不在里面
             $c_name = $node["class"];
             if (isset(ZMBuf::$events[MiddlewareInterface::class][$c_name][$node["method"]])) {
                 $middleware = ZMBuf::$events[MiddlewareInterface::class][$c_name][$node["method"]];
+                if(!isset(ZMBuf::$events[MiddlewareClass::class][$middleware])) throw new AnnotationException("Annotation parse error: Unknown MiddlewareClass named \"{$middleware}\"!");
                 $middleware = ZMBuf::$events[MiddlewareClass::class][$middleware];
                 $before = $middleware["class"];
                 $r = new $before();
@@ -107,11 +111,14 @@ class RequestEvent implements SwooleEvent
                         if (is_string($result) && !$this->response->isEnd()) $this->response->end($result);
                         if (!$this->response->isEnd()) goto eventCall;
                     } catch (Exception $e) {
-                        if (!isset($middleware["exception"])) throw $e;
-                        if ($e instanceof $middleware["exception"]) {
-                            call_user_func([$r, $middleware["exception_method"]], $e, $this->request, $this->response, $params);
-                            return $this;
-                        } else throw $e;
+                        if (!isset($middleware["exceptions"])) throw $e;
+                        foreach($middleware["exceptions"] as $name => $method) {
+                            if($e instanceof $name) {
+                                call_user_func([$r, $method], $e, $this->request, $this->response, $params);
+                                return $this;
+                            }
+                        }
+                        throw $e;
                     }
                 }
                 if (isset($middleware["after"])) {
