@@ -3,6 +3,7 @@
 
 namespace Framework;
 
+use Swoole\Runtime;
 use ZM\Event\EventHandler;
 use Exception;
 use Swoole\WebSocket\Server;
@@ -38,6 +39,7 @@ class FrameworkLoader
 
         chdir(__DIR__ . '/../..');
         define('WORKING_DIR', getcwd());
+        Runtime::enableCoroutine();
         $this->requireGlobalFunctions();
         $this->registerAutoloader('classLoader');
         self::$settings = new GlobalConfig();

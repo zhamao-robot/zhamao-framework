@@ -1,5 +1,6 @@
 <?php
 
+use Framework\Console;
 use Framework\ZMBuf;
 use ZM\Utils\Context;
 
@@ -11,7 +12,7 @@ function classLoader($p) {
     try {
         require_once $filepath;
     } catch (Exception $e) {
-        echo "Error when finding class: ".$p.PHP_EOL;
+        echo "Error when finding class: " . $p . PHP_EOL;
         die;
     }
 }
@@ -148,18 +149,29 @@ function matchArgs($pattern, $context) {
     } else return false;
 }
 
-function set_coroutine_params($array){
+function set_coroutine_params($array) {
     $cid = Co::getCid();
-    if($cid == -1) die("Cannot set coroutine params at none coroutine mode.");
+    if ($cid == -1) die("Cannot set coroutine params at none coroutine mode.");
     ZMBuf::$context[$cid] = $array;
-    foreach(ZMBuf::$context as $c => $v) {
-        if(!Co::exists($c)) unset(ZMBuf::$context[$c]);
+    foreach (ZMBuf::$context as $c => $v) {
+        if (!Co::exists($c)) unset(ZMBuf::$context[$c]);
     }
 }
 
-function context(){
+function context() {
     $cid = Co::getCid();
-    if(isset(ZMBuf::$context[$cid])) {
+    if (isset(ZMBuf::$context[$cid])) {
         return new Context(ZMBuf::$context[$cid], $cid);
-    } else return null;
+    } else {
+        while (($pcid = Co::getPcid($cid)) !== -1) {
+            if (isset(ZMBuf::$context[$cid])) return new Context(ZMBuf::$context[$cid], $cid);
+            else $cid = $pcid;
+        }
+        return null;
+    }
+}
+
+function debug($msg) {
+    if (ZMBuf::$atomics["info_level"]->get() == 1)
+        Console::log(date("[H:i:s ") . "DEBUG] " . $msg, 'gray');
 }

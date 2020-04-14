@@ -21,6 +21,7 @@ class Response
      */
     private $response;
     private $is_end = false;
+    private $status_code;
 
     public function __construct(\Swoole\Http\Response $response) {
         $this->response = $response;
@@ -90,7 +91,12 @@ class Response
      * @return mixed
      */
     public function status($http_code, $reason = null) {
+        $this->status_code = $http_code;
         return $this->response->status($http_code, $reason);
+    }
+
+    public function getStatusCode() {
+        return $this->status_code ?? 200;
     }
 
     /**

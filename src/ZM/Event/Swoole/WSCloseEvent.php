@@ -30,6 +30,7 @@ class WSCloseEvent implements SwooleEvent
     public function onActivate() {
         ZMUtil::checkWait();
         ConnectionManager::close($this->fd);
+        set_coroutine_params(["server" => $this->server, "fd" => $this->fd]);
         foreach(ZMBuf::$events[SwooleEventAt::class] ?? [] as $v) {
             if(strtolower($v->type) == "close" && $this->parseSwooleRule($v)) {
                 $c = $v->class;

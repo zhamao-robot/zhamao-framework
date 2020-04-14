@@ -39,17 +39,19 @@ class MessageEvent implements SwooleEvent
      */
     public function onActivate() {
         ZMUtil::checkWait();
+        $conn = ConnectionManager::get($this->frame->fd);
+        set_coroutine_params(["server" => $this->server, "frame" => $this->frame, "connection" => $conn]);
         try {
-            if (ConnectionManager::get($this->frame->fd)->getType() == "qq") {
+            if ($conn->getType() == "qq") {
                 $data = json_decode($this->frame->data, true);
                 if (isset($data["post_type"])) {
+                    set_coroutine_params(["data" => $data, "connection" => $conn]);
                     EventHandler::callCQEvent($data, ConnectionManager::get($this->frame->fd), 0);
                 } else
                     EventHandler::callCQResponse($data);
             }
             foreach (ZMBuf::$events[SwooleEventAt::class] ?? [] as $v) {
                 if (strtolower($v->type) == "message" && $this->parseSwooleRule($v)) {
-                    $conn = ConnectionManager::get($this->frame->fd);
                     $c = $v->class;
                     /** @var ModBase $class */
                     $class = new $c(["server" => $this->server, "frame" => $this->frame, "connection" => $conn], ModHandleType::SWOOLE_MESSAGE);

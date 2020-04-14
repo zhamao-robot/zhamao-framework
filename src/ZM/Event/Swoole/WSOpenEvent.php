@@ -55,6 +55,7 @@ class WSOpenEvent implements SwooleEvent
             $this->conn = new $type_conn($this->server, $this->request->fd);
         }
         ZMBuf::$connect[$this->request->fd] = $this->conn;
+        set_coroutine_params(["server" => $this->server, "request" => $this->request, "connection" => $this->conn]);
         foreach (ZMBuf::$events[SwooleEventAt::class] ?? [] as $v) {
             if (strtolower($v->type) == "open" && $this->parseSwooleRule($v) === true) {
                 $c = $v->class;

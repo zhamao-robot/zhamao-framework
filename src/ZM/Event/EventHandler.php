@@ -43,6 +43,9 @@ class EventHandler
                 } catch (Exception $e) {
                     /** @var Response $param1 */
                     $param1->status(500);
+                    Console::info($param0->server["remote_addr"].":".$param0->server["remote_port"].
+                        " [".$param1->getStatusCode()."] ".$param0->server["request_uri"]
+                    );
                     if (!$param1->isEnd()) $param1->end("Internal server error: " . $e->getMessage());
                     Console::error("Internal server error (500), caused by uncaught exception.");
                     Console::log($e->getTraceAsString(), "gray");
