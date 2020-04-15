@@ -37,8 +37,15 @@ switch ($argv[1] ?? '') {
         }
         $loader = new FrameworkLoader($argv);
         break;
+    case '--help':
+    case '-h':
+        echo "\nUsage: ".$argv[0]." [OPTION]\n";
+        echo "\nzhamao-framework start script, provides several startup arguments.";
+        echo "\n\n  -h, --help\t\tShow this help menu";
+        echo "\n  framework, server\tstart main framework, this is default option\n\n";
+        break;
     default:
-        echo "Unknown option \"{$argv[1]}\"!\n";
+        echo "Unknown option \"{$argv[1]}\"!\n\"--help\" for more information\n";
         break;
 }
 

@@ -107,9 +107,7 @@ class AnnotationParser
                     elseif ($vss instanceof CQBefore) ZMBuf::$events[CQBefore::class][$vss->cq_event][] = $vss;
                     elseif ($vss instanceof CQAfter) ZMBuf::$events[CQAfter::class][$vss->cq_event][] = $vss;
                     elseif ($vss instanceof OnStart) ZMBuf::$events[OnStart::class][] = $vss;
-                    elseif ($vss instanceof Middleware) {
-                        ZMBuf::$events[MiddlewareInterface::class][$vss->class][$vss->method] = $vss->middleware;
-                    }
+                    elseif ($vss instanceof Middleware) ZMBuf::$events[MiddlewareInterface::class][$vss->class][$vss->method] = $vss->middleware;
                 }
             }
         }

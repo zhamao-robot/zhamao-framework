@@ -2,7 +2,7 @@
 
 use Framework\Console;
 use Framework\ZMBuf;
-use ZM\Utils\Context;
+use ZM\Context\ContextInterface;
 
 function classLoader($p) {
     $filepath = getClassPath($p);
@@ -158,13 +158,17 @@ function set_coroutine_params($array) {
     }
 }
 
+/**
+ * @return ContextInterface|null
+ */
 function context() {
     $cid = Co::getCid();
+    $c_class = ZMBuf::globals("context_class");
     if (isset(ZMBuf::$context[$cid])) {
-        return new Context(ZMBuf::$context[$cid], $cid);
+        return new $c_class(ZMBuf::$context[$cid], $cid);
     } else {
         while (($pcid = Co::getPcid($cid)) !== -1) {
-            if (isset(ZMBuf::$context[$cid])) return new Context(ZMBuf::$context[$cid], $cid);
+            if (isset(ZMBuf::$context[$cid])) return new $c_class(ZMBuf::$context[$cid], $cid);
             else $cid = $pcid;
         }
         return null;

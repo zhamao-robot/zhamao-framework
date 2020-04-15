@@ -6,6 +6,7 @@ namespace ZM\Event\Swoole;
 
 use Co;
 use Doctrine\Common\Annotations\AnnotationException;
+use Exception;
 use ReflectionException;
 use Swoole\Coroutine;
 use Swoole\Timer;
@@ -14,6 +15,7 @@ use ZM\Annotation\AnnotationParser;
 use ZM\Annotation\Swoole\OnStart;
 use ZM\Annotation\Swoole\SwooleEventAfter;
 use ZM\Connection\ConnectionManager;
+use ZM\Context\ContextInterface;
 use ZM\DB\DB;
 use Framework\Console;
 use Framework\GlobalConfig;
@@ -121,6 +123,7 @@ class WorkerStartEvent implements SwooleEvent
     /**
      * @throws AnnotationException
      * @throws ReflectionException
+     * @throws Exception
      */
     private function loadAllClass() {
         //加载phar包
@@ -149,6 +152,7 @@ class WorkerStartEvent implements SwooleEvent
         //加载自定义的全局函数
         if(file_exists(WORKING_DIR."/src/Custom/global_function.php"))
             require_once WORKING_DIR."/src/Custom/global_function.php";
+        $this->afterCheck();
     }
 
     private function setAutosaveTimer($globals) {
@@ -156,5 +160,15 @@ class WorkerStartEvent implements SwooleEvent
         Timer::tick($globals * 1000, function () {
             DataProvider::saveBuffer();
         });
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function afterCheck() {
+        $context_class = ZMBuf::globals("context_class");
+        if(!is_a($context_class, ContextInterface::class, true)) {
+            throw new Exception("Context class must implemented from ContextInterface!");
+        }
     }
 }

@@ -64,4 +64,7 @@ $config['init_atomics'] = [
 /** 自动保存的缓存保存时间（秒） */
 $config['auto_save_interval'] = 900;
 
+/** 上下文接口类 implemented from ContextInterface */
+$config['context_class'] = \ZM\Context\Context::class;
+
 return $config;

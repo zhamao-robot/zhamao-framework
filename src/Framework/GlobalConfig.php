@@ -18,8 +18,7 @@ class GlobalConfig
     public $success = false;
 
     public function __construct() {
-        /** @noinspection PhpIncludeInspection */
-        include_once WORKING_DIR.'/config/global.php';
+        include_once WORKING_DIR . '/config/global.php';
         global $config;
         $this->success = true;
         $this->config = $config;
@@ -29,5 +28,9 @@ class GlobalConfig
         $r = $this->config[$key] ?? null;
         if ($r === null) return null;
         return $r;
+    }
+
+    public function getAll() {
+        return $this->config;
     }
 }
