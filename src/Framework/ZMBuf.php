@@ -99,7 +99,7 @@ class ZMBuf
     }
 
     static function config($config_name) {
-        return self::$config ?? null;
+        return self::$config[$config_name] ?? null;
     }
 
     public static function resetCache() {
