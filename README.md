@@ -9,7 +9,7 @@
 
 一个异步、多平台兼容的 **聊天机器人** 框架。
 
-<img src="./resources/images/logo.png" height = "200" alt="炸毛框架" align=center/>
+<img src="https://avatars0.githubusercontent.com/u/48620312" height = "200" alt="炸毛框架" align=center/>
 
 ## 简介
 zhamao-framework 是一个基于 酷Q 的 PHP Swoole 的机器人框架，它会对 QQ 机器人收到的消息进行解析处理，并以模块化的形式进行开发，来完成机器人的自然语言对话等功能。
