@@ -38,6 +38,7 @@ Pages：[https://framework.zhamao.xin/](https://framework.zhamao.xin/)
 | 模块名称           | 说明                             | 模块地址                                                     |
 | ------------------ | -------------------------------- | ------------------------------------------------------------ |
 | 微信公众号兼容模块 | 为框架提供微信公众号订阅号兼容层 | [zhamao-wechat-patch](https://github.com/zhamao-robot/zhamao-wechat-patch) |
+| 通用模块 | 图片上传和下载模块 | [zhamao-general-tools](https://github.com/zhamao-robot/zhamao-general-tools) |
 
 ## 计划开发内容
 - [ ] WebSocket测试脚本（客户端）
