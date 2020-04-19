@@ -18,6 +18,9 @@ zhamao-framework 是一个基于 酷Q 的 PHP Swoole 的机器人框架，它会
 
 除了起到解析消息的作用，炸毛框架 还提供了完整的 WebSocket + HTTP 服务器，你还能用此框架构建出高性能的 API 接口服务器。
 
+## 开始
+你可以使用 GitHub 的 `Use This Template` 功能快速将本项目克隆到你的公开或私有仓库，也可以直接 clone 本项目到本地私有开发。
+
 ## 文档
 本项目文档正在努力编写中。
 
