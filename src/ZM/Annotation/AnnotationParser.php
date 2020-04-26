@@ -52,6 +52,7 @@ class AnnotationParser
             $class_prefix = '';
             $methods = $reflection_class->getMethods(ReflectionMethod::IS_PUBLIC);
             $class_annotations = $reader->getClassAnnotations($reflection_class);
+            $middleware_addon = null;
             foreach ($class_annotations as $vs) {
                 if ($vs instanceof Closed) {
                     continue 2;
@@ -62,7 +63,7 @@ class AnnotationParser
                 } elseif ($vs instanceof InitBuffer) {
                     ZMBuf::set($vs->buf_name, []);
                 } elseif ($vs instanceof MiddlewareClass) {
-                    Console::info("正在注册中间件 ".$vs->class);
+                    Console::info("正在注册中间件 " . $vs->class);
                     $result = [
                         "class" => "\\" . $reflection_class->getName()
                     ];
@@ -87,6 +88,8 @@ class AnnotationParser
                     }
                     ZMBuf::$events[MiddlewareClass::class][$result["name"]] = $result;
                     continue 2;
+                } elseif ($vs instanceof Middleware) {
+                    $middleware_addon = $vs;
                 }
             }
             foreach ($methods as $vs) {
@@ -102,8 +105,11 @@ class AnnotationParser
                     elseif ($vss instanceof CQRequest) ZMBuf::$events[CQRequest::class][] = $vss;
                     elseif ($vss instanceof CQMetaEvent) ZMBuf::$events[CQMetaEvent::class][] = $vss;
                     elseif ($vss instanceof CQCommand) ZMBuf::$events[CQCommand::class][] = $vss;
-                    elseif ($vss instanceof RequestMapping) self::registerRequestMapping($vss, $vs, $reflection_class, $class_prefix);
-                    elseif ($vss instanceof CustomAnnotation) ZMBuf::$events[get_class($vss)][] = $vss;
+                    elseif ($vss instanceof RequestMapping) {
+                        self::registerRequestMapping($vss, $vs, $reflection_class, $class_prefix);
+                        if($middleware_addon !== null)
+                            ZMBuf::$events[MiddlewareInterface::class][$vss->class][$vss->method] = $middleware_addon->middleware;
+                    } elseif ($vss instanceof CustomAnnotation) ZMBuf::$events[get_class($vss)][] = $vss;
                     elseif ($vss instanceof CQBefore) ZMBuf::$events[CQBefore::class][$vss->cq_event][] = $vss;
                     elseif ($vss instanceof CQAfter) ZMBuf::$events[CQAfter::class][$vss->cq_event][] = $vss;
                     elseif ($vss instanceof OnStart) ZMBuf::$events[OnStart::class][] = $vss;

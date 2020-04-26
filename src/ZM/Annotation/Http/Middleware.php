@@ -12,7 +12,7 @@ use ZM\Annotation\AnnotationBase;
  * Class Middleware
  * @package ZM\Annotation\Http
  * @Annotation
- * @Target("METHOD")
+ * @Target("ALL")
  */
 class Middleware extends AnnotationBase
 {
