@@ -9,7 +9,7 @@
 
 一个异步、多平台兼容的 **聊天机器人** 框架。
 
-<img src="./resources/images/logo.png" height = "200" alt="炸毛框架" align=center/>
+<img src="https://avatars0.githubusercontent.com/u/48620312" height = "200" alt="炸毛框架" align=center/>
 
 ## 简介
 zhamao-framework 是一个基于 酷Q 的 PHP Swoole 的机器人框架，它会对 QQ 机器人收到的消息进行解析处理，并以模块化的形式进行开发，来完成机器人的自然语言对话等功能。
@@ -17,6 +17,9 @@ zhamao-framework 是一个基于 酷Q 的 PHP Swoole 的机器人框架，它会
 框架对接 酷Q 的桥梁是 **CQHTTP** 插件，这里是它的[项目地址](https://github.com/richardchien/coolq-http-api/)。
 
 除了起到解析消息的作用，炸毛框架 还提供了完整的 WebSocket + HTTP 服务器，你还能用此框架构建出高性能的 API 接口服务器。
+
+## 开始
+你可以使用 GitHub 的 `Use This Template` 功能快速将本项目克隆到你的公开或私有仓库，也可以直接 clone 本项目到本地私有开发。
 
 ## 文档
 本项目文档正在努力编写中。
