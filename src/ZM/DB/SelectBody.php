@@ -44,10 +44,12 @@ class SelectBody
         return $this->fetchAll()[0] ?? null;
     }
 
-    public function value() {
+    public function value($key = null) {
         $r = $this->fetchFirst();
         if ($r === null) return null;
-        return current($r);
+        if ($key === null)
+            return current($r);
+        else return $r[$key] ?? null;
     }
 
     public function execute() {
