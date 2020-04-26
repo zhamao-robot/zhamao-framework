@@ -35,6 +35,7 @@ Pages：[https://framework.zhamao.xin/](https://framework.zhamao.xin/)
 - 常驻内存，全局缓存变量随处使用
 - 自带 MySQL 查询器、数据库连接池等数据库连接方案
 - 自带 HTTP 服务器、WebSocket 服务器可复用，可以构建属于自己的 HTTP API 接口
+- 静态文件服务器
 
 ## 炸毛特色模块
 
@@ -59,6 +60,7 @@ Pages：[https://framework.zhamao.xin/](https://framework.zhamao.xin/)
 - [ ] 模块支持 Phar 打包（可能会比较靠后支持）
 - [ ] 兼容面向过程的模块编写方案（可能会比较靠后支持）
 - [ ] 完整的单元测试（如果有需求则尽快开发）
+- [X] 静态文件服务器
 
 ## 从 cqbot-swoole 升级
 目前新的框架采用了全新的注解机制，所以旧版的框架上写的模块到新框架需要重新编写。当然为了减少工作量，新的框架也最大限度地保留了旧版框架编写的风格，一般情况下根据新版框架的文档仅需修改少量地方即可完成重写。
