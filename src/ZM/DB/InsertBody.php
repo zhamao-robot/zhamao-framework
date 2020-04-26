@@ -23,6 +23,6 @@ class InsertBody
     }
 
     public function save() {
-        DB::rawQuery('INSERT INTO ' . $this->table->getTableName() . ' VALUES ('.implode(',', array_fill(0, 5, '?')).')', $this->row);
+        DB::rawQuery('INSERT INTO ' . $this->table->getTableName() . ' VALUES ('.implode(',', array_fill(0, count($this->row), '?')).')', $this->row);
     }
 }

@@ -69,7 +69,7 @@ class DB
         }
     }
 
-    public static function rawQuery(string $line, $params) {
+    public static function rawQuery(string $line, $params = []) {
         if (ZMBuf::get("sql_log") === true) {
             $starttime = microtime(true);
         }
@@ -116,5 +116,9 @@ class DB
             Console::error($e->getMessage());
             return false;
         }
+    }
+
+    public static function isTableExists($table) {
+        return in_array($table, self::$table_list);
     }
 }

@@ -60,11 +60,11 @@ class WorkerStartEvent implements SwooleEvent
             $name = explode(".", $v);
             if (($prefix = end($name)) == "json") {
                 ZMBuf::$config[$name[0]] = json_decode(Co::readFile(WORKING_DIR . '/config/' . $v), true);
-                Console::info("已读取配置文件(json)：" . $prefix);
+                Console::info("已读取配置文件：" . $v);
             } elseif ($prefix == "php") {
                 ZMBuf::$config[$name[0]] = include_once WORKING_DIR . '/config/' . $v;
                 if (is_array(ZMBuf::$config[$name[0]]))
-                    Console::info("已读取配置文件(php)：" . $prefix);
+                    Console::info("已读取配置文件：" . $v);
             }
         }
         if (ZMBuf::globals("sql_config")["sql_host"] != "") {
