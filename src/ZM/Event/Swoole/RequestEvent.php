@@ -64,9 +64,6 @@ class RequestEvent implements SwooleEvent
                 } elseif ($node["son"][0]["name"] == $r) {
                     $node = $node["son"][0];
                     continue;
-                } else {
-                    $this->responseStatus(404);
-                    return $this;
                 }
             } elseif ($cnt >= 1) {
                 if (isset($node["param_route"])) {
@@ -85,6 +82,7 @@ class RequestEvent implements SwooleEvent
                     }
                 }
             }
+
             if (ZMBuf::globals("static_file_server")["status"]) {
                 $base_dir = ZMBuf::globals("static_file_server")["document_root"];
                 $base_index = ZMBuf::globals("static_file_server")["document_index"];
@@ -116,7 +114,8 @@ class RequestEvent implements SwooleEvent
                     }
                 }
             }
-            $this->responseStatus(404);
+            $this->response->status(404);
+            $this->response->end(ZMUtil::getHttpCodePage(404));
             return $this;
         }
 
