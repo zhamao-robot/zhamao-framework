@@ -3,29 +3,17 @@
 
 namespace ZM\Annotation;
 
-use Doctrine\Common\Annotations\AnnotationException;
-use Doctrine\Common\Annotations\AnnotationReader;
-use Framework\Console;
-use Framework\ZMBuf;
+use Doctrine\Common\Annotations\{AnnotationException, AnnotationReader};
+use Framework\{Console, ZMBuf};
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
 use ZM\Annotation\CQ\{CQAfter, CQBefore, CQCommand, CQMessage, CQMetaEvent, CQNotice, CQRequest};
-use ZM\Annotation\Http\After;
-use ZM\Annotation\Http\Before;
-use ZM\Annotation\Http\Controller;
-use ZM\Annotation\Http\HandleException;
-use ZM\Annotation\Http\Middleware;
-use ZM\Annotation\Http\MiddlewareClass;
-use ZM\Annotation\Http\RequestMapping;
+use ZM\Annotation\Http\{After, Before, Controller, HandleException, Middleware, MiddlewareClass, RequestMapping};
 use ZM\Annotation\Interfaces\CustomAnnotation;
 use ZM\Annotation\Interfaces\Level;
-use ZM\Annotation\Module\Closed;
-use ZM\Annotation\Module\InitBuffer;
-use ZM\Annotation\Module\SaveBuffer;
-use ZM\Annotation\Swoole\OnStart;
-use ZM\Annotation\Swoole\SwooleEventAfter;
-use ZM\Annotation\Swoole\SwooleEventAt;
+use ZM\Annotation\Module\{Closed, InitBuffer, SaveBuffer};
+use ZM\Annotation\Swoole\{OnStart, SwooleEventAfter, SwooleEventAt};
 use ZM\Annotation\Interfaces\Rule;
 use ZM\Connection\WSConnection;
 use ZM\Http\MiddlewareInterface;
@@ -244,9 +232,9 @@ class AnnotationParser
             }
         }
         if ($prefix_exp == [] && $route_exp == []) {
-            $array[$uid - 1]['method'] = $method->getName();
-            $array[$uid - 1]['class'] = $class->getName();
-            $array[$uid - 1]['request_method'] = $vss->request_method;
+            $array[0]['method'] = $method->getName();
+            $array[0]['class'] = $class->getName();
+            $array[0]['request_method'] = $vss->request_method;
             ZMBuf::$req_mapping = $array;
             return;
         }

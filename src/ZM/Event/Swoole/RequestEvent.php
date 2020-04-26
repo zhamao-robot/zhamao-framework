@@ -7,6 +7,7 @@ namespace ZM\Event\Swoole;
 use Closure;
 use Doctrine\Common\Annotations\AnnotationException;
 use Exception;
+use Framework\Console;
 use Framework\ZMBuf;
 use Swoole\Http\Request;
 use ZM\Annotation\Http\MiddlewareClass;
@@ -84,6 +85,37 @@ class RequestEvent implements SwooleEvent
                     }
                 }
             }
+            if (ZMBuf::globals("static_file_server")["status"]) {
+                $base_dir = ZMBuf::globals("static_file_server")["document_root"];
+                $base_index = ZMBuf::globals("static_file_server")["document_index"];
+                $uri = $this->request->server["request_uri"];
+                $path = realpath($base_dir . urldecode($uri));
+                if ($path !== false) {
+                    if (is_dir($path)) $path = $path . '/';
+                    $work = realpath(WORKING_DIR) . '/';
+                    if (strpos($path, $work) !== 0) {
+                        $this->responseStatus(403);
+                        return $this;
+                    }
+                    if (is_dir($path)) {
+                        foreach ($base_index as $vp) {
+                            if (is_file($path . $vp)) {
+                                Console::info("[200] " . $uri . " (static)");
+                                $exp = strtolower(pathinfo($path . $vp)['extension'] ?? "unknown");
+                                $this->response->setHeader("Content-Type", ZMBuf::config("file_header")[$exp] ?? "application/octet-stream");
+                                $this->response->end(file_get_contents($path . $vp));
+                                return $this;
+                            }
+                        }
+                    } elseif (is_file($path)) {
+                        Console::info("[200] " . $uri . " (static)");
+                        $exp = strtolower(pathinfo($path)['extension'] ?? "unknown");
+                        $this->response->setHeader("Content-Type", ZMBuf::config("file_header")[$exp] ?? "application/octet-stream");
+                        $this->response->end(file_get_contents($path));
+                        return $this;
+                    }
+                }
+            }
             $this->responseStatus(404);
             return $this;
         }
@@ -94,7 +126,7 @@ class RequestEvent implements SwooleEvent
             $c_name = $node["class"];
             if (isset(ZMBuf::$events[MiddlewareInterface::class][$c_name][$node["method"]])) {
                 $middleware = ZMBuf::$events[MiddlewareInterface::class][$c_name][$node["method"]];
-                if(!isset(ZMBuf::$events[MiddlewareClass::class][$middleware])) throw new AnnotationException("Annotation parse error: Unknown MiddlewareClass named \"{$middleware}\"!");
+                if (!isset(ZMBuf::$events[MiddlewareClass::class][$middleware])) throw new AnnotationException("Annotation parse error: Unknown MiddlewareClass named \"{$middleware}\"!");
                 $middleware = ZMBuf::$events[MiddlewareClass::class][$middleware];
                 $before = $middleware["class"];
                 $r = new $before();
@@ -112,8 +144,8 @@ class RequestEvent implements SwooleEvent
                         if (!$this->response->isEnd()) goto eventCall;
                     } catch (Exception $e) {
                         if (!isset($middleware["exceptions"])) throw $e;
-                        foreach($middleware["exceptions"] as $name => $method) {
-                            if($e instanceof $name) {
+                        foreach ($middleware["exceptions"] as $name => $method) {
+                            if ($e instanceof $name) {
                                 call_user_func([$r, $method], $e, $this->request, $this->response, $params);
                                 return $this;
                             }

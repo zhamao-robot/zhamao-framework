@@ -67,4 +67,13 @@ $config['auto_save_interval'] = 900;
 /** 上下文接口类 implemented from ContextInterface */
 $config['context_class'] = \ZM\Context\Context::class;
 
+/** 静态文件访问 */
+$config['static_file_server'] = [
+    'status' => false,
+    'document_root' => WORKING_DIR . '/resources/html',
+    'document_index' => [
+        'index.html'
+    ]
+];
+
 return $config;
