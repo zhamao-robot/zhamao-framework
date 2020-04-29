@@ -1,0 +1,34 @@
+#!/usr/bin/env php
+<?php
+
+switch ($argv[1] ?? '') {
+    case '--generate':
+        generate();
+        break;
+    case '--help':
+    case '-h':
+    default:
+        echo "\nUsage: " . $argv[0] . " [OPTION]\n";
+        echo "\nzhamao-framework systemd generator.";
+        echo "\n\n  -h, --help\t\tShow this help menu";
+        echo "\n  --generate\tGenerate a systemd service file\n\n";
+        break;
+}
+
+function generate() {
+    $s = <<<EOL
+[Unit]
+Description=zhamao-framework Daemon
+After=rc-local.service
+
+[Service]
+Type=simple
+EOL;
+    $s .= "\nUser=".exec("whoami");
+    $s .= "\nGroup=".exec("groups | awk '{print $1}'");
+    $s .= "\nWorkingDirectory=" . getcwd();
+    $s .= "\nExecStart=php " .getcwd()."/bin/start --disable-console-input";
+    $s .= "\nRestart=always\n\n[Install]\nWantedBy=multi-user.target\n";
+    file_put_contents(getcwd()."/resources/zhamao.service", $s);
+    echo "File successfully generated. Path: ".getcwd()."/resources/zhamao.service\n";
+}
