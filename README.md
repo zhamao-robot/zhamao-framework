@@ -7,7 +7,7 @@
 [![stupid counter](https://img.shields.io/github/search/zhamao-robot/zhamao-framework/stupid.svg)](https://github.com/zhamao-robot/zhamao-framework/search?q=stupid)
 [![TODO counter](https://img.shields.io/github/search/zhamao-robot/zhamao-framework/TODO.svg)](https://github.com/zhamao-robot/zhamao-framework/search?q=TODO)
 
-一个异步、多平台兼容的 **聊天机器人** 框架。
+协程高性能的 **QQ 机器人 + Web 服务器** 开发框架（炸毛框架）。
 
 <img src="https://avatars0.githubusercontent.com/u/48620312" height = "200" alt="炸毛框架" align=center/>
 
