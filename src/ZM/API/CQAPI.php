@@ -10,6 +10,7 @@ use Framework\ZMBuf;
 use ZM\Connection\ConnectionManager;
 use ZM\Connection\CQConnection;
 use ZM\Connection\WSConnection;
+use ZM\Utils\ZMRobot;
 
 /**
  * @method static send_private_msg($self_id, $params, $function = null)
@@ -68,19 +69,26 @@ use ZM\Connection\WSConnection;
  */
 class CQAPI
 {
-    public static function quick_reply(WSConnection $conn, $data, $msg, $yield = null) {
+    public static function quick_reply(CQConnection $conn, $data, $msg, $yield = null) {
         switch ($data["message_type"]) {
             case "group":
-                return self::send_group_msg($conn, ["group_id" => $data["group_id"], "message" => $msg], $yield);
+                return (new ZMRobot($conn))->setCallback($yield)->sendGroupMsg($data["group_id"], $msg);
             case "private":
-                return self::send_private_msg($conn, ["user_id" => $data["user_id"], "message" => $msg], $yield);
+                return (new ZMRobot($conn))->setCallback($yield)->sendPrivateMsg($data["user_id"], $msg);
             case "discuss":
-                return self::send_discuss_msg($conn, ["discuss_id" => $data["discuss_id"], "message" => $msg], $yield);
+                return (new ZMRobot($conn))->setCallback($yield)->sendDiscussMsg($data["discuss_id"], $msg);
         }
         return null;
     }
 
+    /**
+     * @param $name
+     * @param $arg
+     * @return bool
+     * @deprecated
+     */
     public static function __callStatic($name, $arg) {
+        trigger_error("This dynamic CQAPI calling method will be removed after 2.0 version.", E_USER_DEPRECATED);
         $all = self::getSupportedAPIs();
         $find = null;
         if (in_array($name, $all)) $find = $name;

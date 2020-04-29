@@ -308,7 +308,7 @@ class ZMRobot
         ]);
     }
 
-    public function getCookie($domain = "") {
+    public function getCookies($domain = "") {
         return CQAPI::processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__),
             'params' => [
