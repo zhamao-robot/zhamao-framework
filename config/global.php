@@ -58,7 +58,7 @@ $config['init_atomics'] = [
     'out_count' => 0,       //消息发送（调用send_*_msg的统计数量）
     'reload_time' => 0,     //调用reload功能统计数量
     'wait_msg_id' => 0,     //协程挂起id自增
-    'info_level' => 0,      //终端显示的log等级
+    'info_level' => 2,      //终端显示的log等级
 ];
 
 /** 自动保存的缓存保存时间（秒） */

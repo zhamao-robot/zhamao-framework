@@ -1,6 +1,5 @@
 #!/usr/bin/env php
-<?php
-
+<?php /** @since 1.2 */
 switch ($argv[1] ?? '') {
     case '--generate':
         generate();
@@ -16,19 +15,12 @@ switch ($argv[1] ?? '') {
 }
 
 function generate() {
-    $s = <<<EOL
-[Unit]
-Description=zhamao-framework Daemon
-After=rc-local.service
-
-[Service]
-Type=simple
-EOL;
-    $s .= "\nUser=".exec("whoami");
-    $s .= "\nGroup=".exec("groups | awk '{print $1}'");
+    $s = "[Unit]\nDescription=zhamao-framework Daemon\nAfter=rc-local.service\n\n[Service]\nType=simple";
+    $s .= "\nUser=" . exec("whoami");
+    $s .= "\nGroup=" . exec("groups | awk '{print $1}'");
     $s .= "\nWorkingDirectory=" . getcwd();
-    $s .= "\nExecStart=$(which php) " .getcwd()."/bin/start --disable-console-input";
+    $s .= "\nExecStart=" . getcwd() . "/bin/start server --disable-console-input";
     $s .= "\nRestart=always\n\n[Install]\nWantedBy=multi-user.target\n";
-    file_put_contents(getcwd()."/resources/zhamao.service", $s);
-    echo "File successfully generated. Path: ".getcwd()."/resources/zhamao.service\n";
+    file_put_contents(getcwd() . "/resources/zhamao.service", $s);
+    echo "File successfully generated. Path: " . getcwd() . "/resources/zhamao.service\n";
 }

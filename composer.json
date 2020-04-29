@@ -3,7 +3,7 @@
     "description": "high-performance intelligent assistant",
     "minimum-stability": "stable",
     "license": "proprietary",
-    "version": "1.0",
+    "version": "1.2.0",
     "authors": [
         {
             "name": "whale",
@@ -18,10 +18,11 @@
         "swoole/ide-helper": "@dev",
         "ext-mbstring": "*",
         "swlib/saber": "^1.0",
-        "doctrine/annotations": "1.8",
+        "doctrine/annotations": "<1.10.2",
         "ext-json": "*",
         "ext-posix": "*",
-        "ext-ctype": "*"
+        "ext-ctype": "*",
+        "ext-pcntl": "*"
     },
     "repositories": {
         "packagist": {

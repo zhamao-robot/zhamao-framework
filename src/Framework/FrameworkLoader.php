@@ -3,7 +3,10 @@
 
 namespace Framework;
 
+use Co;
+use Swoole\Http\Request;
 use Swoole\Runtime;
+use Swoole\WebSocket\Frame;
 use ZM\Event\EventHandler;
 use Exception;
 use Swoole\WebSocket\Server;
@@ -32,7 +35,8 @@ class FrameworkLoader
     /** @var Server */
     private $server;
 
-    public function __construct($args = []) {
+    public function __construct($args = [])
+    {
         if (self::$instance !== null) die("Cannot run two FrameworkLoader in one process!");
         self::$instance = $this;
         self::$argv = $args;
@@ -52,17 +56,38 @@ class FrameworkLoader
         try {
             $this->server = new Server(self::$settings->get("host"), self::$settings->get("port"));
             if (in_array("--remote-shell", $args)) RemoteShell::listen($this->server, "127.0.0.1");
-            $this->server->set(self::$settings->get("swoole"));
+            $settings = self::$settings->get("swoole");
+            if (in_array("--daemon", $args)) {
+                $settings["daemonize"] = 1;
+                Console::log("已启用守护进程，输出重定向到 " . $settings["log_file"]);
+                self::$argv[] = "--disable-console-input";
+            }
+            $this->server->set($settings);
             $this->server->on("WorkerStart", [$this, "onWorkerStart"]);
-            $this->server->on("message", function ($server, $frame) { EventHandler::callSwooleEvent("message", $server, $frame); });
+            $this->server->on("message", function ($server, Frame $frame) {
+                Console::debug("Calling Swoole \"message\" event from fd=" . $frame->fd);
+                EventHandler::callSwooleEvent("message", $server, $frame);
+            });
             $this->server->on("request", function ($request, $response) {
                 $response = new Response($response);
+                Console::debug("Receiving Http request event, cid=" . Co::getCid());
                 EventHandler::callSwooleEvent("request", $request, $response);
             });
-            $this->server->on("open", function ($server, $request) { EventHandler::callSwooleEvent("open", $server, $request); });
-            $this->server->on("close", function ($server, $fd) { EventHandler::callSwooleEvent("close", $server, $fd); });
+            $this->server->on("open", function ($server, Request $request) {
+                Console::debug("Calling Swoole \"open\" event from fd=" . $request->fd);
+                EventHandler::callSwooleEvent("open", $server, $request);
+            });
+            $this->server->on("close", function ($server, $fd) {
+                Console::debug("Calling Swoole \"close\" event from fd=" . $fd);
+                EventHandler::callSwooleEvent("close", $server, $fd);
+            });
             ZMBuf::initAtomic();
-            Console::info("host: ".self::$settings->get("host").", port: ".self::$settings->get("port"));
+            if (in_array("--log-error", $args)) ZMBuf::$atomics["info_level"]->set(0);
+            if (in_array("--log-warning", $args)) ZMBuf::$atomics["info_level"]->set(1);
+            if (in_array("--log-info", $args)) ZMBuf::$atomics["info_level"]->set(2);
+            if (in_array("--log-verbose", $args)) ZMBuf::$atomics["info_level"]->set(3);
+            if (in_array("--log-debug", $args)) ZMBuf::$atomics["info_level"]->set(4);
+            Console::log("host: " . self::$settings->get("host") . ", port: " . self::$settings->get("port") . ", log_level: " . ZMBuf::$atomics["info_level"]->get());
             $this->server->start();
         } catch (Exception $e) {
             Console::error("Framework初始化出现错误，请检查！");
@@ -71,15 +96,18 @@ class FrameworkLoader
         }
     }
 
-    private function requireGlobalFunctions() {
+    private function requireGlobalFunctions()
+    {
         require __DIR__ . '/global_functions.php';
     }
 
-    private function registerAutoloader(string $string) {
+    private function registerAutoloader(string $string)
+    {
         if (!spl_autoload_register($string)) die("Failed to register autoloader named \"$string\" !");
     }
 
-    private function defineProperties() {
+    private function defineProperties()
+    {
         define("ZM_START_TIME", microtime(true));
         define("ZM_DATA", self::$settings->get("zm_data"));
         define("CONFIG_DIR", self::$settings->get("config_dir"));
@@ -93,7 +121,8 @@ class FrameworkLoader
         define("ZM_MATCH_SECOND", 3);
     }
 
-    private function selfCheck() {
+    private function selfCheck()
+    {
         if (!extension_loaded("swoole")) die("Can not find swoole extension.\n");
         //if (!extension_loaded("gd")) die("Can not find gd extension.\n");
         if (!extension_loaded("sockets")) die("Can not find sockets extension.\n");
@@ -105,7 +134,8 @@ class FrameworkLoader
         return true;
     }
 
-    public function onWorkerStart(\Swoole\Server $server, $worker_id) {
+    public function onWorkerStart(\Swoole\Server $server, $worker_id)
+    {
         self::$instance = $this;
         self::$run_time = microtime(true);
         EventHandler::callSwooleEvent("WorkerStart", $server, $worker_id);

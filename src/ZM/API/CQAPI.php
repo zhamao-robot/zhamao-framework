@@ -93,12 +93,12 @@ class CQAPI
             }
         }
         if ($find === null) {
-            Console::error("Unknown API " . $name);
+            Console::warning("Unknown API " . $name);
             return false;
         }
         $reply = ["action" => $find];
         if (!is_array($arg[1])) {
-            Console::error("Error when parsing params. Please make sure your params is an array.");
+            Console::warning("Error when parsing params. Please make sure your params is an array.");
             return false;
         }
         if ($arg[1] != []) {
@@ -107,7 +107,7 @@ class CQAPI
         if (!($arg[0] instanceof CQConnection)) {
             $robot = ConnectionManager::getByType("qq", ["self_id" => $arg[0]]);
             if ($robot == []) {
-                Console::error("发送错误，机器人连接不存在！");
+                Console::warning("发送错误，机器人连接不存在！");
                 return false;
             }
             $arg[0] = $robot[0];
@@ -195,7 +195,7 @@ class CQAPI
      * @param |null $function
      * @return bool
      */
-    private static function processAPI($connection, $reply, $function = null) {
+    public static function processAPI($connection, $reply, $function = null) {
         $api_id = ZMBuf::$atomics["wait_msg_id"]->get();
         $reply["echo"] = $api_id;
         ZMBuf::$atomics["wait_msg_id"]->add(1);
@@ -222,7 +222,7 @@ class CQAPI
             ]);
         }
         if ($connection->push(json_encode($reply))) {
-            Console::msg($reply, $connection->getQQ());
+            //Console::msg($reply, $connection->getQQ());
             ZMBuf::$atomics["out_count"]->add(1);
             if ($function === true) {
                 Co::suspend();
@@ -232,6 +232,7 @@ class CQAPI
             }
             return true;
         } else {
+            Console::warning("CQAPI send failed, websocket push error.");
             $response = [
                 "status" => "failed",
                 "retcode" => 999,

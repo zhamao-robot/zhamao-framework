@@ -11,7 +11,6 @@ namespace Framework;
 use Swoole\Atomic;
 use swoole_atomic;
 use ZM\connection\WSConnection;
-use ZM\Utils\Scheduler;
 use ZM\Utils\SQLPool;
 
 class ZMBuf
@@ -22,8 +21,7 @@ class ZMBuf
     /** @var WSConnection[] */
     static $connect = [];//储存连接实例的数组
     //Scheduler计划任务连接实例，只可以在单worker_num时使用
-    /** @var Scheduler|null */
-    static $scheduler = null;
+    static $scheduler = null; //This is stupid warning...
 
     //Swoole SQL连接池，多进程下每个进程一个连接池
     /** @var SQLPool */
@@ -52,6 +50,7 @@ class ZMBuf
     public static $req_mapping = [];
     public static $config = [];
     public static $context = [];
+    public static $instance = [];
 
     static function get($name, $default = null) {
         return self::$cache[$name] ?? $default;
@@ -106,6 +105,7 @@ class ZMBuf
         self::$cache = [];
         self::$connect = [];
         self::$time_nlp = null;
+        self::$instance = [];
     }
 
     /**

@@ -14,8 +14,7 @@ use Exception;
 
 class Console
 {
-    static function setColor($string, $color = "")
-    {
+    static function setColor($string, $color = "") {
         switch ($color) {
             case "red":
                 return "\x1b[38;5;203m" . $string . "\x1b[m";
@@ -25,6 +24,7 @@ class Console
                 return "\x1b[38;5;227m" . $string . "\x1b[m";
             case "blue":
                 return "\033[34m" . $string . "\033[0m";
+            case "pink": // I really don't know what stupid color it is.
             case "lightpurple":
                 return "\x1b[38;5;207m" . $string . "\x1b[m";
             case "lightblue":
@@ -33,8 +33,6 @@ class Console
                 return "\x1b[38;5;214m" . $string . "\x1b[m";
             case "gray":
                 return "\x1b[38;5;59m" . $string . "\x1b[m";
-            case "pink":
-                return "\x1b[38;5;207m" . $string . "\x1b[m";
             case "lightlightblue":
                 return "\x1b[38;5;63m" . $string . "\x1b[m";
             default:
@@ -42,9 +40,8 @@ class Console
         }
     }
 
-    static function error($obj, $head = null)
-    {
-        if ($head === null) $head = date("[H:i:s ") . "ERROR] ";
+    static function error($obj, $head = null) {
+        if ($head === null) $head = date("[H:i:s] ") . "[E] ";
         if (ZMBuf::$info_level !== null && in_array(ZMBuf::$info_level->get(), [1, 2])) {
             $trace = debug_backtrace()[1] ?? ['file' => '', 'function' => ''];
             $trace = "[" . basename($trace["file"], ".php") . ":" . $trace["function"] . "] ";
@@ -58,90 +55,80 @@ class Console
         echo(self::setColor($head . ($trace ?? "") . $obj, "red") . "\n");
     }
 
-    static function warning($obj, $head = null)
-    {
-        if ($head === null) $head = date("[H:i:s") . " WARN] ";
+    static function warning($obj, $head = null) {
+        if ($head === null) $head = date("[H:i:s]") . " [W] ";
         if (ZMBuf::$info_level !== null && in_array(ZMBuf::$info_level->get(), [1, 2])) {
             $trace = debug_backtrace()[1] ?? ['file' => '', 'function' => ''];
             $trace = "[" . basename($trace["file"], ".php") . ":" . $trace["function"] . "] ";
         }
-        if (!is_string($obj)) {
-            if (isset($trace)) {
-                var_dump($obj);
-                return;
-            } else $obj = "{Object}";
+        if(ZMBuf::$atomics["info_level"]->get() >= 1) {
+            if (!is_string($obj)) {
+                if (isset($trace)) {
+                    var_dump($obj);
+                    return;
+                } else $obj = "{Object}";
+            }
+            echo(self::setColor($head . ($trace ?? "") . $obj, "yellow") . "\n");
         }
-        echo(self::setColor($head . ($trace ?? "") . $obj, "yellow") . "\n");
     }
 
-    static function info($obj, $head = null)
-    {
-        if ($head === null) $head = date("[H:i:s ") . "INFO] ";
+    static function info($obj, $head = null) {
+        if ($head === null) $head = date("[H:i:s] ") . "[I] ";
         if (ZMBuf::$info_level !== null && in_array(ZMBuf::$info_level->get(), [1, 2])) {
             $trace = debug_backtrace()[1] ?? ['file' => '', 'function' => ''];
             $trace = "[" . basename($trace["file"], ".php") . ":" . $trace["function"] . "] ";
         }
-        if (!is_string($obj)) {
-            if (isset($trace)) {
-                var_dump($obj);
-                return;
-            } else $obj = "{Object}";
+        if(ZMBuf::$atomics["info_level"]->get() >= 2) {
+            if (!is_string($obj)) {
+                if (isset($trace)) {
+                    var_dump($obj);
+                    return;
+                } else $obj = "{Object}";
+            }
+            echo(self::setColor($head . ($trace ?? "") . $obj, "lightblue") . "\n");
         }
-        echo(self::setColor($head . ($trace ?? "") . $obj, "lightblue") . "\n");
     }
 
-    static function log($obj, $color = "")
-    {
+    static function success($obj, $head = null) {
+        if ($head === null) $head = date("[H:i:s] ") . "[S] ";
+        if (ZMBuf::$info_level !== null && in_array(ZMBuf::$info_level->get(), [1, 2])) {
+            $trace = debug_backtrace()[1] ?? ['file' => '', 'function' => ''];
+            $trace = "[" . basename($trace["file"], ".php") . ":" . $trace["function"] . "] ";
+        }
+        if(ZMBuf::$atomics["info_level"]->get() >= 2) {
+            if (!is_string($obj)) {
+                if (isset($trace)) {
+                    var_dump($obj);
+                    return;
+                } else $obj = "{Object}";
+            }
+            echo(self::setColor($head . ($trace ?? "") . $obj, "green") . "\n");
+        }
+    }
+
+    static function verbose($obj, $head = null) {
+        if($head === null) $head = date("[H:i:s] ") . "[V] ";
+        if(ZMBuf::$atomics["info_level"]->get() >= 3) {
+            if (!is_string($obj)) {
+                if (isset($trace)) {
+                    var_dump($obj);
+                    return;
+                } else $obj = "{Object}";
+            }
+            echo(self::setColor($head . ($trace ?? "") . $obj, "blue") . "\n");
+        }
+    }
+
+    static function debug($obj) {
+        debug($obj);
+    }
+
+    static function log($obj, $color = "") {
         if (!is_string($obj)) var_dump($obj);
         else echo(self::setColor($obj, $color) . "\n");
     }
 
-    static function msg($obj, $self_id = "")
-    {
-        if (ZMBuf::$info_level !== null && ZMBuf::$info_level->get() == 3) {
-            if (!isset($obj["post_type"])) {
-                switch ($obj["action"]) {
-                    case "send_private_msg":
-                        $msg = Console::setColor(date("H:i:s ") . "[" . (ZMBuf::globals("robot_alias")[$self_id] ?? "Null") . "] ", "lightlightblue");
-                        $msg .= Console::setColor("私聊↑(" . $obj["params"]["user_id"] . ")", "lightlightblue");
-                        $msg .= Console::setColor(" > ", "gray");
-                        $msg .= $obj["params"]["message"];
-                        Console::log($msg);
-                        break;
-                    case "send_group_msg":
-                        //TODO: 写新的控制台消息（API消息处理）
-                        Console::log(Console::setColor("[" . date("H:i:s") . " GROUP:" . $obj["params"]["group_id"] . "] ", "blue") . Console::setColor($obj["params"]["user_id"] ?? "", "yellow") . Console::setColor(" > ", "gray") . ($obj["params"]["message"] ?? ""));
-                        break;
-                    case "send_discuss_msg":
-                        Console::log(Console::setColor("[" . date("H:i:s") . " DISCUSS:" . $obj["params"]["discuss_id"] . "] ", "blue") . Console::setColor($obj["params"]["user_id"] ?? "", "yellow") . Console::setColor(" > ", "gray") . ($obj["params"]["message"] ?? ""));
-                        break;
-                    case "send_msg":
-                        $obj["action"] = "send_" . $obj["message_type"] . "_msg";
-                        self::msg($obj);
-                        break;
-                    case "send_wechat_msg":
-                        Console::log(Console::setColor("[" . date("H:i:s") . " WECHAT] ", "blue") . Console::setColor($obj["params"]["user_id"] ?? "", "yellow") . Console::setColor(" > ", "gray") . ($obj["params"]["message"] ?? ""));
-                        break;
-                    default:
-                        break;
-                }
-            } else {
-                if ($obj["post_type"] == "message") {
-                    switch ($obj["message_type"]) {
-                        case "group":
-                            //
-                            //TODO: 写新的控制台消息（event处理）
-                        case "private":
-                        case "discuss":
-                        case "wechat":
-                    }
-                }
-            }
-        }
-    }
-
-    static function stackTrace()
-    {
+    static function stackTrace() {
         $log = "Stack trace:\n";
         $trace = debug_backtrace();
         //array_shift($trace);
@@ -165,8 +152,7 @@ class Console
         echo $log;
     }
 
-    static function listenConsole()
-    {
+    static function listenConsole() {
         if (in_array('--disable-console-input', FrameworkLoader::$argv)) {
             self::info("ConsoleCommand disabled.");
             return;
@@ -183,10 +169,18 @@ class Console
      * @param string $cmd
      * @return bool
      */
-    private static function executeCommand(string $cmd)
-    {
+    private static function executeCommand(string $cmd) {
         $it = explodeMsg($cmd);
         switch ($it[0] ?? '') {
+            case 'logtest':
+                Console::log(date("[H:i:s]"). " [L] This is normal msg. (0)");
+                Console::error("This is error msg. (0)");
+                Console::warning("This is warning msg. (1)");
+                Console::info("This is info msg. (2)");
+                Console::success("This is success msg. (2)");
+                Console::verbose("This is verbose msg. (3)");
+                Console::debug("This is debug msg. (4)");
+                return true;
             case 'call':
                 $class_name = $it[1];
                 $function_name = $it[2];
@@ -203,6 +197,9 @@ class Console
             case 'echo':
                 Console::info($it[1]);
                 return true;
+            case 'color':
+                Console::log($it[2], $it[1]);
+                return true;
             case 'stop':
                 ZMUtil::stop();
                 return false;
@@ -218,8 +215,7 @@ class Console
         }
     }
 
-    public static function withSleep(string $string, int $int)
-    {
+    public static function withSleep(string $string, int $int) {
         self::info($string);
         sleep($int);
     }

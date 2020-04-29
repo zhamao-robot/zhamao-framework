@@ -60,7 +60,7 @@ class MessageEvent implements SwooleEvent
                 }
             }
         } catch (Exception $e) {
-            Console::error("出现错误: " . $e->getMessage());
+            Console::warning("Websocket message event exception: " . $e->getMessage());
         }
         return $this;
     }

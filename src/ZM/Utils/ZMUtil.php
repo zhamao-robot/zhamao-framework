@@ -14,25 +14,26 @@ class ZMUtil
      * 检查workerStart是否运行结束
      */
     public static function checkWait() {
-        if(ZMBuf::isset("wait_start")) {
+        if (ZMBuf::isset("wait_start")) {
             ZMBuf::append("wait_start", Co::getCid());
             Co::suspend();
         }
     }
 
-    public static function stop() {
+    public static function stop($without_shutdown = false) {
         Console::info(Console::setColor("Stopping server...", "red"));
         foreach (ZMBuf::$server->connections as $v) {
             ZMBuf::$server->close($v);
         }
         DataProvider::saveBuffer();
-        ZMBuf::$server->shutdown();
+        if (!$without_shutdown)
+            ZMBuf::$server->shutdown();
         ZMBuf::$server->stop();
     }
 
     public static function getHttpCodePage(int $http_code) {
-        if(isset(ZMBuf::globals("http_default_code_page")[$http_code])) {
-            return Co::readFile(DataProvider::getResourceFolder()."html/".ZMBuf::globals("http_default_code_page")[$http_code]);
+        if (isset(ZMBuf::globals("http_default_code_page")[$http_code])) {
+            return Co::readFile(DataProvider::getResourceFolder() . "html/" . ZMBuf::globals("http_default_code_page")[$http_code]);
         } else return null;
     }
 
@@ -67,5 +68,14 @@ class ZMUtil
             $array[$sk] = implode("=", $ss);
         }
         return ["type" => $type, "params" => $array, "start" => $start, "end" => $end];
+    }
+
+    public static function getModInstance($class) {
+        if (!isset(ZMBuf::$instance[$class])) {
+            ZMBuf::$instance[$class] = new $class();
+            return ZMBuf::$instance[$class];
+        } else {
+            return ZMBuf::$instance[$class];
+        }
     }
 }

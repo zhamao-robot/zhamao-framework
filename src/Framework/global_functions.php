@@ -176,6 +176,6 @@ function context() {
 }
 
 function debug($msg) {
-    if (ZMBuf::$atomics["info_level"]->get() == 1)
-        Console::log(date("[H:i:s ") . "DEBUG] " . $msg, 'gray');
+    if (ZMBuf::$atomics["info_level"]->get() >= 4)
+        Console::log(date("[H:i:s] ") . "[D] " . $msg, 'gray');
 }

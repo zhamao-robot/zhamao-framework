@@ -9,6 +9,7 @@ use Doctrine\Common\Annotations\AnnotationException;
 use Exception;
 use ReflectionException;
 use Swoole\Coroutine;
+use Swoole\Process;
 use Swoole\Timer;
 use ZM\Annotation\AnnotationBase;
 use ZM\Annotation\AnnotationParser;
@@ -21,10 +22,12 @@ use Framework\Console;
 use Framework\GlobalConfig;
 use Framework\ZMBuf;
 use Swoole\Server;
+use ZM\Exception\DbException;
 use ZM\ModBase;
 use ZM\ModHandleType;
 use ZM\Utils\DataProvider;
 use ZM\Utils\SQLPool;
+use ZM\Utils\ZMUtil;
 
 class WorkerStartEvent implements SwooleEvent
 {
@@ -43,9 +46,14 @@ class WorkerStartEvent implements SwooleEvent
      * @return WorkerStartEvent
      * @throws AnnotationException
      * @throws ReflectionException
+     * @throws DbException
      */
     public function onActivate(): WorkerStartEvent {
         Console::info("Worker启动中");
+        Process::signal(SIGINT, function (){
+            Console::warning("Server interrupted by keyboard.");
+            ZMUtil::stop(true);
+        });
         ZMBuf::resetCache(); //清空变量缓存
         ZMBuf::set("wait_start", []); //添加队列，在workerStart运行完成前先让其他协程等待执行
         $this->resetConnections();//释放所有与framework的连接

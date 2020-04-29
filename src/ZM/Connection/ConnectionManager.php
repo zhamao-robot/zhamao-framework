@@ -11,7 +11,7 @@ class ConnectionManager
     /**
      * 通过server的fd获取WSConnection实例化对象
      * @param int $fd
-     * @return WSConnection
+     * @return WSConnection|CQConnection|ProxyConnection
      */
     public static function get(int $fd) {
         foreach (ZMBuf::$connect as $v) {
@@ -23,7 +23,7 @@ class ConnectionManager
     /**
      * @param string $type
      * @param array $option
-     * @return WSConnection[]
+     * @return WSConnection[]|CQConnection[]
      */
     public static function getByType(string $type, $option = []) {
         $conn = [];

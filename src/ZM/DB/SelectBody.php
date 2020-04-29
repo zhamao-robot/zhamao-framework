@@ -5,6 +5,7 @@ namespace ZM\DB;
 
 
 use Framework\Console;
+use ZM\Exception\DbException;
 
 class SelectBody
 {
@@ -23,8 +24,16 @@ class SelectBody
         $this->select_thing = $select_thing;
     }
 
+    /**
+     * @return null
+     * @throws DbException
+     */
     public function get() { return $this->fetchAll(); }
 
+    /**
+     * @return null
+     * @throws DbException
+     */
     public function fetchAll() {
         if ($this->table->isCacheEnabled()) {
             $rr = md5(implode(",", $this->select_thing) . serialize($this->where_thing));
@@ -40,10 +49,19 @@ class SelectBody
         return $this->getResult();
     }
 
+    /**
+     * @return mixed|null
+     * @throws DbException
+     */
     public function fetchFirst() {
         return $this->fetchAll()[0] ?? null;
     }
 
+    /**
+     * @param null $key
+     * @return mixed|null
+     * @throws DbException
+     */
     public function value($key = null) {
         $r = $this->fetchFirst();
         if ($r === null) return null;
@@ -52,6 +70,9 @@ class SelectBody
         else return $r[$key] ?? null;
     }
 
+    /**
+     * @throws DbException
+     */
     public function execute() {
         $str = $this->queryPrepare();
         $this->result = DB::rawQuery($str[0], $str[1]);

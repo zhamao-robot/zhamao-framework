@@ -4,6 +4,8 @@
 namespace ZM\DB;
 
 
+use ZM\Exception\DbException;
+
 class DeleteBody
 {
     use WhereBody;
@@ -21,6 +23,10 @@ class DeleteBody
         $this->table = $table;
     }
 
+    /**
+     * @return mixed
+     * @throws DbException
+     */
     public function save() {
         list($sql, $param) = $this->getWhereSQL();
         return DB::rawQuery("DELETE FROM " . $this->table->getTableName() . " WHERE " . $sql, $param);

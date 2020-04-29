@@ -10,14 +10,16 @@ use ReflectionException;
 use ReflectionMethod;
 use ZM\Annotation\CQ\{CQAfter, CQBefore, CQCommand, CQMessage, CQMetaEvent, CQNotice, CQRequest};
 use ZM\Annotation\Http\{After, Before, Controller, HandleException, Middleware, MiddlewareClass, RequestMapping};
+use Swoole\Timer;
 use ZM\Annotation\Interfaces\CustomAnnotation;
 use ZM\Annotation\Interfaces\Level;
 use ZM\Annotation\Module\{Closed, InitBuffer, SaveBuffer};
-use ZM\Annotation\Swoole\{OnStart, SwooleEventAfter, SwooleEventAt};
+use ZM\Annotation\Swoole\{OnStart, OnTick, SwooleEventAfter, SwooleEventAt};
 use ZM\Annotation\Interfaces\Rule;
 use ZM\Connection\WSConnection;
 use ZM\Http\MiddlewareInterface;
 use ZM\Utils\DataProvider;
+use ZM\Utils\ZMUtil;
 
 class AnnotationParser
 {
@@ -45,13 +47,15 @@ class AnnotationParser
                 if ($vs instanceof Closed) {
                     continue 2;
                 } elseif ($vs instanceof Controller) {
+                    Console::debug("找到 Controller 中间件: ".$vs->class);
                     $class_prefix = $vs->prefix;
                 } elseif ($vs instanceof SaveBuffer) {
+                    Console::debug("注册自动保存的缓存变量: ".$vs->buf_name." (Dir:".$vs->sub_folder.")");
                     DataProvider::addSaveBuffer($vs->buf_name, $vs->sub_folder);
                 } elseif ($vs instanceof InitBuffer) {
                     ZMBuf::set($vs->buf_name, []);
                 } elseif ($vs instanceof MiddlewareClass) {
-                    Console::info("正在注册中间件 " . $vs->class);
+                    Console::verbose("正在注册中间件 " . $vs->class);
                     $result = [
                         "class" => "\\" . $reflection_class->getName()
                     ];
@@ -95,13 +99,14 @@ class AnnotationParser
                     elseif ($vss instanceof CQCommand) ZMBuf::$events[CQCommand::class][] = $vss;
                     elseif ($vss instanceof RequestMapping) {
                         self::registerRequestMapping($vss, $vs, $reflection_class, $class_prefix);
-                        if($middleware_addon !== null)
+                        if ($middleware_addon !== null)
                             ZMBuf::$events[MiddlewareInterface::class][$vss->class][$vss->method] = $middleware_addon->middleware;
                     } elseif ($vss instanceof CustomAnnotation) ZMBuf::$events[get_class($vss)][] = $vss;
                     elseif ($vss instanceof CQBefore) ZMBuf::$events[CQBefore::class][$vss->cq_event][] = $vss;
                     elseif ($vss instanceof CQAfter) ZMBuf::$events[CQAfter::class][$vss->cq_event][] = $vss;
                     elseif ($vss instanceof OnStart) ZMBuf::$events[OnStart::class][] = $vss;
                     elseif ($vss instanceof Middleware) ZMBuf::$events[MiddlewareInterface::class][$vss->class][$vss->method] = $vss->middleware;
+                    elseif ($vss instanceof OnTick) self::addTimerTick($vss);
                 }
             }
         }
@@ -122,6 +127,10 @@ class AnnotationParser
                     }
                 }
             }
+        }
+        if (ZMBuf::isset("timer_count")) {
+            Console::info("Added " . ZMBuf::get("timer_count") . " timer(s)!");
+            ZMBuf::unsetCache("timer_count");
         }
     }
 
@@ -305,5 +314,10 @@ class AnnotationParser
             else
                 $tree[] = &$items[$item['id']];
         return $tree;
+    }
+
+    private static function addTimerTick(?OnTick $vss) {
+        ZMBuf::set("timer_count", ZMBuf::get("timer_count", 0) + 1);
+        Timer::tick($vss->tick_ms, [ZMUtil::getModInstance($vss->class), $vss->method]);
     }
 }

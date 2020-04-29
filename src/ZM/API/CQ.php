@@ -18,7 +18,7 @@ class CQ
         if (is_numeric($qq) || $qq === "all") {
             return "[CQ:at,qq=" . $qq . "]";
         }
-        Console::error("传入的QQ号码($qq)错误！");
+        Console::warning("传入的QQ号码($qq)错误！");
         return " ";
     }
 
@@ -31,7 +31,7 @@ class CQ
         if (is_numeric($id)) {
             return "[CQ:face,id=" . $id . "]";
         }
-        Console::error("传入的face id($id)错误！");
+        Console::warning("传入的face id($id)错误！");
         return " ";
     }
 
@@ -44,7 +44,7 @@ class CQ
         if (is_numeric($id)) {
             return "[CQ:emoji,id=" . $id . "]";
         }
-        Console::error("传入的emoji id($id)错误！");
+        Console::warning("传入的emoji id($id)错误！");
         return " ";
     }
 
@@ -66,7 +66,7 @@ class CQ
         if (is_numeric($id)) {
             return "[CQ:sface,id=" . $id . "]";
         }
-        Console::error("传入的sface id($id)错误！");
+        Console::warning("传入的sface id($id)错误！");
         return " ";
     }
 
@@ -151,7 +151,7 @@ class CQ
                 return "[CQ:music,type=$type,id=$id_or_url]";
             case "custom":
                 if ($title === null || $audio === null) {
-                    Console::error("传入CQ码实例的标题和音频链接不能为空！");
+                    Console::warning("传入CQ码实例的标题和音频链接不能为空！");
                     return " ";
                 }
                 if ($content === null) $c = "";
@@ -160,7 +160,7 @@ class CQ
                 else $i = ",image=" . $image;
                 return "[CQ:music,type=custom,url=" . $id_or_url . ",audio=" . $audio . ",title=" . $title . $c . $i . "]";
             default:
-                Console::error("传入的music type($type)错误！");
+                Console::warning("传入的music type($type)错误！");
                 return " ";
         }
     }

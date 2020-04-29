@@ -8,6 +8,7 @@ use Swoole\Http\Request;
 use Swoole\WebSocket\Frame;
 use Swoole\WebSocket\Server;
 use ZM\Http\Response;
+use ZM\Utils\ZMRobot;
 
 interface ContextInterface
 {
@@ -30,4 +31,7 @@ interface ContextInterface
 
     /** @return Request */
     public function getRequest();
+
+    /** @return ZMRobot */
+    public function getRobot();
 }

@@ -14,6 +14,9 @@ class DB
 {
     private static $table_list = [];
 
+    /**
+     * @throws DbException
+     */
     public static function initTableList() {
         $result = self::rawQuery("select TABLE_NAME from INFORMATION_SCHEMA.TABLES where TABLE_SCHEMA='" . ZMBuf::globals("sql_config")["sql_database"] . "';", []);
         foreach ($result as $v) {
@@ -40,10 +43,19 @@ class DB
         return Table::getTableInstance($table_name);
     }
 
+    /**
+     * @param $line
+     * @throws DbException
+     */
     public static function statement($line) {
         self::rawQuery($line, []);
     }
 
+    /**
+     * @param $line
+     * @return bool
+     * @throws DbException
+     */
     public static function unprepared($line) {
         if (ZMBuf::get("sql_log") === true) {
             $starttime = microtime(true);
@@ -64,11 +76,17 @@ class DB
                     "] " . $line . " (Error:" . $e->getMessage() . ")\n";
                 Coroutine::writeFile(CRASH_DIR . "sql.log", $log, FILE_APPEND);
             }
-            Console::error($e->getMessage());
-            return false;
+            Console::warning($e->getMessage());
+            throw $e;
         }
     }
 
+    /**
+     * @param string $line
+     * @param array $params
+     * @return mixed
+     * @throws DbException
+     */
     public static function rawQuery(string $line, $params = []) {
         if (ZMBuf::get("sql_log") === true) {
             $starttime = microtime(true);
@@ -113,8 +131,8 @@ class DB
                     "] " . $line . " " . json_encode($params, JSON_UNESCAPED_UNICODE) . " (Error:" . $e->getMessage() . ")\n";
                 Coroutine::writeFile(CRASH_DIR . "sql.log", $log, FILE_APPEND);
             }
-            Console::error($e->getMessage());
-            return false;
+            Console::warning($e->getMessage());
+            throw $e;
         }
     }
 

@@ -11,6 +11,7 @@ use Framework\Console;
 use Framework\ZMBuf;
 use ZM\Event\Swoole\{MessageEvent, RequestEvent, WorkerStartEvent, WSCloseEvent, WSOpenEvent};
 use ZM\Http\Response;
+use ZM\Utils\DataProvider;
 use ZM\Utils\ZMUtil;
 
 class EventHandler
@@ -21,15 +22,22 @@ class EventHandler
         switch ($event_name) {
             case "workerstart":
                 try {
+                    register_shutdown_function(function () {
+                        $error = error_get_last();
+                        if ($error["type"] != 0) {
+                            Console::error("Internal fatal error: " . $error["message"] . " at " . $error["file"] . "({$error["line"]})");
+                        }
+                        DataProvider::saveBuffer();
+                        ZMBuf::$server->shutdown();
+                    });
                     (new WorkerStartEvent($param0, $param1))->onActivate()->onAfter();
                     Console::log("\n=== Worker #" . $param0->worker_id . " 已启动 ===\n", "gold");
                 } catch (Exception $e) {
                     Console::error("Worker加载出错！停止服务！");
                     Console::error($e->getMessage() . "\n" . $e->getTraceAsString());
-
                     ZMUtil::stop();
                     return;
-                } catch(Error $e) {
+                } catch (Error $e) {
                     var_export($e);
                     ZMUtil::stop();
                 }
@@ -43,8 +51,8 @@ class EventHandler
                 } catch (Exception $e) {
                     /** @var Response $param1 */
                     $param1->status(500);
-                    Console::info($param0->server["remote_addr"].":".$param0->server["remote_port"].
-                        " [".$param1->getStatusCode()."] ".$param0->server["request_uri"]
+                    Console::info($param0->server["remote_addr"] . ":" . $param0->server["remote_port"] .
+                        " [" . $param1->getStatusCode() . "] " . $param0->server["request_uri"]
                     );
                     if (!$param1->isEnd()) $param1->end("Internal server error: " . $e->getMessage());
                     Console::error("Internal server error (500), caused by uncaught exception.");

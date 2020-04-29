@@ -5,7 +5,6 @@ namespace ZM\Connection;
 
 
 use Framework\Console;
-use Framework\Logger;
 use swoole_websocket_server;
 
 abstract class WSConnection
@@ -43,8 +42,8 @@ abstract class WSConnection
         }
         if ($this->server->push($this->fd, $data) === false) {
             $data = unicode_decode($data);
-            if ($push_error_record) Logger::writeSwooleLog("API push failed. Data: " . $data);
-            Console::error("websocket数据未成功推送，长度：" . strlen($data));
+            if ($push_error_record) Console::warning("API push failed. Data: " . $data);
+            Console::warning("websocket数据未成功推送，长度：" . strlen($data));
             return false;
         }
         return true;

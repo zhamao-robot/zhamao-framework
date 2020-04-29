@@ -7,7 +7,10 @@ namespace ZM\Context;
 use Swoole\Http\Request;
 use Swoole\WebSocket\Frame;
 use swoole_server;
+use ZM\Connection\ConnectionManager;
+use ZM\Connection\CQConnection;
 use ZM\Http\Response;
+use ZM\Utils\ZMRobot;
 
 class Context implements ContextInterface
 {
@@ -67,5 +70,13 @@ class Context implements ContextInterface
      */
     public function getCid() {
         return $this->cid;
+    }
+
+    /**
+     * @return ZMRobot|null
+     */
+    public function getRobot() {
+        $conn = ConnectionManager::get($this->getFrame()->fd);
+        return $conn instanceof CQConnection ? new ZMRobot($conn) : null;
     }
 }
