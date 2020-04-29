@@ -87,7 +87,14 @@ class FrameworkLoader
             if (in_array("--log-info", $args)) ZMBuf::$atomics["info_level"]->set(2);
             if (in_array("--log-verbose", $args)) ZMBuf::$atomics["info_level"]->set(3);
             if (in_array("--log-debug", $args)) ZMBuf::$atomics["info_level"]->set(4);
-            Console::log("host: " . self::$settings->get("host") . ", port: " . self::$settings->get("port") . ", log_level: " . ZMBuf::$atomics["info_level"]->get());
+            Console::log(
+                "host: " . self::$settings->get("host") .
+                ", port: " . self::$settings->get("port") .
+                ", log_level: " . ZMBuf::$atomics["info_level"]->get() .
+                ", version: " . json_decode(file_get_contents(WORKING_DIR . "/composer.json"), true)["version"]
+            );
+            global $motd;
+            echo $motd . PHP_EOL;
             $this->server->start();
         } catch (Exception $e) {
             Console::error("Framework初始化出现错误，请检查！");
@@ -141,3 +148,14 @@ class FrameworkLoader
         EventHandler::callSwooleEvent("WorkerStart", $server, $worker_id);
     }
 }
+
+global $motd;
+$motd = <<<EOL
+ ______                                 
+|__  / |__   __ _ _ __ ___   __ _  ___  
+  / /| '_ \ / _` | '_ ` _ \ / _` |/ _ \ 
+ / /_| | | | (_| | | | | | | (_| | (_) |
+/____|_| |_|\__,_|_| |_| |_|\__,_|\___/ 
+
+EOL;
+
