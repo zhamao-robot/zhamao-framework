@@ -3,7 +3,7 @@
     "description": "high-performance intelligent assistant",
     "minimum-stability": "stable",
     "license": "proprietary",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "authors": [
         {
             "name": "whale",
@@ -22,7 +22,8 @@
         "ext-json": "*",
         "ext-posix": "*",
         "ext-ctype": "*",
-        "ext-pcntl": "*"
+        "ext-pcntl": "*",
+        "nikic/php-parser": "^4.4"
     },
     "repositories": {
         "packagist": {

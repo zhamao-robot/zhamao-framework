@@ -18,7 +18,7 @@ use ZM\Annotation\Swoole\{OnStart, OnTick, SwooleEventAfter, SwooleEventAt};
 use ZM\Annotation\Interfaces\Rule;
 use ZM\Connection\WSConnection;
 use ZM\Http\MiddlewareInterface;
-use ZM\Utils\DataProvider;
+use Framework\DataProvider;
 use ZM\Utils\ZMUtil;
 
 class AnnotationParser
@@ -30,7 +30,7 @@ class AnnotationParser
      */
     public static function registerMods() {
         self::loadAnnotationClasses();
-        $all_class = getAllClasses(WORKING_DIR . "/src/Module/", "Module");
+        $all_class = getAllClasses(DataProvider::getWorkingDir() . "/src/Module/", "Module");
         ZMBuf::$req_mapping[0] = [
             'id' => 0,
             'pid' => -1,
@@ -38,6 +38,7 @@ class AnnotationParser
         ];
         $reader = new AnnotationReader();
         foreach ($all_class as $v) {
+            Console::debug("正在检索 ".$v);
             $reflection_class = new ReflectionClass($v);
             $class_prefix = '';
             $methods = $reflection_class->getMethods(ReflectionMethod::IS_PUBLIC);
@@ -47,15 +48,15 @@ class AnnotationParser
                 if ($vs instanceof Closed) {
                     continue 2;
                 } elseif ($vs instanceof Controller) {
-                    Console::debug("找到 Controller 中间件: ".$vs->class);
+                    Console::debug("找到 Controller 中间件: " . $vs->class);
                     $class_prefix = $vs->prefix;
                 } elseif ($vs instanceof SaveBuffer) {
-                    Console::debug("注册自动保存的缓存变量: ".$vs->buf_name." (Dir:".$vs->sub_folder.")");
+                    Console::debug("注册自动保存的缓存变量: " . $vs->buf_name . " (Dir:" . $vs->sub_folder . ")");
                     DataProvider::addSaveBuffer($vs->buf_name, $vs->sub_folder);
                 } elseif ($vs instanceof InitBuffer) {
                     ZMBuf::set($vs->buf_name, []);
                 } elseif ($vs instanceof MiddlewareClass) {
-                    Console::verbose("正在注册中间件 " . $vs->class);
+                    Console::verbose("正在注册中间件 " . $reflection_class->getName());
                     $result = [
                         "class" => "\\" . $reflection_class->getName()
                     ];
@@ -299,9 +300,9 @@ class AnnotationParser
             $s = WORKING_DIR . '/src/' . str_replace("\\", "/", $v) . ".php";
             require_once $s;
         }
-        $class = getAllClasses(WORKING_DIR . "/src/Custom/Annotation/", "Custom\\Annotation");
+        $class = getAllClasses(DataProvider::getWorkingDir() . "/src/Custom/Annotation/", "Custom\\Annotation");
         foreach ($class as $v) {
-            $s = WORKING_DIR . '/src/' . str_replace("\\", "/", $v) . ".php";
+            $s = DataProvider::getWorkingDir() . '/src/' . str_replace("\\", "/", $v) . ".php";
             require_once $s;
         }
     }

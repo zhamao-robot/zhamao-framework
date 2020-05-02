@@ -207,6 +207,12 @@ class Console
             case 'r':
                 ZMUtil::reload();
                 return false;
+            case 'save':
+                $origin = ZMBuf::$atomics["info_level"]->get();
+                ZMBuf::$atomics["info_level"]->set(3);
+                DataProvider::saveBuffer();
+                ZMBuf::$atomics["info_level"]->set($origin);
+                return true;
             case '':
                 return true;
             default:

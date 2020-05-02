@@ -25,7 +25,7 @@ use Swoole\Server;
 use ZM\Exception\DbException;
 use ZM\ModBase;
 use ZM\ModHandleType;
-use ZM\Utils\DataProvider;
+use Framework\DataProvider;
 use ZM\Utils\SQLPool;
 use ZM\Utils\ZMUtil;
 
@@ -50,7 +50,7 @@ class WorkerStartEvent implements SwooleEvent
      */
     public function onActivate(): WorkerStartEvent {
         Console::info("Worker启动中");
-        Process::signal(SIGINT, function (){
+        Process::signal(SIGINT, function () {
             Console::warning("Server interrupted by keyboard.");
             ZMUtil::stop(true);
         });
@@ -61,16 +61,16 @@ class WorkerStartEvent implements SwooleEvent
         //设置炸毛buf中储存的对象
         ZMBuf::$globals = new GlobalConfig();
         ZMBuf::$config = [];
-        $file = scandir(WORKING_DIR . '/config/');
+        $file = scandir(DataProvider::getWorkingDir() . '/config/');
         unset($file[0], $file[1]);
         foreach ($file as $k => $v) {
             if ($v == "global.php") continue;
             $name = explode(".", $v);
             if (($prefix = end($name)) == "json") {
-                ZMBuf::$config[$name[0]] = json_decode(Co::readFile(WORKING_DIR . '/config/' . $v), true);
+                ZMBuf::$config[$name[0]] = json_decode(Co::readFile(DataProvider::getWorkingDir() . '/config/' . $v), true);
                 Console::info("已读取配置文件：" . $v);
             } elseif ($prefix == "php") {
-                ZMBuf::$config[$name[0]] = include_once WORKING_DIR . '/config/' . $v;
+                ZMBuf::$config[$name[0]] = include_once DataProvider::getWorkingDir() . '/config/' . $v;
                 if (is_array(ZMBuf::$config[$name[0]]))
                     Console::info("已读取配置文件：" . $v);
             }
@@ -98,7 +98,7 @@ class WorkerStartEvent implements SwooleEvent
             Coroutine::resume($v);
         }
         ZMBuf::unsetCache("wait_start");
-        foreach(ZMBuf::$events[OnStart::class] ?? [] as $v) {
+        foreach (ZMBuf::$events[OnStart::class] ?? [] as $v) {
             $class_name = $v->class;
             /** @var ModBase $class */
             $class = new $class_name(["server" => $this->server, "worker_id" => $this->worker_id], ModHandleType::SWOOLE_WORKER_START);
@@ -136,7 +136,7 @@ class WorkerStartEvent implements SwooleEvent
     private function loadAllClass() {
         //加载phar包
         Console::info("加载外部phar包中");
-        $dir = WORKING_DIR . "/resources/package/";
+        $dir = DataProvider::getWorkingDir() . "/resources/package/";
         if (is_dir($dir)) {
             $list = scandir($dir);
             unset($list[0], $list[1]);
@@ -147,8 +147,12 @@ class WorkerStartEvent implements SwooleEvent
         }
 
         //加载composer类
-        Console::info("加载composer资源中");
-        require_once WORKING_DIR . "/vendor/autoload.php";
+        if (file_exists(DataProvider::getWorkingDir() . "/vendor/autoload.php")) {
+            Console::info("加载composer资源中");
+            require_once DataProvider::getWorkingDir() . "/vendor/autoload.php";
+        } else {
+            if(isPharMode()) require_once WORKING_DIR . "/vendor/autoload.php";
+        }
 
         //加载各个模块的注解类，以及反射
         Console::info("检索Module中");
@@ -158,8 +162,8 @@ class WorkerStartEvent implements SwooleEvent
         ConnectionManager::registerCustomClass();
 
         //加载自定义的全局函数
-        if(file_exists(WORKING_DIR."/src/Custom/global_function.php"))
-            require_once WORKING_DIR."/src/Custom/global_function.php";
+        if (file_exists(DataProvider::getWorkingDir() . "/src/Custom/global_function.php"))
+            require_once DataProvider::getWorkingDir() . "/src/Custom/global_function.php";
         $this->afterCheck();
     }
 
@@ -175,7 +179,7 @@ class WorkerStartEvent implements SwooleEvent
      */
     private function afterCheck() {
         $context_class = ZMBuf::globals("context_class");
-        if(!is_a($context_class, ContextInterface::class, true)) {
+        if (!is_a($context_class, ContextInterface::class, true)) {
             throw new Exception("Context class must implemented from ContextInterface!");
         }
     }

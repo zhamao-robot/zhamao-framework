@@ -91,6 +91,7 @@ class DB
         if (ZMBuf::get("sql_log") === true) {
             $starttime = microtime(true);
         }
+        Console::debug("MySQL: ".$line);
         try {
             $conn = ZMBuf::$sql_pool->get();
             if ($conn === false) {

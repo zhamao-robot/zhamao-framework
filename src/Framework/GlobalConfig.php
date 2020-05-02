@@ -18,7 +18,8 @@ class GlobalConfig
     public $success = false;
 
     public function __construct() {
-        include_once WORKING_DIR . '/config/global.php';
+        /** @noinspection PhpIncludeInspection */
+        include_once DataProvider::getWorkingDir() . '/config/global.php';
         global $config;
         $this->success = true;
         $this->config = $config;

@@ -11,7 +11,7 @@ use Framework\Console;
 use Framework\ZMBuf;
 use ZM\Event\Swoole\{MessageEvent, RequestEvent, WorkerStartEvent, WSCloseEvent, WSOpenEvent};
 use ZM\Http\Response;
-use ZM\Utils\DataProvider;
+use Framework\DataProvider;
 use ZM\Utils\ZMUtil;
 
 class EventHandler

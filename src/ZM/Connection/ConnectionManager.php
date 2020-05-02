@@ -5,6 +5,7 @@ namespace ZM\Connection;
 
 
 use Framework\ZMBuf;
+use Framework\DataProvider;
 
 class ConnectionManager
 {
@@ -67,7 +68,7 @@ class ConnectionManager
     }
 
     public static function registerCustomClass() {
-        $classes = getAllClasses(WORKING_DIR . "/src/Custom/Connection/", "Custom\\Connection");
+        $classes = getAllClasses(DataProvider::getWorkingDir(). "/src/Custom/Connection/", "Custom\\Connection");
         ZMBuf::$custom_connection_class = $classes;
     }
 }

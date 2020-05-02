@@ -1,8 +1,13 @@
 <?php
 
 use Framework\Console;
+use Framework\DataProvider;
 use Framework\ZMBuf;
 use ZM\Context\ContextInterface;
+
+function isPharMode(){
+    return substr(__DIR__, 0, 7) == 'phar://';
+}
 
 function classLoader($p) {
     $filepath = getClassPath($p);
@@ -19,11 +24,16 @@ function classLoader($p) {
 
 function getClassPath($class_name) {
     $dir = str_replace("\\", "/", $class_name);
-    $dir = WORKING_DIR . "/src/" . $dir . ".php";
-    //echo "@@@".$dir.PHP_EOL;
-    $dir = str_replace("\\", "/", $dir);
-    if (file_exists($dir)) return $dir;
-    else return null;
+    $dir2 = WORKING_DIR . "/src/" . $dir . ".php";
+    //echo "@@@".$dir2.PHP_EOL;
+    $dir2 = str_replace("\\", "/", $dir2);
+    if (file_exists($dir2)) return $dir2;
+    else {
+        $dir = DataProvider::getWorkingDir() . "/src/" . $dir . ".php";
+        //echo "###".$dir.PHP_EOL;
+        if (file_exists($dir)) return $dir;
+        else return null;
+    }
 }
 
 /**

@@ -17,6 +17,7 @@ use ZM\Http\MiddlewareInterface;
 use ZM\Http\Response;
 use ZM\ModBase;
 use ZM\ModHandleType;
+use Framework\DataProvider;
 use ZM\Utils\ZMUtil;
 
 class RequestEvent implements SwooleEvent
@@ -90,7 +91,7 @@ class RequestEvent implements SwooleEvent
                 $path = realpath($base_dir . urldecode($uri));
                 if ($path !== false) {
                     if (is_dir($path)) $path = $path . '/';
-                    $work = realpath(WORKING_DIR) . '/';
+                    $work = realpath(DataProvider::getWorkingDir()) . '/';
                     if (strpos($path, $work) !== 0) {
                         $this->responseStatus(403);
                         return $this;

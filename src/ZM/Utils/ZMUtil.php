@@ -6,6 +6,7 @@ namespace ZM\Utils;
 
 use Co;
 use framework\Console;
+use Framework\DataProvider;
 use Framework\ZMBuf;
 
 class ZMUtil

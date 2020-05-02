@@ -35,17 +35,20 @@ class FrameworkLoader
     /** @var Server */
     private $server;
 
-    public function __construct($args = [])
-    {
+    public function __construct($args = []) {
         if (self::$instance !== null) die("Cannot run two FrameworkLoader in one process!");
         self::$instance = $this;
         self::$argv = $args;
-
-        chdir(__DIR__ . '/../..');
-        define('WORKING_DIR', getcwd());
-        Runtime::enableCoroutine();
         $this->requireGlobalFunctions();
+        if (!isPharMode()) {
+            define('WORKING_DIR', getcwd());
+        } else {
+            echo "Phar mode: " . WORKING_DIR . PHP_EOL;
+        }
         $this->registerAutoloader('classLoader');
+        Runtime::enableCoroutine();
+
+
         self::$settings = new GlobalConfig();
         ZMBuf::$globals = self::$settings;
         if (!self::$settings->success) die("Failed to load global config. Please check config/global.php file");
@@ -91,7 +94,8 @@ class FrameworkLoader
                 "host: " . self::$settings->get("host") .
                 ", port: " . self::$settings->get("port") .
                 ", log_level: " . ZMBuf::$atomics["info_level"]->get() .
-                ", version: " . json_decode(file_get_contents(WORKING_DIR . "/composer.json"), true)["version"]
+                ", version: " . json_decode(file_get_contents(WORKING_DIR . "/composer.json"), true)["version"] .
+                "\nworking_dir: ".(isPharMode() ? realpath('.') : WORKING_DIR)
             );
             global $motd;
             echo $motd . PHP_EOL;
@@ -103,18 +107,15 @@ class FrameworkLoader
         }
     }
 
-    private function requireGlobalFunctions()
-    {
-        require __DIR__ . '/global_functions.php';
+    private function requireGlobalFunctions() {
+        require_once __DIR__ . '/global_functions.php';
     }
 
-    private function registerAutoloader(string $string)
-    {
+    private function registerAutoloader(string $string) {
         if (!spl_autoload_register($string)) die("Failed to register autoloader named \"$string\" !");
     }
 
-    private function defineProperties()
-    {
+    private function defineProperties() {
         define("ZM_START_TIME", microtime(true));
         define("ZM_DATA", self::$settings->get("zm_data"));
         define("CONFIG_DIR", self::$settings->get("config_dir"));
@@ -128,8 +129,7 @@ class FrameworkLoader
         define("ZM_MATCH_SECOND", 3);
     }
 
-    private function selfCheck()
-    {
+    private function selfCheck() {
         if (!extension_loaded("swoole")) die("Can not find swoole extension.\n");
         //if (!extension_loaded("gd")) die("Can not find gd extension.\n");
         if (!extension_loaded("sockets")) die("Can not find sockets extension.\n");
@@ -141,8 +141,7 @@ class FrameworkLoader
         return true;
     }
 
-    public function onWorkerStart(\Swoole\Server $server, $worker_id)
-    {
+    public function onWorkerStart(\Swoole\Server $server, $worker_id) {
         self::$instance = $this;
         self::$run_time = microtime(true);
         EventHandler::callSwooleEvent("WorkerStart", $server, $worker_id);
