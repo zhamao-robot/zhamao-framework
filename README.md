@@ -19,14 +19,14 @@ zhamao-framework 是一个基于 酷Q 的 PHP Swoole 的机器人框架，它会
 除了起到解析消息的作用，炸毛框架 还提供了完整的 WebSocket + HTTP 服务器，你还能用此框架构建出高性能的 API 接口服务器。
 
 ## 开始
-你可以使用 GitHub 的 `Use This Template` 功能快速将本项目克隆到你的公开或私有仓库，也可以从 `release` 中下载本项目的最新版本到本地私有开发。
+1. 你可以使用项目的 `Use this template` 功能将框架克隆到你的公开或私有仓库进行开发
+2. 你也可以直接到 **Release** 中下载最新的 phar 包，放入文件夹后快速启动框架
+3. 还可以使用 Dockerfile 构建 Docker 容器
 
 ## 文档
-本项目文档正在努力编写中。
+Pages托管：[https://framework.zhamao.xin/](https://framework.zhamao.xin/)
 
-Pages：[https://framework.zhamao.xin/](https://framework.zhamao.xin/)
-
-如果上面的访问较慢，可以访问国内服务器：[https://framework2.zhamao.xin/](https://framework2.zhamao.xin/)
+国内服务器：[https://framework2.zhamao.xin/](https://framework2.zhamao.xin/)
 
 ## 特点
 - 支持多账号
@@ -36,6 +36,7 @@ Pages：[https://framework.zhamao.xin/](https://framework.zhamao.xin/)
 - 自带 MySQL 查询器、数据库连接池等数据库连接方案
 - 自带 HTTP 服务器、WebSocket 服务器可复用，可以构建属于自己的 HTTP API 接口
 - 静态文件服务器
+- 支持 phar 一键打包
 
 ## 炸毛特色模块
 
@@ -54,11 +55,10 @@ Pages：[https://framework.zhamao.xin/](https://framework.zhamao.xin/)
 - [ ] 分词模块（可能会放弃计划，因为目前好用的分词都是其他语言的）
 - [ ] HTTP 过滤器、Auth 模块、完整的 MVC 兼容（可能会放弃计划，因为框架主打机器人开发）
 - [ ] Redis 连接池或开箱即用的相应功能内置
-- [ ] 2.0 版本抛弃 `ModBase` 继承结构，完全使用上下文代替
+- [ ] 2.0 版本使用上下文代替
 - [X] 更好的 Logger，稳定和漂亮的控制台输出
 - [ ] 日志服务
-- [ ] 模块支持 Phar 打包（可能会比较靠后支持）
-- [ ] 兼容面向过程的模块编写方案（可能会比较靠后支持）
+- [X] 框架支持 Phar 打包（可能会比较靠后支持）
 - [ ] 完整的单元测试（如果有需求则尽快开发）
 - [X] 静态文件服务器
 
