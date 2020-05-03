@@ -61,14 +61,14 @@ class Console
             $trace = debug_backtrace()[1] ?? ['file' => '', 'function' => ''];
             $trace = "[" . basename($trace["file"], ".php") . ":" . $trace["function"] . "] ";
         }
-        if(ZMBuf::$atomics["info_level"]->get() >= 1) {
+        if (ZMBuf::$atomics["info_level"]->get() >= 1) {
             if (!is_string($obj)) {
                 if (isset($trace)) {
                     var_dump($obj);
                     return;
                 } else $obj = "{Object}";
             }
-            echo(self::setColor($head . ($trace ?? "") . $obj, "yellow") . "\n");
+            echo(self::setColor($head . ($trace ?? "") . $obj, in_array("--white-term", FrameworkLoader::$argv) ? "blue" : "yellow") . "\n");
         }
     }
 
@@ -78,14 +78,14 @@ class Console
             $trace = debug_backtrace()[1] ?? ['file' => '', 'function' => ''];
             $trace = "[" . basename($trace["file"], ".php") . ":" . $trace["function"] . "] ";
         }
-        if(ZMBuf::$atomics["info_level"]->get() >= 2) {
+        if (ZMBuf::$atomics["info_level"]->get() >= 2) {
             if (!is_string($obj)) {
                 if (isset($trace)) {
                     var_dump($obj);
                     return;
                 } else $obj = "{Object}";
             }
-            echo(self::setColor($head . ($trace ?? "") . $obj, "lightblue") . "\n");
+            echo(self::setColor($head . ($trace ?? "") . $obj, in_array("--white-term", FrameworkLoader::$argv) ? "black" : "lightblue") . "\n");
         }
     }
 
@@ -95,7 +95,7 @@ class Console
             $trace = debug_backtrace()[1] ?? ['file' => '', 'function' => ''];
             $trace = "[" . basename($trace["file"], ".php") . ":" . $trace["function"] . "] ";
         }
-        if(ZMBuf::$atomics["info_level"]->get() >= 2) {
+        if (ZMBuf::$atomics["info_level"]->get() >= 2) {
             if (!is_string($obj)) {
                 if (isset($trace)) {
                     var_dump($obj);
@@ -107,8 +107,8 @@ class Console
     }
 
     static function verbose($obj, $head = null) {
-        if($head === null) $head = date("[H:i:s] ") . "[V] ";
-        if(ZMBuf::$atomics["info_level"]->get() >= 3) {
+        if ($head === null) $head = date("[H:i:s] ") . "[V] ";
+        if (ZMBuf::$atomics["info_level"]->get() >= 3) {
             if (!is_string($obj)) {
                 if (isset($trace)) {
                     var_dump($obj);
@@ -173,7 +173,7 @@ class Console
         $it = explodeMsg($cmd);
         switch ($it[0] ?? '') {
             case 'logtest':
-                Console::log(date("[H:i:s]"). " [L] This is normal msg. (0)");
+                Console::log(date("[H:i:s]") . " [L] This is normal msg. (0)");
                 Console::error("This is error msg. (0)");
                 Console::warning("This is warning msg. (1)");
                 Console::info("This is info msg. (2)");
