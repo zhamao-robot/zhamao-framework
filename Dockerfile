@@ -11,5 +11,4 @@ ADD . /app/zhamao-framework-bak
 #RUN mv zhamao-framework-master zhamao-framework
 WORKDIR /app/zhamao-framework
 
-EXPOSE 20001
-CMD ["bash", "/app/zhamao-framework-bak/.entry.sh"]
+CMD ["/bin/bash", "-i", "/app/zhamao-framework-bak/.entry.sh"]
