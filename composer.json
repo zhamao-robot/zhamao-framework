@@ -22,7 +22,6 @@
         "ext-json": "*",
         "ext-posix": "*",
         "ext-ctype": "*",
-        "ext-pcntl": "*",
         "nikic/php-parser": "^4.4"
     },
     "repositories": {
