@@ -85,11 +85,8 @@ class WorkerStartEvent implements SwooleEvent
 
         Console::info("监听console输入");
         Console::listenConsole(); //这个方法只能在这里调用，且如果worker_num不为1的话，此功能不可用
-
-        $this->loadAllClass(); //加载composer资源、phar外置包、注解解析注册等
-
         $this->setAutosaveTimer(ZMBuf::globals("auto_save_interval"));
-
+        $this->loadAllClass(); //加载composer资源、phar外置包、注解解析注册等
         return $this;
     }
 

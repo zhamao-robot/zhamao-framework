@@ -67,7 +67,7 @@ abstract class ModBase
     }
 
     public function finalReply($msg, $yield = false) {
-        $this->block_continue = true;
+        $this->setBlock();
         if ($msg == "") return true;
         return $this->reply($msg, $yield);
     }
@@ -161,5 +161,5 @@ abstract class ModBase
 
     public function getConnection() { return $this->connection; }
 
-    public function setBlock($result = true) { $this->block_continue = $result; }
+    public function setBlock($result = true) { context()->setCache("block_continue", $result); }
 }

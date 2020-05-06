@@ -68,7 +68,7 @@ class FrameworkLoader
             $this->server->set($settings);
             $this->server->on("WorkerStart", [$this, "onWorkerStart"]);
             $this->server->on("message", function ($server, Frame $frame) {
-                Console::debug("Calling Swoole \"message\" event from fd=" . $frame->fd);
+                Console::debug("Calling Swoole \"message\" from fd=" . $frame->fd);
                 EventHandler::callSwooleEvent("message", $server, $frame);
             });
             $this->server->on("request", function ($request, $response) {

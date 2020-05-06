@@ -54,7 +54,7 @@ function testEnvironment() {
     if (!is_file($current_dir . '/config/global.php')) {
         echo "Exporting default global config...\n";
         $global = file_get_contents(__DIR__ . '/config/global.php');
-        $global = str_replace("WORKING_DIR", 'realpath("../")', $global);
+        $global = str_replace("WORKING_DIR", 'realpath(__DIR__ . "/../")', $global);
         file_put_contents($current_dir . '/config/global.php', $global);
     }
     if (!is_file($current_dir . '/config/file_header.json')) {

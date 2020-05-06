@@ -14,9 +14,9 @@ class DataProvider
 
     public static function getWorkingDir() {
         global $is_phar;
-        if($is_phar === true) {
+        if ($is_phar === true) {
             return realpath('.');
-        }  else {
+        } else {
             return WORKING_DIR;
         }
     }
@@ -28,7 +28,8 @@ class DataProvider
     public static function addSaveBuffer($buf_name, $sub_folder = null) {
         $name = ($sub_folder ?? "") . "/" . $buf_name . ".json";
         self::$buffer_list[$buf_name] = $name;
-        Console::debug("Added ".$buf_name . " at $sub_folder");
+        Console::debug("Added " . $buf_name . " at $sub_folder");
+        var_dump(self::$buffer_list);
         ZMBuf::set($buf_name, self::getJsonData($name));
     }
 
@@ -37,6 +38,7 @@ class DataProvider
         if (ZMBuf::$atomics["info_level"]->get() >= 3)
             echo $head;
         foreach (self::$buffer_list as $k => $v) {
+            Console::debug("Saving " . $k . " to " . $v);
             self::setJsonData($v, ZMBuf::get($k));
         }
         if (ZMBuf::$atomics["info_level"]->get() >= 3)
@@ -53,8 +55,12 @@ class DataProvider
     }
 
     private static function setJsonData($filename, array $args) {
-        Console::debug("Saving ".$filename);
-        file_put_contents(self::getDataConfig() . $filename, json_encode($args, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_BIGINT_AS_STRING));
+        $pathinfo = pathinfo($filename);
+        if (!is_dir($pathinfo["dirname"])) mkdir(self::getDataConfig() . $pathinfo["dirname"]);
+        $r = file_put_contents(self::getDataConfig() . $filename, json_encode($args, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_BIGINT_AS_STRING));
+        if ($r === false) {
+            Console::warning("无法保存文件: " . $filename);
+        }
     }
 
     public static function getDataFolder() {

@@ -5,7 +5,7 @@ use Framework\DataProvider;
 use Framework\ZMBuf;
 use ZM\Context\ContextInterface;
 
-function isPharMode(){
+function isPharMode() {
     return substr(__DIR__, 0, 7) == 'phar://';
 }
 
@@ -162,7 +162,8 @@ function matchArgs($pattern, $context) {
 function set_coroutine_params($array) {
     $cid = Co::getCid();
     if ($cid == -1) die("Cannot set coroutine params at none coroutine mode.");
-    ZMBuf::$context[$cid] = $array;
+    if(isset(ZMBuf::$context[$cid])) ZMBuf::$context[$cid] = array_merge(ZMBuf::$context[$cid], $array);
+    else ZMBuf::$context[$cid] = $array;
     foreach (ZMBuf::$context as $c => $v) {
         if (!Co::exists($c)) unset(ZMBuf::$context[$c]);
     }
@@ -175,15 +176,17 @@ function context() {
     $cid = Co::getCid();
     $c_class = ZMBuf::globals("context_class");
     if (isset(ZMBuf::$context[$cid])) {
-        return new $c_class(ZMBuf::$context[$cid], $cid);
+        return new $c_class($cid);
     } else {
         while (($pcid = Co::getPcid($cid)) !== -1) {
-            if (isset(ZMBuf::$context[$cid])) return new $c_class(ZMBuf::$context[$cid], $cid);
+            if (isset(ZMBuf::$context[$cid])) return new $c_class($cid);
             else $cid = $pcid;
         }
         return null;
     }
 }
+
+function ctx() { return context(); }
 
 function debug($msg) {
     if (ZMBuf::$atomics["info_level"]->get() >= 4)

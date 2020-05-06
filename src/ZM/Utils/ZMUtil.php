@@ -40,6 +40,9 @@ class ZMUtil
 
     public static function reload() {
         Console::info(Console::setColor("Reloading server...", "gold"));
+        foreach (ZMBuf::get("wait_api") as $k => $v) {
+            if ($v["result"] === null) Co::resume($v["coroutine"]);
+        }
         foreach (ZMBuf::$server->connections as $v) {
             ZMBuf::$server->close($v);
         }
