@@ -60,7 +60,7 @@ class RequestEvent
                         ], ModHandleType::CQ_REQUEST);
                     $r = call_user_func([$obj[$c], $v->method]);
                     if (is_string($r)) $obj[$c]->reply($r);
-                    if ($obj[$c]->block_continue) return;
+                    if (context()->getCache("block_continue") === true) return;
                 }
             }
         } catch (WaitTimeoutException $e) {

@@ -61,7 +61,7 @@ class WSOpenEvent implements SwooleEvent
                 $c = $v->class;
                 $class = new $c(["server" => $this->server, "request" => $this->request, "connection" => $this->conn], ModHandleType::SWOOLE_OPEN);
                 call_user_func_array([$class, $v->method], [$this->conn]);
-                if ($class->block_continue) break;
+                if (context()->getCache("block_continue") === true) break;
             }
         }
         return $this;
@@ -77,7 +77,7 @@ class WSOpenEvent implements SwooleEvent
                 /** @var ModBase $class */
                 $class = new $v["class"](["server" => $this->server, "request" => $this->request, "connection" => $this->conn], ModHandleType::SWOOLE_OPEN);
                 call_user_func_array([$class, $v["method"]], [$this->conn]);
-                if ($class->block_continue) break;
+                if (context()->getCache("block_continue") === true) break;
             }
         }
         return $this;

@@ -52,7 +52,7 @@ class WSCloseEvent implements SwooleEvent
                 /** @var ModBase $class */
                 $class = new $c(["server" => $this->server, "fd" => $this->fd], ModHandleType::SWOOLE_CLOSE);
                 call_user_func_array([$class, $v->method], []);
-                if($class->block_continue) break;
+                if(context()->getCache("block_continue") === true) break;
             }
         }
         return $this;

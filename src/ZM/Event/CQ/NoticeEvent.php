@@ -59,7 +59,7 @@ class NoticeEvent
                         ], ModHandleType::CQ_NOTICE);
                     $r = call_user_func([$obj[$c], $v->method]);
                     if (is_string($r)) $obj[$c]->reply($r);
-                    if ($obj[$c]->block_continue) return;
+                    if (context()->getCache("block_continue") === true) return;
                 }
             }
         } /** @noinspection PhpRedundantCatchClauseInspection */ catch (WaitTimeoutException $e) {

@@ -120,7 +120,7 @@ class RequestEvent implements SwooleEvent
             return $this;
         }
 
-        set_coroutine_params(["request" => $this->request, "response" => $this->response, "params" => $params]);
+       context()->setCache("params", $params);
 
         if (in_array(strtoupper($this->request->server["request_method"]), $node["request_method"] ?? [])) { //判断目标方法在不在里面
             $c_name = $node["class"];
@@ -171,7 +171,7 @@ class RequestEvent implements SwooleEvent
                 $c = $v->class;
                 $class = new $c(["request" => $this->request, "response" => $this->response]);
                 $r = call_user_func_array([$class, $v->method], []);
-                if ($class->block_continue) break;
+                if (context()->getCache("block_continue") === true) break;
             }
         }
 

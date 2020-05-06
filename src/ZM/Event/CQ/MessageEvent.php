@@ -35,19 +35,20 @@ class MessageEvent
         foreach (ZMBuf::$events[CQBefore::class]["message"] ?? [] as $v) {
             $c = $v->class;
             $class = new $c([
-                "data" => $this->data,
+                "data" => context()->getData(),
                 "connection" => $this->connection
             ], ModHandleType::CQ_MESSAGE);
+            Console::debug("Calling CQBefore: " . $c . " -> " . $v->method);
             $r = call_user_func_array([$class, $v->method], []);
             if (!$r || $class->block_continue) return false;
         }
         foreach (ZMBuf::get("wait_api", []) as $k => $v) {
-            if($this->data["user_id"] == $v["user_id"] &&
-                $this->data["self_id"] == $v["self_id"] &&
-                $this->data["message_type"] == $v["message_type"] &&
-                ($this->data[$this->data["message_type"]."_id"] ?? $this->data["user_id"]) ==
-                ($v[$v["message_type"]."_id"] ?? $v["user_id"])){
-                $v["result"] = $this->data["message"];
+            if (context()->getData()["user_id"] == $v["user_id"] &&
+                context()->getData()["self_id"] == $v["self_id"] &&
+                context()->getData()["message_type"] == $v["message_type"] &&
+                (context()->getData()[context()->getData()["message_type"] . "_id"] ?? context()->getData()["user_id"]) ==
+                ($v[$v["message_type"] . "_id"] ?? $v["user_id"])) {
+                $v["result"] = context()->getData()["message"];
                 ZMBuf::appendKey("wait_api", $k, $v);
                 Co::resume($v["coroutine"]);
                 return false;
@@ -59,9 +60,9 @@ class MessageEvent
     /** @noinspection PhpRedundantCatchClauseInspection */
     public function onActivate() {
         try {
-            $word = split_explode(" ", str_replace("\r", "", $this->data["message"]));
+            $word = split_explode(" ", str_replace("\r", "", context()->getMessage()));
             if (count(explode("\n", $word[0])) >= 2) {
-                $enter = explode("\n", $this->data["message"]);
+                $enter = explode("\n", context()->getMessage());
                 $first = split_explode(" ", array_shift($enter));
                 $word = array_merge($first, $enter);
                 foreach ($word as $k => $v) {
@@ -77,15 +78,16 @@ class MessageEvent
                     $c = $v->class;
                     if (!isset($obj[$c]))
                         $obj[$c] = new $c([
-                            "data" => $this->data,
-                            "connection" => $this->connection
+                            "data" => context()->getData(),
+                            "connection" => context()->getConnection()
                         ], ModHandleType::CQ_MESSAGE);
                     if ($word[0] != "" && $v->match == $word[0]) {
+                        Console::debug("Calling $c -> {$v->method}");
                         $r = call_user_func([$obj[$c], $v->method], $word);
                         if (is_string($r)) $obj[$c]->reply($r);
                         $this->function_call = true;
                         return;
-                    } elseif (($args = matchArgs($v->regexMatch, $this->data["message"])) !== false) {
+                    } elseif ($v->regexMatch != "" && ($args = matchArgs($v->regexMatch, context()->getMessage())) !== false) {
                         $r = call_user_func([$obj[$c], $v->method], $args);
                         if (is_string($r)) $obj[$c]->reply($r);
                         $this->function_call = true;
@@ -96,21 +98,21 @@ class MessageEvent
             foreach (ZMBuf::$events[CQMessage::class] ?? [] as $v) {
                 /** @var CQMessage $v */
                 if (
-                    ($v->message == '' || ($v->message != '' && $v->message == $this->data["message"])) &&
-                    ($v->user_id == 0 || ($v->user_id != 0 && $v->user_id == $this->data["user_id"])) &&
-                    ($v->group_id == 0 || ($v->group_id != 0 && $v->group_id == ($this->data["group_id"] ?? 0))) &&
-                    ($v->discuss_id == 0 || ($v->discuss_id != 0 && $v->discuss_id == ($this->data["discuss_id"] ?? 0))) &&
-                    ($v->message_type == '' || ($v->message_type != '' && $v->message_type == $this->data["message_type"])) &&
-                    ($v->raw_message == '' || ($v->raw_message != '' && $v->raw_message == $this->data["raw_message"]))) {
+                    ($v->message == '' || ($v->message != '' && $v->message == context()->getData()["message"])) &&
+                    ($v->user_id == 0 || ($v->user_id != 0 && $v->user_id == context()->getData()["user_id"])) &&
+                    ($v->group_id == 0 || ($v->group_id != 0 && $v->group_id == (context()->getData()["group_id"] ?? 0))) &&
+                    ($v->discuss_id == 0 || ($v->discuss_id != 0 && $v->discuss_id == (context()->getData()["discuss_id"] ?? 0))) &&
+                    ($v->message_type == '' || ($v->message_type != '' && $v->message_type == context()->getData()["message_type"])) &&
+                    ($v->raw_message == '' || ($v->raw_message != '' && $v->raw_message == context()->getData()["raw_message"]))) {
                     $c = $v->class;
                     if (!isset($obj[$c]))
                         $obj[$c] = new $c([
-                            "data" => $this->data,
+                            "data" => context()->getData(),
                             "connection" => $this->connection
                         ], ModHandleType::CQ_MESSAGE);
-                    $r = call_user_func([$obj[$c], $v->method], $this->data["message"]);
+                    $r = call_user_func([$obj[$c], $v->method], context()->getData()["message"]);
                     if (is_string($r)) $obj[$c]->reply($r);
-                    if ($obj[$c]->block_continue) return;
+                    if (context()->getCache("block_continue") === true) return;
                 }
             }
         } catch (WaitTimeoutException $e) {
@@ -126,7 +128,7 @@ class MessageEvent
         foreach (ZMBuf::$events[CQAfter::class]["message"] ?? [] as $v) {
             $c = $v->class;
             $class = new $c([
-                "data" => $this->data,
+                "data" => context()->getData(),
                 "connection" => $this->connection
             ], ModHandleType::CQ_MESSAGE);
             $r = call_user_func_array([$class, $v->method], []);

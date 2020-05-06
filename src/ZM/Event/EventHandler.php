@@ -10,6 +10,9 @@ use Exception;
 use Framework\Console;
 use Framework\ZMBuf;
 use ZM\Event\Swoole\{MessageEvent, RequestEvent, WorkerStartEvent, WSCloseEvent, WSOpenEvent};
+use Swoole\Server;
+use Swoole\WebSocket\Frame;
+use ZM\Connection\ConnectionManager;
 use ZM\Http\Response;
 use Framework\DataProvider;
 use ZM\Utils\ZMUtil;
@@ -18,6 +21,7 @@ class EventHandler
 {
     public static function callSwooleEvent($event_name, $param0, $param1 = null) {
         //$starttime = microtime(true);
+        unset(ZMBuf::$context[Co::getCid()]);
         $event_name = strtolower($event_name);
         switch ($event_name) {
             case "workerstart":
@@ -43,10 +47,15 @@ class EventHandler
                 }
                 break;
             case "message":
+                /** @var Frame $param1 */
+                /** @var Server $param0 */
+                $conn = ConnectionManager::get($param1->fd);
+                set_coroutine_params(["server" => $param0, "frame" => $param1, "connection" => $conn]);
                 (new MessageEvent($param0, $param1))->onActivate()->onAfter();
                 break;
             case "request":
                 try {
+                    set_coroutine_params(["request" => $param0, "response" => $param1]);
                     (new RequestEvent($param0, $param1))->onActivate()->onAfter();
                 } catch (Exception $e) {
                     /** @var Response $param1 */
@@ -60,9 +69,11 @@ class EventHandler
                 }
                 break;
             case "open":
+                set_coroutine_params(["server" => $param0, "request" => $param1]);
                 (new WSOpenEvent($param0, $param1))->onActivate()->onAfter();
                 break;
             case "close":
+                set_coroutine_params(["server" => $param0, "fd" => $param1]);
                 (new WSCloseEvent($param0, $param1))->onActivate()->onAfter();
                 break;
         }

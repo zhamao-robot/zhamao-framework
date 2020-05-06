@@ -109,7 +109,7 @@ class WorkerStartEvent implements SwooleEvent
                 /** @var ModBase $class */
                 $class = new $class_name(["server" => $this->server, "worker_id" => $this->worker_id], ModHandleType::SWOOLE_WORKER_START);
                 call_user_func_array([$class, $v->method], []);
-                if ($class->block_continue) break;
+                if (context()->getCache("block_continue") === true) break;
             }
         }
         return $this;

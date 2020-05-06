@@ -39,14 +39,14 @@ class MessageEvent implements SwooleEvent
      */
     public function onActivate() {
         ZMUtil::checkWait();
-        $conn = ConnectionManager::get($this->frame->fd);
-        set_coroutine_params(["server" => $this->server, "frame" => $this->frame, "connection" => $conn]);
+        $conn = ConnectionManager::get(context()->getFrame()->fd);
         try {
             if ($conn->getType() == "qq") {
-                $data = json_decode($this->frame->data, true);
+                $data = json_decode(context()->getFrame()->data, true);
                 if (isset($data["post_type"])) {
                     set_coroutine_params(["data" => $data, "connection" => $conn]);
-                    EventHandler::callCQEvent($data, ConnectionManager::get($this->frame->fd), 0);
+                    Console::debug("Calling CQ Event from fd=" . $conn->fd);
+                    EventHandler::callCQEvent($data, ConnectionManager::get(context()->getFrame()->fd), 0);
                 } else
                     EventHandler::callCQResponse($data);
             }
@@ -56,7 +56,7 @@ class MessageEvent implements SwooleEvent
                     /** @var ModBase $class */
                     $class = new $c(["server" => $this->server, "frame" => $this->frame, "connection" => $conn], ModHandleType::SWOOLE_MESSAGE);
                     call_user_func_array([$class, $v->method], [$conn]);
-                    if ($class->block_continue) break;
+                    if (context()->getCache("block_continue") === true) break;
                 }
             }
         } catch (Exception $e) {
@@ -76,7 +76,7 @@ class MessageEvent implements SwooleEvent
                 /** @var ModBase $class */
                 $class = new $c(["server" => $this->server, "frame" => $this->frame, "connection" => $conn], ModHandleType::SWOOLE_MESSAGE);
                 call_user_func_array([$class, $v->method], []);
-                if ($class->block_continue) break;
+                if (context()->getCache("block_continue") === true) break;
             }
         }
         return $this;
