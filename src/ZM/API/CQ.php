@@ -211,6 +211,10 @@ class CQ
         return $msg;
     }
 
+    public static function encode($str) {
+        return self::escape($str);
+    }
+
     public static function removeCQ($msg) {
         while (($cq = ZMUtil::getCQ($msg)) !== null) {
             $msg = str_replace(mb_substr($msg, $cq["start"], $cq["end"] - $cq["start"] + 1), "", $msg);
