@@ -29,7 +29,6 @@ class DataProvider
         $name = ($sub_folder ?? "") . "/" . $buf_name . ".json";
         self::$buffer_list[$buf_name] = $name;
         Console::debug("Added " . $buf_name . " at $sub_folder");
-        var_dump(self::$buffer_list);
         ZMBuf::set($buf_name, self::getJsonData($name));
     }
 
