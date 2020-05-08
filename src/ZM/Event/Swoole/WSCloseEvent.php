@@ -4,11 +4,13 @@
 namespace ZM\Event\Swoole;
 
 
+use Doctrine\Common\Annotations\AnnotationException;
 use Framework\ZMBuf;
 use Swoole\Server;
 use ZM\Annotation\Swoole\SwooleEventAfter;
 use ZM\Annotation\Swoole\SwooleEventAt;
 use ZM\Connection\ConnectionManager;
+use ZM\Event\EventHandler;
 use ZM\ModBase;
 use ZM\ModHandleType;
 use ZM\Utils\ZMUtil;
@@ -26,6 +28,7 @@ class WSCloseEvent implements SwooleEvent
 
     /**
      * @inheritDoc
+     * @throws AnnotationException
      */
     public function onActivate() {
         ZMUtil::checkWait();
@@ -34,9 +37,8 @@ class WSCloseEvent implements SwooleEvent
         foreach(ZMBuf::$events[SwooleEventAt::class] ?? [] as $v) {
             if(strtolower($v->type) == "close" && $this->parseSwooleRule($v)) {
                 $c = $v->class;
-                $class = new $c(["server" => $this->server, "fd" => $this->fd], ModHandleType::SWOOLE_CLOSE);
-                call_user_func_array([$class, $v->method], []);
-                if($class->block_continue) break;
+                EventHandler::callWithMiddleware($c, $v->method, ["server" => $this->server, "fd" => $this->fd], []);
+                if(context()->getCache("block_continue") === true) break;
             }
         }
         return $this;
@@ -44,14 +46,13 @@ class WSCloseEvent implements SwooleEvent
 
     /**
      * @inheritDoc
+     * @throws AnnotationException
      */
     public function onAfter() {
         foreach (ZMBuf::$events[SwooleEventAfter::class] ?? [] as $v) {
             if (strtolower($v->type) == "close" && $this->parseSwooleRule($v) === true) {
                 $c = $v->class;
-                /** @var ModBase $class */
-                $class = new $c(["server" => $this->server, "fd" => $this->fd], ModHandleType::SWOOLE_CLOSE);
-                call_user_func_array([$class, $v->method], []);
+                EventHandler::callWithMiddleware($c, $v->method, ["server" => $this->server, "fd" => $this->fd], []);
                 if(context()->getCache("block_continue") === true) break;
             }
         }

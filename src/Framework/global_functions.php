@@ -178,9 +178,10 @@ function context() {
     if (isset(ZMBuf::$context[$cid])) {
         return new $c_class($cid);
     } else {
+        Console::debug("未找到当前协程的上下文($cid)，正在找父进程的上下文");
         while (($pcid = Co::getPcid($cid)) !== -1) {
+            $cid = $pcid;
             if (isset(ZMBuf::$context[$cid])) return new $c_class($cid);
-            else $cid = $pcid;
         }
         return null;
     }

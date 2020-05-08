@@ -5,18 +5,14 @@ namespace ZM\Event\Swoole;
 
 
 use Closure;
-use Doctrine\Common\Annotations\AnnotationException;
 use Exception;
 use Framework\Console;
 use Framework\ZMBuf;
 use Swoole\Http\Request;
-use ZM\Annotation\Http\MiddlewareClass;
 use ZM\Annotation\Swoole\SwooleEventAfter;
 use ZM\Annotation\Swoole\SwooleEventAt;
-use ZM\Http\MiddlewareInterface;
+use ZM\Event\EventHandler;
 use ZM\Http\Response;
-use ZM\ModBase;
-use ZM\ModHandleType;
 use Framework\DataProvider;
 use ZM\Utils\ZMUtil;
 
@@ -120,57 +116,25 @@ class RequestEvent implements SwooleEvent
             return $this;
         }
 
-       context()->setCache("params", $params);
+        context()->setCache("params", $params);
 
         if (in_array(strtoupper($this->request->server["request_method"]), $node["request_method"] ?? [])) { //判断目标方法在不在里面
             $c_name = $node["class"];
-            if (isset(ZMBuf::$events[MiddlewareInterface::class][$c_name][$node["method"]])) {
-                $middleware = ZMBuf::$events[MiddlewareInterface::class][$c_name][$node["method"]];
-                if (!isset(ZMBuf::$events[MiddlewareClass::class][$middleware])) throw new AnnotationException("Annotation parse error: Unknown MiddlewareClass named \"{$middleware}\"!");
-                $middleware = ZMBuf::$events[MiddlewareClass::class][$middleware];
-                $before = $middleware["class"];
-                $r = new $before();
-                $before_result = true;
-                if (isset($middleware["before"])) {
-                    $before_result = call_user_func([$r, $middleware["before"]], $this->request, $this->response, $params);
-                    if ($before_result !== false) $before_result = true;
+            EventHandler::callWithMiddleware(
+                $c_name,
+                $node["method"],
+                ["request" => $this->request, "response" => &$this->response, "params" => $params],
+                [$params],
+                function ($result) {
+                    if (is_string($result) && !$this->response->isEnd()) $this->response->end($result);
+                    if ($this->response->isEnd()) context()->setCache("block_continue", true);
                 }
-                if ($before_result) {
-                    try {
-                        /** @var ModBase $class */
-                        $class = new $c_name(["request" => $this->request, "response" => $this->response, "params" => $params], ModHandleType::SWOOLE_REQUEST);
-                        $result = call_user_func_array([$class, $node["method"]], [$params]);
-                        if (is_string($result) && !$this->response->isEnd()) $this->response->end($result);
-                        if (!$this->response->isEnd()) goto eventCall;
-                    } catch (Exception $e) {
-                        if (!isset($middleware["exceptions"])) throw $e;
-                        foreach ($middleware["exceptions"] as $name => $method) {
-                            if ($e instanceof $name) {
-                                call_user_func([$r, $method], $e, $this->request, $this->response, $params);
-                                return $this;
-                            }
-                        }
-                        throw $e;
-                    }
-                }
-                if (isset($middleware["after"])) {
-                    call_user_func([$r, $middleware["after"]], $this->request, $this->response, $params);
-                    return $this;
-                }
-            } else {
-                /** @var ModBase $class */
-                $class = new $c_name(["request" => $this->request, "response" => $this->response, "params" => $params], ModHandleType::SWOOLE_REQUEST);
-                $r = call_user_func_array([$class, $node["method"]], [$params]);
-                if (is_string($r) && !$this->response->isEnd()) $this->response->end($r);
-                if (!$this->response->isEnd()) goto eventCall;
-            }
+            );
         }
-        eventCall:
         foreach (ZMBuf::$events[SwooleEventAt::class] ?? [] as $v) {
             if (strtolower($v->type) == "request" && $this->parseSwooleRule($v)) {
                 $c = $v->class;
-                $class = new $c(["request" => $this->request, "response" => $this->response]);
-                $r = call_user_func_array([$class, $v->method], []);
+                EventHandler::callWithMiddleware($c, $v->method, ["request" => $this->request, "response" => $this->response], []);
                 if (context()->getCache("block_continue") === true) break;
             }
         }

@@ -8,6 +8,7 @@ use Co;
 use framework\Console;
 use Framework\DataProvider;
 use Framework\ZMBuf;
+use ZM\API\CQ;
 
 class ZMUtil
 {
@@ -40,7 +41,7 @@ class ZMUtil
 
     public static function reload() {
         Console::info(Console::setColor("Reloading server...", "gold"));
-        foreach (ZMBuf::get("wait_api") as $k => $v) {
+        foreach (ZMBuf::get("wait_api", []) as $k => $v) {
             if ($v["result"] === null) Co::resume($v["coroutine"]);
         }
         foreach (ZMBuf::$server->connections as $v) {
@@ -54,28 +55,14 @@ class ZMUtil
      * 解析CQ码
      * @param $msg
      * @return array|null
-     * 0123456
-     * [CQ:at]
      */
     static function getCQ($msg) {
-        if (($start = mb_strpos($msg, '[')) === false) return null;
-        if (($end = mb_strpos($msg, ']')) === false) return null;
-        $msg = mb_substr($msg, $start + 1, $end - $start - 1);
-        if (mb_substr($msg, 0, 3) != "CQ:") return null;
-        $msg = mb_substr($msg, 3);
-        $msg2 = explode(",", $msg);
-        $type = array_shift($msg2);
-        $array = [];
-        foreach ($msg2 as $k => $v) {
-            $ss = explode("=", $v);
-            $sk = array_shift($ss);
-            $array[$sk] = implode("=", $ss);
-        }
-        return ["type" => $type, "params" => $array, "start" => $start, "end" => $end];
+        return CQ::getCQ($msg);
     }
 
     public static function getModInstance($class) {
         if (!isset(ZMBuf::$instance[$class])) {
+            Console::debug("Class instance $class not exist, so I created it.");
             ZMBuf::$instance[$class] = new $class();
             return ZMBuf::$instance[$class];
         } else {

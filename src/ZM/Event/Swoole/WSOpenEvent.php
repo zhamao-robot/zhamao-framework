@@ -5,6 +5,7 @@ namespace ZM\Event\Swoole;
 
 
 use Closure;
+use Doctrine\Common\Annotations\AnnotationException;
 use Framework\ZMBuf;
 use Swoole\Http\Request;
 use Swoole\WebSocket\Server;
@@ -14,6 +15,7 @@ use ZM\Connection\ConnectionManager;
 use ZM\Connection\CQConnection;
 use ZM\Connection\UnknownConnection;
 use ZM\Connection\WSConnection;
+use ZM\Event\EventHandler;
 use ZM\ModBase;
 use ZM\ModHandleType;
 use ZM\Utils\ZMUtil;
@@ -40,6 +42,7 @@ class WSOpenEvent implements SwooleEvent
 
     /**
      * @inheritDoc
+     * @throws AnnotationException
      */
     public function onActivate() {
         ZMUtil::checkWait();
@@ -59,8 +62,12 @@ class WSOpenEvent implements SwooleEvent
         foreach (ZMBuf::$events[SwooleEventAt::class] ?? [] as $v) {
             if (strtolower($v->type) == "open" && $this->parseSwooleRule($v) === true) {
                 $c = $v->class;
-                $class = new $c(["server" => $this->server, "request" => $this->request, "connection" => $this->conn], ModHandleType::SWOOLE_OPEN);
-                call_user_func_array([$class, $v->method], [$this->conn]);
+                EventHandler::callWithMiddleware(
+                    $c,
+                    $v->method,
+                    ["server" => $this->server, "request" => $this->request, "connection" => $this->conn],
+                    [$this->conn]
+                );
                 if (context()->getCache("block_continue") === true) break;
             }
         }

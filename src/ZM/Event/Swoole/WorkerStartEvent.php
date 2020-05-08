@@ -22,9 +22,8 @@ use Framework\Console;
 use Framework\GlobalConfig;
 use Framework\ZMBuf;
 use Swoole\Server;
+use ZM\Event\EventHandler;
 use ZM\Exception\DbException;
-use ZM\ModBase;
-use ZM\ModHandleType;
 use Framework\DataProvider;
 use ZM\Utils\SQLPool;
 use ZM\Utils\ZMUtil;
@@ -90,25 +89,25 @@ class WorkerStartEvent implements SwooleEvent
         return $this;
     }
 
+    /**
+     * @return WorkerStartEvent
+     * @throws AnnotationException
+     */
     public function onAfter(): WorkerStartEvent {
         foreach (ZMBuf::get("wait_start") as $v) {
             Coroutine::resume($v);
         }
         ZMBuf::unsetCache("wait_start");
+        set_coroutine_params(["server" => $this->server, "worker_id" => $this->worker_id]);
         foreach (ZMBuf::$events[OnStart::class] ?? [] as $v) {
             $class_name = $v->class;
-            /** @var ModBase $class */
-            $class = new $class_name(["server" => $this->server, "worker_id" => $this->worker_id], ModHandleType::SWOOLE_WORKER_START);
-            call_user_func_array([$class, $v->method], []);
+            EventHandler::callWithMiddleware($class_name, $v->method, ["server" => $this->server, "worker_id" => $this->worker_id], []);
         }
-        set_coroutine_params(["server" => $this->server, "worker_id" => $this->worker_id]);
         foreach (ZMBuf::$events[SwooleEventAfter::class] ?? [] as $v) {
             /** @var AnnotationBase $v */
             if (strtolower($v->type) == "workerstart") {
                 $class_name = $v->class;
-                /** @var ModBase $class */
-                $class = new $class_name(["server" => $this->server, "worker_id" => $this->worker_id], ModHandleType::SWOOLE_WORKER_START);
-                call_user_func_array([$class, $v->method], []);
+                EventHandler::callWithMiddleware($class_name, $v->method, ["server" => $this->server, "worker_id" => $this->worker_id], []);
                 if (context()->getCache("block_continue") === true) break;
             }
         }

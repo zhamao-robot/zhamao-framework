@@ -8,18 +8,17 @@ use ZM\Annotation\AnnotationBase;
 use ZM\Annotation\Interfaces\Level;
 
 /**
- * Class CQAfter
+ * Class CQAPISend
+ * @package ZM\Annotation\CQ
  * @Annotation
  * @Target("METHOD")
- * @package ZM\Annotation\CQ
  */
-class CQAfter extends AnnotationBase implements Level
+class CQAPISend extends AnnotationBase implements Level
 {
     /**
      * @var string
-     * @Required()
      */
-    public $cq_event;
+    public $action = "";
 
     public $level = 20;
 

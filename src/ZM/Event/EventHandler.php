@@ -5,6 +5,7 @@ namespace ZM\Event;
 
 
 use Co;
+use Doctrine\Common\Annotations\AnnotationException;
 use Error;
 use Exception;
 use Framework\Console;
@@ -12,13 +13,24 @@ use Framework\ZMBuf;
 use ZM\Event\Swoole\{MessageEvent, RequestEvent, WorkerStartEvent, WSCloseEvent, WSOpenEvent};
 use Swoole\Server;
 use Swoole\WebSocket\Frame;
+use ZM\Annotation\CQ\CQAPIResponse;
+use ZM\Annotation\CQ\CQAPISend;
+use ZM\Annotation\Http\MiddlewareClass;
 use ZM\Connection\ConnectionManager;
+use ZM\Connection\CQConnection;
+use ZM\Http\MiddlewareInterface;
 use ZM\Http\Response;
 use Framework\DataProvider;
 use ZM\Utils\ZMUtil;
 
 class EventHandler
 {
+    /**
+     * @param $event_name
+     * @param $param0
+     * @param null $param1
+     * @throws AnnotationException
+     */
     public static function callSwooleEvent($event_name, $param0, $param1 = null) {
         //$starttime = microtime(true);
         unset(ZMBuf::$context[Co::getCid()]);
@@ -80,6 +92,13 @@ class EventHandler
         //Console::info(Console::setColor("Event: " . $event_name . " 运行了 " . round(microtime(true) - $starttime, 5) . " 秒", "gold"));
     }
 
+    /**
+     * @param $event_data
+     * @param $conn_or_response
+     * @param int $level
+     * @return bool
+     * @throws AnnotationException
+     */
     public static function callCQEvent($event_data, $conn_or_response, int $level = 0) {
         if ($level >= 5) {
             Console::warning("Recursive call reached " . $level . " times");
@@ -115,10 +134,10 @@ class EventHandler
 
     public static function callCQResponse($req) {
         //Console::info("收到来自API连接的回复：".json_encode($req, 128|256));
+        $status = $req["status"];
+        $retcode = $req["retcode"];
+        $data = $req["data"];
         if (isset($req["echo"]) && ZMBuf::array_key_exists("sent_api", $req["echo"])) {
-            $status = $req["status"];
-            $retcode = $req["retcode"];
-            $data = $req["data"];
             $origin = ZMBuf::get("sent_api")[$req["echo"]];
             $self_id = $origin["self_id"];
             $response = [
@@ -127,6 +146,11 @@ class EventHandler
                 "data" => $data,
                 "self_id" => $self_id
             ];
+            if (isset(ZMBuf::$events[CQAPIResponse::class][$req["retcode"]])) {
+                list($c, $method) = ZMBuf::$events[CQAPIResponse::class][$req["retcode"]];
+                $class = new $c(["data" => $origin["data"]]);
+                call_user_func_array([$class, $method], [$origin["data"], $req]);
+            }
             if (($origin["func"] ?? null) !== null) {
                 call_user_func($origin["func"], $response, $origin["data"]);
             } elseif (($origin["coroutine"] ?? false) !== false) {
@@ -137,5 +161,92 @@ class EventHandler
             }
             ZMBuf::unsetByValue("sent_api", $req["echo"]);
         }
+    }
+
+    public static function callCQAPISend($reply, ?CQConnection $connection) {
+        $action = $reply["action"] ?? null;
+        if ($action === null) {
+            Console::warning("API 激活事件异常！");
+            return;
+        }
+        $content = ctx()->copy();
+        go(function () use ($action, $reply, $connection, $content) {
+            set_coroutine_params($content);
+            context()->setCache("action", $action);
+            context()->setCache("reply", $reply);
+            foreach (ZMBuf::$events[CQAPISend::class] ?? [] as $k => $v) {
+                if ($v->action == "" || $v->action == $action) {
+                    $c = $v->class;
+                    self::callWithMiddleware($c, $v->method, context()->copy(), [$reply["action"], $reply["params"] ?? [], $connection->getQQ()]);
+                    if (context()->getCache("block_continue") === true) break;
+                }
+            }
+        });
+    }
+
+    /**
+     * @param $c
+     * @param $method
+     * @param array $class_construct
+     * @param array $func_args
+     * @param null $after_call
+     * @return mixed|null
+     * @throws AnnotationException
+     * @throws Exception
+     */
+    public static function callWithMiddleware($c, $method, array $class_construct, array $func_args, $after_call = null) {
+        $return_value = null;
+        $plain_class = is_object($c) ? get_class($c) : $c;
+        if (isset(ZMBuf::$events[MiddlewareInterface::class][$plain_class][$method])) {
+            $middlewares = ZMBuf::$events[MiddlewareInterface::class][$plain_class][$method];
+            $before_result = true;
+            $r = [];
+            foreach ($middlewares as $k => $middleware) {
+                if (!isset(ZMBuf::$events[MiddlewareClass::class][$middleware])) throw new AnnotationException("Annotation parse error: Unknown MiddlewareClass named \"{$middleware}\"!");
+                $middleware_obj = ZMBuf::$events[MiddlewareClass::class][$middleware];
+                $before = $middleware_obj["class"];
+                $r[$k] = new $before();
+                $r[$k]->class = is_object($c) ? get_class($c) : $c;
+                $r[$k]->method = $method;
+                if (isset($middleware_obj["before"])) {
+                    $before_result = call_user_func_array([$r[$k], $middleware_obj["before"]], $func_args);
+                    if ($before_result === false) break;
+                }
+            }
+            if ($before_result) {
+                try {
+                    if (is_object($c)) $class = $c;
+                    else $class = new $c($class_construct);
+                    $result = call_user_func_array([$class, $method], $func_args);
+                    if (is_callable($after_call))
+                        $return_value = call_user_func_array($after_call, [$result]);
+                } catch (Exception $e) {
+                    for ($i = count($middlewares) - 1; $i >= 0; --$i) {
+                        $middleware_obj = ZMBuf::$events[MiddlewareClass::class][$middlewares[$i]];
+                        if (!isset($middleware_obj["exceptions"])) continue;
+                        foreach ($middleware_obj["exceptions"] as $name => $method) {
+                            if ($e instanceof $name) {
+                                call_user_func_array([$r[$i], $method], [$e]);
+                                context()->setCache("block_continue", true);
+                            }
+                        }
+                        if (context()->getCache("block_continue") === true) return $return_value;
+                    }
+                    throw $e;
+                }
+            }
+            for ($i = count($middlewares) - 1; $i >= 0; --$i) {
+                $middleware_obj = ZMBuf::$events[MiddlewareClass::class][$middlewares[$i]];
+                if (isset($middleware_obj["after"], $r[$i]))
+                    call_user_func_array([$r[$i], $middleware_obj["after"]], $func_args);
+            }
+        } else {
+            if (is_object($c)) $class = $c;
+            else $class = new $c($class_construct);
+            $result = call_user_func_array([$class, $method], $func_args);
+            if (is_callable($after_call))
+                $return_value = call_user_func_array($after_call, [$result]);
+        }
+        return $return_value;
     }
 }

@@ -9,7 +9,7 @@ use Framework\Console;
 use Framework\ZMBuf;
 use ZM\Connection\ConnectionManager;
 use ZM\Connection\CQConnection;
-use ZM\Connection\WSConnection;
+use ZM\Event\EventHandler;
 use ZM\Utils\ZMRobot;
 
 /**
@@ -198,7 +198,7 @@ class CQAPI
     }
 
     /**
-     * @param WSConnection $connection
+     * @param CQConnection $connection
      * @param $reply
      * @param |null $function
      * @return bool
@@ -207,7 +207,7 @@ class CQAPI
         $api_id = ZMBuf::$atomics["wait_msg_id"]->get();
         $reply["echo"] = $api_id;
         ZMBuf::$atomics["wait_msg_id"]->add(1);
-
+        EventHandler::callCQAPISend($reply, $connection);
         if (is_callable($function)) {
             ZMBuf::appendKey("sent_api", $api_id, [
                 "data" => $reply,

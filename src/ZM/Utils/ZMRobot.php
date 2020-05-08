@@ -407,6 +407,6 @@ class ZMRobot
     private function getActionName(string $method) {
         $prefix = ($this->prefix == self::API_ASYNC ? '_async' : ($this->prefix == self::API_RATE_LIMITED ? '_rate_limited' : ''));
         $func_name = strtolower(preg_replace('/(?<=[a-z])([A-Z])/', '_$1', $method));
-        return $prefix . $func_name;
+        return $func_name . $prefix;
     }
 }

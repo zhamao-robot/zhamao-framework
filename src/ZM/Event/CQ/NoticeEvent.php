@@ -4,11 +4,13 @@
 namespace ZM\Event\CQ;
 
 
+use Doctrine\Common\Annotations\AnnotationException;
 use Framework\ZMBuf;
 use ZM\Annotation\CQ\CQAfter;
 use ZM\Annotation\CQ\CQBefore;
 use ZM\Annotation\CQ\CQNotice;
 use ZM\Connection\CQConnection;
+use ZM\Event\EventHandler;
 use ZM\Exception\WaitTimeoutException;
 use ZM\ModBase;
 use ZM\ModHandleType;
@@ -26,20 +28,30 @@ class NoticeEvent
         $this->circle = $circle;
     }
 
+    /**
+     * @return bool
+     * @throws AnnotationException
+     */
     public function onBefore() {
         foreach (ZMBuf::$events[CQBefore::class]["notice"] ?? [] as $v) {
             $c = $v->class;
-            /** @var CQNotice $v */
-            $class = new $c([
-                "data" => $this->data,
-                "connection" => $this->connection
-            ], ModHandleType::CQ_NOTICE);
-            $r = call_user_func_array([$class, $v->method], []);
-            if (!$r || $class->block_continue) return false;
+            EventHandler::callWithMiddleware(
+                $c,
+                $v->method,
+                ["data" => context()->getData(), "connection" => $this->connection],
+                [],
+                function ($r) {
+                    if(!$r) context()->setCache("block_continue", true);
+                }
+            );
+            if(context()->getCache("block_continue") === true) return false;
         }
         return true;
     }
 
+    /**
+     * @throws AnnotationException
+     */
     public function onActivate() {
         try {
             /** @var ModBase[] $obj */
@@ -57,8 +69,9 @@ class NoticeEvent
                             "data" => $this->data,
                             "connection" => $this->connection
                         ], ModHandleType::CQ_NOTICE);
-                    $r = call_user_func([$obj[$c], $v->method]);
-                    if (is_string($r)) $obj[$c]->reply($r);
+                    EventHandler::callWithMiddleware($obj[$c],$v->method, [], [], function($r) {
+                        if (is_string($r)) context()->reply($r);
+                    });
                     if (context()->getCache("block_continue") === true) return;
                 }
             }
@@ -67,15 +80,23 @@ class NoticeEvent
         }
     }
 
+    /**
+     * @return bool
+     * @throws AnnotationException
+     */
     public function onAfter() {
         foreach (ZMBuf::$events[CQAfter::class]["notice"] ?? [] as $v) {
             $c = $v->class;
-            $class = new $c([
-                "data" => $this->data,
-                "connection" => $this->connection
-            ], ModHandleType::CQ_NOTICE);
-            $r = call_user_func_array([$class, $v->method], []);
-            if (!$r || $class->block_continue) return false;
+            EventHandler::callWithMiddleware(
+                $c,
+                $v->method,
+                ["data" => context()->getData(), "connection" => $this->connection],
+                [],
+                function ($r) {
+                    if(!$r) context()->setCache("block_continue", true);
+                }
+            );
+            if(context()->getCache("block_continue") === true) return false;
         }
         return true;
     }

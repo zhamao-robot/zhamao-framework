@@ -53,9 +53,12 @@ class MessageEvent implements SwooleEvent
             foreach (ZMBuf::$events[SwooleEventAt::class] ?? [] as $v) {
                 if (strtolower($v->type) == "message" && $this->parseSwooleRule($v)) {
                     $c = $v->class;
-                    /** @var ModBase $class */
-                    $class = new $c(["server" => $this->server, "frame" => $this->frame, "connection" => $conn], ModHandleType::SWOOLE_MESSAGE);
-                    call_user_func_array([$class, $v->method], [$conn]);
+                    EventHandler::callWithMiddleware(
+                        $c,
+                        $v->method,
+                        ["server" => $this->server, "frame" => $this->frame, "connection" => $conn],
+                        [$conn]
+                    );
                     if (context()->getCache("block_continue") === true) break;
                 }
             }

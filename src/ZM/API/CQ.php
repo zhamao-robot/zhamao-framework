@@ -216,9 +216,26 @@ class CQ
     }
 
     public static function removeCQ($msg) {
-        while (($cq = ZMUtil::getCQ($msg)) !== null) {
+        while (($cq = self::getCQ($msg)) !== null) {
             $msg = str_replace(mb_substr($msg, $cq["start"], $cq["end"] - $cq["start"] + 1), "", $msg);
         }
         return $msg;
+    }
+
+    public static function getCQ($msg) {
+        if (($start = mb_strpos($msg, '[')) === false) return null;
+        if (($end = mb_strpos($msg, ']')) === false) return null;
+        $msg = mb_substr($msg, $start + 1, $end - $start - 1);
+        if (mb_substr($msg, 0, 3) != "CQ:") return null;
+        $msg = mb_substr($msg, 3);
+        $msg2 = explode(",", $msg);
+        $type = array_shift($msg2);
+        $array = [];
+        foreach ($msg2 as $k => $v) {
+            $ss = explode("=", $v);
+            $sk = array_shift($ss);
+            $array[$sk] = implode("=", $ss);
+        }
+        return ["type" => $type, "params" => $array, "start" => $start, "end" => $end];
     }
 }
