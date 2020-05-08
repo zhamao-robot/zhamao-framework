@@ -2,7 +2,7 @@
 
 [![作者QQ](https://img.shields.io/badge/作者QQ-627577391-orange.svg)]()
 [![zhamao License](https://img.shields.io/hexpm/l/plug.svg?maxAge=2592000)](https://github.com/zhamao-robot/zhamao-framework/blob/master/LICENSE)
-[![版本](https://img.shields.io/badge/version-1.2-green.svg)]()
+[![版本](https://img.shields.io/badge/version-1.3-green.svg)]()
 
 [![stupid counter](https://img.shields.io/github/search/zhamao-robot/zhamao-framework/stupid.svg)](https://github.com/zhamao-robot/zhamao-framework/search?q=stupid)
 [![TODO counter](https://img.shields.io/github/search/zhamao-robot/zhamao-framework/TODO.svg)](https://github.com/zhamao-robot/zhamao-framework/search?q=TODO)
@@ -31,6 +31,7 @@ Pages托管：[https://framework.zhamao.xin/](https://framework.zhamao.xin/)
 ## 特点
 - 支持多账号
 - 灵活的注解事件绑定机制
+- 易用的上下文，模块内随处可用
 - 采用模块化编写，功能之间高内聚低耦合
 - 常驻内存，全局缓存变量随处使用
 - 自带 MySQL 查询器、数据库连接池等数据库连接方案
@@ -55,7 +56,7 @@ Pages托管：[https://framework.zhamao.xin/](https://framework.zhamao.xin/)
 - [ ] 分词模块（可能会放弃计划，因为目前好用的分词都是其他语言的）
 - [ ] HTTP 过滤器、Auth 模块、完整的 MVC 兼容（可能会放弃计划，因为框架主打机器人开发）
 - [ ] Redis 连接池或开箱即用的相应功能内置
-- [ ] 2.0 版本使用上下文代替
+- [X] 1.3 版本使用上下文代替
 - [X] 更好的 Logger，稳定和漂亮的控制台输出
 - [ ] 日志服务
 - [X] 框架支持 Phar 打包（可能会比较靠后支持）
