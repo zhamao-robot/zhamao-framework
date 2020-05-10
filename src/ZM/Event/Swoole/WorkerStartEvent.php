@@ -139,7 +139,10 @@ class WorkerStartEvent implements SwooleEvent
             unset($list[0], $list[1]);
             foreach ($list as $v) {
                 if (is_dir($dir . $v)) continue;
-                if (pathinfo($dir . $v, 4) == "phar") require_once($dir . $v);
+                if (pathinfo($dir . $v, 4) == "phar") {
+                    Console::verbose("加载Phar: " . $dir . $v . " 中");
+                    require_once($dir . $v);
+                }
             }
         }
 

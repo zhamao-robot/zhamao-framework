@@ -45,6 +45,7 @@ class MessageEvent implements SwooleEvent
                 $data = json_decode(context()->getFrame()->data, true);
                 if (isset($data["post_type"])) {
                     set_coroutine_params(["data" => $data, "connection" => $conn]);
+                    ctx()->setCache("level", 0);
                     Console::debug("Calling CQ Event from fd=" . $conn->fd);
                     EventHandler::callCQEvent($data, ConnectionManager::get(context()->getFrame()->fd), 0);
                 } else
@@ -64,6 +65,7 @@ class MessageEvent implements SwooleEvent
             }
         } catch (Exception $e) {
             Console::warning("Websocket message event exception: " . (($cs = $e->getMessage()) == "" ? get_class($e) : $cs));
+            Console::warning("In ". $e->getFile() . " at line ".$e->getLine());
         }
         return $this;
     }
