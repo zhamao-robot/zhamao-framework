@@ -133,6 +133,7 @@ class WorkerStartEvent implements SwooleEvent
         //加载phar包
         Console::info("加载外部phar包中");
         $dir = DataProvider::getWorkingDir() . "/resources/package/";
+        if (version_compare(SWOOLE_VERSION, "4.4.0", ">=")) Timer::clearAll();
         if (is_dir($dir)) {
             $list = scandir($dir);
             unset($list[0], $list[1]);
@@ -147,7 +148,7 @@ class WorkerStartEvent implements SwooleEvent
             Console::info("加载composer资源中");
             require_once DataProvider::getWorkingDir() . "/vendor/autoload.php";
         } else {
-            if(isPharMode()) require_once WORKING_DIR . "/vendor/autoload.php";
+            if (isPharMode()) require_once WORKING_DIR . "/vendor/autoload.php";
         }
 
         //加载各个模块的注解类，以及反射

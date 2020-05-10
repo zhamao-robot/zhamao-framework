@@ -10,6 +10,8 @@ namespace ZM\Utils;
 
 use framework\Console;
 use framework\ZMBuf;
+use PDO;
+use PDOException;
 use SplQueue;
 use Swoole\Coroutine;
 use Swoole\Coroutine\Mysql;
@@ -48,11 +50,11 @@ class SQLPool
     /**
      * 获取队中的连接，如果不存在则创建新的
      * @param bool $no_new_conn
-     * @return bool|mixed|Mysql
+     * @return bool|mixed|PDO
      */
     public function get($no_new_conn = false) {
         if (count($this->pool) == 0 && $this->connect_cnt <= 70) {
-            if($no_new_conn) return false;
+            if ($no_new_conn) return false;
             $this->connect_cnt += 1;
             $r = $this->newConnect();
             if ($r !== false) {
@@ -62,11 +64,12 @@ class SQLPool
                 return false;
             }
         } elseif (count($this->pool) > 0) {
+            /** @var PDO $con */
             $con = $this->pool->pop();
-            if ($con->connected !== false) return $con;
+            return $con;
         } elseif ($this->connect_cnt > 70) {
-            $this->co_list[]=Coroutine::getuid();
-            Console::warning("数据库连接过多，协程等待重复利用中...当前协程数 ".Coroutine::stats()["coroutine_num"]);
+            $this->co_list[] = Coroutine::getuid();
+            Console::warning("数据库连接过多，协程等待重复利用中...当前协程数 " . Coroutine::stats()["coroutine_num"]);
             Coroutine::suspend();
             return $this->get($no_new_conn);
         }
@@ -88,14 +91,14 @@ class SQLPool
     private function newConnect() {
         //无空闲连接，创建新连接
         $mysql = new Mysql();
-
-        Console::info("创建SQL连接中，当前有" . $this->connect_cnt . "个连接");
-        $res = $mysql->connect($this->info);
-        if ($res == false) {
-            echo $mysql->error . PHP_EOL;
+        $dsn = "mysql:host=" . $this->info["host"] . ";dbname=" . $this->info["database"];
+        try {
+            $mysql = new PDO($dsn, $this->info["user"], $this->info["password"], array(PDO::ATTR_PERSISTENT => true));
+        } catch (PDOException $e) {
+            Console::error("PDO Error: " . $e->getMessage());
             return false;
-        } else {
-            return $mysql;
         }
+        Console::info("创建SQL连接中，当前有" . $this->connect_cnt . "个连接");
+        return $mysql;
     }
 }

@@ -38,7 +38,7 @@ class SelectBody
         if ($this->table->isCacheEnabled()) {
             $rr = md5(implode(",", $this->select_thing) . serialize($this->where_thing));
             if (array_key_exists($rr, $this->table->cache)) {
-                Console::info('SQL query cached: ' . $rr, date("[H:i:s ") . 'DB] ');
+                Console::debug('SQL query cached: ' . $rr);
                 return $this->table->cache[$rr]->getResult();
             }
         }

@@ -63,7 +63,12 @@ class EventHandler
                 /** @var Server $param0 */
                 $conn = ConnectionManager::get($param1->fd);
                 set_coroutine_params(["server" => $param0, "frame" => $param1, "connection" => $conn]);
-                (new MessageEvent($param0, $param1))->onActivate()->onAfter();
+                try {
+                    (new MessageEvent($param0, $param1))->onActivate()->onAfter();
+                } catch (Error $e) {
+                    $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
+                    Console::error("Fatal error when calling $event_name: " . $error_msg);
+                }
                 break;
             case "request":
                 try {
@@ -78,15 +83,37 @@ class EventHandler
                     if (!$param1->isEnd()) $param1->end("Internal server error: " . $e->getMessage());
                     Console::error("Internal server error (500), caused by uncaught exception.");
                     Console::log($e->getTraceAsString(), "gray");
+                } catch (Error $e) {
+                    /** @var Response $param1 */
+                    $param1->status(500);
+                    Console::info($param0->server["remote_addr"] . ":" . $param0->server["remote_port"] .
+                        " [" . $param1->getStatusCode() . "] " . $param0->server["request_uri"]
+                    );
+                    $doc = "Internal server error<br>";
+                    $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
+                    if (ZMBuf::$atomics["info_level"]->get() >= 4) $doc .= $error_msg;
+                    if (!$param1->isEnd()) $param1->end($doc);
+                    Console::error("Internal server error (500): " . $error_msg);
+                    Console::log($e->getTraceAsString(), "gray");
                 }
                 break;
             case "open":
                 set_coroutine_params(["server" => $param0, "request" => $param1]);
-                (new WSOpenEvent($param0, $param1))->onActivate()->onAfter();
+                try {
+                    (new WSOpenEvent($param0, $param1))->onActivate()->onAfter();
+                } catch (Error $e) {
+                    $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
+                    Console::error("Fatal error when calling $event_name: " . $error_msg);
+                }
                 break;
             case "close":
                 set_coroutine_params(["server" => $param0, "fd" => $param1]);
-                (new WSCloseEvent($param0, $param1))->onActivate()->onAfter();
+                try {
+                    (new WSCloseEvent($param0, $param1))->onActivate()->onAfter();
+                } catch (Error $e) {
+                    $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
+                    Console::error("Fatal error when calling $event_name: " . $error_msg);
+                }
                 break;
         }
         //Console::info(Console::setColor("Event: " . $event_name . " 运行了 " . round(microtime(true) - $starttime, 5) . " 秒", "gold"));

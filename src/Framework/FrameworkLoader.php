@@ -4,6 +4,7 @@
 namespace Framework;
 
 use Co;
+use Doctrine\Common\Annotations\AnnotationException;
 use Swoole\Http\Request;
 use Swoole\Runtime;
 use Swoole\WebSocket\Frame;
@@ -46,9 +47,7 @@ class FrameworkLoader
             echo "Phar mode: " . WORKING_DIR . PHP_EOL;
         }
         $this->registerAutoloader('classLoader');
-        Runtime::enableCoroutine();
-
-
+        Runtime::enableCoroutine(true, SWOOLE_HOOK_ALL);
         self::$settings = new GlobalConfig();
         ZMBuf::$globals = self::$settings;
         if (!self::$settings->success) die("Failed to load global config. Please check config/global.php file");
@@ -95,7 +94,7 @@ class FrameworkLoader
                 ", port: " . self::$settings->get("port") .
                 ", log_level: " . ZMBuf::$atomics["info_level"]->get() .
                 ", version: " . json_decode(file_get_contents(WORKING_DIR . "/composer.json"), true)["version"] .
-                "\nworking_dir: ".(isPharMode() ? realpath('.') : WORKING_DIR)
+                "\nworking_dir: " . (isPharMode() ? realpath('.') : WORKING_DIR)
             );
             global $motd;
             echo $motd . PHP_EOL;
@@ -141,6 +140,11 @@ class FrameworkLoader
         return true;
     }
 
+    /**
+     * @param \Swoole\Server $server
+     * @param $worker_id
+     * @throws AnnotationException
+     */
     public function onWorkerStart(\Swoole\Server $server, $worker_id) {
         self::$instance = $this;
         self::$run_time = microtime(true);

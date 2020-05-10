@@ -4,10 +4,11 @@
 namespace ZM\DB;
 
 
+use Exception;
 use framework\Console;
 use framework\ZMBuf;
+use PDOStatement;
 use Swoole\Coroutine;
-use Swoole\Coroutine\MySQL\Statement;
 use ZM\Exception\DbException;
 
 class DB
@@ -16,8 +17,10 @@ class DB
 
     /**
      * @throws DbException
+     * @throws Exception
      */
     public static function initTableList() {
+        if (!extension_loaded("mysqlnd")) throw new Exception("Can not find mysqlnd PHP extension.");
         $result = self::rawQuery("select TABLE_NAME from INFORMATION_SCHEMA.TABLES where TABLE_SCHEMA='" . ZMBuf::globals("sql_config")["sql_database"] . "';", []);
         foreach ($result as $v) {
             self::$table_list[] = $v['TABLE_NAME'];
@@ -99,11 +102,10 @@ class DB
             }
             $ps = $conn->prepare($line);
             if ($ps === false) {
-                $conn->close();
                 ZMBuf::$sql_pool->connect_cnt -= 1;
                 throw new DbException("SQL语句查询错误，" . $line . "，错误信息：" . $conn->error);
             } else {
-                if (!($ps instanceof Statement)) {
+                if (!($ps instanceof PDOStatement)) {
                     throw new DbException("语句查询错误！" . $line);
                 }
                 if ($params == []) $result = $ps->execute();
@@ -111,8 +113,8 @@ class DB
                     $result = $ps->execute([$params]);
                 } else $result = $ps->execute($params);
                 ZMBuf::$sql_pool->put($conn);
-                if ($ps->errno != 0) {
-                    throw new DBException("语句[$line]错误！" . $ps->error);
+                if ($result !== true) {
+                    throw new DBException("语句[$line]错误！" . $ps->errorInfo()[2]);
                     //echo json_encode(debug_backtrace(), 128 | 256);
                 }
                 if (ZMBuf::get("sql_log") === true) {
@@ -122,7 +124,7 @@ class DB
                         "] " . $line . " " . json_encode($params, JSON_UNESCAPED_UNICODE) . "\n";
                     Coroutine::writeFile(CRASH_DIR . "sql.log", $log, FILE_APPEND);
                 }
-                return $result;
+                return $ps->fetchAll();
             }
         } catch (DBException $e) {
             if (ZMBuf::get("sql_log") === true) {
@@ -133,6 +135,7 @@ class DB
                 Coroutine::writeFile(CRASH_DIR . "sql.log", $log, FILE_APPEND);
             }
             Console::warning($e->getMessage());
+
             throw $e;
         }
     }

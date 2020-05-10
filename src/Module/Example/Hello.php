@@ -73,6 +73,7 @@ class Hello extends ModBase
     /**
      * 默认示例页面
      * @RequestMapping("/index")
+     * @RequestMapping("/")
      */
     public function index() {
         return "Hello Zhamao!";

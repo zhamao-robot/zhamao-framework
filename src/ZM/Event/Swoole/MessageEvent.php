@@ -63,7 +63,7 @@ class MessageEvent implements SwooleEvent
                 }
             }
         } catch (Exception $e) {
-            Console::warning("Websocket message event exception: " . $e->getMessage());
+            Console::warning("Websocket message event exception: " . (($cs = $e->getMessage()) == "" ? get_class($e) : $cs));
         }
         return $this;
     }

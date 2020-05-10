@@ -55,7 +55,10 @@ class DataProvider
 
     private static function setJsonData($filename, array $args) {
         $pathinfo = pathinfo($filename);
-        if (!is_dir($pathinfo["dirname"])) mkdir(self::getDataConfig() . $pathinfo["dirname"]);
+        if (!is_dir(self::getDataConfig() . $pathinfo["dirname"])) {
+            Console::debug("Making Directory: " . self::getDataConfig() . $pathinfo["dirname"]);
+            mkdir(self::getDataConfig() . $pathinfo["dirname"]);
+        }
         $r = file_put_contents(self::getDataConfig() . $filename, json_encode($args, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_BIGINT_AS_STRING));
         if ($r === false) {
             Console::warning("无法保存文件: " . $filename);
