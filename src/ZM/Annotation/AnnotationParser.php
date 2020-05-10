@@ -16,7 +16,8 @@ use ZM\Annotation\CQ\{CQAfter,
     CQMessage,
     CQMetaEvent,
     CQNotice,
-    CQRequest};
+    CQRequest
+};
 use ZM\Annotation\Http\{After, Before, Controller, HandleException, Middleware, MiddlewareClass, RequestMapping};
 use Swoole\Timer;
 use ZM\Annotation\Interfaces\CustomAnnotation;
@@ -25,9 +26,11 @@ use ZM\Annotation\Module\{Closed, InitBuffer, SaveBuffer};
 use ZM\Annotation\Swoole\{OnStart, OnTick, SwooleEventAfter, SwooleEventAt};
 use ZM\Annotation\Interfaces\Rule;
 use ZM\Connection\WSConnection;
+use ZM\Event\EventHandler;
 use ZM\Http\MiddlewareInterface;
 use Framework\DataProvider;
 use ZM\Utils\ZMUtil;
+use function foo\func;
 
 class AnnotationParser
 {
@@ -95,7 +98,7 @@ class AnnotationParser
             }
             foreach ($methods as $vs) {
                 if ($middleware_addon !== null) {
-                    Console::debug("Added middleware ".$middleware_addon->middleware . " to $v -> ".$vs->getName());
+                    Console::debug("Added middleware " . $middleware_addon->middleware . " to $v -> " . $vs->getName());
                     ZMBuf::$events[MiddlewareInterface::class][$v][$vs->getName()][] = $middleware_addon->middleware;
                 }
                 $method_annotations = $reader->getMethodAnnotations($vs);
@@ -331,6 +334,43 @@ class AnnotationParser
 
     private static function addTimerTick(?OnTick $vss) {
         ZMBuf::set("timer_count", ZMBuf::get("timer_count", 0) + 1);
-        Timer::tick($vss->tick_ms, [ZMUtil::getModInstance($vss->class), $vss->method]);
+        $class = ZMUtil::getModInstance($vss->class);
+        $method = $vss->method;
+        $has_middleware = false;
+        $ms = $vss->tick_ms;
+        $cid = go(function () use ($class, $method, $ms) {
+            \Co::suspend();
+            $plain_class = get_class($class);
+            if (!isset(ZMBuf::$events[MiddlewareInterface::class][$plain_class][$method])) {
+                Console::debug("Added timer: " . $plain_class . " -> " . $method);
+                Timer::tick($ms, function () use ($class, $method) {
+                    set_coroutine_params([]);
+                    try {
+                        $class->$method();
+                    } catch (\Exception $e) {
+                        Console::error("Uncaught error from TimerTick: " . $e->getMessage() . " at " . $e->getFile() . "({$e->getLine()})");
+                    } catch (\Error $e) {
+                        Console::error("Uncaught fatal error from TimerTick: " . $e->getMessage());
+                        echo Console::setColor($e->getTraceAsString(), "gray");
+                        Console::error("Please check your code!");
+                    }
+                });
+            } else {
+                Console::debug("Added Middleware-based timer: " . $plain_class . " -> " . $method);
+                Timer::tick($ms, function () use ($class, $method) {
+                    set_coroutine_params([]);
+                    try {
+                        EventHandler::callWithMiddleware($class, $method, [], []);
+                    } catch (\Exception $e) {
+                        Console::error("Uncaught error from TimerTick: " . $e->getMessage() . " at " . $e->getFile() . "({$e->getLine()})");
+                    } catch (\Error $e) {
+                        Console::error("Uncaught fatal error from TimerTick: " . $e->getMessage());
+                        echo Console::setColor($e->getTraceAsString(), "gray");
+                        Console::error("Please check your code!");
+                    }
+                });
+            }
+        });
+        ZMBuf::append("paused_tick", $cid);
     }
 }

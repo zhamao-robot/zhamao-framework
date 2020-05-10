@@ -48,6 +48,7 @@ class EventHandler
                     });
                     (new WorkerStartEvent($param0, $param1))->onActivate()->onAfter();
                     Console::log("\n=== Worker #" . $param0->worker_id . " 已启动 ===\n", "gold");
+                    self::startTick();
                 } catch (Exception $e) {
                     Console::error("Worker加载出错！停止服务！");
                     Console::error($e->getMessage() . "\n" . $e->getTraceAsString());
@@ -244,6 +245,7 @@ class EventHandler
             if ($before_result) {
                 try {
                     if (is_object($c)) $class = $c;
+                    elseif ($class_construct == []) $class = ZMUtil::getModInstance($c);
                     else $class = new $c($class_construct);
                     $result = call_user_func_array([$class, $method], $func_args);
                     if (is_callable($after_call))
@@ -254,7 +256,7 @@ class EventHandler
                         if (!isset($middleware_obj["exceptions"])) continue;
                         foreach ($middleware_obj["exceptions"] as $name => $method) {
                             if ($e instanceof $name) {
-                                call_user_func_array([$r[$i], $method], [$e]);
+                                $r[$i]->$method($e);
                                 context()->setCache("block_continue", true);
                             }
                         }
@@ -270,11 +272,19 @@ class EventHandler
             }
         } else {
             if (is_object($c)) $class = $c;
+            elseif ($class_construct == []) $class = ZMUtil::getModInstance($c);
             else $class = new $c($class_construct);
             $result = call_user_func_array([$class, $method], $func_args);
             if (is_callable($after_call))
                 $return_value = call_user_func_array($after_call, [$result]);
         }
         return $return_value;
+    }
+
+    private static function startTick() {
+        Console::debug("Starting " . count(ZMBuf::get("paused_tick", [])) . " custom tick function");
+        foreach (ZMBuf::get("paused_tick", []) as $cid) {
+            Co::resume($cid);
+        }
     }
 }
