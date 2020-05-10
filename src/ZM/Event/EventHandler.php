@@ -196,7 +196,8 @@ class EventHandler
             Console::warning("API 激活事件异常！");
             return;
         }
-        $content = ctx()->copy();
+        if (ctx() === null) $content = [];
+        else $content = ctx()->copy();
         go(function () use ($action, $reply, $connection, $content) {
             set_coroutine_params($content);
             context()->setCache("action", $action);
