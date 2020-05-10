@@ -112,7 +112,7 @@ class Context implements ContextInterface
     }
 
     public function finalReply($msg, $yield = false) {
-        ZMBuf::$context[$this->cid]["block_continue"] = true;
+        ZMBuf::$context[$this->cid]["cache"]["block_continue"] = true;
         if ($msg == "") return true;
         return $this->reply($msg, $yield);
     }
