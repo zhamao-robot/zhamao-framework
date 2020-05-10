@@ -2,7 +2,7 @@
     "name": "zhamao/framework",
     "description": "high-performance intelligent assistant",
     "minimum-stability": "stable",
-    "license": "proprietary",
+    "license": "Apache-2.0",
     "version": "1.3.2",
     "authors": [
         {
