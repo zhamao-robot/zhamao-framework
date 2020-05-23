@@ -72,6 +72,8 @@ interface ContextInterface
 
     public function setMessageType($type);
 
+    public function getCQResponse();
+
     /**
      * @param $msg
      * @param bool $yield

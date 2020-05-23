@@ -9,9 +9,9 @@
 namespace Framework;
 
 use Swoole\Atomic;
+use Swoole\Database\PDOPool;
 use swoole_atomic;
 use ZM\connection\WSConnection;
-use ZM\Utils\SQLPool;
 
 class ZMBuf
 {
@@ -24,7 +24,7 @@ class ZMBuf
     static $scheduler = null; //This is stupid warning...
 
     //Swoole SQL连接池，多进程下每个进程一个连接池
-    /** @var SQLPool */
+    /** @var PDOPool */
     static $sql_pool = null;//保存sql连接池的类
 
     //只读的数据，可以在多worker_num下使用
@@ -51,6 +51,7 @@ class ZMBuf
     public static $config = [];
     public static $context = [];
     public static $instance = [];
+    public static $context_class = [];
 
     static function get($name, $default = null) {
         return self::$cache[$name] ?? $default;

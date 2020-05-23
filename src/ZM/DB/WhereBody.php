@@ -28,6 +28,7 @@ trait WhereBody
                 $param []=$vs;
             }
         }
+        if ($msg == '') $msg = 1;
         return [$msg, $param];
     }
 }

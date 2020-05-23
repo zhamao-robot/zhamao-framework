@@ -3,17 +3,15 @@
 
 namespace ZM\Annotation\Module;
 
-
-use Doctrine\Common\Annotations\Annotation\Required;
 use Doctrine\Common\Annotations\Annotation\Target;
 
 /**
- * Class SaveBuffer
+ * Class LoadBuffer
+ * @package ZM\Annotation\Module
  * @Annotation
  * @Target("CLASS")
- * @package ZM\Annotation\Module
  */
-class SaveBuffer
+class LoadBuffer
 {
     /**
      * @var string

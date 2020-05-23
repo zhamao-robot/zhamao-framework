@@ -4,7 +4,10 @@
 namespace ZM\Annotation;
 
 use Doctrine\Common\Annotations\{AnnotationException, AnnotationReader};
+use Co;
 use Framework\{Console, ZMBuf};
+use Error;
+use Exception;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
@@ -22,15 +25,14 @@ use ZM\Annotation\Http\{After, Before, Controller, HandleException, Middleware, 
 use Swoole\Timer;
 use ZM\Annotation\Interfaces\CustomAnnotation;
 use ZM\Annotation\Interfaces\Level;
-use ZM\Annotation\Module\{Closed, InitBuffer, SaveBuffer};
-use ZM\Annotation\Swoole\{OnStart, OnTick, SwooleEventAfter, SwooleEventAt};
+use ZM\Annotation\Module\{Closed, InitBuffer, LoadBuffer, SaveBuffer};
+use ZM\Annotation\Swoole\{OnSave, OnStart, OnTick, SwooleEventAfter, SwooleEventAt};
 use ZM\Annotation\Interfaces\Rule;
 use ZM\Connection\WSConnection;
 use ZM\Event\EventHandler;
 use ZM\Http\MiddlewareInterface;
 use Framework\DataProvider;
 use ZM\Utils\ZMUtil;
-use function foo\func;
 
 class AnnotationParser
 {
@@ -64,6 +66,9 @@ class AnnotationParser
                 } elseif ($vs instanceof SaveBuffer) {
                     Console::debug("注册自动保存的缓存变量: " . $vs->buf_name . " (Dir:" . $vs->sub_folder . ")");
                     DataProvider::addSaveBuffer($vs->buf_name, $vs->sub_folder);
+                } elseif ($vs instanceof LoadBuffer) {
+                    Console::debug("注册到内存的缓存变量: " . $vs->buf_name . " (Dir:" . $vs->sub_folder . ")");
+                    ZMBuf::set($vs->buf_name, DataProvider::getJsonData(($vs->sub_folder ?? "") . "/" . $vs->buf_name . ".json"));
                 } elseif ($vs instanceof InitBuffer) {
                     ZMBuf::set($vs->buf_name, []);
                 } elseif ($vs instanceof MiddlewareClass) {
@@ -119,6 +124,7 @@ class AnnotationParser
                     elseif ($vss instanceof CQBefore) ZMBuf::$events[CQBefore::class][$vss->cq_event][] = $vss;
                     elseif ($vss instanceof CQAfter) ZMBuf::$events[CQAfter::class][$vss->cq_event][] = $vss;
                     elseif ($vss instanceof OnStart) ZMBuf::$events[OnStart::class][] = $vss;
+                    elseif ($vss instanceof OnSave) ZMBuf::$events[OnSave::class][] = $vss;
                     elseif ($vss instanceof Middleware) ZMBuf::$events[MiddlewareInterface::class][$vss->class][$vss->method][] = $vss->middleware;
                     elseif ($vss instanceof OnTick) self::addTimerTick($vss);
                     elseif ($vss instanceof CQAPISend) ZMBuf::$events[CQAPISend::class][] = $vss;
@@ -144,13 +150,14 @@ class AnnotationParser
                 }
             }
         }
+        Console::debug("解析注解完毕！");
         if (ZMBuf::isset("timer_count")) {
             Console::info("Added " . ZMBuf::get("timer_count") . " timer(s)!");
             ZMBuf::unsetCache("timer_count");
         }
     }
 
-    private static function getRuleCallback($rule_str) {
+    public static function getRuleCallback($rule_str) {
         $func = null;
         $rule = $rule_str;
         if ($rule != "") {
@@ -228,14 +235,14 @@ class AnnotationParser
         return $func;
     }
 
-    private static function registerRuleEvent(?AnnotationBase $vss, ReflectionMethod $method, ReflectionClass $class) {
+    public static function registerRuleEvent(?AnnotationBase $vss, ReflectionMethod $method, ReflectionClass $class) {
         $vss->callback = self::getRuleCallback($vss->getRule());
         $vss->method = $method->getName();
         $vss->class = $class->getName();
         return $vss;
     }
 
-    private static function registerMethod(?AnnotationBase $vss, ReflectionMethod $method, ReflectionClass $class) {
+    public static function registerMethod(?AnnotationBase $vss, ReflectionMethod $method, ReflectionClass $class) {
         $vss->method = $method->getName();
         $vss->class = $class->getName();
         return $vss;
@@ -336,10 +343,9 @@ class AnnotationParser
         ZMBuf::set("timer_count", ZMBuf::get("timer_count", 0) + 1);
         $class = ZMUtil::getModInstance($vss->class);
         $method = $vss->method;
-        $has_middleware = false;
         $ms = $vss->tick_ms;
         $cid = go(function () use ($class, $method, $ms) {
-            \Co::suspend();
+            Co::suspend();
             $plain_class = get_class($class);
             if (!isset(ZMBuf::$events[MiddlewareInterface::class][$plain_class][$method])) {
                 Console::debug("Added timer: " . $plain_class . " -> " . $method);
@@ -347,9 +353,9 @@ class AnnotationParser
                     set_coroutine_params([]);
                     try {
                         $class->$method();
-                    } catch (\Exception $e) {
+                    } catch (Exception $e) {
                         Console::error("Uncaught error from TimerTick: " . $e->getMessage() . " at " . $e->getFile() . "({$e->getLine()})");
-                    } catch (\Error $e) {
+                    } catch (Error $e) {
                         Console::error("Uncaught fatal error from TimerTick: " . $e->getMessage());
                         echo Console::setColor($e->getTraceAsString(), "gray");
                         Console::error("Please check your code!");
@@ -361,9 +367,9 @@ class AnnotationParser
                     set_coroutine_params([]);
                     try {
                         EventHandler::callWithMiddleware($class, $method, [], []);
-                    } catch (\Exception $e) {
+                    } catch (Exception $e) {
                         Console::error("Uncaught error from TimerTick: " . $e->getMessage() . " at " . $e->getFile() . "({$e->getLine()})");
-                    } catch (\Error $e) {
+                    } catch (Error $e) {
                         Console::error("Uncaught fatal error from TimerTick: " . $e->getMessage());
                         echo Console::setColor($e->getTraceAsString(), "gray");
                         Console::error("Please check your code!");

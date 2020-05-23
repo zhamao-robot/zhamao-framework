@@ -3,7 +3,9 @@
 use Framework\Console;
 use Framework\DataProvider;
 use Framework\ZMBuf;
+use Swoole\Coroutine\System;
 use ZM\Context\ContextInterface;
+use ZM\Utils\ZMUtil;
 
 function isPharMode() {
     return substr(__DIR__, 0, 7) == 'phar://';
@@ -162,10 +164,10 @@ function matchArgs($pattern, $context) {
 function set_coroutine_params($array) {
     $cid = Co::getCid();
     if ($cid == -1) die("Cannot set coroutine params at none coroutine mode.");
-    if(isset(ZMBuf::$context[$cid])) ZMBuf::$context[$cid] = array_merge(ZMBuf::$context[$cid], $array);
+    if (isset(ZMBuf::$context[$cid])) ZMBuf::$context[$cid] = array_merge(ZMBuf::$context[$cid], $array);
     else ZMBuf::$context[$cid] = $array;
     foreach (ZMBuf::$context as $c => $v) {
-        if (!Co::exists($c)) unset(ZMBuf::$context[$c]);
+        if (!Co::exists($c)) unset(ZMBuf::$context[$c], ZMBuf::$context_class[$c]);
     }
 }
 
@@ -173,23 +175,52 @@ function set_coroutine_params($array) {
  * @return ContextInterface|null
  */
 function context() {
+    return ctx();
+}
+
+/**
+ * @return ContextInterface|null
+ */
+function ctx() {
     $cid = Co::getCid();
     $c_class = ZMBuf::globals("context_class");
     if (isset(ZMBuf::$context[$cid])) {
-        return new $c_class($cid);
+        return ZMBuf::$context_class[$cid] ?? (ZMBuf::$context_class[$cid] = new $c_class($cid));
     } else {
         Console::debug("未找到当前协程的上下文($cid)，正在找父进程的上下文");
         while (($pcid = Co::getPcid($cid)) !== -1) {
             $cid = $pcid;
-            if (isset(ZMBuf::$context[$cid])) return new $c_class($cid);
+            if (isset(ZMBuf::$context[$cid])) return ZMBuf::$context_class[$cid] ?? (ZMBuf::$context_class[$cid] = new $c_class($cid));
         }
         return null;
     }
 }
 
-function ctx() { return context(); }
+function debug($msg) { Console::debug($msg); }
 
-function debug($msg) {
-    if (ZMBuf::$atomics["info_level"]->get() >= 4)
-        Console::log(date("[H:i:s] ") . "[D] " . $msg, 'gray');
+function zm_sleep($s = 1) { Co::sleep($s); }
+
+function zm_exec($cmd): array { return System::exec($cmd); }
+
+function zm_cid() { return Co::getCid(); }
+
+function zm_yield() { Co::yield(); }
+
+function zm_resume(int $cid) { Co::resume($cid); }
+
+function zm_timer_after($ms, callable $callable) {
+    go(function () use ($ms, $callable) {
+        ZMUtil::checkWait();
+        Swoole\Timer::after($ms, $callable);
+    });
 }
+
+function zm_timer_tick($ms, callable $callable) {
+    go(function () use ($ms, $callable) {
+        ZMUtil::checkWait();
+        Console::debug("Adding extra timer tick of " . $ms . " ms");
+        Swoole\Timer::tick($ms, $callable);
+    });
+}
+
+

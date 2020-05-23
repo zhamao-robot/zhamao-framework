@@ -48,8 +48,10 @@ class MessageEvent implements SwooleEvent
                     ctx()->setCache("level", 0);
                     Console::debug("Calling CQ Event from fd=" . $conn->fd);
                     EventHandler::callCQEvent($data, ConnectionManager::get(context()->getFrame()->fd), 0);
-                } else
+                } else{
+                    set_coroutine_params(["connection" => $conn]);
                     EventHandler::callCQResponse($data);
+                }
             }
             foreach (ZMBuf::$events[SwooleEventAt::class] ?? [] as $v) {
                 if (strtolower($v->type) == "message" && $this->parseSwooleRule($v)) {

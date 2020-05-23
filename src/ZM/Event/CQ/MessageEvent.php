@@ -38,18 +38,19 @@ class MessageEvent
      * @throws AnnotationException
      */
     public function onBefore() {
-        foreach (ZMBuf::$events[CQBefore::class]["message"] ?? [] as $v) {
-            $c = $v->class;
+        $obj_list = ZMBuf::$events[CQBefore::class]["message"];
+        foreach ($obj_list as $v) {
+            if($v->level < 200) break;
             EventHandler::callWithMiddleware(
-                $c,
+                $v->class,
                 $v->method,
                 ["data" => context()->getData(), "connection" => $this->connection],
                 [],
                 function ($r) {
-                    if(!$r) context()->setCache("block_continue", true);
+                    if (!$r) context()->setCache("block_continue", true);
                 }
             );
-            if(context()->getCache("block_continue") === true) return false;
+            if (context()->getCache("block_continue") === true) return false;
         }
         foreach (ZMBuf::get("wait_api", []) as $k => $v) {
             if (context()->getData()["user_id"] == $v["user_id"] &&
@@ -62,6 +63,21 @@ class MessageEvent
                 Co::resume($v["coroutine"]);
                 return false;
             }
+        }
+        foreach (ZMBuf::$events[CQBefore::class]["message"] ?? [] as $v) {
+            if($v->level >= 200) continue;
+            $c = $v->class;
+            if (ctx()->getCache("level") != 0) continue;
+            EventHandler::callWithMiddleware(
+                $c,
+                $v->method,
+                ["data" => context()->getData(), "connection" => $this->connection],
+                [],
+                function ($r) {
+                    if (!$r) context()->setCache("block_continue", true);
+                }
+            );
+            if (context()->getCache("block_continue") === true) return false;
         }
         return true;
     }
@@ -91,7 +107,7 @@ class MessageEvent
                         "data" => context()->getData(),
                         "connection" => context()->getConnection()
                     ];
-                    if(!isset($obj[$c])) {
+                    if (!isset($obj[$c])) {
                         $obj[$c] = new $c($class_construct);
                     }
                     if ($word[0] != "" && $v->match == $word[0]) {
@@ -102,7 +118,8 @@ class MessageEvent
                         });
                         return;
                     } elseif ($v->regexMatch != "" && ($args = matchArgs($v->regexMatch, context()->getMessage())) !== false) {
-                        $this->function_call = EventHandler::callWithMiddleware($obj[$c], $v->method, $class_construct, [$args], function ($r){
+                        Console::debug("Calling $c -> {$v->method}");
+                        $this->function_call = EventHandler::callWithMiddleware($obj[$c], $v->method, $class_construct, [$args], function ($r) {
                             if (is_string($r)) context()->reply($r);
                             return true;
                         });
@@ -120,13 +137,14 @@ class MessageEvent
                     ($v->message_type == '' || ($v->message_type != '' && $v->message_type == context()->getData()["message_type"])) &&
                     ($v->raw_message == '' || ($v->raw_message != '' && $v->raw_message == context()->getData()["raw_message"]))) {
                     $c = $v->class;
+                    Console::debug("Calling CQMessage: $c -> {$v->method}");
                     if (!isset($obj[$c]))
                         $obj[$c] = new $c([
                             "data" => context()->getData(),
                             "connection" => $this->connection
                         ], ModHandleType::CQ_MESSAGE);
-                    EventHandler::callWithMiddleware($obj[$c], $v->method, [], [context()->getData()["message"]], function($r) {
-                        if(is_string($r)) context()->reply($r);
+                    EventHandler::callWithMiddleware($obj[$c], $v->method, [], [context()->getData()["message"]], function ($r) {
+                        if (is_string($r)) context()->reply($r);
                     });
                     if (context()->getCache("block_continue") === true) return;
                 }
@@ -150,10 +168,10 @@ class MessageEvent
                 ["data" => context()->getData(), "connection" => $this->connection],
                 [],
                 function ($r) {
-                    if(!$r) context()->setCache("block_continue", true);
+                    if (!$r) context()->setCache("block_continue", true);
                 }
             );
-            if(context()->getCache("block_continue") === true) return false;
+            if (context()->getCache("block_continue") === true) return false;
         }
         return true;
     }

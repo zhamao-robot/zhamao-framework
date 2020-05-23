@@ -4,6 +4,8 @@
 namespace Framework;
 
 
+use ZM\Annotation\Swoole\OnSave;
+
 class DataProvider
 {
     public static $buffer_list = [];
@@ -40,6 +42,13 @@ class DataProvider
             Console::debug("Saving " . $k . " to " . $v);
             self::setJsonData($v, ZMBuf::get($k));
         }
+        foreach (ZMBuf::$events[OnSave::class] ?? [] as $v) {
+            $c = $v->class;
+            $method = $v->method;
+            $class = new $c();
+            Console::debug("Calling @OnSave: $c -> $method");
+            $class->$method();
+        }
         if (ZMBuf::$atomics["info_level"]->get() >= 3)
             echo Console::setColor("saved", "blue") . PHP_EOL;
     }
@@ -53,7 +62,7 @@ class DataProvider
         return json_decode(file_get_contents(self::getDataConfig() . $string), true);
     }
 
-    private static function setJsonData($filename, array $args) {
+    public static function setJsonData($filename, array $args) {
         $pathinfo = pathinfo($filename);
         if (!is_dir(self::getDataConfig() . $pathinfo["dirname"])) {
             Console::debug("Making Directory: " . self::getDataConfig() . $pathinfo["dirname"]);

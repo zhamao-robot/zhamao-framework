@@ -8,12 +8,19 @@
 
 namespace Framework;
 
-use co;
+use ZM\Annotation\Swoole\SwooleEventAt;
+use ZM\Connection\WSConnection;
 use ZM\Utils\ZMUtil;
 use Exception;
 
 class Console
 {
+    /**
+     * @var false|resource
+     */
+    public static $console_proc = null;
+    public static $pipes = [];
+
     static function setColor($string, $color = "") {
         switch ($color) {
             case "red":
@@ -119,8 +126,8 @@ class Console
         }
     }
 
-    static function debug($obj) {
-        debug($obj);
+    static function debug($msg) {
+        if (ZMBuf::$atomics["info_level"]->get() >= 4) Console::log(date("[H:i:s] ") . "[D] " . $msg, 'gray');
     }
 
     static function log($obj, $color = "") {
@@ -157,11 +164,51 @@ class Console
             self::info("ConsoleCommand disabled.");
             return;
         }
-        go(function () {
-            while (true) {
-                $cmd = trim(co::fread(STDIN));
-                if (self::executeCommand($cmd) === false) break;
+        global $terminal_id;
+        global $port;
+        $port = ZMBuf::globals("port");
+        $vss = new SwooleEventAt();
+        $vss->type = "open";
+        $vss->level = 256;
+        $vss->rule = "connectType:terminal";
+        $terminal_id = call_user_func(function () {
+            try {
+                $data = random_bytes(16);
+            } catch (Exception $e) {
+                return "";
             }
+            $data[6] = chr(ord($data[6]) & 0x0f | 0x40);
+            $data[8] = chr(ord($data[8]) & 0x3f | 0x80);
+            return strtoupper(vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4)));
+        });
+        $vss->callback = function(?WSConnection $conn) use ($terminal_id){
+            $req = ctx()->getRequest();
+            if($conn->getType() != "terminal") return false;
+            if(($req->header["x-terminal-id"] ?? "") != $terminal_id || ($req->header["x-pid"] ?? "") != posix_getpid()) {
+                $conn->close();
+                return false;
+            }
+            return false;
+        };
+        ZMBuf::$events[SwooleEventAt::class][] = $vss;
+        $vss2 = new SwooleEventAt();
+        $vss2->type = "message";
+        $vss2->rule = "connectType:terminal";
+        $vss2->callback = function(?WSConnection $conn){
+            if($conn->getType() != "terminal") return false;
+            $cmd = ctx()->getFrame()->data;
+            self::executeCommand($cmd);
+            return false;
+        };
+        ZMBuf::$events[SwooleEventAt::class][] = $vss2;
+        go(function () {
+            global $terminal_id, $port;
+            $descriptorspec = array(
+                0 => STDIN,
+                1 => STDOUT,
+                2 => STDERR
+            );
+            self::$console_proc = proc_open('php -r \'$terminal_id = "'.$terminal_id.'";$port = '.$port.';require "'.__DIR__.'/terminal_listener.php";\'', $descriptorspec, $pipes);
         });
     }
 
@@ -209,14 +256,14 @@ class Console
                 return false;
             case 'save':
                 $origin = ZMBuf::$atomics["info_level"]->get();
-                ZMBuf::$atomics["info_level"]->set(3);
+                //ZMBuf::$atomics["info_level"]->set(3);
                 DataProvider::saveBuffer();
-                ZMBuf::$atomics["info_level"]->set($origin);
+                //ZMBuf::$atomics["info_level"]->set($origin);
                 return true;
             case '':
                 return true;
             default:
-                Console::info("Command not found: " . $it[0]);
+                Console::info("Command not found: " . $cmd);
                 return true;
         }
     }

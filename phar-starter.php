@@ -41,6 +41,7 @@ function loadPhp($dir) {
             loadPhp($path);
         } else {
             if (pathinfo($dir . '/' . $v)['extension'] == 'php') {
+                if(pathinfo($dir . '/' . $v)['basename'] == 'terminal_listener.php') continue;
                 //echo 'loading '.$path.PHP_EOL;
                 require_once $path;
             }

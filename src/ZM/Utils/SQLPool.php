@@ -14,7 +14,6 @@ use PDO;
 use PDOException;
 use SplQueue;
 use Swoole\Coroutine;
-use Swoole\Coroutine\Mysql;
 
 class SQLPool
 {
@@ -34,6 +33,26 @@ class SQLPool
             "password" => ZMBuf::globals("sql_config")["sql_password"],
             "database" => ZMBuf::globals("sql_config")["sql_database"]
         ];
+        Console::debug("新建检测 MySQL 连接的计时器");
+        zm_timer_tick(10000, function () {
+            //Console::debug("正在检测是否有坏死的MySQL连接，当前连接池有 ".count($this->pool) . " 个连接");
+            if (count($this->pool) > 0) {
+                /** @var PDO $cnn */
+                $cnn = $this->pool->pop();
+                $this->connect_cnt -= 1;
+                try {
+                    $cnn->getAttribute(PDO::ATTR_SERVER_INFO);
+                } catch (PDOException $e) {
+                    if (strpos($e->getMessage(), 'MySQL server has gone away') !== false) {
+                        Console::info("MySQL 长连接丢失，取消连接");
+                        unset($cnn);
+                        return;
+                    }
+                }
+                $this->pool->push($cnn);
+                $this->connect_cnt += 1;
+            }
+        });
     }
 
     /**
@@ -90,8 +109,7 @@ class SQLPool
 
     private function newConnect() {
         //无空闲连接，创建新连接
-        $mysql = new Mysql();
-        $dsn = "mysql:host=" . $this->info["host"] . ";dbname=" . $this->info["database"];
+        $dsn = "mysql:host=" . $this->info["host"] . ";dbname=" . $this->info["database"] . ";charset=utf8";
         try {
             $mysql = new PDO($dsn, $this->info["user"], $this->info["password"], array(PDO::ATTR_PERSISTENT => true));
         } catch (PDOException $e) {

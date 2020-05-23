@@ -11,6 +11,7 @@ use Exception;
 use Framework\Console;
 use Framework\ZMBuf;
 use ZM\Event\Swoole\{MessageEvent, RequestEvent, WorkerStartEvent, WSCloseEvent, WSOpenEvent};
+use Swoole\Http\Request;
 use Swoole\Server;
 use Swoole\WebSocket\Frame;
 use ZM\Annotation\CQ\CQAPIResponse;
@@ -46,8 +47,9 @@ class EventHandler
                         DataProvider::saveBuffer();
                         ZMBuf::$server->shutdown();
                     });
-                    (new WorkerStartEvent($param0, $param1))->onActivate()->onAfter();
+                    $r = (new WorkerStartEvent($param0, $param1))->onActivate();
                     Console::log("\n=== Worker #" . $param0->worker_id . " 已启动 ===\n", "gold");
+                    $r->onAfter();
                     self::startTick();
                 } catch (Exception $e) {
                     Console::error("Worker加载出错！停止服务！");
@@ -69,6 +71,7 @@ class EventHandler
                 } catch (Error $e) {
                     $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
                     Console::error("Fatal error when calling $event_name: " . $error_msg);
+                    Console::stackTrace();
                 }
                 break;
             case "request":
@@ -99,12 +102,14 @@ class EventHandler
                 }
                 break;
             case "open":
-                set_coroutine_params(["server" => $param0, "request" => $param1]);
+                /** @var Request $param1 */
+                set_coroutine_params(["server" => $param0, "request" => $param1, "fd" => $param1->fd]);
                 try {
                     (new WSOpenEvent($param0, $param1))->onActivate()->onAfter();
                 } catch (Error $e) {
                     $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
                     Console::error("Fatal error when calling $event_name: " . $error_msg);
+                    Console::stackTrace();
                 }
                 break;
             case "close":
@@ -114,6 +119,7 @@ class EventHandler
                 } catch (Error $e) {
                     $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
                     Console::error("Fatal error when calling $event_name: " . $error_msg);
+                    Console::stackTrace();
                 }
                 break;
         }
@@ -128,6 +134,7 @@ class EventHandler
      * @throws AnnotationException
      */
     public static function callCQEvent($event_data, $conn_or_response, int $level = 0) {
+        ctx()->setCache("level",$level);
         if ($level >= 5) {
             Console::warning("Recursive call reached " . $level . " times");
             Console::stackTrace();
@@ -160,8 +167,12 @@ class EventHandler
         return false;
     }
 
+    /**
+     * @param $req
+     * @throws AnnotationException
+     */
     public static function callCQResponse($req) {
-        //Console::info("收到来自API连接的回复：".json_encode($req, 128|256));
+        Console::debug("收到来自API连接的回复：".json_encode($req, 128|256));
         $status = $req["status"];
         $retcode = $req["retcode"];
         $data = $req["data"];
@@ -172,13 +183,26 @@ class EventHandler
                 "status" => $status,
                 "retcode" => $retcode,
                 "data" => $data,
-                "self_id" => $self_id
+                "self_id" => $self_id,
+                "echo" => $req["echo"]
             ];
+            set_coroutine_params(["cq_response" => $response]);
             if (isset(ZMBuf::$events[CQAPIResponse::class][$req["retcode"]])) {
                 list($c, $method) = ZMBuf::$events[CQAPIResponse::class][$req["retcode"]];
                 $class = new $c(["data" => $origin["data"]]);
                 call_user_func_array([$class, $method], [$origin["data"], $req]);
             }
+            $origin_ctx = ctx()->copy();
+            ctx()->setCache("action", $origin["data"]["action"] ?? "unknown");
+            ctx()->setData($origin["data"]);
+            foreach (ZMBuf::$events[CQAPISend::class] ?? [] as $k => $v) {
+                if (($v->action == "" || $v->action == ctx()->getCache("action")) && $v->with_result) {
+                    $c = $v->class;
+                    self::callWithMiddleware($c, $v->method, context()->copy(), [ctx()->getCache("action"), $origin["data"]["params"] ?? [], ctx()->getRobotId()]);
+                    if (context()->getCache("block_continue") === true) break;
+                }
+            }
+            set_coroutine_params($origin_ctx);
             if (($origin["func"] ?? null) !== null) {
                 call_user_func($origin["func"], $response, $origin["data"]);
             } elseif (($origin["coroutine"] ?? false) !== false) {
@@ -204,7 +228,7 @@ class EventHandler
             context()->setCache("action", $action);
             context()->setCache("reply", $reply);
             foreach (ZMBuf::$events[CQAPISend::class] ?? [] as $k => $v) {
-                if ($v->action == "" || $v->action == $action) {
+                if (($v->action == "" || $v->action == $action) && !$v->with_result) {
                     $c = $v->class;
                     self::callWithMiddleware($c, $v->method, context()->copy(), [$reply["action"], $reply["params"] ?? [], $connection->getQQ()]);
                     if (context()->getCache("block_continue") === true) break;
@@ -286,5 +310,6 @@ class EventHandler
         foreach (ZMBuf::get("paused_tick", []) as $cid) {
             Co::resume($cid);
         }
+
     }
 }

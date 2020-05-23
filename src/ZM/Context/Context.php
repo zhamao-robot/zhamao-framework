@@ -54,7 +54,7 @@ class Context implements ContextInterface
     public function getResponse() { return ZMBuf::$context[$this->cid]["response"] ?? null; }
 
     /** @return WSConnection */
-    public function getConnection() { return ConnectionManager::get($this->getFrame()->fd); }
+    public function getConnection() { return ConnectionManager::get($this->getFd()); }
 
     /**
      * @return int|null
@@ -95,6 +95,8 @@ class Context implements ContextInterface
 
     public function setCache($key, $value) { ZMBuf::$context[$this->cid]["cache"][$key] = $value; }
 
+    public function getCQResponse() { return ZMBuf::$context[$this->cid]["cq_response"] ?? null; }
+
     /**
      * only can used by cq->message event function
      * @param $msg
@@ -106,6 +108,7 @@ class Context implements ContextInterface
             case "group":
             case "private":
             case "discuss":
+                $this->setCache("has_reply", true);
                 return CQAPI::quick_reply(ConnectionManager::get($this->getFrame()->fd), $this->getData(), $msg, $yield);
         }
         return false;

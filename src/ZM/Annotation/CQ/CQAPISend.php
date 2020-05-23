@@ -20,6 +20,11 @@ class CQAPISend extends AnnotationBase implements Level
      */
     public $action = "";
 
+    /**
+     * @var bool
+     */
+    public $with_result = false;
+
     public $level = 20;
 
     /**

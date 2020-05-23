@@ -201,7 +201,7 @@ class CQAPI
      * @param CQConnection $connection
      * @param $reply
      * @param |null $function
-     * @return bool
+     * @return bool|array
      */
     public static function processAPI($connection, $reply, $function = null) {
         $api_id = ZMBuf::$atomics["wait_msg_id"]->get();
@@ -243,7 +243,7 @@ class CQAPI
             Console::warning("CQAPI send failed, websocket push error.");
             $response = [
                 "status" => "failed",
-                "retcode" => 999,
+                "retcode" => -1000,
                 "data" => null,
                 "self_id" => $connection->getQQ()
             ];
@@ -251,7 +251,7 @@ class CQAPI
             if (($s["func"] ?? null) !== null)
                 call_user_func($s["func"], $response, $reply);
             ZMBuf::unsetByValue("sent_api", $reply["echo"]);
-            if ($function === true) return null;
+            if ($function === true) return $response;
             return false;
         }
     }

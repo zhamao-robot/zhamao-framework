@@ -39,7 +39,8 @@ class FrameworkLoader
     public function __construct($args = []) {
         if (self::$instance !== null) die("Cannot run two FrameworkLoader in one process!");
         self::$instance = $this;
-        self::$argv = $args;
+
+
         $this->requireGlobalFunctions();
         if (!isPharMode()) {
             define('WORKING_DIR', getcwd());
@@ -47,7 +48,15 @@ class FrameworkLoader
             echo "Phar mode: " . WORKING_DIR . PHP_EOL;
         }
         $this->registerAutoloader('classLoader');
-        Runtime::enableCoroutine(true, SWOOLE_HOOK_ALL);
+        self::$settings = new GlobalConfig();
+        if (self::$settings->get("debug_mode") === true) {
+            $args[] = "--debug-mode";
+            $args[] = "--disable-console-input";
+        }
+        self::$argv = $args;
+        if (!in_array("--debug-mode", self::$argv)) {
+            Runtime::enableCoroutine(true, SWOOLE_HOOK_ALL);
+        }
         self::$settings = new GlobalConfig();
         ZMBuf::$globals = self::$settings;
         if (!self::$settings->success) die("Failed to load global config. Please check config/global.php file");
@@ -97,7 +106,13 @@ class FrameworkLoader
                 "\nworking_dir: " . (isPharMode() ? realpath('.') : WORKING_DIR)
             );
             global $motd;
-            echo $motd . PHP_EOL;
+            if (!file_exists(DataProvider::getWorkingDir() . "/config/motd.txt")) {
+                echo $motd;
+            } else {
+                echo file_get_contents(DataProvider::getWorkingDir() . "/config/motd.txt");
+            }
+            if (in_array("--debug-mode", self::$argv))
+                Console::warning("You are in debug mode, do not use in production!");
             $this->server->start();
         } catch (Exception $e) {
             Console::error("Framework初始化出现错误，请检查！");
@@ -126,12 +141,15 @@ class FrameworkLoader
         define("ZM_MATCH_FIRST", 1);
         define("ZM_MATCH_NUMBER", 2);
         define("ZM_MATCH_SECOND", 3);
+        define("ZM_BREAKPOINT", 'if(in_array("--debug-mode", \Framework\FrameworkLoader::$argv)) extract(\Psy\debug(get_defined_vars(), isset($this) ? $this : @get_called_class()));');
     }
 
     private function selfCheck() {
         if (!extension_loaded("swoole")) die("Can not find swoole extension.\n");
+        if (version_compare(SWOOLE_VERSION, "4.4.13") == -1) die("You must install swoole version >= 4.4.13 !");
         //if (!extension_loaded("gd")) die("Can not find gd extension.\n");
         if (!extension_loaded("sockets")) die("Can not find sockets extension.\n");
+        if (!extension_loaded("ctype")) die("Can not find ctype extension.\n");
         if (!function_exists("mb_substr")) die("Can not find mbstring extension.\n");
         if (substr(PHP_VERSION, 0, 1) != "7") die("PHP >=7 required.\n");
         //if (!function_exists("curl_exec")) die("Can not find curl extension.\n");
@@ -159,6 +177,7 @@ $motd = <<<EOL
   / /| '_ \ / _` | '_ ` _ \ / _` |/ _ \ 
  / /_| | | | (_| | | | | | | (_| | (_) |
 /____|_| |_|\__,_|_| |_| |_|\__,_|\___/ 
+
 
 EOL;
 

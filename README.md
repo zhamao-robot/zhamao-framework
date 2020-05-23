@@ -2,7 +2,7 @@
 
 [![作者QQ](https://img.shields.io/badge/作者QQ-627577391-orange.svg)]()
 [![zhamao License](https://img.shields.io/hexpm/l/plug.svg?maxAge=2592000)](https://github.com/zhamao-robot/zhamao-framework/blob/master/LICENSE)
-[![版本](https://img.shields.io/badge/version-1.3-green.svg)]()
+[![版本](https://img.shields.io/badge/version-1.4-green.svg)]()
 
 [![stupid counter](https://img.shields.io/github/search/zhamao-robot/zhamao-framework/stupid.svg)](https://github.com/zhamao-robot/zhamao-framework/search?q=stupid)
 [![TODO counter](https://img.shields.io/github/search/zhamao-robot/zhamao-framework/TODO.svg)](https://github.com/zhamao-robot/zhamao-framework/search?q=TODO)
@@ -31,6 +31,7 @@ Pages托管：[https://framework.zhamao.xin/](https://framework.zhamao.xin/)
 ## 特点
 - 支持多账号
 - 灵活的注解事件绑定机制
+- 支持下断点调试（Psysh）
 - 易用的上下文，模块内随处可用
 - 采用模块化编写，功能之间高内聚低耦合
 - 常驻内存，全局缓存变量随处使用
@@ -47,11 +48,10 @@ Pages托管：[https://framework.zhamao.xin/](https://framework.zhamao.xin/)
 | 通用模块 | 图片上传和下载模块 | [zhamao-general-tools](https://github.com/zhamao-robot/zhamao-general-tools) |
 
 ## 计划开发内容
-- [ ] WebSocket测试脚本（客户端）
+- [X] WebSocket测试脚本（客户端）
 - [X] Session 和中间层管理模块
-- [ ] 支持本地和远程两种方式的定时器（计划任务）
 - [X] 常驻服务脚本
-- [ ] 一些常用的通用 API 例如经济（用户积分、亲密度等）的模块
+- [X] 一些常用的通用 API 例如经济（用户积分、亲密度等）的模块
 - [ ] 图灵机器人/腾讯AI 聊天模块
 - [ ] 分词模块（可能会放弃计划，因为目前好用的分词都是其他语言的）
 - [ ] HTTP 过滤器、Auth 模块、完整的 MVC 兼容（可能会放弃计划，因为框架主打机器人开发）

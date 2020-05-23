@@ -9,6 +9,7 @@ use framework\Console;
 use framework\ZMBuf;
 use PDOStatement;
 use Swoole\Coroutine;
+use Swoole\Database\PDOStatementProxy;
 use ZM\Exception\DbException;
 
 class DB
@@ -66,9 +67,10 @@ class DB
         try {
             $conn = ZMBuf::$sql_pool->get();
             if ($conn === false) {
+                ZMBuf::$sql_pool->put(null);
                 throw new DbException("无法连接SQL！" . $line);
             }
-            $result = $conn->query($line) === false ? false : ($conn->errno != 0 ? false : true);
+            $result = $conn->query($line) === false ? false : true;
             ZMBuf::$sql_pool->put($conn);
             return $result;
         } catch (DBException $e) {
@@ -98,25 +100,29 @@ class DB
         try {
             $conn = ZMBuf::$sql_pool->get();
             if ($conn === false) {
+                ZMBuf::$sql_pool->put(null);
                 throw new DbException("无法连接SQL！" . $line);
             }
             $ps = $conn->prepare($line);
             if ($ps === false) {
-                ZMBuf::$sql_pool->connect_cnt -= 1;
+                ZMBuf::$sql_pool->put(null);
                 throw new DbException("SQL语句查询错误，" . $line . "，错误信息：" . $conn->error);
             } else {
-                if (!($ps instanceof PDOStatement)) {
-                    throw new DbException("语句查询错误！" . $line);
+                if (!($ps instanceof PDOStatement) && !($ps instanceof PDOStatementProxy)) {
+                    var_dump($ps);
+                    ZMBuf::$sql_pool->put(null);
+                    throw new DbException("语句查询错误！返回的不是 PDOStatement" . $line);
                 }
                 if ($params == []) $result = $ps->execute();
                 elseif (!is_array($params)) {
                     $result = $ps->execute([$params]);
                 } else $result = $ps->execute($params);
-                ZMBuf::$sql_pool->put($conn);
                 if ($result !== true) {
+                    ZMBuf::$sql_pool->put(null);
                     throw new DBException("语句[$line]错误！" . $ps->errorInfo()[2]);
                     //echo json_encode(debug_backtrace(), 128 | 256);
                 }
+                ZMBuf::$sql_pool->put($conn);
                 if (ZMBuf::get("sql_log") === true) {
                     $log =
                         "[" . date("Y-m-d H:i:s") .
@@ -134,8 +140,12 @@ class DB
                     "] " . $line . " " . json_encode($params, JSON_UNESCAPED_UNICODE) . " (Error:" . $e->getMessage() . ")\n";
                 Coroutine::writeFile(CRASH_DIR . "sql.log", $log, FILE_APPEND);
             }
+            if(mb_strpos($e->getMessage(), "has gone away") !== false) {
+                zm_sleep(0.2);
+                Console::warning("Gone away of MySQL! retrying!");
+                return self::rawQuery($line, $params);
+            }
             Console::warning($e->getMessage());
-
             throw $e;
         }
     }

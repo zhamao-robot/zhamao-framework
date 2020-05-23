@@ -47,6 +47,8 @@ class ConnectionManager
                 return WCConnection::class;
             case "proxy":
                 return ProxyConnection::class;
+            case "terminal":
+                return TerminalConnection::class;
             default:
                 foreach (ZMBuf::$custom_connection_class as $v) {
                     /** @var WSConnection $r */

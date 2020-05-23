@@ -6,6 +6,7 @@ namespace ZM\Event\Swoole;
 
 use Closure;
 use Doctrine\Common\Annotations\AnnotationException;
+use Framework\Console;
 use Framework\ZMBuf;
 use Swoole\Http\Request;
 use Swoole\WebSocket\Server;
@@ -51,9 +52,16 @@ class WSOpenEvent implements SwooleEvent
         if ($type_conn == CQConnection::class) {
             $qq = $this->request->get["qq"] ?? $this->request->header["x-self-id"] ?? "";
             $self_token = ZMBuf::globals("access_token") ?? "";
-            $remote_token = $this->request->get["token"] ?? (isset($header["authorization"]) ? explode(" ", $this->request->header["authorization"])[1] : "");
+            if(isset($this->request->header["authorization"])) {
+                Console::debug($this->request->header["authorization"]);
+            }
+            $remote_token = $this->request->get["token"] ?? (isset($this->request->header["authorization"]) ? explode(" ", $this->request->header["authorization"])[1] : "");
             if ($qq != "" && ($self_token == $remote_token)) $this->conn = new CQConnection($this->server, $this->request->fd, $qq);
-            else $this->conn = new UnknownConnection($this->server, $this->request->fd);
+            else {
+                $this->conn = new UnknownConnection($this->server, $this->request->fd);
+                Console::warning("connection of CQ has invalid QQ or token!");
+                Console::debug("Remote token: ".$remote_token);
+            }
         } else {
             $this->conn = new $type_conn($this->server, $this->request->fd);
         }
