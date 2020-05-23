@@ -167,7 +167,8 @@ class AnnotationParser
             //Swoole 事件时走此switch
             switch ($asp_name) {
                 case "connectType": //websocket连接类型
-                    $func = function (WSConnection $connection) use ($rest) {
+                    $func = function (?WSConnection $connection) use ($rest) {
+                        if($connection === null) return false;
                         return $connection->getType() == $rest ? true : false;
                     };
                     break;
