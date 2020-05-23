@@ -160,7 +160,7 @@ class Console
     }
 
     static function listenConsole() {
-        if (in_array('--disable-console-input', FrameworkLoader::$argv)) {
+        if (in_array('--disable-console-input', FrameworkLoader::$argv) || in_array('--debug-mode', FrameworkLoader::$argv)) {
             self::info("ConsoleCommand disabled.");
             return;
         }
