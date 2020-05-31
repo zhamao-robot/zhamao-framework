@@ -7,6 +7,7 @@ namespace ZM\DB;
 use Exception;
 use framework\Console;
 use framework\ZMBuf;
+use PDOException;
 use PDOStatement;
 use Swoole\Coroutine;
 use Swoole\Database\PDOStatementProxy;
@@ -132,7 +133,7 @@ class DB
                 }
                 return $ps->fetchAll();
             }
-        } catch (DBException $e) {
+        } catch (DbException $e) {
             if (ZMBuf::get("sql_log") === true) {
                 $log =
                     "[" . date("Y-m-d H:i:s") .
@@ -147,6 +148,21 @@ class DB
             }
             Console::warning($e->getMessage());
             throw $e;
+        } catch (PDOException $e) {
+            if (ZMBuf::get("sql_log") === true) {
+                $log =
+                    "[" . date("Y-m-d H:i:s") .
+                    " " . round(microtime(true) - $starttime, 4) .
+                    "] " . $line . " " . json_encode($params, JSON_UNESCAPED_UNICODE) . " (Error:" . $e->getMessage() . ")\n";
+                Coroutine::writeFile(CRASH_DIR . "sql.log", $log, FILE_APPEND);
+            }
+            if(mb_strpos($e->getMessage(), "has gone away") !== false) {
+                zm_sleep(0.2);
+                Console::warning("Gone away of MySQL! retrying!");
+                return self::rawQuery($line, $params);
+            }
+            Console::warning($e->getMessage());
+            throw new DbException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
