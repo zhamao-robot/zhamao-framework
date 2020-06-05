@@ -16,12 +16,13 @@ class ZMRequest
      * @param array $headers
      * @param array $set
      * @param bool $return_body
+     * @param array $data 请求body
      * @return bool|string|Client
      * @version 1.1
      * 返回请求后的body
      * 如果请求失败或返回状态不是200，则返回 false
      */
-    public static function get($url, $headers = [], $set = [], $return_body = true) {
+    public static function get($url, $headers = [], $set = [], $return_body = true, $data = []) {
         $parse = parse_url($url);
         if (!isset($parse["host"])) {
             Console::warning("ZMRequest: url must contains scheme such as \"http(s)\"");
@@ -31,6 +32,7 @@ class ZMRequest
         $cli = new Client($parse["host"], $port, (($parse["scheme"] ?? "http") == "https" ? true : false));
         $cli->setHeaders($headers);
         $cli->set($set == [] ? ['timeout' => 15.0] : $set);
+        $cli->setData($data);
         $cli->get($parse["path"] . (isset($parse["query"]) ? "?" . $parse["query"] : ""));
         if ($return_body) {
             if ($cli->errCode != 0 || $cli->statusCode != 200) return false;
@@ -52,9 +54,10 @@ class ZMRequest
      * @param $data
      * @param array $set
      * @param bool $return_body
+     * @param array $data 请求body
      * @return bool|string|Client
      */
-    public static function post($url, array $header, $data, $set = [], $return_body = true) {
+    public static function post($url, array $header, $data, $set = [], $return_body = true, $data = []) {
         $parse = parse_url($url);
         if (!isset($parse["host"])) {
             Console::warning("ZMRequest: url must contains scheme such as \"http(s)://\"");
@@ -63,6 +66,7 @@ class ZMRequest
         $port = $parse["port"] ?? (($parse["scheme"] ?? "http") == "https" ? 443 : 80);
         $cli = new Client($parse["host"], $port, (($parse["scheme"] ?? "http") == "https" ? true : false));
         $cli->set($set == [] ? ['timeout' => 15.0] : $set);
+        $cli->setData($data);
         $cli->setHeaders($header);
         $cli->post($parse["path"] . (isset($parse["query"]) ? ("?" . $parse["query"]) : ""), $data);
         if ($return_body) {
