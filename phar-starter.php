@@ -30,6 +30,8 @@ Swoole\Coroutine::set([
 date_default_timezone_set("Asia/Shanghai");
 
 define('WORKING_DIR', __DIR__);
+define('FRAMEWORK_DIR', __DIR__);
+define('LOAD_MODE', 2);
 
 $s = new FrameworkLoader($argv);
 

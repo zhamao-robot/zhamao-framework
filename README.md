@@ -2,7 +2,7 @@
 
 [![作者QQ](https://img.shields.io/badge/作者QQ-627577391-orange.svg)]()
 [![zhamao License](https://img.shields.io/hexpm/l/plug.svg?maxAge=2592000)](https://github.com/zhamao-robot/zhamao-framework/blob/master/LICENSE)
-[![版本](https://img.shields.io/badge/version-1.4-green.svg)]()
+[![版本](https://img.shields.io/badge/version-1.5-green.svg)]()
 
 [![stupid counter](https://img.shields.io/github/search/zhamao-robot/zhamao-framework/stupid.svg)](https://github.com/zhamao-robot/zhamao-framework/search?q=stupid)
 [![TODO counter](https://img.shields.io/github/search/zhamao-robot/zhamao-framework/TODO.svg)](https://github.com/zhamao-robot/zhamao-framework/search?q=TODO)
@@ -19,8 +19,9 @@ zhamao-framework 是一个基于 酷Q 的 PHP Swoole 的机器人框架，它会
 除了起到解析消息的作用，炸毛框架 还提供了完整的 WebSocket + HTTP 服务器，你还能用此框架构建出高性能的 API 接口服务器。
 
 ## 开始
-1. 你可以使用项目的 `Use this template` 功能将框架克隆到你的公开或私有仓库进行开发
-2. 你也可以直接到 **Release** 中下载最新的 phar 包，放入文件夹后快速启动框架
+先安装环境，环境安装见下方文档。
+1. `composer create-project zhamao/framework-starter` 从模板新建基础文档结构进行使用
+2. 你也可以直接到 **Release** 中下载最新的 phar 包，放入文件夹后 `php server.phar` 快速启动框架
 3. 还可以使用 Dockerfile 构建 Docker 容器
 
 ## 文档

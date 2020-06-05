@@ -4,6 +4,7 @@
 namespace ZM\Utils;
 
 
+use Framework\Console;
 use Swlib\Saber;
 use Swoole\Coroutine\Http\Client;
 
@@ -11,18 +12,23 @@ class ZMRequest
 {
     /**
      * 使用Swoole协程客户端发起HTTP GET请求
-     * @version 1.1
-     * 返回请求后的body
-     * 如果请求失败或返回状态不是200，则返回 false
      * @param $url
      * @param array $headers
      * @param array $set
      * @param bool $return_body
      * @return bool|string|Client
+     * @version 1.1
+     * 返回请求后的body
+     * 如果请求失败或返回状态不是200，则返回 false
      */
     public static function get($url, $headers = [], $set = [], $return_body = true) {
         $parse = parse_url($url);
-        $cli = new Client($parse["host"], ($parse["scheme"] == "https" ? 443 : (isset($parse["port"]) ? $parse["port"] : 80)), ($parse["scheme"] == "https" ? true : false));
+        if (!isset($parse["host"])) {
+            Console::warning("ZMRequest: url must contains scheme such as \"http(s)\"");
+            return false;
+        }
+        $port = $parse["port"] ?? (($parse["scheme"] ?? "http") == "https" ? 443 : 80);
+        $cli = new Client($parse["host"], $port, (($parse["scheme"] ?? "http") == "https" ? true : false));
         $cli->setHeaders($headers);
         $cli->set($set == [] ? ['timeout' => 15.0] : $set);
         $cli->get($parse["path"] . (isset($parse["query"]) ? "?" . $parse["query"] : ""));
@@ -50,7 +56,12 @@ class ZMRequest
      */
     public static function post($url, array $header, $data, $set = [], $return_body = true) {
         $parse = parse_url($url);
-        $cli = new Client($parse["host"], ($parse["scheme"] == "https" ? 443 : (isset($parse["port"]) ? $parse["port"] : 80)), ($parse["scheme"] == "https" ? true : false));
+        if (!isset($parse["host"])) {
+            Console::warning("ZMRequest: url must contains scheme such as \"http(s)://\"");
+            return false;
+        }
+        $port = $parse["port"] ?? (($parse["scheme"] ?? "http") == "https" ? 443 : 80);
+        $cli = new Client($parse["host"], $port, (($parse["scheme"] ?? "http") == "https" ? true : false));
         $cli->set($set == [] ? ['timeout' => 15.0] : $set);
         $cli->setHeaders($header);
         $cli->post($parse["path"] . (isset($parse["query"]) ? ("?" . $parse["query"]) : ""), $data);
@@ -63,6 +74,17 @@ class ZMRequest
             $cli->close();
             return $cli;
         }
+    }
+
+    /**
+     * @param $url
+     * @param array $set
+     * @param array $header
+     * @return ZMWebSocket
+     * @since 1.5
+     */
+    public static function websocket($url, $set = ['websocket_mask' => true], $header = []) {
+        return new ZMWebSocket($url, $set, $header);
     }
 
     /**

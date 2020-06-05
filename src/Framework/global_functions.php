@@ -7,9 +7,6 @@ use Swoole\Coroutine\System;
 use ZM\Context\ContextInterface;
 use ZM\Utils\ZMUtil;
 
-function isPharMode() {
-    return substr(__DIR__, 0, 7) == 'phar://';
-}
 
 function classLoader($p) {
     $filepath = getClassPath($p);
@@ -72,6 +69,7 @@ function unicode_decode($str) {
  * @return array
  */
 function getAllClasses($dir, $indoor_name) {
+    if(!is_dir($dir)) return [];
     $list = scandir($dir);
     $classes = [];
     unset($list[0], $list[1]);

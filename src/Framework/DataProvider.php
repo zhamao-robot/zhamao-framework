@@ -15,12 +15,10 @@ class DataProvider
     }
 
     public static function getWorkingDir() {
-        global $is_phar;
-        if ($is_phar === true) {
-            return realpath('.');
-        } else {
-            return WORKING_DIR;
-        }
+        if(LOAD_MODE == 0) return WORKING_DIR;
+        elseif (LOAD_MODE == 1) return LOAD_MODE_COMPOSER_PATH;
+        elseif (LOAD_MODE == 2) return realpath('.');
+        return null;
     }
 
     public static function getDataConfig() {

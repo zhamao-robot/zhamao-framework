@@ -42,11 +42,9 @@ class FrameworkLoader
 
 
         $this->requireGlobalFunctions();
-        if (!isPharMode()) {
-            define('WORKING_DIR', getcwd());
-        } else {
-            echo "Phar mode: " . WORKING_DIR . PHP_EOL;
-        }
+        if (LOAD_MODE == 0) define("WORKING_DIR", getcwd());
+        elseif(LOAD_MODE == 1) define("WORKING_DIR", realpath(__DIR__ . "/../../"));
+        elseif (LOAD_MODE == 2) echo "Phar mode: " . WORKING_DIR . PHP_EOL;
         $this->registerAutoloader('classLoader');
         self::$settings = new GlobalConfig();
         if (self::$settings->get("debug_mode") === true) {
@@ -66,7 +64,6 @@ class FrameworkLoader
         $this->selfCheck();
         try {
             $this->server = new Server(self::$settings->get("host"), self::$settings->get("port"));
-            if (in_array("--remote-shell", $args)) RemoteShell::listen($this->server, "127.0.0.1");
             $settings = self::$settings->get("swoole");
             if (in_array("--daemon", $args)) {
                 $settings["daemonize"] = 1;
@@ -93,6 +90,7 @@ class FrameworkLoader
                 EventHandler::callSwooleEvent("close", $server, $fd);
             });
             ZMBuf::initAtomic();
+            if (in_array("--remote-shell", $args)) RemoteShell::listen($this->server, "127.0.0.1");
             if (in_array("--log-error", $args)) ZMBuf::$atomics["info_level"]->set(0);
             if (in_array("--log-warning", $args)) ZMBuf::$atomics["info_level"]->set(1);
             if (in_array("--log-info", $args)) ZMBuf::$atomics["info_level"]->set(2);
@@ -103,7 +101,7 @@ class FrameworkLoader
                 ", port: " . self::$settings->get("port") .
                 ", log_level: " . ZMBuf::$atomics["info_level"]->get() .
                 ", version: " . json_decode(file_get_contents(WORKING_DIR . "/composer.json"), true)["version"] .
-                "\nworking_dir: " . (isPharMode() ? realpath('.') : WORKING_DIR)
+                "\nworking_dir: " . DataProvider::getWorkingDir()
             );
             global $motd;
             if (!file_exists(DataProvider::getWorkingDir() . "/config/motd.txt")) {

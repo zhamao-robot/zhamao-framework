@@ -10,6 +10,14 @@ require __DIR__ . '/../src/Scheduler/Scheduler.php';
 Swoole\Coroutine::set([
     'max_coroutine' => 30000,
 ]);
+global $vendor_mode;
+$vendor_mode = false;
+if (mb_strpos(__DIR__, getcwd()) !== false && substr(str_replace(getcwd(), "", __DIR__), 0, 8) == "/vendor/") {
+    define("LOAD_MODE", 1); //composer项目模式
+    define("LOAD_MODE_COMPOSER_PATH", getcwd());
+} else {
+    define("LOAD_MODE", 0); //正常模式
+}
 
 date_default_timezone_set("Asia/Shanghai");
 
@@ -24,13 +32,21 @@ switch ($argv[1] ?? '') {
             }
         });
         break;
+    case 'phar-build':
+        array_shift($argv);
+        require_once 'phar-build';
+        break;
+    case 'systemd':
+        array_shift($argv);
+        require_once 'systemd';
+        break;
     case '':
     case 'framework':
     case 'server':
-        if(!is_dir(__DIR__.'/../vendor/')){
+        if (!is_dir(__DIR__ . '/../vendor/') && LOAD_MODE == 0) {
             echo "Warning: you have not update composer!\n";
             exec("composer update", $out, $var);
-            if($var != 0) {
+            if ($var != 0) {
                 echo "You need to run \"composer update\" at root of zhamao-framework!\n";
                 die;
             }
@@ -39,10 +55,12 @@ switch ($argv[1] ?? '') {
         break;
     case '--help':
     case '-h':
-        echo "\nUsage: ".$argv[0]." [OPTION]\n";
+        echo "\nUsage: " . $argv[0] . " [OPTION]\n";
         echo "\nzhamao-framework start script, provides several startup arguments.";
         echo "\n\n  -h, --help\t\tShow this help menu";
-        echo "\n  framework, server\tstart main framework, this is default option\n\n";
+        echo "\n  framework, server\tstart main framework, this is default option";
+        echo "\n  phar-build\t\tbuild a new phar archive";
+        echo "\n  systemd\t\tgenerate a new systemd \".service\" file to use\n\n";
         break;
     default:
         echo "Unknown option \"{$argv[1]}\"!\n\"--help\" for more information\n";

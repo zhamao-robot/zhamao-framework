@@ -31,6 +31,16 @@ class SelectBody
     public function get() { return $this->fetchAll(); }
 
     /**
+     * @throws DbException
+     */
+    public function count() {
+        $this->select_thing = ["count(*)"];
+        $str = $this->queryPrepare();
+        $this->result = DB::rawQuery($str[0], $str[1]);
+        return intval($this->result[0]["count(*)"]);
+    }
+
+    /**
      * @return null
      * @throws DbException
      */

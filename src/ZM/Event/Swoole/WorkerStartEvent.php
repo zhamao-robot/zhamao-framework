@@ -7,6 +7,7 @@ namespace ZM\Event\Swoole;
 use Co;
 use Doctrine\Common\Annotations\AnnotationException;
 use Exception;
+use PDO;
 use ReflectionException;
 use Swoole\Coroutine;
 use Swoole\Database\PDOConfig;
@@ -101,6 +102,7 @@ class WorkerStartEvent implements SwooleEvent
                 ->withCharset('utf8mb4')
                 ->withUsername($sql["sql_username"])
                 ->withPassword($sql["sql_password"])
+                ->withOptions([PDO::ATTR_STRINGIFY_FETCHES => false])
             );
             DB::initTableList();
         }
@@ -180,7 +182,7 @@ class WorkerStartEvent implements SwooleEvent
         if (file_exists(DataProvider::getWorkingDir() . "/vendor/autoload.php")) {
             require_once DataProvider::getWorkingDir() . "/vendor/autoload.php";
         }
-        if (isPharMode()) require_once WORKING_DIR . "/vendor/autoload.php";
+        if (LOAD_MODE == 2) require_once FRAMEWORK_DIR . "/vendor/autoload.php";
 
         //加载各个模块的注解类，以及反射
         Console::info("检索Module中");

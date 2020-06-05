@@ -3,7 +3,7 @@
     "description": "high-performance intelligent assistant",
     "minimum-stability": "stable",
     "license": "Apache-2.0",
-    "version": "1.4.1",
+    "version": "1.5",
     "authors": [
         {
             "name": "whale",
@@ -13,6 +13,10 @@
             "name": "swift",
             "email": "hugo_swift@yahoo.com"
         }
+    ],
+    "prefer-stable": true,
+    "bin": [
+        "bin/start"
     ],
     "require": {
         "php": ">=7.2",
@@ -25,11 +29,5 @@
         "ext-ctype": "*",
         "ext-pdo": "*",
         "psy/psysh": "@stable"
-    },
-    "repositories": {
-        "packagist": {
-            "type": "composer",
-            "url": "https://mirrors.aliyun.com/composer/"
-        }
     }
 }

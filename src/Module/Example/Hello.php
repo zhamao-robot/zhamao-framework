@@ -67,6 +67,7 @@ class Hello extends ModBase
      * @Middleware("timer")
      */
     public function timer() {
+        eval(ZM_BREAKPOINT);
         return "This page is used as testing TimerMiddleware! Do not use it in production.";
     }
 

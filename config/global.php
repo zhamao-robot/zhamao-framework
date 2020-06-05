@@ -14,7 +14,7 @@ $config['http_reverse_link'] = "http://127.0.0.1:".$config['port'];
 $config['debug_mode'] = false;
 
 /** 存放框架内文件数据的目录 */
-$config['zm_data'] = WORKING_DIR.'/zm_data/';
+$config['zm_data'] = realpath(__DIR__ . "/../").'/zm_data/';
 
 /** 存放各个模块配置文件的目录 */
 $config['config_dir'] = $config['zm_data'].'config/';
@@ -73,7 +73,7 @@ $config['context_class'] = \ZM\Context\Context::class;
 /** 静态文件访问 */
 $config['static_file_server'] = [
     'status' => false,
-    'document_root' => WORKING_DIR . '/resources/html',
+    'document_root' => realpath(__DIR__ . "/../") . '/resources/html',
     'document_index' => [
         'index.html'
     ]
