@@ -10,7 +10,6 @@ use ZM\Annotation\Http\Middleware;
 use ZM\Annotation\Http\RequestMapping;
 use ZM\Annotation\Swoole\SwooleEventAt;
 use ZM\Connection\CQConnection;
-use ZM\ModBase;
 use ZM\Utils\ZMUtil;
 
 /**
@@ -18,7 +17,7 @@ use ZM\Utils\ZMUtil;
  * @package Module\Example
  * @since 1.0
  */
-class Hello extends ModBase
+class Hello
 {
     /**
      * 在机器人连接后向终端输出信息
