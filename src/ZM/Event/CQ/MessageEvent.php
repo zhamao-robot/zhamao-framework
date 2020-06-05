@@ -38,7 +38,7 @@ class MessageEvent
      * @throws AnnotationException
      */
     public function onBefore() {
-        $obj_list = ZMBuf::$events[CQBefore::class]["message"];
+        $obj_list = ZMBuf::$events[CQBefore::class]["message"] ?? [];
         foreach ($obj_list as $v) {
             if($v->level < 200) break;
             EventHandler::callWithMiddleware(
