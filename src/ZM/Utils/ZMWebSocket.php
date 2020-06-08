@@ -29,6 +29,7 @@ class ZMWebSocket
             Console::warning("ZMRequest: url must contains scheme such as \"ws(s)://\"");
             return;
         }
+        if (!isset($this->parse["path"])) $this->parse["path"] = "/";
         $port = $this->parse["port"] ?? (($this->parse["scheme"] ?? "ws") == "wss" ? 443 : 80);
         $this->client = new Client($this->parse["host"], $port, (($this->parse["scheme"] ?? "ws") == "wss" ? true : false));
         $this->client->set($set);
@@ -85,18 +86,18 @@ class ZMWebSocket
     }
 }
 
-if(!debug_backtrace()) {
+if (!debug_backtrace()) {
     go(function () {
         require_once __DIR__ . "/../../Framework/Console.php";
         $cli = new ZMWebSocket("ws://127.0.0.1:20001/");
         if (!$cli->is_available) die("Error!\n");
-        $cli->onMessage(function ($frame){
+        $cli->onMessage(function (Frame $frame) {
             var_dump($frame);
         });
-        $cli->onClose(function($client){
+        $cli->onClose(function () {
             echo "Connection closed.\n";
         });
-        if($cli->upgrade()){
+        if ($cli->upgrade()) {
             echo "成功连接！\n";
         } else {
             echo "连接失败！\n";

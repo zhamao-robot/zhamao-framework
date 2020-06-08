@@ -100,7 +100,7 @@ class FrameworkLoader
                 "host: " . self::$settings->get("host") .
                 ", port: " . self::$settings->get("port") .
                 ", log_level: " . ZMBuf::$atomics["info_level"]->get() .
-                ", version: " . json_decode(file_get_contents(WORKING_DIR . "/composer.json"), true)["version"] .
+                ", version: " . ZM_VERSION .
                 "\nworking_dir: " . DataProvider::getWorkingDir()
             );
             global $motd;
@@ -130,6 +130,7 @@ class FrameworkLoader
     private function defineProperties() {
         define("ZM_START_TIME", microtime(true));
         define("ZM_DATA", self::$settings->get("zm_data"));
+        define("ZM_VERSION", json_decode(file_get_contents(__DIR__."/../../composer.json"), true)["version"] ?? "unknown");
         define("CONFIG_DIR", self::$settings->get("config_dir"));
         define("CRASH_DIR", self::$settings->get("crash_dir"));
         @mkdir(ZM_DATA);
