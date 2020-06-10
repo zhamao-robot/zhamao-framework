@@ -184,7 +184,7 @@ class Console
         $vss->callback = function(?WSConnection $conn) use ($terminal_id){
             $req = ctx()->getRequest();
             if($conn->getType() != "terminal") return false;
-            if(($req->header["x-terminal-id"] ?? "") != $terminal_id || ($req->header["x-pid"] ?? "") != posix_getpid()) {
+            if(($req->header["x-terminal-id"] ?? "") != $terminal_id) {
                 $conn->close();
                 return false;
             }
