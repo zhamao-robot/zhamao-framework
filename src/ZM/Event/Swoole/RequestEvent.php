@@ -42,7 +42,7 @@ class RequestEvent implements SwooleEvent
             $this->response->setHeader($k, $v);
         }
         $uri = $this->request->server["request_uri"];
-        Console::verbose($this->request->server["remote_addr"]." request ".$uri);
+        Console::verbose($this->request->server["remote_addr"] . " request " . $uri);
         $uri = explode("/", $uri);
         $uri = array_diff($uri, ["..", "", "."]);
         $node = ZMBuf::$req_mapping;

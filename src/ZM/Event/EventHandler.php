@@ -85,7 +85,7 @@ class EventHandler
                         " [" . $param1->getStatusCode() . "] " . $param0->server["request_uri"]
                     );
                     if (!$param1->isEnd()) $param1->end("Internal server error: " . $e->getMessage());
-                    Console::error("Internal server error (500), caused by uncaught exception.");
+                    Console::error("Internal server exception (500), caused by ".get_class($e));
                     Console::log($e->getTraceAsString(), "gray");
                 } catch (Error $e) {
                     /** @var Response $param1 */

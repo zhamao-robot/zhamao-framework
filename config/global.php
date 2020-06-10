@@ -38,7 +38,11 @@ $config['sql_config'] = [
     'sql_database' => 'db_name',
     'sql_password' => '',
     'sql_enable_cache' => true,
-    'sql_reset_cache' => '0300'
+    'sql_reset_cache' => '0300',
+    'sql_options' => [
+        PDO::ATTR_STRINGIFY_FETCHES => false,
+        PDO::ATTR_EMULATE_PREPARES => false
+    ]
 ];
 
 /** CQHTTP连接约定的token */

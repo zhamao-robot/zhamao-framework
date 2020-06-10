@@ -102,7 +102,7 @@ class WorkerStartEvent implements SwooleEvent
                 ->withCharset('utf8mb4')
                 ->withUsername($sql["sql_username"])
                 ->withPassword($sql["sql_password"])
-                ->withOptions([PDO::ATTR_STRINGIFY_FETCHES => false])
+                ->withOptions($sql["sql_options"] ?? [PDO::ATTR_STRINGIFY_FETCHES => false])
             );
             DB::initTableList();
         }
