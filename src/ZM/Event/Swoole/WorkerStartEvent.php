@@ -176,13 +176,8 @@ class WorkerStartEvent implements SwooleEvent
                 }
             }
         }
-
         //加载composer类
-        Console::info("加载composer资源中");
-        if (file_exists(DataProvider::getWorkingDir() . "/vendor/autoload.php")) {
-            require_once DataProvider::getWorkingDir() . "/vendor/autoload.php";
-        }
-        if (LOAD_MODE == 2) require_once FRAMEWORK_DIR . "/vendor/autoload.php";
+        //remove stupid duplicate code
 
         //加载各个模块的注解类，以及反射
         Console::info("检索Module中");
