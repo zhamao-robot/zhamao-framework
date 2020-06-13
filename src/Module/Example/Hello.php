@@ -33,7 +33,6 @@ class Hello
      * @CQCommand(match="你好",alias={"你好啊","你是谁"})
      */
     public function hello() {
-        eval(ZM_BREAKPOINT);
         return "你好啊，我是由炸毛框架构建的机器人！";
     }
 
