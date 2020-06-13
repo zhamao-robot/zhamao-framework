@@ -40,6 +40,61 @@ switch ($argv[1] ?? '') {
         array_shift($argv);
         require_once 'systemd';
         break;
+    case 'init':
+        array_shift($argv);
+        if (LOAD_MODE != 1) {
+            echo "initialization must be started with composer-project mode!\n";
+            exit(1);
+        }
+        $cwd = LOAD_MODE_COMPOSER_PATH;
+        echo "Copying default module file ...";
+        @mkdir($cwd . "/config");
+        @mkdir($cwd . "/src");
+        @mkdir($cwd . "/src/Custom");
+        @mkdir($cwd . "/src/Module");
+        @mkdir($cwd . "/src/Module/Example");
+        copy($cwd . "/vendor/zhamao/framework/config/global.php", $cwd . "/config/global.php");
+        copy($cwd . "/vendor/zhamao/framework/.gitignore", $cwd . "/.gitignore");
+        copy($cwd . "/vendor/zhamao/framework/config/file_header.json", $cwd . "/config/file_header.json");
+        copy($cwd . "/vendor/zhamao/framework/config/motd.txt", $cwd . "/config/motd.txt");
+        copy($cwd . "/vendor/zhamao/framework/src/Module/Example/Hello.php", $cwd . "/src/Module/Example/Hello.php");
+        copy($cwd . "/vendor/zhamao/framework/src/Module/Middleware/TimerMiddleware.php", $cwd . "/src/Module/Middleware/TimerMiddleware.php");
+        $autoload = [
+            "psr-4" => [
+                "Module\\" => "src/Module",
+                "Custom\\" => "src/Custom"
+            ],
+            "files" => [
+                "src/Custom/global_function.php"
+            ]
+        ];
+        $scripts = [
+            "server" => "vendor/bin/start server",
+            "server:log-debug" => "vendor/bin/start server --log-debug",
+            "server:log-verbose" => "vendor/bin/start server --log-verbose",
+            "server:log-info" => "vendor/bin/start server --log-info",
+            "server:log-warning" => "vendor/bin/start server --log-warning",
+            "server:debug-mode" => "vendor/bin/start server --debug-mode",
+            "systemd" => "vendor/bin/start systemd"
+        ];
+        echo PHP_EOL;
+        if (file_exists($cwd . "/composer.json")) {
+            echo "Updating composer.json ...";
+            $composer = json_decode(file_get_contents($cwd . "/composer.json"), true);
+            if (!isset($composer["autoload"])) {
+                $composer["autoload"] = $autoload;
+            }
+            if(!isset($composer["scripts"])) {
+                $composer["scripts"] = $scripts;
+            }
+            file_put_contents($cwd."/composer.json", json_encode($composer, 64|128|256));
+            echo PHP_EOL;
+        } else {
+            echo("Error occurred. Please check your updates.\n");
+            exit(1);
+        }
+        echo "success!\n";
+        break;
     case '':
     case 'framework':
     case 'server':
@@ -60,6 +115,7 @@ switch ($argv[1] ?? '') {
         echo "\n\n  -h, --help\t\tShow this help menu";
         echo "\n  framework, server\tstart main framework, this is default option";
         echo "\n  phar-build\t\tbuild a new phar archive";
+        echo "\n  init\t\t\tinitialize framework structure in this directory";
         echo "\n  systemd\t\tgenerate a new systemd \".service\" file to use\n\n";
         break;
     default:
