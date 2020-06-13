@@ -53,6 +53,7 @@ switch ($argv[1] ?? '') {
         @mkdir($cwd . "/src/Custom");
         @mkdir($cwd . "/src/Module");
         @mkdir($cwd . "/src/Module/Example");
+        @mkdir($cwd . "/src/Module/Middleware");
         copy($cwd . "/vendor/zhamao/framework/config/global.php", $cwd . "/config/global.php");
         copy($cwd . "/vendor/zhamao/framework/.gitignore", $cwd . "/.gitignore");
         copy($cwd . "/vendor/zhamao/framework/config/file_header.json", $cwd . "/config/file_header.json");

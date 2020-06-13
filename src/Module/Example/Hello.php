@@ -29,6 +29,15 @@ class Hello
     }
 
     /**
+     * 在机器人连接后向终端输出信息
+     * @SwooleEventAt("close",rule="connectType:qq")
+     */
+    public function onDisconnect() {
+        $conn = ctx()->getConnection();
+        Console::info("机器人 " . $conn->getQQ() . " 已断开连接！");
+    }
+
+    /**
      * 向机器人发送"你好"，即可回复这句话
      * @CQCommand(match="你好",alias={"你好啊","你是谁"})
      */
