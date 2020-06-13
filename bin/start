@@ -54,12 +54,21 @@ switch ($argv[1] ?? '') {
         @mkdir($cwd . "/src/Module");
         @mkdir($cwd . "/src/Module/Example");
         @mkdir($cwd . "/src/Module/Middleware");
-        copy($cwd . "/vendor/zhamao/framework/config/global.php", $cwd . "/config/global.php");
-        copy($cwd . "/vendor/zhamao/framework/.gitignore", $cwd . "/.gitignore");
-        copy($cwd . "/vendor/zhamao/framework/config/file_header.json", $cwd . "/config/file_header.json");
-        copy($cwd . "/vendor/zhamao/framework/config/motd.txt", $cwd . "/config/motd.txt");
-        copy($cwd . "/vendor/zhamao/framework/src/Module/Example/Hello.php", $cwd . "/src/Module/Example/Hello.php");
-        copy($cwd . "/vendor/zhamao/framework/src/Module/Middleware/TimerMiddleware.php", $cwd . "/src/Module/Middleware/TimerMiddleware.php");
+        $ls = [
+            "/config/global.php",
+            "/.gitignore",
+            "/config/file_header.json",
+            "/config/motd.txt",
+            "/src/Module/Example/Hello.php",
+            "/src/Module/Middleware/TimerMiddleware.php",
+            "/src/Custom/global_function.php"
+        ];
+        foreach($ls as $v) {
+            if(!file_exists($cwd.$v)) {
+                echo "Copying ".$v.PHP_EOL;
+                copy($cwd."/vendor/zhamao/framework".$v, $cwd.$v);
+            }
+        }
         $autoload = [
             "psr-4" => [
                 "Module\\" => "src/Module",
@@ -85,10 +94,10 @@ switch ($argv[1] ?? '') {
             if (!isset($composer["autoload"])) {
                 $composer["autoload"] = $autoload;
             }
-            if(!isset($composer["scripts"])) {
+            if (!isset($composer["scripts"])) {
                 $composer["scripts"] = $scripts;
             }
-            file_put_contents($cwd."/composer.json", json_encode($composer, 64|128|256));
+            file_put_contents($cwd . "/composer.json", json_encode($composer, 64 | 128 | 256));
             echo PHP_EOL;
         } else {
             echo("Error occurred. Please check your updates.\n");
