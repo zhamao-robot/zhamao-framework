@@ -42,7 +42,8 @@ $config['sql_config'] = [
     'sql_options' => [
         PDO::ATTR_STRINGIFY_FETCHES => false,
         PDO::ATTR_EMULATE_PREPARES => false
-    ]
+    ],
+    'sql_no_exception' => false
 ];
 
 /** CQHTTP连接约定的token */
