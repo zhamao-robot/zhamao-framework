@@ -30,9 +30,10 @@ class Hello
 
     /**
      * 向机器人发送"你好"，即可回复这句话
-     * @CQCommand("你好")
+     * @CQCommand(match="你好",alias={"你好啊","你是谁"})
      */
     public function hello() {
+        eval(ZM_BREAKPOINT);
         return "你好啊，我是由炸毛框架构建的机器人！";
     }
 
@@ -66,7 +67,6 @@ class Hello
      * @Middleware("timer")
      */
     public function timer() {
-        eval(ZM_BREAKPOINT);
         return "This page is used as testing TimerMiddleware! Do not use it in production.";
     }
 

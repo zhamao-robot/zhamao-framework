@@ -23,11 +23,19 @@
         "swoole/ide-helper": "@dev",
         "ext-mbstring": "*",
         "swlib/saber": "^1.0",
-        "doctrine/annotations": "<1.10.2",
+        "doctrine/annotations": "~1.10",
         "ext-json": "*",
         "ext-posix": "*",
         "ext-ctype": "*",
         "ext-pdo": "*",
         "psy/psysh": "@stable"
+    },
+    "autoload": {
+        "psr-4": {
+            "Custom\\": "src/Custom",
+            "Framework\\": "src/Framework",
+            "ZM\\": "src/ZM",
+            "Module\\": "src/Module"
+        }
     }
 }

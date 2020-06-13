@@ -8,11 +8,12 @@ use ZM\Context\ContextInterface;
 use ZM\Utils\ZMUtil;
 
 
-function classLoader($p) {
+function phar_classloader($p){
     $filepath = getClassPath($p);
-    if ($filepath === null)
-        echo "F:Warning: get class path wrongs.$p\n";
-    //else echo "F:DBG: Found " . $p . "\n";
+    if($filepath === null) {
+        Console::debug("F:Warning: get class path wrongs.$p");
+        return;
+    }
     try {
         require_once $filepath;
     } catch (Exception $e) {

@@ -40,7 +40,7 @@ class MessageEvent
     public function onBefore() {
         $obj_list = ZMBuf::$events[CQBefore::class]["message"] ?? [];
         foreach ($obj_list as $v) {
-            if($v->level < 200) break;
+            if ($v->level < 200) break;
             EventHandler::callWithMiddleware(
                 $v->class,
                 $v->method,
@@ -65,7 +65,7 @@ class MessageEvent
             }
         }
         foreach (ZMBuf::$events[CQBefore::class]["message"] ?? [] as $v) {
-            if($v->level >= 200) continue;
+            if ($v->level >= 200) continue;
             $c = $v->class;
             if (ctx()->getCache("level") != 0) continue;
             EventHandler::callWithMiddleware(
@@ -111,6 +111,13 @@ class MessageEvent
                         $obj[$c] = new $c($class_construct);
                     }
                     if ($word[0] != "" && $v->match == $word[0]) {
+                        Console::debug("Calling $c -> {$v->method}");
+                        $this->function_call = EventHandler::callWithMiddleware($obj[$c], $v->method, $class_construct, [$word], function ($r) {
+                            if (is_string($r)) context()->reply($r);
+                            return true;
+                        });
+                        return;
+                    } elseif (in_array($word[0], $v->alias)) {
                         Console::debug("Calling $c -> {$v->method}");
                         $this->function_call = EventHandler::callWithMiddleware($obj[$c], $v->method, $class_construct, [$word], function ($r) {
                             if (is_string($r)) context()->reply($r);

@@ -43,9 +43,19 @@ class FrameworkLoader
 
         $this->requireGlobalFunctions();
         if (LOAD_MODE == 0) define("WORKING_DIR", getcwd());
-        elseif(LOAD_MODE == 1) define("WORKING_DIR", realpath(__DIR__ . "/../../"));
+        elseif (LOAD_MODE == 1) define("WORKING_DIR", realpath(__DIR__ . "/../../"));
         elseif (LOAD_MODE == 2) echo "Phar mode: " . WORKING_DIR . PHP_EOL;
-        $this->registerAutoloader('classLoader');
+        //$this->registerAutoloader('classLoader');
+        require_once "DataProvider.php";
+        if (file_exists(DataProvider::getWorkingDir() . "/vendor/autoload.php")) {
+            require_once DataProvider::getWorkingDir() . "/vendor/autoload.php";
+        }
+        if (LOAD_MODE == 2) {
+            require_once FRAMEWORK_DIR . "/vendor/autoload.php";
+            spl_autoload_register('phar_classloader');
+        }
+
+
         self::$settings = new GlobalConfig();
         if (self::$settings->get("debug_mode") === true) {
             $args[] = "--debug-mode";
@@ -130,7 +140,7 @@ class FrameworkLoader
     private function defineProperties() {
         define("ZM_START_TIME", microtime(true));
         define("ZM_DATA", self::$settings->get("zm_data"));
-        define("ZM_VERSION", json_decode(file_get_contents(__DIR__."/../../composer.json"), true)["version"] ?? "unknown");
+        define("ZM_VERSION", json_decode(file_get_contents(__DIR__ . "/../../composer.json"), true)["version"] ?? "unknown");
         define("CONFIG_DIR", self::$settings->get("config_dir"));
         define("CRASH_DIR", self::$settings->get("crash_dir"));
         @mkdir(ZM_DATA);
