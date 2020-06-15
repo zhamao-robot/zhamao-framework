@@ -110,7 +110,7 @@ class AnnotationParser
                 foreach ($method_annotations as $vss) {
                     if ($vss instanceof Rule) $vss = self::registerRuleEvent($vss, $vs, $reflection_class);
                     else $vss = self::registerMethod($vss, $vs, $reflection_class);
-
+                    Console::debug("寻找 ".$vs->getName() ." -> ".get_class($vss));
                     if ($vss instanceof SwooleEventAt) ZMBuf::$events[SwooleEventAt::class][] = $vss;
                     elseif ($vss instanceof SwooleEventAfter) ZMBuf::$events[SwooleEventAfter::class][] = $vss;
                     elseif ($vss instanceof CQMessage) ZMBuf::$events[CQMessage::class][] = $vss;
@@ -326,6 +326,7 @@ class AnnotationParser
         $class = getAllClasses(DataProvider::getWorkingDir() . "/src/Custom/Annotation/", "Custom\\Annotation");
         foreach ($class as $v) {
             $s = DataProvider::getWorkingDir() . '/src/' . str_replace("\\", "/", $v) . ".php";
+            Console::debug("Requiring custom annotation ".$s);
             require_once $s;
         }
     }

@@ -41,10 +41,11 @@ class SelectBody
     }
 
     /**
+     * @param int $fetch_mode
      * @return null
      * @throws DbException
      */
-    public function fetchAll() {
+    public function fetchAll($fetch_mode = ZM_DEFAULT_FETCH_MODE) {
         if ($this->table->isCacheEnabled()) {
             $rr = md5(implode(",", $this->select_thing) . serialize($this->where_thing));
             if (array_key_exists($rr, $this->table->cache)) {
@@ -52,7 +53,7 @@ class SelectBody
                 return $this->table->cache[$rr]->getResult();
             }
         }
-        $this->execute();
+        $this->execute($fetch_mode);
         if ($this->table->isCacheEnabled() && !in_array($rr, $this->table->cache)) {
             $this->table->cache[$rr] = $this;
         }
@@ -81,11 +82,12 @@ class SelectBody
     }
 
     /**
+     * @param int $fetch_mode
      * @throws DbException
      */
-    public function execute() {
+    public function execute($fetch_mode = ZM_DEFAULT_FETCH_MODE) {
         $str = $this->queryPrepare();
-        $this->result = DB::rawQuery($str[0], $str[1]);
+        $this->result = DB::rawQuery($str[0], $str[1], $fetch_mode);
     }
 
     public function getResult() { return $this->result; }

@@ -43,11 +43,12 @@ $config['sql_config'] = [
         PDO::ATTR_STRINGIFY_FETCHES => false,
         PDO::ATTR_EMULATE_PREPARES => false
     ],
-    'sql_no_exception' => false
+    'sql_no_exception' => false,
+    'sql_default_fetch_mode' => PDO::FETCH_BOTH         // added in 1.5.6
 ];
 
 /** CQHTTP连接约定的token */
-$config["access_token"] = "";
+$config["access_token"] = "0ACA097E-AA82-4577-8B17-4A8D454D171B";
 
 /** HTTP服务器固定请求头的返回 */
 $config['http_header'] = [

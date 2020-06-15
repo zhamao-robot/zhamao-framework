@@ -101,7 +101,11 @@ class MessageEvent
             foreach (ZMBuf::$events[CQCommand::class] ?? [] as $v) {
                 /** @var CQCommand $v */
                 if ($v->match == "" && $v->regexMatch == "") continue;
-                else {
+                elseif (($v->user_id == 0 || ($v->user_id != 0 && $v->user_id == context()->getData()["user_id"])) &&
+                    ($v->group_id == 0 || ($v->group_id != 0 && $v->group_id == (context()->getData()["group_id"] ?? 0))) &&
+                    ($v->discuss_id == 0 || ($v->discuss_id != 0 && $v->discuss_id == (context()->getData()["discuss_id"] ?? 0))) &&
+                    ($v->message_type == '' || ($v->message_type != '' && $v->message_type == context()->getData()["message_type"]))
+                    ) {
                     $c = $v->class;
                     $class_construct = [
                         "data" => context()->getData(),

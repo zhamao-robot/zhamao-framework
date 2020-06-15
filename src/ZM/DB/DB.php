@@ -90,10 +90,11 @@ class DB
     /**
      * @param string $line
      * @param array $params
+     * @param int $fetch_mode
      * @return mixed
      * @throws DbException
      */
-    public static function rawQuery(string $line, $params = []) {
+    public static function rawQuery(string $line, $params = [], $fetch_mode = ZM_DEFAULT_FETCH_MODE) {
         if (ZMBuf::get("sql_log") === true) {
             $starttime = microtime(true);
         }
@@ -131,7 +132,7 @@ class DB
                         "] " . $line . " " . json_encode($params, JSON_UNESCAPED_UNICODE) . "\n";
                     Coroutine::writeFile(CRASH_DIR . "sql.log", $log, FILE_APPEND);
                 }
-                return $ps->fetchAll();
+                return $ps->fetchAll($fetch_mode);
             }
         } catch (DbException $e) {
             if (ZMBuf::get("sql_log") === true) {
