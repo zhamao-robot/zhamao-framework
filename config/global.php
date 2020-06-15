@@ -48,7 +48,7 @@ $config['sql_config'] = [
 ];
 
 /** CQHTTP连接约定的token */
-$config["access_token"] = "0ACA097E-AA82-4577-8B17-4A8D454D171B";
+$config["access_token"] = "";
 
 /** HTTP服务器固定请求头的返回 */
 $config['http_header'] = [
