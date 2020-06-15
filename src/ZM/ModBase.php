@@ -15,6 +15,11 @@ use ZM\Http\Response;
 use Swoole\WebSocket\Frame;
 use Swoole\WebSocket\Server;
 
+/**
+ * Class ModBase
+ * @package ZM
+ * @deprecated
+ */
 abstract class ModBase
 {
     /** @var Server */
