@@ -24,7 +24,7 @@ class ZMUtil
 
     public static function stop($without_shutdown = false) {
         Console::info(Console::setColor("Stopping server...", "red"));
-        foreach (ZMBuf::$server->connections as $v) {
+        foreach ((ZMBuf::$server->connections ?? []) as $v) {
             ZMBuf::$server->close($v);
         }
         DataProvider::saveBuffer();

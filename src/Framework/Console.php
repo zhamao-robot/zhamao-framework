@@ -184,6 +184,7 @@ class Console
         $vss->callback = function(?WSConnection $conn) use ($terminal_id){
             $req = ctx()->getRequest();
             if($conn->getType() != "terminal") return false;
+            Console::debug("Terminal fd: ".$conn->fd);
             if(($req->header["x-terminal-id"] ?? "") != $terminal_id) {
                 $conn->close();
                 return false;
@@ -195,6 +196,7 @@ class Console
         $vss2->type = "message";
         $vss2->rule = "connectType:terminal";
         $vss2->callback = function(?WSConnection $conn){
+            if ($conn === null) return false;
             if($conn->getType() != "terminal") return false;
             $cmd = ctx()->getFrame()->data;
             self::executeCommand($cmd);

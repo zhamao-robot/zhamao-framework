@@ -3,6 +3,7 @@
 use Swoole\Coroutine\Http\Client;
 
 Co\run(function (){
+    hello:
     global $terminal_id, $port;
     $client = new Client("127.0.0.1", $port);
     $client->set(['websocket_mask' => true]);
@@ -17,8 +18,9 @@ Co\run(function (){
                     break;
                 }
                 if($r === false) {
-                    echo "Unable to connect framework terminal, connection closed.\n";
-                    break;
+                    echo "Unable to connect framework terminal, connection closed. Trying to reconnect after 5s.\n";
+                    sleep(5);
+                    goto hello;
                 }
             } else {
                 break;

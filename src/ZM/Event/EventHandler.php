@@ -39,14 +39,17 @@ class EventHandler
         switch ($event_name) {
             case "workerstart":
                 try {
-                    register_shutdown_function(function () {
+                    register_shutdown_function(function () use ($param0) {
                         $error = error_get_last();
                         if ($error["type"] != 0) {
                             Console::error("Internal fatal error: " . $error["message"] . " at " . $error["file"] . "({$error["line"]})");
                         }
                         DataProvider::saveBuffer();
-                        ZMBuf::$server->shutdown();
+                        /** @var Server $param0 */
+                        if (ZMBuf::$server === null) $param0->shutdown();
+                        else ZMBuf::$server->shutdown();
                     });
+                    ZMBuf::$server = $param0;
                     $r = (new WorkerStartEvent($param0, $param1))->onActivate();
                     Console::log("\n=== Worker #" . $param0->worker_id . " 已启动 ===\n", "gold");
                     $r->onAfter();
@@ -57,7 +60,9 @@ class EventHandler
                     ZMUtil::stop();
                     return;
                 } catch (Error $e) {
-                    var_export($e);
+                    Console::error("PHP Error: " . $e->getMessage() . " in " . $e->getFile() . " on line " . $e->getLine());
+                    Console::error("Maybe it caused by your own code if in your own Module directory.");
+                    Console::log($e->getTraceAsString(), 'gray');
                     ZMUtil::stop();
                 }
                 break;
@@ -85,7 +90,7 @@ class EventHandler
                         " [" . $param1->getStatusCode() . "] " . $param0->server["request_uri"]
                     );
                     if (!$param1->isEnd()) $param1->end("Internal server error: " . $e->getMessage());
-                    Console::error("Internal server exception (500), caused by ".get_class($e));
+                    Console::error("Internal server exception (500), caused by " . get_class($e));
                     Console::log($e->getTraceAsString(), "gray");
                 } catch (Error $e) {
                     /** @var Response $param1 */
@@ -134,7 +139,7 @@ class EventHandler
      * @throws AnnotationException
      */
     public static function callCQEvent($event_data, $conn_or_response, int $level = 0) {
-        ctx()->setCache("level",$level);
+        ctx()->setCache("level", $level);
         if ($level >= 5) {
             Console::warning("Recursive call reached " . $level . " times");
             Console::stackTrace();
@@ -172,7 +177,7 @@ class EventHandler
      * @throws AnnotationException
      */
     public static function callCQResponse($req) {
-        Console::debug("收到来自API连接的回复：".json_encode($req, 128|256));
+        Console::debug("收到来自API连接的回复：" . json_encode($req, 128 | 256));
         $status = $req["status"];
         $retcode = $req["retcode"];
         $data = $req["data"];

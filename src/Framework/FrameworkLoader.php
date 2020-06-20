@@ -151,6 +151,7 @@ class FrameworkLoader
         define("ZM_MATCH_NUMBER", 2);
         define("ZM_MATCH_SECOND", 3);
         define("ZM_BREAKPOINT", 'if(in_array("--debug-mode", \Framework\FrameworkLoader::$argv)) extract(\Psy\debug(get_defined_vars(), isset($this) ? $this : @get_called_class()));');
+        define("BP", ZM_BREAKPOINT);
         define("ZM_DEFAULT_FETCH_MODE", self::$settings->get("sql_config")["sql_default_fetch_mode"] ?? 4);
     }
 

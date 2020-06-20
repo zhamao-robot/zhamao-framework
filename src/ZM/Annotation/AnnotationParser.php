@@ -111,6 +111,7 @@ class AnnotationParser
                     if ($vss instanceof Rule) $vss = self::registerRuleEvent($vss, $vs, $reflection_class);
                     else $vss = self::registerMethod($vss, $vs, $reflection_class);
                     Console::debug("寻找 ".$vs->getName() ." -> ".get_class($vss));
+
                     if ($vss instanceof SwooleEventAt) ZMBuf::$events[SwooleEventAt::class][] = $vss;
                     elseif ($vss instanceof SwooleEventAfter) ZMBuf::$events[SwooleEventAfter::class][] = $vss;
                     elseif ($vss instanceof CQMessage) ZMBuf::$events[CQMessage::class][] = $vss;
