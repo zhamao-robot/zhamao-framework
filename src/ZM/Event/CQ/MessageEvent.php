@@ -100,7 +100,7 @@ class MessageEvent
             $obj = [];
             foreach (ZMBuf::$events[CQCommand::class] ?? [] as $v) {
                 /** @var CQCommand $v */
-                if ($v->match == "" && $v->regexMatch == "") continue;
+                if ($v->match == "" && $v->regexMatch == "" && $v->fullMatch == "") continue;
                 elseif (($v->user_id == 0 || ($v->user_id != 0 && $v->user_id == context()->getData()["user_id"])) &&
                     ($v->group_id == 0 || ($v->group_id != 0 && $v->group_id == (context()->getData()["group_id"] ?? 0))) &&
                     ($v->discuss_id == 0 || ($v->discuss_id != 0 && $v->discuss_id == (context()->getData()["discuss_id"] ?? 0))) &&
@@ -130,6 +130,14 @@ class MessageEvent
                         return;
                     } elseif ($v->regexMatch != "" && ($args = matchArgs($v->regexMatch, context()->getMessage())) !== false) {
                         Console::debug("Calling $c -> {$v->method}");
+                        $this->function_call = EventHandler::callWithMiddleware($obj[$c], $v->method, $class_construct, [$args], function ($r) {
+                            if (is_string($r)) context()->reply($r);
+                            return true;
+                        });
+                        return;
+                    } elseif ($v->fullMatch != "" && (preg_match("/".$v->fullMatch."/u", ctx()->getMessage(), $args)) != 0) {
+                        Console::debug("Calling $c -> {$v->method}");
+                        array_shift($args);
                         $this->function_call = EventHandler::callWithMiddleware($obj[$c], $v->method, $class_construct, [$args], function ($r) {
                             if (is_string($r)) context()->reply($r);
                             return true;
