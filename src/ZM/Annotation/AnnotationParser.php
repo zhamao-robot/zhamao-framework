@@ -99,6 +99,9 @@ class AnnotationParser
                     continue 2;
                 } elseif ($vs instanceof Middleware) {
                     $middleware_addon = $vs;
+                } elseif ($vs instanceof CustomAnnotation) {
+                    $vs->class = $reflection_class->getName();
+                    ZMBuf::$events[get_class($vs)][] = $vs;
                 }
             }
             foreach ($methods as $vs) {
@@ -110,7 +113,7 @@ class AnnotationParser
                 foreach ($method_annotations as $vss) {
                     if ($vss instanceof Rule) $vss = self::registerRuleEvent($vss, $vs, $reflection_class);
                     else $vss = self::registerMethod($vss, $vs, $reflection_class);
-                    Console::debug("寻找 ".$vs->getName() ." -> ".get_class($vss));
+                    Console::debug("寻找 " . $vs->getName() . " -> " . get_class($vss));
 
                     if ($vss instanceof SwooleEventAt) ZMBuf::$events[SwooleEventAt::class][] = $vss;
                     elseif ($vss instanceof SwooleEventAfter) ZMBuf::$events[SwooleEventAfter::class][] = $vss;
@@ -169,7 +172,7 @@ class AnnotationParser
             switch ($asp_name) {
                 case "connectType": //websocket连接类型
                     $func = function (?WSConnection $connection) use ($rest) {
-                        if($connection === null) return false;
+                        if ($connection === null) return false;
                         return $connection->getType() == $rest ? true : false;
                     };
                     break;
@@ -327,7 +330,7 @@ class AnnotationParser
         $class = getAllClasses(DataProvider::getWorkingDir() . "/src/Custom/Annotation/", "Custom\\Annotation");
         foreach ($class as $v) {
             $s = DataProvider::getWorkingDir() . '/src/' . str_replace("\\", "/", $v) . ".php";
-            Console::debug("Requiring custom annotation ".$s);
+            Console::debug("Requiring custom annotation " . $s);
             require_once $s;
         }
     }
