@@ -9,8 +9,8 @@ trait WhereBody
     protected $where_thing = [];
 
     public function where($column, $operation_or_value, $value = null) {
-        if (!in_array($operation_or_value, ['=', '!=', '>', '<', '>=', '<=', 'IN', 'in'])) $this->where_thing['='][$column] = $operation_or_value;
-        elseif ($value !== null) $this->where_thing[$operation_or_value][$column] = $value;
+        if ($value !== null) $this->where_thing[$operation_or_value][$column] = $value;
+        elseif (!in_array($operation_or_value, ['=', '!=', '>', '<', '>=', '<=', 'IN', 'in'])) $this->where_thing['='][$column] = $operation_or_value;
         else $this->where_thing['='][$column] = $operation_or_value;
         return $this;
     }
