@@ -52,6 +52,7 @@ class ZMBuf
     public static $context = [];
     public static $instance = [];
     public static $context_class = [];
+    public static $server_events = [];
 
     static function get($name, $default = null) {
         return self::$cache[$name] ?? $default;

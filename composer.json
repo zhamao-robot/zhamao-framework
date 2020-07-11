@@ -3,7 +3,7 @@
     "description": "High performance QQ robot and web server development framework",
     "minimum-stability": "stable",
     "license": "Apache-2.0",
-    "version": "1.5.8",
+    "version": "1.6",
     "authors": [
         {
             "name": "whale",

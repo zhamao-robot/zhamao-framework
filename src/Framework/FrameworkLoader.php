@@ -3,15 +3,13 @@
 
 namespace Framework;
 
-use Co;
-use Doctrine\Common\Annotations\AnnotationException;
-use Swoole\Http\Request;
+use Doctrine\Common\Annotations\AnnotationReader;
+use ReflectionClass;
+use ReflectionMethod;
 use Swoole\Runtime;
-use Swoole\WebSocket\Frame;
-use ZM\Event\EventHandler;
+use ZM\Annotation\Swoole\OnEvent;
 use Exception;
 use Swoole\WebSocket\Server;
-use ZM\Http\Response;
 
 /**
  * Class FrameworkLoader
@@ -37,10 +35,6 @@ class FrameworkLoader
     private $server;
 
     public function __construct($args = []) {
-        if (self::$instance !== null) die("Cannot run two FrameworkLoader in one process!");
-        self::$instance = $this;
-
-
         $this->requireGlobalFunctions();
         if (LOAD_MODE == 0) define("WORKING_DIR", getcwd());
         elseif (LOAD_MODE == 1) define("WORKING_DIR", realpath(__DIR__ . "/../../"));
@@ -48,6 +42,7 @@ class FrameworkLoader
         //$this->registerAutoloader('classLoader');
         require_once "DataProvider.php";
         if (file_exists(DataProvider::getWorkingDir() . "/vendor/autoload.php")) {
+            /** @noinspection PhpIncludeInspection */
             require_once DataProvider::getWorkingDir() . "/vendor/autoload.php";
         }
         if (LOAD_MODE == 2) {
@@ -81,24 +76,33 @@ class FrameworkLoader
                 self::$argv[] = "--disable-console-input";
             }
             $this->server->set($settings);
-            $this->server->on("WorkerStart", [$this, "onWorkerStart"]);
-            $this->server->on("message", function ($server, Frame $frame) {
-                Console::debug("Calling Swoole \"message\" from fd=" . $frame->fd);
-                EventHandler::callSwooleEvent("message", $server, $frame);
-            });
-            $this->server->on("request", function ($request, $response) {
-                $response = new Response($response);
-                Console::debug("Receiving Http request event, cid=" . Co::getCid());
-                EventHandler::callSwooleEvent("request", $request, $response);
-            });
-            $this->server->on("open", function ($server, Request $request) {
-                Console::debug("Calling Swoole \"open\" event from fd=" . $request->fd);
-                EventHandler::callSwooleEvent("open", $server, $request);
-            });
-            $this->server->on("close", function ($server, $fd) {
-                Console::debug("Calling Swoole \"close\" event from fd=" . $fd);
-                EventHandler::callSwooleEvent("close", $server, $fd);
-            });
+            $all_event_class = self::$settings->get("server_event_handler_class");
+            $event_list = [];
+            foreach ($all_event_class as $v) {
+                $reader = new AnnotationReader();
+                $reflection_class = new ReflectionClass($v);
+                $methods = $reflection_class->getMethods(ReflectionMethod::IS_PUBLIC);
+                foreach ($methods as $vs) {
+                    $method_annotations = $reader->getMethodAnnotations($vs);
+                    if ($method_annotations != []) {
+                        $annotation = $method_annotations[0];
+                        if ($annotation instanceof OnEvent) {
+                            $annotation->class = $v;
+                            $annotation->method = $vs->getName();
+                            $event_list[strtolower($annotation->event)] = $annotation;
+                        }
+                    }
+                }
+            }
+            foreach ($event_list as $k => $v) {
+                $this->server->on($k, function (...$param) use ($v) {
+                    $c = $v->class;
+                    //echo $c.PHP_EOL;
+                    $c = new $c();
+                    call_user_func_array([$c, $v->method], $param);
+                });
+            }
+
             ZMBuf::initAtomic();
             if (in_array("--remote-shell", $args)) RemoteShell::listen($this->server, "127.0.0.1");
             if (in_array("--log-error", $args)) ZMBuf::$atomics["info_level"]->set(0);
@@ -121,6 +125,15 @@ class FrameworkLoader
             }
             if (in_array("--debug-mode", self::$argv))
                 Console::warning("You are in debug mode, do not use in production!");
+            register_shutdown_function(function() {
+                $error = error_get_last();
+                if(isset($error["type"]) && $error["type"] == 1) {
+                    if(mb_strpos($error["message"], "require") !== false && mb_strpos($error["message"], "callback") !== false) {
+                        echo "\e[38;5;203mYou may need to update your \"global.php\" config!\n";
+                        echo "Please see: https://github.com/zhamao-robot/zhamao-framework/issues/15\e[m\n";
+                    }
+                }
+            });
             $this->server->start();
         } catch (Exception $e) {
             Console::error("Framework初始化出现错误，请检查！");
@@ -131,10 +144,6 @@ class FrameworkLoader
 
     private function requireGlobalFunctions() {
         require_once __DIR__ . '/global_functions.php';
-    }
-
-    private function registerAutoloader(string $string) {
-        if (!spl_autoload_register($string)) die("Failed to register autoloader named \"$string\" !");
     }
 
     private function defineProperties() {
@@ -169,16 +178,6 @@ class FrameworkLoader
         return true;
     }
 
-    /**
-     * @param \Swoole\Server $server
-     * @param $worker_id
-     * @throws AnnotationException
-     */
-    public function onWorkerStart(\Swoole\Server $server, $worker_id) {
-        self::$instance = $this;
-        self::$run_time = microtime(true);
-        EventHandler::callSwooleEvent("WorkerStart", $server, $worker_id);
-    }
 }
 
 global $motd;
