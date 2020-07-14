@@ -56,7 +56,7 @@ class AnnotationParser
             $class_prefix = '';
             $methods = $reflection_class->getMethods(ReflectionMethod::IS_PUBLIC);
             $class_annotations = $reader->getClassAnnotations($reflection_class);
-            $middleware_addon = null;
+            $middleware_addon = [];
             foreach ($class_annotations as $vs) {
                 if ($vs instanceof Closed) {
                     continue 2;
@@ -98,16 +98,18 @@ class AnnotationParser
                     ZMBuf::$events[MiddlewareClass::class][$result["name"]] = $result;
                     continue 2;
                 } elseif ($vs instanceof Middleware) {
-                    $middleware_addon = $vs;
+                    $middleware_addon[] = $vs;
                 } elseif ($vs instanceof CustomAnnotation) {
                     $vs->class = $reflection_class->getName();
                     ZMBuf::$events[get_class($vs)][] = $vs;
                 }
             }
             foreach ($methods as $vs) {
-                if ($middleware_addon !== null) {
-                    Console::debug("Added middleware " . $middleware_addon->middleware . " to $v -> " . $vs->getName());
-                    ZMBuf::$events[MiddlewareInterface::class][$v][$vs->getName()][] = $middleware_addon->middleware;
+                if ($middleware_addon !== []) {
+                    foreach($middleware_addon as $value){
+                        Console::debug("Added middleware " . $value->middleware . " to $v -> " . $vs->getName());
+                        ZMBuf::$events[MiddlewareInterface::class][$v][$vs->getName()][] = $value->middleware;
+                    }
                 }
                 $method_annotations = $reader->getMethodAnnotations($vs);
                 foreach ($method_annotations as $vss) {
