@@ -22,16 +22,11 @@ class ZMRequest
      * 如果请求失败或返回状态不是200，则返回 false
      */
     public static function get($url, $headers = [], $set = [], $return_body = true) {
-        $parse = parse_url($url);
-        if (!isset($parse["host"])) {
-            Console::warning("ZMRequest: url must contains scheme such as \"http(s)\"");
-            return false;
-        }
-        if(!isset($parse["path"])) $parse["path"] = "/";
-        $port = $parse["port"] ?? (($parse["scheme"] ?? "http") == "https" ? 443 : 80);
-        $cli = new Client($parse["host"], $port, (($parse["scheme"] ?? "http") == "https" ? true : false));
-        $cli->setHeaders($headers);
+        /** @var Client $cli */
+        list($cli, $parse) = self::getNewClient($url);
+        if($cli === null) return false;
         $cli->set($set == [] ? ['timeout' => 15.0] : $set);
+        $cli->setHeaders($headers);
         $cli->get($parse["path"] . (isset($parse["query"]) ? "?" . $parse["query"] : ""));
         if ($return_body) {
             if ($cli->errCode != 0 || $cli->statusCode != 200) return false;
@@ -56,14 +51,9 @@ class ZMRequest
      * @return bool|string|Client
      */
     public static function post($url, array $header, $data, $set = [], $return_body = true) {
-        $parse = parse_url($url);
-        if (!isset($parse["host"])) {
-            Console::warning("ZMRequest: url must contains scheme such as \"http(s)://\"");
-            return false;
-        }
-        if(!isset($parse["path"])) $parse["path"] = "/";
-        $port = $parse["port"] ?? (($parse["scheme"] ?? "http") == "https" ? 443 : 80);
-        $cli = new Client($parse["host"], $port, (($parse["scheme"] ?? "http") == "https" ? true : false));
+        /** @var Client $cli */
+        list($cli, $parse) = self::getNewClient($url);
+        if($cli === null) return false;
         $cli->set($set == [] ? ['timeout' => 15.0] : $set);
         $cli->setHeaders($header);
         $cli->post($parse["path"] . (isset($parse["query"]) ? ("?" . $parse["query"]) : ""), $data);
@@ -97,15 +87,16 @@ class ZMRequest
         return Saber::session($option);
     }
 
+    /**
+     * @param $url
+     * @param array $attribute
+     * @param bool $return_body
+     * @return bool|string|Client
+     */
     public static function request($url, $attribute = [], $return_body = true) {
-        $parse = parse_url($url);
-        if (!isset($parse["host"])) {
-            Console::warning("ZMRequest: url must contains scheme such as \"http(s)://\"");
-            return false;
-        }
-        if(!isset($parse["path"])) $parse["path"] = "/";
-        $port = $parse["port"] ?? (($parse["scheme"] ?? "http") == "https" ? 443 : 80);
-        $cli = new Client($parse["host"], $port, (($parse["scheme"] ?? "http") == "https" ? true : false));
+        /** @var Client $cli */
+        list($cli, $parse) = self::getNewClient($url);
+        if($cli === null) return false;
         $cli->set($attribute["set"] ?? ["timeout" => 15.0]);
         $cli->setMethod($attribute["method"] ?? "GET");
         $cli->setHeaders($attribute["headers"] ?? []);
@@ -125,5 +116,38 @@ class ZMRequest
             $cli->close();
             return $cli;
         }
+    }
+
+    /**
+     * @param $url
+     * @param null|bool $dst
+     * @return bool
+     */
+    public static function downloadFile($url, $dst = null) {
+        /** @var Client $cli */
+        list($cli, $parse) = self::getNewClient($url);
+        if($cli === null) return false;
+        $cli->set(["timeout" => 60.0]);
+        $save_path = $dst === null ? "/tmp/_zm_".mt_rand(1000000, 9999999) : $dst;
+        $result = $cli->download($parse["path"] . (isset($parse["query"]) ? "?" . $parse["query"] : ""), $save_path);
+        if($result === false) return false;
+        elseif ($dst === null) return $save_path;
+        else return true;
+    }
+
+    /**
+     * @param $url
+     * @return bool|array
+     */
+    private static function getNewClient($url) {
+        $parse = parse_url($url);
+        if (!isset($parse["host"])) {
+            Console::warning("ZMRequest: url must contains scheme such as \"http(s)://\"");
+            return false;
+        }
+        if(!isset($parse["path"])) $parse["path"] = "/";
+        $port = $parse["port"] ?? (($parse["scheme"] ?? "http") == "https" ? 443 : 80);
+        $cli = new Client($parse["host"], $port, ($parse["scheme"] ?? "http") == "https");
+        return [$cli, $parse];
     }
 }
