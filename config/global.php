@@ -8,23 +8,23 @@ $config['host'] = '0.0.0.0';
 $config['port'] = 20001;
 
 /** 框架开到公网或外部的HTTP访问链接，通过 DataProvider::getFrameworkLink() 获取 */
-$config['http_reverse_link'] = "http://127.0.0.1:".$config['port'];
+$config['http_reverse_link'] = "http://127.0.0.1:" . $config['port'];
 
 /** 框架是否启动debug模式 */
 $config['debug_mode'] = false;
 
 /** 存放框架内文件数据的目录 */
-$config['zm_data'] = realpath(__DIR__ . "/../").'/zm_data/';
+$config['zm_data'] = realpath(__DIR__ . "/../") . '/zm_data/';
 
 /** 存放各个模块配置文件的目录 */
-$config['config_dir'] = $config['zm_data'].'config/';
+$config['config_dir'] = $config['zm_data'] . 'config/';
 
 /** 存放崩溃和运行日志的目录 */
-$config['crash_dir'] = $config['zm_data'].'crash/';
+$config['crash_dir'] = $config['zm_data'] . 'crash/';
 
 /** 对应swoole的server->set参数 */
 $config['swoole'] = [
-    'log_file' => $config['crash_dir'].'swoole_error.log',
+    'log_file' => $config['crash_dir'] . 'swoole_error.log',
     'worker_num' => 1,
     'dispatch_mode' => 2,
     //'task_worker_num' => 1,
@@ -88,7 +88,7 @@ $config['static_file_server'] = [
 
 /** 注册 Swoole Server 事件注解的类列表 */
 $config['server_event_handler_class'] = [
-    \Framework\ServerEventHandler::class, //默认不可删除，否则会不能使用框架
+    \Framework\ServerEventHandler::class,
 ];
 
 return $config;

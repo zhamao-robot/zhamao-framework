@@ -76,7 +76,10 @@ class FrameworkLoader
                 self::$argv[] = "--disable-console-input";
             }
             $this->server->set($settings);
-            $all_event_class = self::$settings->get("server_event_handler_class");
+            $all_event_class = self::$settings->get("server_event_handler_class") ?? [];
+            if (!in_array(ServerEventHandler::class, $all_event_class)) {
+                $all_event_class[] = ServerEventHandler::class;
+            }
             $event_list = [];
             foreach ($all_event_class as $v) {
                 $reader = new AnnotationReader();
@@ -125,15 +128,6 @@ class FrameworkLoader
             }
             if (in_array("--debug-mode", self::$argv))
                 Console::warning("You are in debug mode, do not use in production!");
-            register_shutdown_function(function() {
-                $error = error_get_last();
-                if(isset($error["type"]) && $error["type"] == 1) {
-                    if(mb_strpos($error["message"], "require") !== false && mb_strpos($error["message"], "callback") !== false) {
-                        echo "\e[38;5;203mYou may need to update your \"global.php\" config!\n";
-                        echo "Please see: https://github.com/zhamao-robot/zhamao-framework/issues/15\e[m\n";
-                    }
-                }
-            });
             $this->server->start();
         } catch (Exception $e) {
             Console::error("Framework初始化出现错误，请检查！");
@@ -177,7 +171,6 @@ class FrameworkLoader
         //if (!file_exists(CRASH_DIR . "last_error.log")) die("Can not find log file.\n");
         return true;
     }
-
 }
 
 global $motd;
