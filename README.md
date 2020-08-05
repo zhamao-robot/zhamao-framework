@@ -10,16 +10,16 @@
 协程高性能的 **微信公众号机器人 + Web 服务器** 开发框架（炸毛框架）。
 
 ## 开发者注意
-**由于 CQHTTP 不再提供维护，本框架也将在未来不会继续维护和更新 QQ 机器人部分，并将在下一个大版本（2.0）将 QQ 机器人部分独立，届时需要手动安装才能正常使用。**
+**由于 CQHTTP 不再提供维护，本框架也将在未来不会继续维护和更新 QQ 部分，并将在下一个大版本（2.0）将 QQ 机器人部分独立，届时需要手动安装才能正常使用。**
 
 **同时，炸毛框架的微信公众号兼容模块将会整合到框架内，不再需要额外安装，且对于一些基础的定义层会发生变更。**
+
+**此框架暂时不会停止开发，欢迎持续关注。**
 
 <img src="https://avatars0.githubusercontent.com/u/48620312" height = "200" alt="炸毛框架" align=center/>
 
 ## 简介
-zhamao-framework 是一个基于 酷Q 的 PHP Swoole 的机器人框架，它会对 QQ 机器人收到的消息进行解析处理，并以模块化的形式进行开发，来完成机器人的自然语言对话等功能。
-
-框架对接 酷Q 的桥梁是 **CQHTTP** 插件，这里是它的[项目地址](https://github.com/richardchien/coolq-http-api/)。
+zhamao-framework 是一个 PHP Swoole 的聊天机器人框架，它会对微信公众号等终端收到的消息进行解析处理，并以模块化的形式进行开发，来完成机器人的自然语言对话等功能。
 
 除了起到解析消息的作用，炸毛框架 还提供了完整的 WebSocket + HTTP 服务器，你还能用此框架构建出高性能的 API 接口服务器。
 
@@ -50,7 +50,6 @@ Pages托管：[https://framework.zhamao.xin/](https://framework.zhamao.xin/)
 
 | 模块名称           | 说明                             | 模块地址                                                     |
 | ------------------ | -------------------------------- | ------------------------------------------------------------ |
-| 微信公众号兼容模块 | 为框架提供微信公众号订阅号兼容层 | [zhamao-wechat-patch](https://github.com/zhamao-robot/zhamao-wechat-patch) |
 | 通用模块 | 图片上传和下载模块 | [zhamao-general-tools](https://github.com/zhamao-robot/zhamao-general-tools) |
 
 ## 计划开发内容
@@ -85,7 +84,7 @@ Pages托管：[https://framework.zhamao.xin/](https://framework.zhamao.xin/)
 ![支付宝二维码](/resources/images/alipay_img.jpg)
 
 ## 关于
-框架和 SDK 是 炸毛机器人 项目的核心框架开源部分。炸毛机器人（3276124472）是作者写的一个高性能机器人，曾获全国计算机设计大赛一等奖。
+框架和 SDK 是 炸毛机器人 项目的核心框架开源部分。炸毛机器人是作者写的一个高性能机器人，曾获全国计算机设计大赛一等奖。
 
 欢迎随时在 HTTP-API 插件群里提问，当然更好的话可以加作者 QQ（627577391）或提交 Issue 进行疑难解答。
 
