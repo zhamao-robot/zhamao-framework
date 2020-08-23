@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://avatars0.githubusercontent.com/u/48620312" height = "200" alt="炸毛框架"><br>
+  <img src="https://avatars0.githubusercontent.com/u/48620312" height = "150" alt="炸毛框架"><br>
   <h2>炸毛框架</h2>
   炸毛框架 (zhamao-frameowork) 是一个协程高性能的聊天机器人 + Web 服务器开发框架<br><br>
 
