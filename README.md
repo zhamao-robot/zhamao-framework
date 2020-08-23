@@ -1,6 +1,8 @@
 <div align="center">
   <img src="https://avatars0.githubusercontent.com/u/48620312" height = "200" alt="炸毛框架"><br>
- </div>
+  <h2>炸毛框架</h2>
+
+----
 
 [![作者QQ](https://img.shields.io/badge/作者QQ-627577391-orange.svg)]()
 [![zhamao License](https://img.shields.io/hexpm/l/plug.svg?maxAge=2592000)](https://github.com/zhamao-robot/zhamao-framework/blob/master/LICENSE)
@@ -10,6 +12,8 @@
 
 [![stupid counter](https://img.shields.io/github/search/zhamao-robot/zhamao-framework/stupid.svg)](https://github.com/zhamao-robot/zhamao-framework/search?q=stupid)
 [![TODO counter](https://img.shields.io/github/search/zhamao-robot/zhamao-framework/TODO.svg)](https://github.com/zhamao-robot/zhamao-framework/search?q=TODO)
+
+ </div>
 
 协程高性能的 **微信公众号机器人 + Web 服务器** 开发框架（炸毛框架）。
 
