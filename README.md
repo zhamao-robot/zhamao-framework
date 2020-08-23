@@ -1,9 +1,12 @@
-# zhamao-framework
+<div align="center">
+  <img src="https://avatars0.githubusercontent.com/u/48620312" height = "200" alt="炸毛框架"><br>
+ </div>
 
 [![作者QQ](https://img.shields.io/badge/作者QQ-627577391-orange.svg)]()
 [![zhamao License](https://img.shields.io/hexpm/l/plug.svg?maxAge=2592000)](https://github.com/zhamao-robot/zhamao-framework/blob/master/LICENSE)
 [![Latest Stable Version](http://img.shields.io/packagist/v/zhamao/framework.svg)](https://packagist.org/packages/zhamao/framework)
-[![Banner](https://img.shields.io/badge/CQHTTP-v11-black)](https://img.shields.io/badge/CQHTTP-v11-black)
+[![Banner](https://img.shields.io/badge/CQHTTP-v11-black)]()
+[![dev-version](https://img.shields.io/badge/dev--version-v2.0.0--a1-green)]()
 
 [![stupid counter](https://img.shields.io/github/search/zhamao-robot/zhamao-framework/stupid.svg)](https://github.com/zhamao-robot/zhamao-framework/search?q=stupid)
 [![TODO counter](https://img.shields.io/github/search/zhamao-robot/zhamao-framework/TODO.svg)](https://github.com/zhamao-robot/zhamao-framework/search?q=TODO)
@@ -15,11 +18,11 @@
 
 **同时将标准实现层独立出来，但默认依赖，对于一些基础的定义层会发生变更。**
 
-**此框架暂时不会停止开发，欢迎持续关注。**
+**以上涉及的变更将在下一个大版本 (v2.0.0) 更新，请关注 commit 和 project！**
 
 
 
-<img src="https://avatars0.githubusercontent.com/u/48620312" height = "200" alt="炸毛框架" align=center/>
+
 
 ## 简介
 zhamao-framework 是一个 PHP Swoole 的聊天机器人框架，兼容 OneBot 标准，它会对微信公众号等终端收到的消息进行解析处理，并以模块化的形式进行开发，来完成机器人的自然语言对话等功能。
