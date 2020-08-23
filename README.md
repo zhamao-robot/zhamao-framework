@@ -1,8 +1,7 @@
 <div align="center">
   <img src="https://avatars0.githubusercontent.com/u/48620312" height = "200" alt="炸毛框架"><br>
   <h2>炸毛框架</h2>
-
-----
+  炸毛框架 (zhamao-frameowork) 是一个协程高性能的聊天机器人 + Web 服务器开发框架
 
 [![作者QQ](https://img.shields.io/badge/作者QQ-627577391-orange.svg)]()
 [![zhamao License](https://img.shields.io/hexpm/l/plug.svg?maxAge=2592000)](https://github.com/zhamao-robot/zhamao-framework/blob/master/LICENSE)
@@ -14,8 +13,6 @@
 [![TODO counter](https://img.shields.io/github/search/zhamao-robot/zhamao-framework/TODO.svg)](https://github.com/zhamao-robot/zhamao-framework/search?q=TODO)
 
  </div>
-
-协程高性能的 **微信公众号机器人 + Web 服务器** 开发框架（炸毛框架）。
 
 ## 开发者注意
 **由于 CQHTTP 不再提供维护，转为 [OneBot 标准](https://github.com/howmanybots/onebot)（原 CQHTTP 插件衍生而来的机器人 HTTP 接口标准），本框架也将在未来改为兼容此标准。**
