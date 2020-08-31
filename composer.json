@@ -3,7 +3,7 @@
     "description": "High performance QQ robot and web server development framework",
     "minimum-stability": "stable",
     "license": "Apache-2.0",
-    "version": "1.6.2",
+    "version": "2.0.0-a1",
     "authors": [
         {
             "name": "whale",
@@ -28,14 +28,24 @@
         "ext-posix": "*",
         "ext-ctype": "*",
         "ext-pdo": "*",
-        "psy/psysh": "@stable"
+        "psy/psysh": "@stable",
+        "symfony/console": "^5.1",
+        "symfony/polyfill-ctype": "^1.18",
+        "zhamao/connection-manager": "^1.0",
+        "zhamao/console": "^1.0",
+        "zhamao/config": "^1.0"
     },
     "autoload": {
         "psr-4": {
             "Custom\\": "src/Custom",
-            "Framework\\": "src/Framework",
             "ZM\\": "src/ZM",
             "Module\\": "src/Module"
-        }
+        },
+        "files": [
+            "src/ZM/global_functions.php"
+        ]
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.3"
     }
 }

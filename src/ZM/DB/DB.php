@@ -5,8 +5,9 @@ namespace ZM\DB;
 
 
 use Exception;
-use framework\Console;
-use framework\ZMBuf;
+use ZM\Config\ZMConfig;
+use ZM\Console\Console;
+use ZM\Store\ZMBuf;
 use PDOException;
 use PDOStatement;
 use Swoole\Coroutine;
@@ -23,7 +24,7 @@ class DB
      */
     public static function initTableList() {
         if (!extension_loaded("mysqlnd")) throw new Exception("Can not find mysqlnd PHP extension.");
-        $result = self::rawQuery("select TABLE_NAME from INFORMATION_SCHEMA.TABLES where TABLE_SCHEMA='" . ZMBuf::globals("sql_config")["sql_database"] . "';", []);
+        $result = self::rawQuery("select TABLE_NAME from INFORMATION_SCHEMA.TABLES where TABLE_SCHEMA='" . ZMConfig::get("global", "sql_config")["sql_database"] . "';", []);
         foreach ($result as $v) {
             self::$table_list[] = $v['TABLE_NAME'];
         }
@@ -38,7 +39,7 @@ class DB
     public static function table($table_name, $enable_cache = null) {
         if (Table::getTableInstance($table_name) === null) {
             if (in_array($table_name, self::$table_list))
-                return new Table($table_name, $enable_cache ?? ZMBuf::globals("sql_config")["sql_enable_cache"]);
+                return new Table($table_name, $enable_cache ?? ZMConfig::get("global", "sql_config")["sql_enable_cache"]);
             elseif(ZMBuf::$sql_pool !== null){
                 throw new DbException("Table " . $table_name . " not exist in database.");
             } else {
@@ -98,7 +99,7 @@ class DB
         if (ZMBuf::get("sql_log") === true) {
             $starttime = microtime(true);
         }
-        Console::debug("MySQL: ".$line);
+        Console::debug("MySQL: ".$line." | ". implode(", ", $params));
         try {
             $conn = ZMBuf::$sql_pool->get();
             if ($conn === false) {

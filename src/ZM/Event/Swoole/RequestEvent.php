@@ -6,14 +6,14 @@ namespace ZM\Event\Swoole;
 
 use Closure;
 use Exception;
-use Framework\Console;
+use ZM\Console\Console;
 use Framework\ZMBuf;
 use Swoole\Http\Request;
 use ZM\Annotation\Swoole\SwooleEventAfter;
 use ZM\Annotation\Swoole\SwooleEventAt;
 use ZM\Event\EventHandler;
 use ZM\Http\Response;
-use Framework\DataProvider;
+use ZM\Utils\DataProvider;
 use ZM\Utils\ZMUtil;
 
 class RequestEvent implements SwooleEvent
@@ -38,7 +38,7 @@ class RequestEvent implements SwooleEvent
      */
     public function onActivate() {
         ZMUtil::checkWait();
-        foreach (ZMBuf::globals("http_header") as $k => $v) {
+        foreach (\ZM\Config\ZMConfig::get("global", "http_header") as $k => $v) {
             $this->response->setHeader($k, $v);
         }
         $uri = $this->request->server["request_uri"];
@@ -81,9 +81,9 @@ class RequestEvent implements SwooleEvent
                 }
             }
 
-            if (ZMBuf::globals("static_file_server")["status"]) {
-                $base_dir = ZMBuf::globals("static_file_server")["document_root"];
-                $base_index = ZMBuf::globals("static_file_server")["document_index"];
+            if (\ZM\Config\ZMConfig::get("global", "static_file_server")["status"]) {
+                $base_dir = \ZM\Config\ZMConfig::get("global", "static_file_server")["document_root"];
+                $base_index = \ZM\Config\ZMConfig::get("global", "static_file_server")["document_index"];
                 $uri = $this->request->server["request_uri"];
                 $path = realpath($base_dir . urldecode($uri));
                 if ($path !== false) {
@@ -116,7 +116,6 @@ class RequestEvent implements SwooleEvent
             $this->response->end(ZMUtil::getHttpCodePage(404));
             return $this;
         }
-
         context()->setCache("params", $params);
 
         if (in_array(strtoupper($this->request->server["request_method"]), $node["request_method"] ?? [])) { //判断目标方法在不在里面

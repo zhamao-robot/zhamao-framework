@@ -6,12 +6,13 @@ namespace ZM\Event\Swoole;
 
 use Closure;
 use Doctrine\Common\Annotations\AnnotationException;
-use Framework\ZMBuf;
+use ZM\ConnectionManager\ManagerGM;
+use ZM\Console\Console;
 use Swoole\Server;
 use ZM\Annotation\Swoole\SwooleEventAfter;
 use ZM\Annotation\Swoole\SwooleEventAt;
-use ZM\Connection\ConnectionManager;
 use ZM\Event\EventHandler;
+use ZM\Store\ZMBuf;
 use ZM\Utils\ZMUtil;
 
 class WSCloseEvent implements SwooleEvent
@@ -30,8 +31,9 @@ class WSCloseEvent implements SwooleEvent
      * @throws AnnotationException
      */
     public function onActivate() {
+        Console::info("Closed #{$this->fd}");
         ZMUtil::checkWait();
-        set_coroutine_params(["server" => $this->server, "fd" => $this->fd, "connection" => ConnectionManager::get($this->fd)]);
+        set_coroutine_params(["server" => $this->server, "fd" => $this->fd, "connection" => ManagerGM::get($this->fd)]);
         foreach(ZMBuf::$events[SwooleEventAt::class] ?? [] as $v) {
             if(strtolower($v->type) == "close" && $this->parseSwooleRule($v)) {
                 $c = $v->class;
@@ -39,7 +41,7 @@ class WSCloseEvent implements SwooleEvent
                 if(context()->getCache("block_continue") === true) break;
             }
         }
-        ConnectionManager::close($this->fd);
+        ManagerGM::popConnect($this->fd);
         return $this;
     }
 
@@ -61,7 +63,7 @@ class WSCloseEvent implements SwooleEvent
     private function parseSwooleRule($v) {
         switch (explode(":", $v->rule)[0]) {
             case "connectType": //websocket连接类型
-                if ($v->callback instanceof Closure) return call_user_func($v->callback, ConnectionManager::get($this->fd));
+                if ($v->callback instanceof Closure) return call_user_func($v->callback, ManagerGM::get($this->fd));
                 break;
         }
         return true;

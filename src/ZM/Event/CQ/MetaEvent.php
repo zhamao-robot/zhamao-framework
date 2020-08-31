@@ -5,19 +5,15 @@ namespace ZM\Event\CQ;
 
 
 use Doctrine\Common\Annotations\AnnotationException;
-use Framework\ZMBuf;
 use ZM\Annotation\CQ\CQBefore;
 use ZM\Annotation\CQ\CQMetaEvent;
-use ZM\Connection\CQConnection;
 use ZM\Event\EventHandler;
 use ZM\Exception\WaitTimeoutException;
-use ZM\ModBase;
-use ZM\ModHandleType;
+use ZM\Store\ZMBuf;
 
 class MetaEvent
 {
     private $data;
-    /** @var CQConnection */
     private $connection;
     private $circle;
 
@@ -53,7 +49,6 @@ class MetaEvent
      */
     public function onActivate() {
         try {
-            /** @var ModBase[] $obj */
             $obj = [];
             foreach (ZMBuf::$events[CQMetaEvent::class] ?? [] as $v) {
                 /** @var CQMetaEvent $v */
@@ -62,10 +57,7 @@ class MetaEvent
                     ($v->sub_type == 0 || ($v->sub_type != 0 && $v->sub_type == $this->data["sub_type"]))) {
                     $c = $v->class;
                     if (!isset($obj[$c]))
-                        $obj[$c] = new $c([
-                            "data" => $this->data,
-                            "connection" => $this->connection
-                        ], ModHandleType::CQ_META_EVENT);
+                        $obj[$c] = new $c();
                     EventHandler::callWithMiddleware($obj[$c],$v->method, [], [], function($r) {
                         if (is_string($r)) context()->reply($r);
                     });

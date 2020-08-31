@@ -5,20 +5,16 @@ namespace ZM\Event\CQ;
 
 
 use Doctrine\Common\Annotations\AnnotationException;
-use Framework\ZMBuf;
 use ZM\Annotation\CQ\CQAfter;
 use ZM\Annotation\CQ\CQBefore;
 use ZM\Annotation\CQ\CQRequest;
-use ZM\Connection\CQConnection;
 use ZM\Event\EventHandler;
 use ZM\Exception\WaitTimeoutException;
-use ZM\ModBase;
-use ZM\ModHandleType;
+use ZM\Store\ZMBuf;
 
 class RequestEvent
 {
     private $data;
-    /** @var CQConnection */
     private $connection;
     private $circle;
 
@@ -51,10 +47,10 @@ class RequestEvent
 
     /**
      * @throws AnnotationException
+     * @noinspection PhpRedundantCatchClauseInspection
      */
     public function onActivate() {
         try {
-            /** @var ModBase[] $obj */
             $obj = [];
             foreach (ZMBuf::$events[CQRequest::class] ?? [] as $v) {
                 /** @var CQRequest $v */
@@ -65,10 +61,7 @@ class RequestEvent
                     ($v->comment == 0 || ($v->comment != 0 && $v->comment == ($this->data["comment"] ?? 0)))) {
                     $c = $v->class;
                     if (!isset($obj[$c]))
-                        $obj[$c] = new $c([
-                            "data" => $this->data,
-                            "connection" => $this->connection
-                        ], ModHandleType::CQ_REQUEST);
+                        $obj[$c] = new $c();
                     EventHandler::callWithMiddleware($obj[$c],$v->method, [], [], function($r) {
                         if (is_string($r)) context()->reply($r);
                     });

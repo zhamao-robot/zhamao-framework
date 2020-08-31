@@ -5,17 +5,15 @@ namespace ZM\Event\Swoole;
 
 
 use Closure;
-use Framework\Console;
-use Framework\ZMBuf;
+use ZM\ConnectionManager\ManagerGM;
+use ZM\Console\Console;
 use Swoole\WebSocket\Frame;
 use Swoole\WebSocket\Server;
 use ZM\Annotation\Swoole\SwooleEventAfter;
 use ZM\Annotation\Swoole\SwooleEventAt;
-use ZM\Connection\ConnectionManager;
 use Exception;
 use ZM\Event\EventHandler;
-use ZM\ModBase;
-use ZM\ModHandleType;
+use ZM\Store\ZMBuf;
 use ZM\Utils\ZMUtil;
 
 class MessageEvent implements SwooleEvent
@@ -39,15 +37,15 @@ class MessageEvent implements SwooleEvent
      */
     public function onActivate() {
         ZMUtil::checkWait();
-        $conn = ConnectionManager::get(context()->getFrame()->fd);
+        $conn = ManagerGM::get(context()->getFrame()->fd);
         try {
-            if ($conn->getType() == "qq") {
+            if ($conn->getName() == "qq") {
                 $data = json_decode(context()->getFrame()->data, true);
                 if (isset($data["post_type"])) {
                     set_coroutine_params(["data" => $data, "connection" => $conn]);
                     ctx()->setCache("level", 0);
-                    Console::debug("Calling CQ Event from fd=" . $conn->fd);
-                    EventHandler::callCQEvent($data, ConnectionManager::get(context()->getFrame()->fd), 0);
+                    Console::debug("Calling CQ Event from fd=" . $conn->getFd());
+                    EventHandler::callCQEvent($data, ManagerGM::get(context()->getFrame()->fd), 0);
                 } else{
                     set_coroutine_params(["connection" => $conn]);
                     EventHandler::callCQResponse($data);
@@ -78,10 +76,8 @@ class MessageEvent implements SwooleEvent
     public function onAfter() {
         foreach (ZMBuf::$events[SwooleEventAfter::class] ?? [] as $v) {
             if (strtolower($v->type) == "message" && $this->parseSwooleRule($v) === true) {
-                $conn = ConnectionManager::get($this->frame->fd);
                 $c = $v->class;
-                /** @var ModBase $class */
-                $class = new $c(["server" => $this->server, "frame" => $this->frame, "connection" => $conn], ModHandleType::SWOOLE_MESSAGE);
+                $class = new $c();
                 call_user_func_array([$class, $v->method], []);
                 if (context()->getCache("block_continue") === true) break;
             }
@@ -92,7 +88,7 @@ class MessageEvent implements SwooleEvent
     private function parseSwooleRule($v) {
         switch (explode(":", $v->rule)[0]) {
             case "connectType": //websocket连接类型
-                if ($v->callback instanceof Closure) return call_user_func($v->callback, ConnectionManager::get($this->frame->fd));
+                if ($v->callback instanceof Closure) return call_user_func($v->callback, ManagerGM::get($this->frame->fd));
                 break;
             case "dataEqual": //handle websocket message事件时才能用
                 if ($v->callback instanceof Closure) return call_user_func($v->callback, $this->frame->data);

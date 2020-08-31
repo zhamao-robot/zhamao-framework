@@ -5,18 +5,16 @@ namespace ZM\Context;
 
 
 use Co;
-use Framework\ZMBuf;
 use Swoole\Http\Request;
 use Swoole\WebSocket\Frame;
 use swoole_server;
-use ZM\API\CQAPI;
-use ZM\Connection\ConnectionManager;
-use ZM\Connection\CQConnection;
-use ZM\Connection\WSConnection;
+use ZM\ConnectionManager\ConnectionObject;
+use ZM\ConnectionManager\ManagerGM;
 use ZM\Exception\InvalidArgumentException;
 use ZM\Exception\WaitTimeoutException;
 use ZM\Http\Response;
-use ZM\Utils\ZMRobot;
+use ZM\API\ZMRobot;
+use ZM\Store\ZMBuf;
 
 class Context implements ContextInterface
 {
@@ -53,8 +51,8 @@ class Context implements ContextInterface
      */
     public function getResponse() { return ZMBuf::$context[$this->cid]["response"] ?? null; }
 
-    /** @return WSConnection */
-    public function getConnection() { return ConnectionManager::get($this->getFd()); }
+    /** @return ConnectionObject|null */
+    public function getConnection() { return ManagerGM::get($this->getFd()); }
 
     /**
      * @return int|null
@@ -65,8 +63,8 @@ class Context implements ContextInterface
      * @return ZMRobot|null
      */
     public function getRobot() {
-        $conn = ConnectionManager::get($this->getFrame()->fd);
-        return $conn instanceof CQConnection ? new ZMRobot($conn) : null;
+        $conn = ManagerGM::get($this->getFrame()->fd);
+        return $conn instanceof ConnectionObject ? new ZMRobot($conn) : null;
     }
 
     public function getMessage() { return ZMBuf::$context[$this->cid]["data"]["message"] ?? null; }
@@ -109,7 +107,17 @@ class Context implements ContextInterface
             case "private":
             case "discuss":
                 $this->setCache("has_reply", true);
-                return CQAPI::quick_reply(ConnectionManager::get($this->getFrame()->fd), $this->getData(), $msg, $yield);
+                $data = $this->getData();
+                $conn = $this->getConnection();
+                switch ($data["message_type"]) {
+                    case "group":
+                        return (new ZMRobot($conn))->setCallback($yield)->sendGroupMsg($data["group_id"], $msg);
+                    case "private":
+                        return (new ZMRobot($conn))->setCallback($yield)->sendPrivateMsg($data["user_id"], $msg);
+                    case "discuss":
+                        return (new ZMRobot($conn))->setCallback($yield)->sendDiscussMsg($data["discuss_id"], $msg);
+                }
+                return null;
         }
         return false;
     }

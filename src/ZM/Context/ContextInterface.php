@@ -7,9 +7,9 @@ namespace ZM\Context;
 use Swoole\Http\Request;
 use Swoole\WebSocket\Frame;
 use Swoole\WebSocket\Server;
-use ZM\Connection\WSConnection;
+use ZM\ConnectionManager\ConnectionObject;
 use ZM\Http\Response;
-use ZM\Utils\ZMRobot;
+use ZM\API\ZMRobot;
 
 interface ContextInterface
 {
@@ -26,7 +26,7 @@ interface ContextInterface
 
     public function setData($data);
 
-    /** @return WSConnection */
+    /** @return ConnectionObject */
     public function getConnection();
 
     /** @return int|null */

@@ -6,19 +6,16 @@ namespace ZM\Event\Swoole;
 
 use Closure;
 use Doctrine\Common\Annotations\AnnotationException;
-use Framework\Console;
-use Framework\ZMBuf;
+use ZM\Config\ZMConfig;
+use ZM\ConnectionManager\ConnectionObject;
+use ZM\ConnectionManager\ManagerGM;
+use ZM\Console\Console;
 use Swoole\Http\Request;
 use Swoole\WebSocket\Server;
 use ZM\Annotation\Swoole\SwooleEventAfter;
 use ZM\Annotation\Swoole\SwooleEventAt;
-use ZM\Connection\ConnectionManager;
-use ZM\Connection\CQConnection;
-use ZM\Connection\UnknownConnection;
-use ZM\Connection\WSConnection;
 use ZM\Event\EventHandler;
-use ZM\ModBase;
-use ZM\ModHandleType;
+use ZM\Store\ZMBuf;
 use ZM\Utils\ZMUtil;
 
 class WSOpenEvent implements SwooleEvent
@@ -31,9 +28,7 @@ class WSOpenEvent implements SwooleEvent
      * @var Request
      */
     private $request;
-    /**
-     * @var WSConnection
-     */
+    /** @var ConnectionObject */
     private $conn;
 
     public function __construct(Server $server, Request $request) {
@@ -47,25 +42,28 @@ class WSOpenEvent implements SwooleEvent
      */
     public function onActivate() {
         ZMUtil::checkWait();
+        ManagerGM::pushConnect($this->request->fd);
         $type = strtolower($this->request->get["type"] ?? $this->request->header["x-client-role"] ?? "");
-        $type_conn = ConnectionManager::getTypeClassName($type);
-        if ($type_conn == CQConnection::class) {
+        $type_conn = $this->getTypeClassName($type);
+        if ($type_conn == "qq") {
+            ManagerGM::setName($this->request->fd, "qq");
             $qq = $this->request->get["qq"] ?? $this->request->header["x-self-id"] ?? "";
-            $self_token = ZMBuf::globals("access_token") ?? "";
-            if(isset($this->request->header["authorization"])) {
+            $self_token = ZMConfig::get("global", "access_token") ?? "";
+            if (isset($this->request->header["authorization"])) {
                 Console::debug($this->request->header["authorization"]);
             }
             $remote_token = $this->request->get["token"] ?? (isset($this->request->header["authorization"]) ? explode(" ", $this->request->header["authorization"])[1] : "");
-            if ($qq != "" && ($self_token == $remote_token)) $this->conn = new CQConnection($this->server, $this->request->fd, $qq);
-            else {
-                $this->conn = new UnknownConnection($this->server, $this->request->fd);
+            if ($qq != "" && ($self_token == $remote_token)) {
+                ManagerGM::setOption($this->request->fd, "connect_id", $qq);
+                $this->conn = ManagerGM::get($this->request->fd);
+            } else {
+                $this->conn = ManagerGM::get($this->request->fd);
                 Console::warning("connection of CQ has invalid QQ or token!");
-                Console::debug("Remote token: ".$remote_token);
+                Console::debug("Remote token: " . $remote_token);
             }
         } else {
-            $this->conn = new $type_conn($this->server, $this->request->fd);
+            $this->conn = ManagerGM::get($this->request->fd);
         }
-        ZMBuf::$connect[$this->request->fd] = $this->conn;
         set_coroutine_params(["server" => $this->server, "request" => $this->request, "connection" => $this->conn]);
         foreach (ZMBuf::$events[SwooleEventAt::class] ?? [] as $v) {
             if (strtolower($v->type) == "open" && $this->parseSwooleRule($v) === true) {
@@ -86,11 +84,10 @@ class WSOpenEvent implements SwooleEvent
      * @inheritDoc
      */
     public function onAfter() {
-        if (!$this->conn->exists()) return $this;
+        if (!$this->server->exists($this->conn->getFd())) return $this;
         foreach (ZMBuf::$events[SwooleEventAfter::class] ?? [] as $v) {
             if (strtolower($v->type) == "open" && $this->parseSwooleRule($v) === true) {
-                /** @var ModBase $class */
-                $class = new $v["class"](["server" => $this->server, "request" => $this->request, "connection" => $this->conn], ModHandleType::SWOOLE_OPEN);
+                $class = new $v["class"]();
                 call_user_func_array([$class, $v["method"]], [$this->conn]);
                 if (context()->getCache("block_continue") === true) break;
             }
@@ -105,5 +102,16 @@ class WSOpenEvent implements SwooleEvent
                 break;
         }
         return true;
+    }
+
+    private function getTypeClassName(string $type) {
+        $map = [
+            "qq" => "qq",
+            "universal" => "qq",
+            "webconsole" => "webconsole",
+            "proxy" => "proxy",
+            "terminal" => "terminal"
+        ];
+        return $map[$type] ?? "default";
     }
 }

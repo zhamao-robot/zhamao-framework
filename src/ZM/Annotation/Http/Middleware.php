@@ -7,6 +7,7 @@ namespace ZM\Annotation\Http;
 use Doctrine\Common\Annotations\Annotation\Required;
 use Doctrine\Common\Annotations\Annotation\Target;
 use ZM\Annotation\AnnotationBase;
+use ZM\Annotation\Interfaces\ErgodicAnnotation;
 
 /**
  * Class Middleware
@@ -14,7 +15,7 @@ use ZM\Annotation\AnnotationBase;
  * @Annotation
  * @Target("ALL")
  */
-class Middleware extends AnnotationBase
+class Middleware extends AnnotationBase implements ErgodicAnnotation
 {
     /**
      * @var string

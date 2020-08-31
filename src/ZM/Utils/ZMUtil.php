@@ -5,10 +5,10 @@ namespace ZM\Utils;
 
 
 use Co;
-use framework\Console;
-use Framework\DataProvider;
-use Framework\ZMBuf;
+use ZM\Config\ZMConfig;
+use ZM\Console\Console;
 use ZM\API\CQ;
+use ZM\Store\ZMBuf;
 
 class ZMUtil
 {
@@ -34,8 +34,8 @@ class ZMUtil
     }
 
     public static function getHttpCodePage(int $http_code) {
-        if (isset(ZMBuf::globals("http_default_code_page")[$http_code])) {
-            return Co::readFile(DataProvider::getResourceFolder() . "html/" . ZMBuf::globals("http_default_code_page")[$http_code]);
+        if (isset(ZMConfig::get("global", "http_default_code_page")[$http_code])) {
+            return Co::readFile(DataProvider::getResourceFolder() . "html/" . ZMConfig::get("global", "http_default_code_page")[$http_code]);
         } else return null;
     }
 
@@ -51,20 +51,10 @@ class ZMUtil
         ZMBuf::$server->reload();
     }
 
-    /**
-     * 解析CQ码
-     * @param $msg
-     * @return array|null
-     */
-    static function getCQ($msg) {
-        return CQ::getCQ($msg);
-    }
-
     public static function getModInstance($class) {
         if (!isset(ZMBuf::$instance[$class])) {
             Console::debug("Class instance $class not exist, so I created it.");
-            ZMBuf::$instance[$class] = new $class();
-            return ZMBuf::$instance[$class];
+            return ZMBuf::$instance[$class] = new $class();
         } else {
             return ZMBuf::$instance[$class];
         }

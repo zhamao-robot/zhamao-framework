@@ -9,7 +9,6 @@ use ZM\Annotation\AnnotationBase;
 /**
  * Class RequestMethod
  * @Annotation
- *
  * @package ZM\Annotation\Http
  */
 class RequestMethod extends AnnotationBase

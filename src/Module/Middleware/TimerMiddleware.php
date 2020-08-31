@@ -2,10 +2,10 @@
 
 namespace Module\Middleware;
 
-use Framework\Console;
 use ZM\Annotation\Http\After;
 use ZM\Annotation\Http\Before;
 use ZM\Annotation\Http\MiddlewareClass;
+use ZM\Console\Console;
 use ZM\Http\MiddlewareInterface;
 
 /**

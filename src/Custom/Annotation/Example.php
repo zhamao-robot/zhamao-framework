@@ -4,6 +4,7 @@
 namespace Custom\Annotation;
 
 use Doctrine\Common\Annotations\Annotation\Target;
+use ZM\Annotation\AnnotationBase;
 use ZM\Annotation\Interfaces\CustomAnnotation;
 
 /**
@@ -12,7 +13,7 @@ use ZM\Annotation\Interfaces\CustomAnnotation;
  * @Target("ALL")
  * @package Custom\Annotation
  */
-class Example implements CustomAnnotation
+class Example extends AnnotationBase implements CustomAnnotation
 {
     /** @var string */
     public $str;

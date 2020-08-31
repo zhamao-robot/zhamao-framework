@@ -1,11 +1,10 @@
-<?php
+<?php /** @noinspection PhpUnused */
 
 
-namespace ZM\Utils;
+namespace ZM\API;
 
-use ZM\API\CQAPI;
-use ZM\Connection\ConnectionManager;
-use ZM\Connection\CQConnection;
+use ZM\ConnectionManager\ConnectionObject;
+use ZM\ConnectionManager\ManagerGM;
 use ZM\Exception\RobotNotFoundException;
 
 /**
@@ -15,10 +14,12 @@ use ZM\Exception\RobotNotFoundException;
  */
 class ZMRobot
 {
+    use CQAPI;
     const API_ASYNC = 1;
     const API_NORMAL = 0;
     const API_RATE_LIMITED = 2;
 
+    /** @var ConnectionObject|null */
     private $connection;
 
     private $callback = null;
@@ -30,9 +31,11 @@ class ZMRobot
      * @throws RobotNotFoundException
      */
     public static function get($robot_id) {
-        $r = ConnectionManager::getByType("qq", ["self_id" => $robot_id]);
-        if ($r == []) throw new RobotNotFoundException("机器人 " . $robot_id . " 未连接到框架！");
-        return new ZMRobot($r[0]);
+        $r = ManagerGM::getAllByName('qq');
+        foreach($r as $v) {
+            if($v->getOption('connect_id') == $robot_id) return new ZMRobot($v);
+        }
+        throw new RobotNotFoundException("机器人 " . $robot_id . " 未连接到框架！");
     }
 
     /**
@@ -40,12 +43,12 @@ class ZMRobot
      * @return ZMRobot
      */
     public static function getRandom() {
-        $r = ConnectionManager::getByType("qq");
+        $r = ManagerGM::getAllByName('qq');
         if($r == []) throw new RobotNotFoundException("没有任何机器人连接到框架！");
         return new ZMRobot($r[array_rand($r)]);
     }
 
-    public function __construct(CQConnection $connection) {
+    public function __construct(ConnectionObject $connection) {
         $this->connection = $connection;
     }
 
@@ -60,7 +63,7 @@ class ZMRobot
     }
 
     public function sendPrivateMsg($user_id, $message, $auto_escape = false) {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__),
             'params' => [
                 'user_id' => $user_id,
@@ -71,7 +74,7 @@ class ZMRobot
     }
 
     public function sendGroupMsg($group_id, $message, $auto_escape = false) {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__),
             'params' => [
                 'group_id' => $group_id,
@@ -82,7 +85,7 @@ class ZMRobot
     }
 
     public function sendDiscussMsg($discuss_id, $message, $auto_escape = false) {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__),
             'params' => [
                 'discuss_id' => $discuss_id,
@@ -93,7 +96,7 @@ class ZMRobot
     }
 
     public function sendMsg($message_type, $target_id, $message, $auto_escape = false) {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__),
             'params' => [
                 'message_type' => $message_type,
@@ -105,7 +108,7 @@ class ZMRobot
     }
 
     public function deleteMsg($message_id) {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__),
             'params' => [
                 'message_id' => $message_id
@@ -114,7 +117,7 @@ class ZMRobot
     }
 
     public function sendLike($user_id, $times = 1) {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__),
             'params' => [
                 'user_id' => $user_id,
@@ -124,7 +127,7 @@ class ZMRobot
     }
 
     public function setGroupKick($group_id, $user_id, $reject_add_request = false) {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__),
             'params' => [
                 'group_id' => $group_id,
@@ -135,7 +138,7 @@ class ZMRobot
     }
 
     public function setGroupBan($group_id, $user_id, $duration = 1800) {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__),
             'params' => [
                 'group_id' => $group_id,
@@ -146,7 +149,7 @@ class ZMRobot
     }
 
     public function setGroupAnonymousBan($group_id, $anonymous_or_flag, $duration = 1800) {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__),
             'params' => [
                 'group_id' => $group_id,
@@ -157,7 +160,7 @@ class ZMRobot
     }
 
     public function setGroupWholeBan($group_id, $enable = true) {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__),
             'params' => [
                 'group_id' => $group_id,
@@ -167,7 +170,7 @@ class ZMRobot
     }
 
     public function setGroupAdmin($group_id, $user_id, $enable = true) {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__),
             'params' => [
                 'group_id' => $group_id,
@@ -178,7 +181,7 @@ class ZMRobot
     }
 
     public function setGroupAnonymous($group_id, $enable = true) {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__),
             'params' => [
                 'group_id' => $group_id,
@@ -188,7 +191,7 @@ class ZMRobot
     }
 
     public function setGroupCard($group_id, $user_id, $card = "") {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__),
             'params' => [
                 'group_id' => $group_id,
@@ -199,7 +202,7 @@ class ZMRobot
     }
 
     public function setGroupLeave($group_id, $is_dismiss = false) {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__),
             'params' => [
                 'group_id' => $group_id,
@@ -209,7 +212,7 @@ class ZMRobot
     }
 
     public function setGroupSpecialTitle($group_id, $user_id, $special_title = "", $duration = -1) {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__),
             'params' => [
                 'group_id' => $group_id,
@@ -221,7 +224,7 @@ class ZMRobot
     }
 
     public function setDiscussLeave($discuss_id) {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__),
             'params' => [
                 'discuss_id' => $discuss_id
@@ -230,7 +233,7 @@ class ZMRobot
     }
 
     public function setFriendAddRequest($flag, $approve = true, $remark = "") {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__),
             'params' => [
                 'flag' => $flag,
@@ -241,7 +244,7 @@ class ZMRobot
     }
 
     public function setGroupAddRequest($flag, $sub_type, $approve = true, $reason = "") {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__),
             'params' => [
                 'flag' => $flag,
@@ -253,11 +256,11 @@ class ZMRobot
     }
 
     public function getLoginInfo() {
-        return CQAPI::processAPI($this->connection, ['action' => $this->getActionName(__FUNCTION__)], $this->callback);
+        return $this->processAPI($this->connection, ['action' => $this->getActionName(__FUNCTION__)], $this->callback);
     }
 
     public function getStrangerInfo($user_id, $no_cache = false) {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__),
             'params' => [
                 'user_id' => $user_id,
@@ -267,19 +270,19 @@ class ZMRobot
     }
 
     public function getFriendList() {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__)
         ], $this->callback);
     }
 
     public function getGroupList() {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__)
         ], $this->callback);
     }
 
     public function getGroupInfo($group_id, $no_cache = false) {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__),
             'params' => [
                 'group_id' => $group_id,
@@ -289,7 +292,7 @@ class ZMRobot
     }
 
     public function getGroupMemberInfo($group_id, $user_id, $no_cache = false) {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__),
             'params' => [
                 'group_id' => $group_id,
@@ -300,7 +303,7 @@ class ZMRobot
     }
 
     public function getGroupMemberList($group_id) {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__),
             'params' => [
                 'group_id' => $group_id
@@ -309,7 +312,7 @@ class ZMRobot
     }
 
     public function getCookies($domain = "") {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__),
             'params' => [
                 'domain' => $domain
@@ -318,13 +321,13 @@ class ZMRobot
     }
 
     public function getCsrfToken() {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__)
         ], $this->callback);
     }
 
     public function getCredentials($domain = "") {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__),
             'params' => [
                 'domain' => $domain
@@ -333,7 +336,7 @@ class ZMRobot
     }
 
     public function getRecord($file, $out_format, $full_path = false) {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__),
             'params' => [
                 'file' => $file,
@@ -344,7 +347,7 @@ class ZMRobot
     }
 
     public function getImage($file) {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__),
             'params' => [
                 'file' => $file
@@ -353,31 +356,31 @@ class ZMRobot
     }
 
     public function canSendImage() {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__)
         ], $this->callback);
     }
 
     public function canSendRecord() {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__)
         ], $this->callback);
     }
 
     public function getStatus() {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__)
         ], $this->callback);
     }
 
     public function getVersionInfo() {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__)
         ], $this->callback);
     }
 
     public function setRestartPlugin($delay = 0) {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__),
             'params' => [
                 'delay' => $delay
@@ -386,7 +389,7 @@ class ZMRobot
     }
 
     public function cleanDataDir($data_dir) {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__),
             'params' => [
                 'data_dir' => $data_dir
@@ -395,7 +398,7 @@ class ZMRobot
     }
 
     public function cleanPluginLog() {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => $this->getActionName(__FUNCTION__)
         ], $this->callback);
     }

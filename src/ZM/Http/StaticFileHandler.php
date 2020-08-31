@@ -4,7 +4,7 @@
 namespace ZM\Http;
 
 
-use Framework\Console;
+use ZM\Console\Console;
 use Framework\ZMBuf;
 use ZM\Utils\ZMUtil;
 

@@ -40,7 +40,6 @@ class RemoteShell
      * @throws Exception
      */
     static function listen($serv, $host = "127.0.0.1", $port = 9599) {
-        Console::warning("正在监听".$host.":".strval($port)."的调试接口，请注意安全");
         $port = $serv->listen($host, $port, SWOOLE_SOCK_TCP);
         if (!$port) {
             throw new Exception("listen fail.");

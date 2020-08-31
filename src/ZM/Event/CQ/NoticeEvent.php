@@ -5,20 +5,16 @@ namespace ZM\Event\CQ;
 
 
 use Doctrine\Common\Annotations\AnnotationException;
-use Framework\ZMBuf;
 use ZM\Annotation\CQ\CQAfter;
 use ZM\Annotation\CQ\CQBefore;
 use ZM\Annotation\CQ\CQNotice;
-use ZM\Connection\CQConnection;
 use ZM\Event\EventHandler;
 use ZM\Exception\WaitTimeoutException;
-use ZM\ModBase;
-use ZM\ModHandleType;
+use ZM\Store\ZMBuf;
 
 class NoticeEvent
 {
     private $data;
-    /** @var CQConnection */
     private $connection;
     private $circle;
 
@@ -54,7 +50,6 @@ class NoticeEvent
      */
     public function onActivate() {
         try {
-            /** @var ModBase[] $obj */
             $obj = [];
             foreach (ZMBuf::$events[CQNotice::class] ?? [] as $v) {
                 /** @var CQNotice $v */
@@ -65,10 +60,7 @@ class NoticeEvent
                     ($v->operator_id == 0 || ($v->operator_id != 0 && $v->operator_id == ($this->data["operator_id"] ?? 0)))) {
                     $c = $v->class;
                     if (!isset($obj[$c]))
-                        $obj[$c] = new $c([
-                            "data" => $this->data,
-                            "connection" => $this->connection
-                        ], ModHandleType::CQ_NOTICE);
+                        $obj[$c] = new $c();
                     EventHandler::callWithMiddleware($obj[$c],$v->method, [], [], function($r) {
                         if (is_string($r)) context()->reply($r);
                     });

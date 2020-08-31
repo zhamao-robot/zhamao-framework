@@ -27,6 +27,7 @@ $config['swoole'] = [
     'log_file' => $config['crash_dir'] . 'swoole_error.log',
     'worker_num' => 1,
     'dispatch_mode' => 2,
+    'max_coroutine' => 30000,
     //'task_worker_num' => 1,
     //'task_enable_coroutine' => true
 ];
@@ -68,8 +69,9 @@ $config['init_atomics'] = [
     'out_count' => 0,       //消息发送（调用send_*_msg的统计数量）
     'reload_time' => 0,     //调用reload功能统计数量
     'wait_msg_id' => 0,     //协程挂起id自增
-    'info_level' => 2,      //终端显示的log等级
 ];
+
+$config["info_level"] = 2;
 
 /** 自动保存的缓存保存时间（秒） */
 $config['auto_save_interval'] = 900;
@@ -88,7 +90,7 @@ $config['static_file_server'] = [
 
 /** 注册 Swoole Server 事件注解的类列表 */
 $config['server_event_handler_class'] = [
-    \Framework\ServerEventHandler::class,
+    \ZM\Event\ServerEventHandler::class,
 ];
 
 return $config;

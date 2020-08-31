@@ -1,10 +1,13 @@
 <?php
 
 
-namespace Framework;
+namespace ZM\Utils;
 
 
+use ZM\Config\ZMConfig;
+use ZM\Console\Console;
 use ZM\Annotation\Swoole\OnSave;
+use ZM\Store\ZMBuf;
 
 class DataProvider
 {
@@ -34,7 +37,7 @@ class DataProvider
 
     public static function saveBuffer() {
         $head = Console::setColor(date("[H:i:s] ") . "[V] Saving buffer......", "blue");
-        if (ZMBuf::$atomics["info_level"]->get() >= 3)
+        if (Console::getLevel() >= 3)
             echo $head;
         foreach (self::$buffer_list as $k => $v) {
             Console::debug("Saving " . $k . " to " . $v);
@@ -47,12 +50,12 @@ class DataProvider
             Console::debug("Calling @OnSave: $c -> $method");
             $class->$method();
         }
-        if (ZMBuf::$atomics["info_level"]->get() >= 3)
+        if (Console::getLevel() >= 3)
             echo Console::setColor("saved", "blue") . PHP_EOL;
     }
 
     public static function getFrameworkLink() {
-        return ZMBuf::globals("http_reverse_link");
+        return ZMConfig::get("global", "http_reverse_link");
     }
 
     public static function getJsonData(string $string) {

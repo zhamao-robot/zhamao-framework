@@ -6,25 +6,23 @@ namespace ZM\Event\CQ;
 
 use Co;
 use Doctrine\Common\Annotations\AnnotationException;
-use Framework\Console;
-use Framework\ZMBuf;
+use ZM\ConnectionManager\ConnectionObject;
+use ZM\Console\Console;
+use ZM\Store\ZMBuf;
 use ZM\Annotation\CQ\CQAfter;
 use ZM\Annotation\CQ\CQBefore;
 use ZM\Annotation\CQ\CQCommand;
 use ZM\Annotation\CQ\CQMessage;
-use ZM\Connection\WSConnection;
 use ZM\Event\EventHandler;
 use ZM\Exception\WaitTimeoutException;
 use ZM\Http\Response;
-use ZM\ModBase;
-use ZM\ModHandleType;
 
 class MessageEvent
 {
     private $function_call = false;
     private $data;
     private $circle;
-    /** @var WSConnection|Response */
+    /** @var ConnectionObject|Response */
     private $connection;
 
     public function __construct($data, $conn_or_response, $circle = 0) {
@@ -84,6 +82,7 @@ class MessageEvent
 
     /**
      * @throws AnnotationException
+     * @noinspection PhpRedundantCatchClauseInspection
      */
     public function onActivate() {
         try {
@@ -96,7 +95,6 @@ class MessageEvent
                     $word[$k] = trim($word[$k]);
                 }
             }
-            /** @var ModBase[] $obj */
             $obj = [];
             foreach (ZMBuf::$events[CQCommand::class] ?? [] as $v) {
                 /** @var CQCommand $v */
@@ -107,30 +105,26 @@ class MessageEvent
                     ($v->message_type == '' || ($v->message_type != '' && $v->message_type == context()->getData()["message_type"]))
                     ) {
                     $c = $v->class;
-                    $class_construct = [
-                        "data" => context()->getData(),
-                        "connection" => context()->getConnection()
-                    ];
                     if (!isset($obj[$c])) {
-                        $obj[$c] = new $c($class_construct);
+                        $obj[$c] = new $c();
                     }
                     if ($word[0] != "" && $v->match == $word[0]) {
                         Console::debug("Calling $c -> {$v->method}");
-                        $this->function_call = EventHandler::callWithMiddleware($obj[$c], $v->method, $class_construct, [$word], function ($r) {
+                        $this->function_call = EventHandler::callWithMiddleware($obj[$c], $v->method, [], [$word], function ($r) {
                             if (is_string($r)) context()->reply($r);
                             return true;
                         });
                         return;
                     } elseif (in_array($word[0], $v->alias)) {
                         Console::debug("Calling $c -> {$v->method}");
-                        $this->function_call = EventHandler::callWithMiddleware($obj[$c], $v->method, $class_construct, [$word], function ($r) {
+                        $this->function_call = EventHandler::callWithMiddleware($obj[$c], $v->method, [], [$word], function ($r) {
                             if (is_string($r)) context()->reply($r);
                             return true;
                         });
                         return;
                     } elseif ($v->regexMatch != "" && ($args = matchArgs($v->regexMatch, context()->getMessage())) !== false) {
                         Console::debug("Calling $c -> {$v->method}");
-                        $this->function_call = EventHandler::callWithMiddleware($obj[$c], $v->method, $class_construct, [$args], function ($r) {
+                        $this->function_call = EventHandler::callWithMiddleware($obj[$c], $v->method, [], [$args], function ($r) {
                             if (is_string($r)) context()->reply($r);
                             return true;
                         });
@@ -138,7 +132,7 @@ class MessageEvent
                     } elseif ($v->fullMatch != "" && (preg_match("/".$v->fullMatch."/u", ctx()->getMessage(), $args)) != 0) {
                         Console::debug("Calling $c -> {$v->method}");
                         array_shift($args);
-                        $this->function_call = EventHandler::callWithMiddleware($obj[$c], $v->method, $class_construct, [$args], function ($r) {
+                        $this->function_call = EventHandler::callWithMiddleware($obj[$c], $v->method, [], [$args], function ($r) {
                             if (is_string($r)) context()->reply($r);
                             return true;
                         });
@@ -158,10 +152,7 @@ class MessageEvent
                     $c = $v->class;
                     Console::debug("Calling CQMessage: $c -> {$v->method}");
                     if (!isset($obj[$c]))
-                        $obj[$c] = new $c([
-                            "data" => context()->getData(),
-                            "connection" => $this->connection
-                        ], ModHandleType::CQ_MESSAGE);
+                        $obj[$c] = new $c();
                     EventHandler::callWithMiddleware($obj[$c], $v->method, [], [context()->getData()["message"]], function ($r) {
                         if (is_string($r)) context()->reply($r);
                     });

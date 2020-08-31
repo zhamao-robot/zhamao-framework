@@ -3,14 +3,11 @@
 
 namespace ZM\API;
 
-
 use Co;
-use Framework\Console;
-use Framework\ZMBuf;
-use ZM\Connection\ConnectionManager;
-use ZM\Connection\CQConnection;
+use ZM\ConnectionManager\ConnectionObject;
+use ZM\Console\Console;
 use ZM\Event\EventHandler;
-use ZM\Utils\ZMRobot;
+use ZM\Store\ZMBuf;
 
 /**
  * @method static send_private_msg($self_id, $params, $function = null)
@@ -67,143 +64,15 @@ use ZM\Utils\ZMRobot;
  * @method static set_friend_add_request_async($self_id, $params, $function = null)
  * @method static set_group_add_request_async($self_id, $params, $function = null)
  */
-class CQAPI
+trait CQAPI
 {
-    public static function quick_reply(CQConnection $conn, $data, $msg, $yield = null) {
-        switch ($data["message_type"]) {
-            case "group":
-                return (new ZMRobot($conn))->setCallback($yield)->sendGroupMsg($data["group_id"], $msg);
-            case "private":
-                return (new ZMRobot($conn))->setCallback($yield)->sendPrivateMsg($data["user_id"], $msg);
-            case "discuss":
-                return (new ZMRobot($conn))->setCallback($yield)->sendDiscussMsg($data["discuss_id"], $msg);
-        }
-        return null;
-    }
-
     /**
-     * @param $name
-     * @param $arg
-     * @return bool
-     * @deprecated
-     */
-    public static function __callStatic($name, $arg) {
-        trigger_error("This dynamic CQAPI calling method will be removed after 2.0 version.", E_USER_DEPRECATED);
-        $all = self::getSupportedAPIs();
-        $find = null;
-        if (in_array($name, $all)) $find = $name;
-        else {
-            foreach ($all as $v) {
-                if (strtolower($name) == strtolower(str_replace("_", "", $v))) {
-                    $find = $v;
-                    break;
-                }
-            }
-        }
-        if ($find === null) {
-            Console::warning("Unknown API " . $name);
-            return false;
-        }
-        $reply = ["action" => $find];
-        if (!is_array($arg[1])) {
-            Console::warning("Error when parsing params. Please make sure your params is an array.");
-            return false;
-        }
-        if ($arg[1] != []) {
-            $reply["params"] = $arg[1];
-        }
-        if (!($arg[0] instanceof CQConnection)) {
-            $robot = ConnectionManager::getByType("qq", ["self_id" => $arg[0]]);
-            if ($robot == []) {
-                Console::warning("发送错误，机器人连接不存在！");
-                return false;
-            }
-            $arg[0] = $robot[0];
-        }
-        return self::processAPI($arg[0], $reply, $arg[2] ?? null);
-    }
-
-    /**********************   non-API Part   **********************/
-
-    private static function getSupportedAPIs() {
-        return [
-            "send_private_msg",
-            "send_group_msg",
-            "send_discuss_msg",
-            "send_msg",
-            "delete_msg",
-            "send_like",
-            "set_group_kick",
-            "set_group_ban",
-            "set_group_anonymous_ban",
-            "set_group_whole_ban",
-            "set_group_admin",
-            "set_group_anonymous",
-            "set_group_card",
-            "set_group_leave",
-            "set_group_special_title",
-            "set_discuss_leave",
-            "set_friend_add_request",
-            "set_group_add_request",
-            "get_login_info",
-            "get_stranger_info",
-            "get_group_list",
-            "get_group_member_info",
-            "get_group_member_list",
-            "get_cookies",
-            "get_csrf_token",
-            "get_credentials",
-            "get_record",
-            "get_status",
-            "get_version_info",
-            "set_restart",
-            "set_restart_plugin",
-            "clean_data_dir",
-            "clean_plugin_log",
-            "_get_friend_list",
-            "_get_group_info",
-            "_get_vip_info",
-            //异步API
-            "send_private_msg_async",
-            "send_group_msg_async",
-            "send_discuss_msg_async",
-            "send_msg_async",
-            "delete_msg_async",
-            "set_group_kick_async",
-            "set_group_ban_async",
-            "set_group_anonymous_ban_async",
-            "set_group_whole_ban_async",
-            "set_group_admin_async",
-            "set_group_anonymous_async",
-            "set_group_card_async",
-            "set_group_leave_async",
-            "set_group_special_title_async",
-            "set_discuss_leave_async",
-            "set_friend_add_request_async",
-            "set_group_add_request_async"
-        ];
-    }
-
-    public static function getLoggedAPIs() {
-        return [
-            "send_private_msg",
-            "send_group_msg",
-            "send_discuss_msg",
-            "send_msg",
-            "send_private_msg_async",
-            "send_group_msg_async",
-            "send_discuss_msg_async",
-            "send_msg_async"
-        ];
-    }
-
-    /**
-     * @param CQConnection $connection
+     * @param ConnectionObject $connection
      * @param $reply
      * @param |null $function
      * @return bool|array
      */
-    public static function processAPI($connection, $reply, $function = null) {
+    private function processAPI($connection, $reply, $function = null) {
         $api_id = ZMBuf::$atomics["wait_msg_id"]->get();
         $reply["echo"] = $api_id;
         ZMBuf::$atomics["wait_msg_id"]->add(1);

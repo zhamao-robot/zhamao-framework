@@ -8,8 +8,9 @@ use Co;
 use Doctrine\Common\Annotations\AnnotationException;
 use Error;
 use Exception;
-use Framework\Console;
-use Framework\ZMBuf;
+use ZM\ConnectionManager\ConnectionObject;
+use ZM\ConnectionManager\ManagerGM;
+use ZM\Console\Console;
 use ZM\Event\Swoole\{MessageEvent, RequestEvent, WorkerStartEvent, WSCloseEvent, WSOpenEvent};
 use Swoole\Http\Request;
 use Swoole\Server;
@@ -17,11 +18,10 @@ use Swoole\WebSocket\Frame;
 use ZM\Annotation\CQ\CQAPIResponse;
 use ZM\Annotation\CQ\CQAPISend;
 use ZM\Annotation\Http\MiddlewareClass;
-use ZM\Connection\ConnectionManager;
-use ZM\Connection\CQConnection;
 use ZM\Http\MiddlewareInterface;
 use ZM\Http\Response;
-use Framework\DataProvider;
+use ZM\Store\ZMBuf;
+use ZM\Utils\DataProvider;
 use ZM\Utils\ZMUtil;
 
 class EventHandler
@@ -51,7 +51,7 @@ class EventHandler
                     });
                     ZMBuf::$server = $param0;
                     $r = (new WorkerStartEvent($param0, $param1))->onActivate();
-                    Console::log("\n=== Worker #" . $param0->worker_id . " 已启动 ===\n", "gold");
+                    Console::success("Worker #" . $param0->worker_id . " 已启动");
                     $r->onAfter();
                     self::startTick();
                 } catch (Exception $e) {
@@ -69,14 +69,14 @@ class EventHandler
             case "message":
                 /** @var Frame $param1 */
                 /** @var Server $param0 */
-                $conn = ConnectionManager::get($param1->fd);
+                $conn = ManagerGM::get($param1->fd);
                 set_coroutine_params(["server" => $param0, "frame" => $param1, "connection" => $conn]);
                 try {
                     (new MessageEvent($param0, $param1))->onActivate()->onAfter();
                 } catch (Error $e) {
                     $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
                     Console::error("Fatal error when calling $event_name: " . $error_msg);
-                    Console::stackTrace();
+                    Console::trace();
                 }
                 break;
             case "request":
@@ -89,7 +89,12 @@ class EventHandler
                     Console::info($param0->server["remote_addr"] . ":" . $param0->server["remote_port"] .
                         " [" . $param1->getStatusCode() . "] " . $param0->server["request_uri"]
                     );
-                    if (!$param1->isEnd()) $param1->end("Internal server error: " . $e->getMessage());
+                    if (!$param1->isEnd()) {
+                        if (\ZM\Config\ZMConfig::get("global", "debug_mode"))
+                            $param1->end("Internal server error: " . $e->getMessage());
+                        else
+                            $param1->end("Internal server error.");
+                    }
                     Console::error("Internal server exception (500), caused by " . get_class($e));
                     Console::log($e->getTraceAsString(), "gray");
                 } catch (Error $e) {
@@ -100,7 +105,7 @@ class EventHandler
                     );
                     $doc = "Internal server error<br>";
                     $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
-                    if (ZMBuf::$atomics["info_level"]->get() >= 4) $doc .= $error_msg;
+                    if (Console::getLevel() >= 4) $doc .= $error_msg;
                     if (!$param1->isEnd()) $param1->end($doc);
                     Console::error("Internal server error (500): " . $error_msg);
                     Console::log($e->getTraceAsString(), "gray");
@@ -114,7 +119,7 @@ class EventHandler
                 } catch (Error $e) {
                     $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
                     Console::error("Fatal error when calling $event_name: " . $error_msg);
-                    Console::stackTrace();
+                    Console::trace();
                 }
                 break;
             case "close":
@@ -124,7 +129,7 @@ class EventHandler
                 } catch (Error $e) {
                     $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
                     Console::error("Fatal error when calling $event_name: " . $error_msg);
-                    Console::stackTrace();
+                    Console::trace();
                 }
                 break;
         }
@@ -142,7 +147,7 @@ class EventHandler
         ctx()->setCache("level", $level);
         if ($level >= 5) {
             Console::warning("Recursive call reached " . $level . " times");
-            Console::stackTrace();
+            Console::trace();
             return false;
         }
         $starttime = microtime(true);
@@ -220,7 +225,7 @@ class EventHandler
         }
     }
 
-    public static function callCQAPISend($reply, ?CQConnection $connection) {
+    public static function callCQAPISend($reply, ?ConnectionObject $connection) {
         $action = $reply["action"] ?? null;
         if ($action === null) {
             Console::warning("API 激活事件异常！");
@@ -235,7 +240,7 @@ class EventHandler
             foreach (ZMBuf::$events[CQAPISend::class] ?? [] as $k => $v) {
                 if (($v->action == "" || $v->action == $action) && !$v->with_result) {
                     $c = $v->class;
-                    self::callWithMiddleware($c, $v->method, context()->copy(), [$reply["action"], $reply["params"] ?? [], $connection->getQQ()]);
+                    self::callWithMiddleware($c, $v->method, context()->copy(), [$reply["action"], $reply["params"] ?? [], $connection->getOption('connect_id')]);
                     if (context()->getCache("block_continue") === true) break;
                 }
             }

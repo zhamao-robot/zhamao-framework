@@ -1,0 +1,20 @@
+{
+    "default": {
+        "success": "green",
+        "info": "lightblue",
+        "warning": "yellow",
+        "error": "red",
+        "verbose": "blue",
+        "debug": "gray",
+        "trace": "gray"
+    },
+    "white-term": {
+        "success": "green",
+        "info": "black",
+        "warning": "yellow",
+        "error": "red",
+        "verbose": "blue",
+        "debug": "gray",
+        "trace": "gray"
+    }
+}

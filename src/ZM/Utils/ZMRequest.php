@@ -4,8 +4,7 @@
 namespace ZM\Utils;
 
 
-use Framework\Console;
-use Swlib\Saber;
+use ZM\Console\Console;
 use Swoole\Coroutine\Http\Client;
 
 class ZMRequest
@@ -77,14 +76,6 @@ class ZMRequest
      */
     public static function websocket($url, $set = ['websocket_mask' => true], $header = []) {
         return new ZMWebSocket($url, $set, $header);
-    }
-
-    /**
-     * @param $option
-     * @return Saber
-     */
-    public static function session($option) {
-        return Saber::session($option);
     }
 
     /**

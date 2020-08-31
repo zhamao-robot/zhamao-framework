@@ -4,7 +4,6 @@
 namespace ZM\Event\Swoole;
 
 
-use Co;
 use Doctrine\Common\Annotations\AnnotationException;
 use Exception;
 use PDO;
@@ -14,20 +13,18 @@ use Swoole\Database\PDOConfig;
 use Swoole\Database\PDOPool;
 use Swoole\Process;
 use Swoole\Timer;
-use ZM\Annotation\AnnotationBase;
 use ZM\Annotation\AnnotationParser;
 use ZM\Annotation\Swoole\OnStart;
-use ZM\Annotation\Swoole\SwooleEventAfter;
-use ZM\Connection\ConnectionManager;
+use ZM\Config\ZMConfig;
 use ZM\Context\ContextInterface;
 use ZM\DB\DB;
-use Framework\Console;
-use Framework\GlobalConfig;
-use Framework\ZMBuf;
+use ZM\Console\Console;
 use Swoole\Server;
 use ZM\Event\EventHandler;
 use ZM\Exception\DbException;
-use Framework\DataProvider;
+use ZM\Store\ZMBuf;
+use ZM\Utils\DataProvider;
+use ZM\Utils\Terminal;
 use ZM\Utils\ZMUtil;
 
 class WorkerStartEvent implements SwooleEvent
@@ -50,50 +47,46 @@ class WorkerStartEvent implements SwooleEvent
      * @throws DbException
      */
     public function onActivate(): WorkerStartEvent {
-        Console::info("Worker启动中");
-        ZMBuf::$server = $this->server;
-        Console::listenConsole(); //这个方法只能在这里调用，且如果worker_num不为1的话，此功能不可用
 
-        Process::signal(SIGINT, function () {
-            Console::warning("Server interrupted by keyboard.");
-            ZMUtil::stop(true);
-        });
+        Console::info("Worker #{$this->server->worker_id} 启动中");
+        ZMBuf::$server = $this->server;
         ZMBuf::resetCache(); //清空变量缓存
         ZMBuf::set("wait_start", []); //添加队列，在workerStart运行完成前先让其他协程等待执行
         $this->resetConnections();//释放所有与framework的连接
 
-        //设置炸毛buf中储存的对象
-        ZMBuf::$globals = new GlobalConfig();
-        ZMBuf::$config = [];
-        $file = scandir(DataProvider::getWorkingDir() . '/config/');
-        unset($file[0], $file[1]);
-        foreach ($file as $k => $v) {
-            if ($v == "global.php") continue;
-            $name = explode(".", $v);
-            if (($prefix = end($name)) == "json") {
-                ZMBuf::$config[$name[0]] = json_decode(Co::readFile(DataProvider::getWorkingDir() . '/config/' . $v), true);
-                Console::info("已读取配置文件：" . $v);
-            } elseif ($prefix == "php") {
-                ZMBuf::$config[$name[0]] = include_once DataProvider::getWorkingDir() . '/config/' . $v;
-                if (is_array(ZMBuf::$config[$name[0]]))
-                    Console::info("已读取配置文件：" . $v);
-            }
+        global $terminal_id;
+
+        Terminal::listenConsole($terminal_id); //这个方法只能在这里调用，且如果worker_num不为1的话，此功能不可用
+        // 这里执行的是只需要执行一遍的代码，比如终端监听器和键盘监听器
+        if ($this->server->worker_id === 0) {
+            if($terminal_id !== null) Console::info("监听console输入");
+            Process::signal(SIGINT, function () {
+                echo PHP_EOL;
+                Console::warning("Server interrupted by keyboard.");
+                ZMUtil::stop();
+            });
+            ZMBuf::$atomics['reload_time']->add(1);
+            $this->setAutosaveTimer(ZMConfig::get("global", "auto_save_interval"));
+        } else {
+            Process::signal(SIGINT, function () {
+                // Do Nothing
+            });
         }
-        if (ZMBuf::globals("sql_config")["sql_host"] != "") {
+        if (ZMConfig::get("global", "sql_config")["sql_host"] != "") {
             Console::info("新建SQL连接池中");
             ob_start();
             phpinfo();
             $str = ob_get_clean();
             $str = explode("\n", $str);
-            foreach($str as $k => $v) {
+            foreach ($str as $k => $v) {
                 $v = trim($v);
-                if($v == "") continue;
-                if(mb_strpos($v, "API Extensions") === false) continue;
-                if(mb_strpos($v, "pdo_mysql") === false) {
+                if ($v == "") continue;
+                if (mb_strpos($v, "API Extensions") === false) continue;
+                if (mb_strpos($v, "pdo_mysql") === false) {
                     throw new DbException("未安装 mysqlnd php-mysql扩展。");
                 }
             }
-            $sql = ZMBuf::globals("sql_config");
+            $sql = ZMConfig::get("global", "sql_config");
             ZMBuf::$sql_pool = new PDOPool((new PDOConfig())
                 ->withHost($sql["sql_host"])
                 ->withPort($sql["sql_port"])
@@ -107,11 +100,6 @@ class WorkerStartEvent implements SwooleEvent
             DB::initTableList();
         }
 
-        ZMBuf::$atomics['reload_time']->add(1);
-
-        Console::info("监听console输入");
-
-        $this->setAutosaveTimer(ZMBuf::globals("auto_save_interval"));
         $this->loadAllClass(); //加载composer资源、phar外置包、注解解析注册等
         return $this;
     }
@@ -126,22 +114,14 @@ class WorkerStartEvent implements SwooleEvent
         }
         ZMBuf::unsetCache("wait_start");
         set_coroutine_params(["server" => $this->server, "worker_id" => $this->worker_id]);
-
-        foreach (ZMBuf::$events[OnStart::class] ?? [] as $v) {
-            $class_name = $v->class;
-            Console::debug("正在调用启动时函数: " . $class_name . " -> " . $v->method);
-            EventHandler::callWithMiddleware($class_name, $v->method, ["server" => $this->server, "worker_id" => $this->worker_id], []);
-        }
-        foreach (ZMBuf::$events[SwooleEventAfter::class] ?? [] as $v) {
-            /** @var AnnotationBase $v */
-            if (strtolower($v->type) == "workerstart") {
+        if($this->server->worker_id === 0) {
+            foreach (ZMBuf::$events[OnStart::class] ?? [] as $v) {
                 $class_name = $v->class;
-                Console::debug("正在调用启动时函数after: " . $class_name . " -> " . $v->method);
+                Console::debug("正在调用启动时函数: " . $class_name . " -> " . $v->method);
                 EventHandler::callWithMiddleware($class_name, $v->method, ["server" => $this->server, "worker_id" => $this->worker_id], []);
-                if (context()->getCache("block_continue") === true) break;
             }
+            Console::debug("@OnStart 执行完毕");
         }
-        Console::debug("调用完毕！");
         return $this;
     }
 
@@ -156,7 +136,6 @@ class WorkerStartEvent implements SwooleEvent
     }
 
     /**
-     * @throws AnnotationException
      * @throws ReflectionException
      * @throws Exception
      */
@@ -181,15 +160,13 @@ class WorkerStartEvent implements SwooleEvent
 
         //加载各个模块的注解类，以及反射
         Console::info("检索Module中");
-        AnnotationParser::registerMods();
-
-        //加载Custom目录下的自定义的内部类
-        ConnectionManager::registerCustomClass();
+        $parser = new AnnotationParser();
+        $parser->addRegisterPath(DataProvider::getWorkingDir() . "/src/Module/", "Module");
+        $parser->registerMods();
+        $parser->sortLevels();
 
         //加载自定义的全局函数
         Console::debug("加载自定义的全局函数中");
-        if (file_exists(DataProvider::getWorkingDir() . "/src/Custom/global_function.php"))
-            require_once DataProvider::getWorkingDir() . "/src/Custom/global_function.php";
         $this->afterCheck();
     }
 
@@ -204,7 +181,7 @@ class WorkerStartEvent implements SwooleEvent
      * @throws Exception
      */
     private function afterCheck() {
-        $context_class = ZMBuf::globals("context_class");
+        $context_class = ZMConfig::get("global", "context_class");
         if (!is_a($context_class, ContextInterface::class, true)) {
             throw new Exception("Context class must implemented from ContextInterface!");
         }

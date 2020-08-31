@@ -1,16 +1,18 @@
 <?php
 
-use Framework\Console;
-use Framework\DataProvider;
-use Framework\ZMBuf;
+use ZM\Config\ZMConfig;
+use ZM\Console\Console;
+use ZM\Framework;
+use ZM\Store\ZMBuf;
+use ZM\Utils\DataProvider;
 use Swoole\Coroutine\System;
 use ZM\Context\ContextInterface;
 use ZM\Utils\ZMUtil;
 
 
-function phar_classloader($p){
+function phar_classloader($p) {
     $filepath = getClassPath($p);
-    if($filepath === null) {
+    if ($filepath === null) {
         Console::debug("F:Warning: get class path wrongs.$p");
         return;
     }
@@ -70,10 +72,10 @@ function unicode_decode($str) {
  * @return array
  */
 function getAllClasses($dir, $indoor_name) {
-    if(!is_dir($dir)) return [];
+    if (!is_dir($dir)) return [];
     $list = scandir($dir);
     $classes = [];
-    unset($list[0], $list[1]);
+    if ($list[0] == '.') unset($list[0], $list[1]);
     foreach ($list as $v) {
         //echo "Finding " . $dir . $v . PHP_EOL;
         //echo "At " . $indoor_name . PHP_EOL;
@@ -182,7 +184,7 @@ function context() {
  */
 function ctx() {
     $cid = Co::getCid();
-    $c_class = ZMBuf::globals("context_class");
+    $c_class = ZMConfig::get("global", "context_class");
     if (isset(ZMBuf::$context[$cid])) {
         return ZMBuf::$context_class[$cid] ?? (ZMBuf::$context_class[$cid] = new $c_class($cid));
     } else {
@@ -220,6 +222,10 @@ function zm_timer_tick($ms, callable $callable) {
         Console::debug("Adding extra timer tick of " . $ms . " ms");
         Swoole\Timer::tick($ms, $callable);
     });
+}
+
+function server() {
+    return Framework::getServer();
 }
 
 

@@ -4,7 +4,7 @@
 namespace ZM\DB;
 
 
-use Framework\Console;
+use ZM\Console\Console;
 use ZM\Exception\DbException;
 
 class SelectBody

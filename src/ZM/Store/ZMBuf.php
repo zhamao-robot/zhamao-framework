@@ -6,20 +6,18 @@
  * Time: 下午11:11
  */
 
-namespace Framework;
+namespace ZM\Store;
 
 use Swoole\Atomic;
 use Swoole\Database\PDOPool;
 use swoole_atomic;
-use ZM\connection\WSConnection;
+use ZM\Config\ZMConfig;
 
 class ZMBuf
 {
     //读写的缓存数据，需要在worker_num = 1下才能正常使用
     /** @var mixed[] ZMBuf的data */
     private static $cache = [];
-    /** @var WSConnection[] */
-    static $connect = [];//储存连接实例的数组
     //Scheduler计划任务连接实例，只可以在单worker_num时使用
     static $scheduler = null; //This is stupid warning...
 
@@ -27,9 +25,6 @@ class ZMBuf
     /** @var PDOPool */
     static $sql_pool = null;//保存sql连接池的类
 
-    //只读的数据，可以在多worker_num下使用
-    /** @var null|\Framework\GlobalConfig */
-    static $globals = null;
 
     // swoole server操作对象，每个进程均分配
     /** @var \swoole_websocket_server $server */
@@ -95,17 +90,12 @@ class ZMBuf
         return in_array($val, self::$cache[$name]);
     }
 
-    static function globals($key) {
-        return self::$globals->get($key);
-    }
-
     static function config($config_name) {
         return self::$config[$config_name] ?? null;
     }
 
     public static function resetCache() {
         self::$cache = [];
-        self::$connect = [];
         self::$time_nlp = null;
         self::$instance = [];
     }
@@ -114,8 +104,9 @@ class ZMBuf
      * 初始化atomic计数器
      */
     public static function initAtomic() {
-        foreach (ZMBuf::globals("init_atomics") as $k => $v) {
+        foreach (ZMConfig::get("global", "init_atomics") as $k => $v) {
             self::$atomics[$k] = new Atomic($v);
         }
+        self::$atomics["show_log_worker"] = new Atomic(999999);
     }
 }

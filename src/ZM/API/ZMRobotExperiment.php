@@ -1,11 +1,10 @@
 <?php
 
 
-namespace ZM\Utils;
+namespace ZM\API;
 
 
-use ZM\API\CQAPI;
-use ZM\Connection\CQConnection;
+use ZM\ConnectionManager\ConnectionObject;
 
 /**
  * Class ZMRobotExperiment
@@ -14,15 +13,14 @@ use ZM\Connection\CQConnection;
  */
 class ZMRobotExperiment
 {
-    /**
-     * @var CQConnection
-     */
+    use CQAPI;
+
     private $connection;
 
     private $callback = null;
     private $prefix = 0;
 
-    public function __construct(CQConnection $connection, $callback, $prefix) {
+    public function __construct(ConnectionObject $connection, $callback, $prefix) {
         $this->connection = $connection;
         $this->callback = $callback;
         $this->prefix = $prefix;
@@ -39,7 +37,7 @@ class ZMRobotExperiment
     }
 
     public function getFriendList($flat = false) {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => '_' . $this->getActionName(__FUNCTION__),
             'params' => [
                 'flat' => $flat
@@ -48,7 +46,7 @@ class ZMRobotExperiment
     }
 
     public function getGroupInfo($group_id) {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => '_' . $this->getActionName(__FUNCTION__),
             'params' => [
                 'group_id' => $group_id
@@ -57,7 +55,7 @@ class ZMRobotExperiment
     }
 
     public function getVipInfo($user_id) {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => '_' . $this->getActionName(__FUNCTION__),
             'params' => [
                 'user_id' => $user_id
@@ -66,7 +64,7 @@ class ZMRobotExperiment
     }
 
     public function getGroupNotice($group_id) {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => '_' . $this->getActionName(__FUNCTION__),
             'params' => [
                 'group_id' => $group_id
@@ -75,7 +73,7 @@ class ZMRobotExperiment
     }
 
     public function sendGroupNotice($group_id, $title, $content) {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => '_' . $this->getActionName(__FUNCTION__),
             'params' => [
                 'group_id' => $group_id,
@@ -86,7 +84,7 @@ class ZMRobotExperiment
     }
 
     public function setRestart($clean_log = false, $clean_cache = false, $clean_event = false) {
-        return CQAPI::processAPI($this->connection, [
+        return $this->processAPI($this->connection, [
             'action' => '_' . $this->getActionName(__FUNCTION__),
             'params' => [
                 'clean_log' => $clean_log,

@@ -4,7 +4,7 @@
 namespace ZM\Utils;
 
 
-use Framework\Console;
+use ZM\Console\Console;
 use Swoole\Coroutine\Http\Client;
 use Swoole\WebSocket\Frame;
 

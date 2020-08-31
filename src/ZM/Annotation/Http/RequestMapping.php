@@ -10,7 +10,7 @@ use ZM\Annotation\AnnotationBase;
 /**
  * Class RequestMapping
  * @Annotation
- * @Target("ALL")
+ * @Target("METHOD")
  * @package ZM\Annotation\Http
  */
 class RequestMapping extends AnnotationBase

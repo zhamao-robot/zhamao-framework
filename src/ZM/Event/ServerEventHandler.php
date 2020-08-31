@@ -1,19 +1,18 @@
 <?php
 
 
-namespace Framework;
+namespace ZM\Event;
 
 
 use Co;
 use Doctrine\Common\Annotations\AnnotationException;
+use ZM\Console\Console;
 use Swoole\Http\Request;
 use Swoole\Server;
 use Swoole\WebSocket\Frame;
-use ZM\Annotation\AnnotationParser;
 use ZM\Annotation\Swoole\OnEvent;
-use ZM\Connection\ConnectionManager;
-use ZM\Event\EventHandler;
 use ZM\Http\Response;
+use ZM\Store\ZMBuf;
 
 class ServerEventHandler
 {
@@ -22,17 +21,13 @@ class ServerEventHandler
      * @param Server $server
      * @param $worker_id
      * @throws AnnotationException
-     * @throws \ReflectionException
      */
     public function onWorkerStart(Server $server, $worker_id) {
         if ($server->taskworker === false) {
-            FrameworkLoader::$run_time = microtime(true);
             EventHandler::callSwooleEvent("WorkerStart", $server, $worker_id);
         } else {
             ob_start();
-            AnnotationParser::registerMods();
-            //加载Custom目录下的自定义的内部类
-            ConnectionManager::registerCustomClass();
+            //AnnotationParser::registerMods();
             ob_get_clean();
         }
     }
@@ -44,7 +39,8 @@ class ServerEventHandler
      * @throws AnnotationException
      */
     public function onMessage($server, Frame $frame) {
-        Console::debug("Calling Swoole \"message\" from fd=" . $frame->fd);
+        if ($frame->fd !== ZMBuf::get("terminal_fd"))
+            Console::debug("Calling Swoole \"message\" from fd=" . $frame->fd);
         EventHandler::callSwooleEvent("message", $server, $frame);
     }
 

@@ -4,12 +4,12 @@
 namespace Module\Example;
 
 
-use Framework\Console;
+use ZM\ConnectionManager\ConnectionObject;
+use ZM\Console\Console;
 use ZM\Annotation\CQ\CQCommand;
 use ZM\Annotation\Http\Middleware;
 use ZM\Annotation\Http\RequestMapping;
 use ZM\Annotation\Swoole\SwooleEventAt;
-use ZM\Connection\CQConnection;
 use ZM\Utils\ZMUtil;
 
 /**
@@ -24,8 +24,8 @@ class Hello
      * @SwooleEventAt("open",rule="connectType:qq")
      * @param $conn
      */
-    public function onConnect(CQConnection $conn) {
-        Console::info("机器人 " . $conn->getQQ() . " 已连接！");
+    public function onConnect(ConnectionObject $conn) {
+        Console::info("机器人 " . $conn->getOption("connect_id") . " 已连接！");
     }
 
     /**
@@ -34,7 +34,7 @@ class Hello
      */
     public function onDisconnect() {
         $conn = ctx()->getConnection();
-        Console::info("机器人 " . $conn->getQQ() . " 已断开连接！");
+        Console::info("机器人 " . $conn->getOption("connect_id") . " 已断开连接！");
     }
 
     /**
@@ -60,13 +60,13 @@ class Hello
      */
     public function randNum($arg) {
         // 获取第一个数字类型的参数
-        $num1 = context()->getArgs($arg, ZM_MATCH_NUMBER, "请输入第一个数字");
+        $num1 = ctx()->getArgs($arg, ZM_MATCH_NUMBER, "请输入第一个数字");
         // 获取第二个数字类型的参数
-        $num2 = context()->getArgs($arg, ZM_MATCH_NUMBER, "请输入第二个数字");
+        $num2 = ctx()->getArgs($arg, ZM_MATCH_NUMBER, "请输入第二个数字");
         $a = min(intval($num1), intval($num2));
         $b = max(intval($num1), intval($num2));
         // 回复用户结果
-        context()->reply("随机数是：".mt_rand($a, $b));
+        ctx()->reply("随机数是：".mt_rand($a, $b));
     }
 
     /**
@@ -94,6 +94,6 @@ class Hello
      */
     public function closeUnknownConn() {
         Console::info("Unknown connection , I will close it.");
-        context()->getConnection()->close();
+        server()->close(ctx()->getConnection()->getFd());
     }
 }
