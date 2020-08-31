@@ -15,13 +15,11 @@
  </div>
 
 ## 开发者注意
-**由于 CQHTTP 不再提供维护，转为 [OneBot 标准](https://github.com/howmanybots/onebot)（原 CQHTTP 插件衍生而来的机器人 HTTP 接口标准），本框架也将在未来改为兼容此标准。**
+**此版本目前无法正常运行，还在持续开发中，请勿使用！！！**
 
-**同时将标准实现层独立出来，但默认依赖，对于一些基础的定义层会发生变更。**
+**2.0 版本开发完毕后，会发布测试版和并入 master 分支，敬请关注。**
 
-**以上涉及的变更将在下一个大版本 (v2.0.0) 更新，请关注 commit 和 project！**
-
-
+[![dev-version2](https://img.shields.io/badge/process-%2530-green)]()
 
 
 
