@@ -19,7 +19,7 @@
 
 **2.0 版本开发完毕后，会发布测试版和并入 master 分支，敬请关注。**
 
-[![dev-version2](https://img.shields.io/badge/process-%2530-green)]()
+[![dev-version2](https://img.shields.io/badge/process-30%25-green)]()
 
 
 
