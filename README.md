@@ -90,6 +90,8 @@ Pages托管：[https://framework.zhamao.xin/](https://framework.zhamao.xin/)
 ### 支付宝
 ![支付宝二维码](/resources/images/alipay_img.jpg)
 
+如果你对我们的周边感兴趣，我们还有炸毛机器人定制 logo 的雨伞，详情咨询作者 QQ，我们会作为您捐助了本项目！
+
 ## 关于
 框架和 SDK 是 炸毛机器人 项目的核心框架开源部分。炸毛机器人是作者写的一个高性能机器人，曾获全国计算机设计大赛一等奖。
 
