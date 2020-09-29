@@ -5,74 +5,18 @@ namespace ZM\Utils;
 
 
 use Exception;
-use ZM\Config\ZMConfig;
-use ZM\ConnectionManager\ConnectionObject;
+use Swoole\Event;
 use ZM\Console\Console;
-use ZM\Store\ZMBuf;
-use ZM\Annotation\Swoole\SwooleEventAt;
+use ZM\Framework;
 
 class Terminal
 {
     /**
-     * @var false|resource
-     */
-    public static $console_proc = null;
-    public static $pipes = [];
-
-    static function listenConsole($terminal_id) {
-        if ($terminal_id === null) {
-            if (ZMBuf::$server->worker_id === 0) Console::info("ConsoleCommand disabled.");
-            return;
-        }
-        global $terminal_id;
-        global $port;
-        $port = ZMConfig::get("global", "port");
-        $vss = new SwooleEventAt();
-        $vss->type = "open";
-        $vss->level = 256;
-        $vss->rule = "connectType:terminal";
-
-        $vss->callback = function (?ConnectionObject $conn) use ($terminal_id) {
-            $req = ctx()->getRequest();
-            if ($conn->getName() != "terminal") return false;
-            Console::debug("Terminal fd: " . $conn->getFd());
-            ZMBuf::set("terminal_fd", $conn->getFd());
-            if (($req->header["x-terminal-id"] ?? "") != $terminal_id) {
-                ZMBuf::$server->close($conn->getFd());
-                return false;
-            }
-            return false;
-        };
-        ZMBuf::$events[SwooleEventAt::class][] = $vss;
-        $vss2 = new SwooleEventAt();
-        $vss2->type = "message";
-        $vss2->rule = "connectType:terminal";
-        $vss2->callback = function (?ConnectionObject $conn) {
-            if ($conn === null) return false;
-            if ($conn->getName() != "terminal") return false;
-            $cmd = ctx()->getFrame()->data;
-            self::executeCommand($cmd);
-            return false;
-        };
-        ZMBuf::$events[SwooleEventAt::class][] = $vss2;
-        if (ZMBuf::$server->worker_id === 0) {
-            go(function () {
-                global $terminal_id, $port;
-                $descriptorspec = array(
-                    0 => STDIN,
-                    1 => STDOUT,
-                    2 => STDERR
-                );
-                self::$console_proc = proc_open('php -r \'$terminal_id = "' . $terminal_id . '";$port = ' . $port . ';require "' . __DIR__ . '/terminal_listener.php";\'', $descriptorspec, self::$pipes);
-            });
-        }
-    }
-
-    /**
      * @param string $cmd
+     * @param $resource
      * @return bool
      */
-    private static function executeCommand(string $cmd) {
+    public static function executeCommand(string $cmd, $resource) {
         $it = explodeMsg($cmd);
         switch ($it[0] ?? '') {
             case 'logtest':
@@ -88,7 +32,13 @@ class Terminal
                 $class_name = $it[1];
                 $function_name = $it[2];
                 $class = new $class_name([]);
-                call_user_func_array([$class, $function_name], []);
+                $class->$function_name();
+                return true;
+            case 'psysh':
+                if (Framework::$argv["disable-coroutine"])
+                    eval(\Psy\sh());
+                else
+                    Console::error("Only \"--disable-coroutine\" mode can use psysh!!!");
                 return true;
             case 'bc':
                 $code = base64_decode($it[1] ?? '', true);
@@ -104,18 +54,13 @@ class Terminal
                 Console::log($it[2], $it[1]);
                 return true;
             case 'stop':
+                Event::del($resource);
                 ZMUtil::stop();
                 return false;
             case 'reload':
             case 'r':
                 ZMUtil::reload();
                 return false;
-            case 'save':
-                //$origin = ZMBuf::$atomics["info_level"]->get();
-                //ZMBuf::$atomics["info_level"]->set(3);
-                DataProvider::saveBuffer();
-                //ZMBuf::$atomics["info_level"]->set($origin);
-                return true;
             case '':
                 return true;
             default:

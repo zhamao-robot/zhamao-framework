@@ -4,48 +4,15 @@
 namespace ZM\Annotation;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Co;
-use ZM\ConnectionManager\ConnectionObject;
+use ZM\Annotation\Interfaces\ErgodicAnnotation;
 use ZM\Console\Console;
-use ZM\Store\ZMBuf;
-use Error;
-use Exception;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
-use ZM\Annotation\CQ\CQAfter;
-use ZM\Annotation\CQ\CQAPIResponse;
-use ZM\Annotation\CQ\CQAPISend;
-use ZM\Annotation\CQ\CQBefore;
-use ZM\Annotation\CQ\CQCommand;
-use ZM\Annotation\CQ\CQMessage;
-use ZM\Annotation\CQ\CQMetaEvent;
-use ZM\Annotation\CQ\CQNotice;
-use ZM\Annotation\CQ\CQRequest;
-use ZM\Annotation\Http\After;
-use ZM\Annotation\Http\Before;
-use ZM\Annotation\Http\Controller;
-use ZM\Annotation\Http\HandleException;
-use ZM\Annotation\Http\Middleware;
-use ZM\Annotation\Http\MiddlewareClass;
-use ZM\Annotation\Http\RequestMapping;
-use Swoole\Timer;
-use ZM\Annotation\Interfaces\CustomAnnotation;
+use ZM\Annotation\Http\{After, Before, Controller, HandleException, Middleware, MiddlewareClass, RequestMapping};
 use ZM\Annotation\Interfaces\Level;
 use ZM\Annotation\Module\Closed;
-use ZM\Annotation\Module\InitBuffer;
-use ZM\Annotation\Module\LoadBuffer;
-use ZM\Annotation\Module\SaveBuffer;
-use ZM\Annotation\Swoole\OnSave;
-use ZM\Annotation\Swoole\OnStart;
-use ZM\Annotation\Swoole\OnTick;
-use ZM\Annotation\Swoole\SwooleEventAfter;
-use ZM\Annotation\Swoole\SwooleEventAt;
-use ZM\Annotation\Interfaces\Rule;
-use ZM\Event\EventHandler;
-use ZM\Http\MiddlewareInterface;
 use ZM\Utils\DataProvider;
-use ZM\Utils\ZMUtil;
 
 class AnnotationParser
 {
@@ -54,12 +21,20 @@ class AnnotationParser
     private $start_time;
 
     private $annotation_map = [];
+    private $middleware_map = [];
+    private $middlewares = [];
 
+    /** @var null|AnnotationReader */
+    private $reader = null;
+    private $req_mapping = [];
+
+    /**
+     * AnnotationParser constructor.
+     */
     public function __construct() {
         $this->start_time = microtime(true);
         $this->loadAnnotationClasses();
-        ZMBuf::$req_mapping = [];
-        ZMBuf::$req_mapping[0] = [
+        $this->req_mapping[0] = [
             'id' => 0,
             'pid' => -1,
             'name' => '/'
@@ -71,15 +46,17 @@ class AnnotationParser
      * @throws ReflectionException
      */
     public function registerMods() {
-        foreach($this->path_list as $path) {
+        foreach ($this->path_list as $path) {
+            Console::debug("parsing annotation in ".$path[0]);
             $all_class = getAllClasses($path[0], $path[1]);
-            $reader = new AnnotationReader();
+            $this->reader = new AnnotationReader();
             foreach ($all_class as $v) {
                 Console::debug("正在检索 " . $v);
                 $reflection_class = new ReflectionClass($v);
                 $methods = $reflection_class->getMethods(ReflectionMethod::IS_PUBLIC);
-                $class_annotations = $reader->getClassAnnotations($reflection_class);
+                $class_annotations = $this->reader->getClassAnnotations($reflection_class);
 
+                // 这段为新加的:start
                 //这里将每个类里面所有的类注解、方法注解通通加到一颗大树上，后期解析
                 /*
                 $annotation_map: {
@@ -97,222 +74,116 @@ class AnnotationParser
                     }
                 }
                 */
+
+                // 生成主树
                 $this->annotation_map[$v]["class_annotations"] = $class_annotations;
                 $this->annotation_map[$v]["methods"] = $methods;
                 foreach ($methods as $method) {
-                    $this->annotation_map[$v]["methods_annotations"][$method->getName()] = $reader->getMethodAnnotations($method);
+                    $this->annotation_map[$v]["methods_annotations"][$method->getName()] = $this->reader->getMethodAnnotations($method);
                 }
 
-                /*
-                $middleware_addon = [];
-                foreach ($class_annotations as $vs) {
+
+                foreach ($this->annotation_map[$v]["class_annotations"] as $ks => $vs) {
+                    $vs->class = $v;
+
+                    //预处理1：将适用于每一个函数的注解到类注解重新注解到每个函数下面
+                    if ($vs instanceof ErgodicAnnotation) {
+                        foreach ($this->annotation_map[$v]["methods"] as $method) {
+                            $copy = clone $vs;
+                            $copy->method = $method->getName();
+                            $this->annotation_map[$v]["methods_annotations"][$method->getName()][] = $copy;
+                        }
+                    }
+
+                    //预处理2：处理 class 下面的注解
                     if ($vs instanceof Closed) {
+                        unset($this->annotation_map[$v]);
                         continue 2;
-                    } elseif ($vs instanceof Controller) {
-                        Console::debug("找到 Controller 中间件: " . $vs->class);
-                        $class_prefix = $vs->prefix;
-                    } elseif ($vs instanceof SaveBuffer) {
-                        Console::debug("注册自动保存的缓存变量: " . $vs->buf_name . " (Dir:" . $vs->sub_folder . ")");
-                        DataProvider::addSaveBuffer($vs->buf_name, $vs->sub_folder);
-                    } elseif ($vs instanceof LoadBuffer) {
-                        Console::debug("注册到内存的缓存变量: " . $vs->buf_name . " (Dir:" . $vs->sub_folder . ")");
-                        ZMBuf::set($vs->buf_name, DataProvider::getJsonData(($vs->sub_folder ?? "") . "/" . $vs->buf_name . ".json"));
-                    } elseif ($vs instanceof InitBuffer) {
-                        ZMBuf::set($vs->buf_name, []);
                     } elseif ($vs instanceof MiddlewareClass) {
                         Console::verbose("正在注册中间件 " . $reflection_class->getName());
-                        $result = [
-                            "class" => "\\" . $reflection_class->getName()
-                        ];
-                        foreach ($methods as $vss) {
-                            if ($vss->getName() == "getName") {
-                                /** @var MiddlewareInterface $tmp *
-                                $tmp = new $v();
-                                $result["name"] = $tmp->getName();
-                                continue;
-                            }
-                            $method_annotations = $reader->getMethodAnnotations($vss);
-                            foreach ($method_annotations as $vsss) {
-                                if ($vss instanceof Rule) $vss = self::registerRuleEvent($vsss, $vss, $reflection_class);
-                                else $vss = self::registerMethod($vsss, $vss, $reflection_class);
-                                //echo get_class($vsss) . PHP_EOL;
-                                if ($vsss instanceof Before) $result["before"] = $vsss->method;
-                                if ($vsss instanceof After) $result["after"] = $vsss->method;
-                                if ($vsss instanceof HandleException) {
-                                    $result["exceptions"][$vsss->class_name] = $vsss->method;
-                                }
-                            }
-                        }
-                        ZMBuf::$events[MiddlewareClass::class][$result["name"]] = $result;
-                        continue 2;
-                    } elseif ($vs instanceof Middleware) {
-                        $middleware_addon[] = $vs;
-                    } elseif ($vs instanceof CustomAnnotation) {
-                        $vs->class = $reflection_class->getName();
-                        ZMBuf::$events[get_class($vs)][] = $vs;
+                        $rs = $this->registerMiddleware($vs, $reflection_class);
+                        $this->middlewares[$rs["name"]] = $rs;
                     }
                 }
-                foreach ($methods as $vs) {
-                    if ($middleware_addon !== []) {
-                        foreach ($middleware_addon as $value) {
-                            Console::debug("Added middleware " . $value->middleware . " to $v -> " . $vs->getName());
-                            ZMBuf::$events[MiddlewareInterface::class][$v][$vs->getName()][] = $value->middleware;
+
+                //预处理3：处理每个函数上面的特殊注解，就是需要操作一些东西的
+                foreach ($this->annotation_map[$v]["methods_annotations"] as $method_name => $methods_annotations) {
+                    foreach ($methods_annotations as $method_anno) {
+                        /** @var AnnotationBase $method_anno */
+                        $method_anno->class = $v;
+                        $method_anno->method = $method_name;
+                        if ($method_anno instanceof RequestMapping) {
+                            $this->registerRequestMapping($method_anno, $method_name, $v, $methods_annotations); //TODO: 用symfony的routing重写
+                        } elseif ($method_anno instanceof Middleware) {
+                            $this->middleware_map[$method_anno->class][$method_anno->method][] = $method_anno->middleware;
                         }
                     }
-                    $method_annotations = $reader->getMethodAnnotations($vs);
-                    foreach ($method_annotations as $vss) {
-                        if ($vss instanceof Rule) $vss = self::registerRuleEvent($vss, $vs, $reflection_class);
-                        else $vss = self::registerMethod($vss, $vs, $reflection_class);
-                        Console::debug("寻找 " . $vs->getName() . " -> " . get_class($vss));
-
-                        if ($vss instanceof SwooleEventAt) ZMBuf::$events[SwooleEventAt::class][] = $vss;
-                        elseif ($vss instanceof SwooleEventAfter) ZMBuf::$events[SwooleEventAfter::class][] = $vss;
-                        elseif ($vss instanceof CQMessage) ZMBuf::$events[CQMessage::class][] = $vss;
-                        elseif ($vss instanceof CQNotice) ZMBuf::$events[CQNotice::class][] = $vss;
-                        elseif ($vss instanceof CQRequest) ZMBuf::$events[CQRequest::class][] = $vss;
-                        elseif ($vss instanceof CQMetaEvent) ZMBuf::$events[CQMetaEvent::class][] = $vss;
-                        elseif ($vss instanceof CQCommand) ZMBuf::$events[CQCommand::class][] = $vss;
-                        elseif ($vss instanceof RequestMapping) {
-                            self::registerRequestMapping($vss, $vs, $reflection_class, $class_prefix);
-                        } elseif ($vss instanceof CustomAnnotation) ZMBuf::$events[get_class($vss)][] = $vss;
-                        elseif ($vss instanceof CQBefore) ZMBuf::$events[CQBefore::class][$vss->cq_event][] = $vss;
-                        elseif ($vss instanceof CQAfter) ZMBuf::$events[CQAfter::class][$vss->cq_event][] = $vss;
-                        elseif ($vss instanceof OnStart) ZMBuf::$events[OnStart::class][] = $vss;
-                        elseif ($vss instanceof OnSave) ZMBuf::$events[OnSave::class][] = $vss;
-                        elseif ($vss instanceof Middleware) ZMBuf::$events[MiddlewareInterface::class][$vss->class][$vss->method][] = $vss->middleware;
-                        elseif ($vss instanceof OnTick) self::addTimerTick($vss);
-                        elseif ($vss instanceof CQAPISend) ZMBuf::$events[CQAPISend::class][] = $vss;
-                        elseif ($vss instanceof CQAPIResponse) ZMBuf::$events[CQAPIResponse::class][$vss->retcode] = [$vss->class, $vss->method];
-                    }
-                }*/
+                }
             }
         }
 
-
-
-        $tree = self::genTree(ZMBuf::$req_mapping);
-        ZMBuf::$req_mapping = $tree[0];
-        //给支持level的排个序
+        //预处理4：生成路由树（换成symfony后就不需要了）
+        $tree = $this->genTree($this->req_mapping);
+        $this->req_mapping = $tree[0];
 
         Console::debug("解析注解完毕！");
-        if (ZMBuf::isset("timer_count")) {
-            Console::info("Added " . ZMBuf::get("timer_count") . " timer(s)!");
-            ZMBuf::unsetCache("timer_count");
-        }
     }
 
-    public function sortLevels() {
-        foreach (ZMBuf::$events as $class_name => $v) {
-            if (is_a($class_name, Level::class, true)) {
-                for ($i = 0; $i < count(ZMBuf::$events[$class_name]) - 1; ++$i) {
-                    for ($j = 0; $j < count(ZMBuf::$events[$class_name]) - $i - 1; ++$j) {
-                        $l1 = ZMBuf::$events[$class_name][$j]->level;
-                        $l2 = ZMBuf::$events[$class_name][$j + 1]->level;
-                        if ($l1 < $l2) {
-                            $t = ZMBuf::$events[$class_name][$j + 1];
-                            ZMBuf::$events[$class_name][$j + 1] = ZMBuf::$events[$class_name][$j];
-                            ZMBuf::$events[$class_name][$j] = $t;
-                        }
-                    }
+    /**
+     * @return array
+     */
+    public function generateAnnotationEvents() {
+        $o = [];
+        foreach ($this->annotation_map as $module => $obj) {
+            foreach ($obj["class_annotations"] as $class_annotation) {
+                if ($class_annotation instanceof ErgodicAnnotation) continue;
+                else $o[get_class($class_annotation)][] = $class_annotation;
+            }
+            foreach ($obj["methods_annotations"] as $method_name => $methods_annotations) {
+                foreach ($methods_annotations as $annotation) {
+                    $o[get_class($annotation)][] = $annotation;
                 }
             }
+
         }
+        foreach ($o as $k => $v) {
+            $this->sortByLevel($o, $k);
+        }
+        return $o;
     }
 
-    public static function getRuleCallback($rule_str) {
-        $func = null;
-        $rule = $rule_str;
-        if ($rule != "") {
-            $asp = explode(":", $rule);
-            $asp_name = array_shift($asp);
-            $rest = implode(":", $asp);
-            //Swoole 事件时走此switch
-            switch ($asp_name) {
-                case "connectType": //websocket连接类型
-                    $func = function (?ConnectionObject $connection) use ($rest) {
-                        if ($connection === null) return false;
-                        return $connection->getName() == $rest ? true : false;
-                    };
-                    break;
-                case "containsGet": //handle http request事件时才能用
-                case "containsPost":
-                    $get_list = explode(",", $rest);
-                    if ($asp_name == "containsGet")
-                        $func = function ($request) use ($get_list) {
-                            foreach ($get_list as $v) if (!isset($request->get[$v])) return false;
-                            return true;
-                        };
-                    else
-                        $func = function ($request) use ($get_list) {
-                            foreach ($get_list as $v) if (!isset($request->post[$v])) return false;
-                            return true;
-                        };
-                    /*
-                    if ($controller_prefix != '') {
-                        $p = ZMBuf::$req_mapping_node;
-                        $prefix_exp = explode("/", $controller_prefix);
-                        foreach ($prefix_exp as $k => $v) {
-                            if ($v == "" || $v == ".." || $v == ".") {
-                                unset($prefix_exp[$k]);
-                            }
-                        }
-                        while (($shift = array_shift($prefix_exp)) !== null) {
-                            $p->addRoute($shift, new MappingNode($shift));
-                            $p = $p->getRoute($shift);
-                        }
-                        if ($p->getNodeName() != "/") {
-                            $p->setMethod($method->getName());
-                            $p->setClass($class->getName());
-                            $p->setRule($func);
-                            return "mapped";
-                        }
-                    }*/
-                    break;
-                case "containsJson": //handle http request事件时才能用
-                    $json_list = explode(",", $rest);
-                    $func = function ($json) use ($json_list) {
-                        foreach ($json_list as $v) if (!isset($json[$v])) return false;
-                        return true;
-                    };
-                    break;
-                case "dataEqual": //handle websocket message事件时才能用
-                    $func = function ($data) use ($rest) {
-                        return $data == $rest;
-                    };
-                    break;
-            }
-            switch ($asp_name) {
-                case "msgMatch": //handle cq message事件时才能用
-                    $func = function ($msg) use ($rest) {
-                        return matchPattern($rest, $msg);
-                    };
-                    break;
-                case "msgEqual": //handle cq message事件时才能用
-                    $func = function ($msg) use ($rest) {
-                        return trim($msg) == $rest;
-                    };
-                    break;
+    /**
+     * @return array
+     */
+    public function getMiddlewares() { return $this->middlewares; }
 
+    /**
+     * @return array
+     */
+    public function getMiddlewareMap() { return $this->middleware_map; }
+
+    /**
+     * @return array
+     */
+    public function getReqMapping() { return $this->req_mapping; }
+
+    /**
+     * @param $path
+     * @param $indoor_name
+     */
+    public function addRegisterPath($path, $indoor_name) { $this->path_list[] = [$path, $indoor_name]; }
+
+    //private function below
+
+    private function registerRequestMapping(RequestMapping $vss, $method, $class, $methods_annotations) {
+        $prefix = '';
+        foreach ($methods_annotations as $annotation) {
+            if ($annotation instanceof Controller) {
+                $prefix = $annotation->prefix;
+                break;
             }
         }
-        return $func;
-    }
-
-    public static function registerRuleEvent(?AnnotationBase $vss, ReflectionMethod $method, ReflectionClass $class) {
-        $vss->callback = self::getRuleCallback($vss->getRule());
-        $vss->method = $method->getName();
-        $vss->class = $class->getName();
-        return $vss;
-    }
-
-    public static function registerMethod(?AnnotationBase $vss, ReflectionMethod $method, ReflectionClass $class) {
-        $vss->method = $method->getName();
-        $vss->class = $class->getName();
-        return $vss;
-    }
-
-    private static function registerRequestMapping(RequestMapping $vss, ReflectionMethod $method, ReflectionClass $class, string $prefix) {
-        $array = ZMBuf::$req_mapping;
+        $array = $this->req_mapping;
         $uid = count($array);
         $prefix_exp = explode("/", $prefix);
         $route_exp = explode("/", $vss->route);
@@ -327,10 +198,10 @@ class AnnotationParser
             }
         }
         if ($prefix_exp == [] && $route_exp == []) {
-            $array[0]['method'] = $method->getName();
-            $array[0]['class'] = $class->getName();
+            $array[0]['method'] = $method;
+            $array[0]['class'] = $class;
             $array[0]['request_method'] = $vss->request_method;
-            ZMBuf::$req_mapping = $array;
+            $this->req_mapping = $array;
             return;
         }
         $pid = 0;
@@ -373,16 +244,19 @@ class AnnotationParser
             ];
             $pid = $uid - 1;
         }
-        $array[$uid - 1]['method'] = $method->getName();
-        $array[$uid - 1]['class'] = $class->getName();
+        $array[$uid - 1]['method'] = $method;
+        $array[$uid - 1]['class'] = $class;
         $array[$uid - 1]['request_method'] = $vss->request_method;
-        ZMBuf::$req_mapping = $array;
+        $array[$uid - 1]['route'] = $vss->route;
+        $this->req_mapping = $array;
     }
 
+    /** @noinspection PhpIncludeInspection */
     private function loadAnnotationClasses() {
         $class = getAllClasses(WORKING_DIR . "/src/ZM/Annotation/", "ZM\\Annotation");
         foreach ($class as $v) {
             $s = WORKING_DIR . '/src/' . str_replace("\\", "/", $v) . ".php";
+            //Console::debug("Requiring annotation " . $s);
             require_once $s;
         }
         $class = getAllClasses(DataProvider::getWorkingDir() . "/src/Custom/Annotation/", "Custom\\Annotation");
@@ -393,7 +267,7 @@ class AnnotationParser
         }
     }
 
-    public static function genTree($items) {
+    private function genTree($items) {
         $tree = array();
         foreach ($items as $item)
             if (isset($items[$item['pid']]))
@@ -403,48 +277,33 @@ class AnnotationParser
         return $tree;
     }
 
-    private static function addTimerTick(?OnTick $vss) {
-        ZMBuf::set("timer_count", ZMBuf::get("timer_count", 0) + 1);
-        $class = ZMUtil::getModInstance($vss->class);
-        $method = $vss->method;
-        $ms = $vss->tick_ms;
-        $cid = go(function () use ($class, $method, $ms) {
-            Co::suspend();
-            $plain_class = get_class($class);
-            if (!isset(ZMBuf::$events[MiddlewareInterface::class][$plain_class][$method])) {
-                Console::debug("Added timer: " . $plain_class . " -> " . $method);
-                Timer::tick($ms, function () use ($class, $method) {
-                    set_coroutine_params([]);
-                    try {
-                        $class->$method();
-                    } catch (Exception $e) {
-                        Console::error("Uncaught error from TimerTick: " . $e->getMessage() . " at " . $e->getFile() . "({$e->getLine()})");
-                    } catch (Error $e) {
-                        Console::error("Uncaught fatal error from TimerTick: " . $e->getMessage());
-                        echo Console::setColor($e->getTraceAsString(), "gray");
-                        Console::error("Please check your code!");
-                    }
-                });
-            } else {
-                Console::debug("Added Middleware-based timer: " . $plain_class . " -> " . $method);
-                Timer::tick($ms, function () use ($class, $method) {
-                    set_coroutine_params([]);
-                    try {
-                        EventHandler::callWithMiddleware($class, $method, [], []);
-                    } catch (Exception $e) {
-                        Console::error("Uncaught error from TimerTick: " . $e->getMessage() . " at " . $e->getFile() . "({$e->getLine()})");
-                    } catch (Error $e) {
-                        Console::error("Uncaught fatal error from TimerTick: " . $e->getMessage());
-                        echo Console::setColor($e->getTraceAsString(), "gray");
-                        Console::error("Please check your code!");
-                    }
-                });
+    private function registerMiddleware(MiddlewareClass $vs, ReflectionClass $reflection_class) {
+        $result = [
+            "class" => "\\" . $reflection_class->getName(),
+            "name" => $vs->name
+        ];
+
+        foreach ($reflection_class->getMethods() as $vss) {
+            $method_annotations = $this->reader->getMethodAnnotations($vss);
+            foreach ($method_annotations as $vsss) {
+                if ($vsss instanceof Before) $result["before"] = $vss->getName();
+                if ($vsss instanceof After) $result["after"] = $vss->getName();
+                if ($vsss instanceof HandleException) {
+                    $result["exceptions"][$vsss->class_name] = $vss->getName();
+                }
             }
-        });
-        ZMBuf::append("paused_tick", $cid);
+        }
+        return $result;
     }
 
-    public function addRegisterPath($path, $indoor_name) {
-        $this->path_list[] = [$path, $indoor_name];
+    private function sortByLevel(&$events, string $class_name, $prefix = "") {
+        if (is_a($class_name, Level::class, true)) {
+            $class_name .= $prefix;
+            usort($events[$class_name], function ($a, $b) {
+                $left = $a->level;
+                $right = $b->level;
+                return $left > $right ? -1 : ($left == $right ? 0 : 1);
+            });
+        }
     }
 }

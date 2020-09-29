@@ -10,12 +10,12 @@ use ZM\ConnectionManager\ManagerGM;
 use ZM\Console\Console;
 use Swoole\Server;
 use ZM\Annotation\Swoole\SwooleEventAfter;
-use ZM\Annotation\Swoole\SwooleEventAt;
+use ZM\Annotation\Swoole\SwooleEvent;
 use ZM\Event\EventHandler;
 use ZM\Store\ZMBuf;
 use ZM\Utils\ZMUtil;
 
-class WSCloseEvent implements SwooleEvent
+class WSCloseEvent implements SwooleEventInterface
 {
     public $server;
 
@@ -31,10 +31,9 @@ class WSCloseEvent implements SwooleEvent
      * @throws AnnotationException
      */
     public function onActivate() {
-        Console::info("Closed #{$this->fd}");
-        ZMUtil::checkWait();
+        Console::debug("Websocket closed #{$this->fd}");
         set_coroutine_params(["server" => $this->server, "fd" => $this->fd, "connection" => ManagerGM::get($this->fd)]);
-        foreach(ZMBuf::$events[SwooleEventAt::class] ?? [] as $v) {
+        foreach(ZMBuf::$events[SwooleEvent::class] ?? [] as $v) {
             if(strtolower($v->type) == "close" && $this->parseSwooleRule($v)) {
                 $c = $v->class;
                 EventHandler::callWithMiddleware($c, $v->method, ["server" => $this->server, "fd" => $this->fd], []);

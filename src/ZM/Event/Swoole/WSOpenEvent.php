@@ -13,12 +13,11 @@ use ZM\Console\Console;
 use Swoole\Http\Request;
 use Swoole\WebSocket\Server;
 use ZM\Annotation\Swoole\SwooleEventAfter;
-use ZM\Annotation\Swoole\SwooleEventAt;
+use ZM\Annotation\Swoole\SwooleEvent;
 use ZM\Event\EventHandler;
 use ZM\Store\ZMBuf;
-use ZM\Utils\ZMUtil;
 
-class WSOpenEvent implements SwooleEvent
+class WSOpenEvent implements SwooleEventInterface
 {
     /**
      * @var Server
@@ -41,10 +40,9 @@ class WSOpenEvent implements SwooleEvent
      * @throws AnnotationException
      */
     public function onActivate() {
-        ZMUtil::checkWait();
-        ManagerGM::pushConnect($this->request->fd);
         $type = strtolower($this->request->get["type"] ?? $this->request->header["x-client-role"] ?? "");
         $type_conn = $this->getTypeClassName($type);
+        ManagerGM::pushConnect($this->request->fd, $type_conn);
         if ($type_conn == "qq") {
             ManagerGM::setName($this->request->fd, "qq");
             $qq = $this->request->get["qq"] ?? $this->request->header["x-self-id"] ?? "";
@@ -65,7 +63,7 @@ class WSOpenEvent implements SwooleEvent
             $this->conn = ManagerGM::get($this->request->fd);
         }
         set_coroutine_params(["server" => $this->server, "request" => $this->request, "connection" => $this->conn]);
-        foreach (ZMBuf::$events[SwooleEventAt::class] ?? [] as $v) {
+        foreach (ZMBuf::$events[SwooleEvent::class] ?? [] as $v) {
             if (strtolower($v->type) == "open" && $this->parseSwooleRule($v) === true) {
                 $c = $v->class;
                 EventHandler::callWithMiddleware(
@@ -104,14 +102,5 @@ class WSOpenEvent implements SwooleEvent
         return true;
     }
 
-    private function getTypeClassName(string $type) {
-        $map = [
-            "qq" => "qq",
-            "universal" => "qq",
-            "webconsole" => "webconsole",
-            "proxy" => "proxy",
-            "terminal" => "terminal"
-        ];
-        return $map[$type] ?? "default";
-    }
+
 }

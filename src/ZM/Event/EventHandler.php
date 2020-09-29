@@ -8,20 +8,21 @@ use Co;
 use Doctrine\Common\Annotations\AnnotationException;
 use Error;
 use Exception;
+use ZM\Config\ZMConfig;
 use ZM\ConnectionManager\ConnectionObject;
 use ZM\ConnectionManager\ManagerGM;
 use ZM\Console\Console;
-use ZM\Event\Swoole\{MessageEvent, RequestEvent, WorkerStartEvent, WSCloseEvent, WSOpenEvent};
+use ZM\Event\Swoole\{MessageEvent, RequestEvent, WSCloseEvent, WSOpenEvent};
 use Swoole\Http\Request;
 use Swoole\Server;
 use Swoole\WebSocket\Frame;
 use ZM\Annotation\CQ\CQAPIResponse;
 use ZM\Annotation\CQ\CQAPISend;
 use ZM\Annotation\Http\MiddlewareClass;
+use ZM\Context\Context;
 use ZM\Http\MiddlewareInterface;
 use ZM\Http\Response;
 use ZM\Store\ZMBuf;
-use ZM\Utils\DataProvider;
 use ZM\Utils\ZMUtil;
 
 class EventHandler
@@ -34,38 +35,9 @@ class EventHandler
      */
     public static function callSwooleEvent($event_name, $param0, $param1 = null) {
         //$starttime = microtime(true);
-        unset(ZMBuf::$context[Co::getCid()]);
+        unset(Context::$context[Co::getCid()]);
         $event_name = strtolower($event_name);
         switch ($event_name) {
-            case "workerstart":
-                try {
-                    register_shutdown_function(function () use ($param0) {
-                        $error = error_get_last();
-                        if ($error["type"] != 0) {
-                            Console::error("Internal fatal error: " . $error["message"] . " at " . $error["file"] . "({$error["line"]})");
-                        }
-                        DataProvider::saveBuffer();
-                        /** @var Server $param0 */
-                        if (ZMBuf::$server === null) $param0->shutdown();
-                        else ZMBuf::$server->shutdown();
-                    });
-                    ZMBuf::$server = $param0;
-                    $r = (new WorkerStartEvent($param0, $param1))->onActivate();
-                    Console::success("Worker #" . $param0->worker_id . " 已启动");
-                    $r->onAfter();
-                    self::startTick();
-                } catch (Exception $e) {
-                    Console::error("Worker加载出错！停止服务！");
-                    Console::error($e->getMessage() . "\n" . $e->getTraceAsString());
-                    ZMUtil::stop();
-                    return;
-                } catch (Error $e) {
-                    Console::error("PHP Error: " . $e->getMessage() . " in " . $e->getFile() . " on line " . $e->getLine());
-                    Console::error("Maybe it caused by your own code if in your own Module directory.");
-                    Console::log($e->getTraceAsString(), 'gray');
-                    ZMUtil::stop();
-                }
-                break;
             case "message":
                 /** @var Frame $param1 */
                 /** @var Server $param0 */
@@ -90,7 +62,7 @@ class EventHandler
                         " [" . $param1->getStatusCode() . "] " . $param0->server["request_uri"]
                     );
                     if (!$param1->isEnd()) {
-                        if (\ZM\Config\ZMConfig::get("global", "debug_mode"))
+                        if (ZMConfig::get("global", "debug_mode"))
                             $param1->end("Internal server error: " . $e->getMessage());
                         else
                             $param1->end("Internal server error.");
@@ -268,11 +240,13 @@ class EventHandler
                 if (!isset(ZMBuf::$events[MiddlewareClass::class][$middleware])) throw new AnnotationException("Annotation parse error: Unknown MiddlewareClass named \"{$middleware}\"!");
                 $middleware_obj = ZMBuf::$events[MiddlewareClass::class][$middleware];
                 $before = $middleware_obj["class"];
+                //var_dump($middleware_obj);
                 $r[$k] = new $before();
                 $r[$k]->class = is_object($c) ? get_class($c) : $c;
                 $r[$k]->method = $method;
                 if (isset($middleware_obj["before"])) {
-                    $before_result = call_user_func_array([$r[$k], $middleware_obj["before"]], $func_args);
+                    $rs = $middleware_obj["before"];
+                    $before_result = $r[$k]->$rs(...$func_args);
                     if ($before_result === false) break;
                 }
             }
@@ -281,9 +255,9 @@ class EventHandler
                     if (is_object($c)) $class = $c;
                     elseif ($class_construct == []) $class = ZMUtil::getModInstance($c);
                     else $class = new $c($class_construct);
-                    $result = call_user_func_array([$class, $method], $func_args);
+                    $result = $class->$method(...$func_args);
                     if (is_callable($after_call))
-                        $return_value = call_user_func_array($after_call, [$result]);
+                        $return_value = $after_call($result);
                 } catch (Exception $e) {
                     for ($i = count($middlewares) - 1; $i >= 0; --$i) {
                         $middleware_obj = ZMBuf::$events[MiddlewareClass::class][$middlewares[$i]];
@@ -301,8 +275,9 @@ class EventHandler
             }
             for ($i = count($middlewares) - 1; $i >= 0; --$i) {
                 $middleware_obj = ZMBuf::$events[MiddlewareClass::class][$middlewares[$i]];
-                if (isset($middleware_obj["after"], $r[$i]))
-                    call_user_func_array([$r[$i], $middleware_obj["after"]], $func_args);
+                if (isset($middleware_obj["after"], $r[$i])) {
+                    $r[$i]->{$middleware_obj["after"]}(...$func_args);
+                }
             }
         } else {
             if (is_object($c)) $class = $c;
@@ -313,13 +288,5 @@ class EventHandler
                 $return_value = call_user_func_array($after_call, [$result]);
         }
         return $return_value;
-    }
-
-    private static function startTick() {
-        Console::debug("Starting " . count(ZMBuf::get("paused_tick", [])) . " custom tick function");
-        foreach (ZMBuf::get("paused_tick", []) as $cid) {
-            Co::resume($cid);
-        }
-
     }
 }

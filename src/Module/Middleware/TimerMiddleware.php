@@ -9,10 +9,10 @@ use ZM\Console\Console;
 use ZM\Http\MiddlewareInterface;
 
 /**
- * Class AuthMiddleware
+ * Class TimerMiddleware
  * 示例中间件：用于统计路由函数运行时间用的
  * @package Module\Middleware
- * @MiddlewareClass()
+ * @MiddlewareClass("timer")
  */
 class TimerMiddleware implements MiddlewareInterface
 {
@@ -33,6 +33,4 @@ class TimerMiddleware implements MiddlewareInterface
     public function onAfter() {
         Console::info("Using " . round((microtime(true) - $this->starttime) * 1000, 2) . " ms.");
     }
-
-    public function getName() { return "timer"; }
 }

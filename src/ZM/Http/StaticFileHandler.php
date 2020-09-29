@@ -6,6 +6,7 @@ namespace ZM\Http;
 
 use ZM\Console\Console;
 use Framework\ZMBuf;
+use ZM\Utils\HttpUtil;
 use ZM\Utils\ZMUtil;
 
 class StaticFileHandler
@@ -29,7 +30,7 @@ class StaticFileHandler
             }
         }
         $response->status(404);
-        $response->end(ZMUtil::getHttpCodePage(404));
+        $response->end(HttpUtil::getHttpCodePage(404));
         return true;
     }
 }

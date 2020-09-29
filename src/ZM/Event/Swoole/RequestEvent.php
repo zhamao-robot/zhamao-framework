@@ -6,17 +6,20 @@ namespace ZM\Event\Swoole;
 
 use Closure;
 use Exception;
+use ZM\Config\ZMConfig;
 use ZM\Console\Console;
-use Framework\ZMBuf;
+use ZM\Event\EventManager;
+use ZM\Store\ZMBuf;
 use Swoole\Http\Request;
 use ZM\Annotation\Swoole\SwooleEventAfter;
-use ZM\Annotation\Swoole\SwooleEventAt;
+use ZM\Annotation\Swoole\SwooleEvent;
 use ZM\Event\EventHandler;
 use ZM\Http\Response;
 use ZM\Utils\DataProvider;
+use ZM\Utils\HttpUtil;
 use ZM\Utils\ZMUtil;
 
-class RequestEvent implements SwooleEvent
+class RequestEvent implements SwooleEventInterface
 {
     /**
      * @var Request
@@ -37,15 +40,14 @@ class RequestEvent implements SwooleEvent
      * @throws Exception
      */
     public function onActivate() {
-        ZMUtil::checkWait();
-        foreach (\ZM\Config\ZMConfig::get("global", "http_header") as $k => $v) {
+        foreach (ZMConfig::get("global", "http_header") as $k => $v) {
             $this->response->setHeader($k, $v);
         }
         $uri = $this->request->server["request_uri"];
         Console::verbose($this->request->server["remote_addr"] . " request " . $uri);
         $uri = explode("/", $uri);
         $uri = array_diff($uri, ["..", "", "."]);
-        $node = ZMBuf::$req_mapping;
+        $node = EventManager::$req_mapping;
         $params = [];
         while (true) {
             $r = array_shift($uri);
@@ -81,9 +83,9 @@ class RequestEvent implements SwooleEvent
                 }
             }
 
-            if (\ZM\Config\ZMConfig::get("global", "static_file_server")["status"]) {
-                $base_dir = \ZM\Config\ZMConfig::get("global", "static_file_server")["document_root"];
-                $base_index = \ZM\Config\ZMConfig::get("global", "static_file_server")["document_index"];
+            if (ZMConfig::get("global", "static_file_server")["status"]) {
+                $base_dir = ZMConfig::get("global", "static_file_server")["document_root"];
+                $base_index = ZMConfig::get("global", "static_file_server")["document_index"];
                 $uri = $this->request->server["request_uri"];
                 $path = realpath($base_dir . urldecode($uri));
                 if ($path !== false) {
@@ -98,7 +100,7 @@ class RequestEvent implements SwooleEvent
                             if (is_file($path . $vp)) {
                                 Console::info("[200] " . $uri . " (static)");
                                 $exp = strtolower(pathinfo($path . $vp)['extension'] ?? "unknown");
-                                $this->response->setHeader("Content-Type", ZMBuf::config("file_header")[$exp] ?? "application/octet-stream");
+                                $this->response->setHeader("Content-Type", ZMConfig::get("file_header")[$exp] ?? "application/octet-stream");
                                 $this->response->end(file_get_contents($path . $vp));
                                 return $this;
                             }
@@ -106,14 +108,14 @@ class RequestEvent implements SwooleEvent
                     } elseif (is_file($path)) {
                         Console::info("[200] " . $uri . " (static)");
                         $exp = strtolower(pathinfo($path)['extension'] ?? "unknown");
-                        $this->response->setHeader("Content-Type", ZMBuf::config("file_header")[$exp] ?? "application/octet-stream");
+                        $this->response->setHeader("Content-Type", ZMConfig::get("file_header")[$exp] ?? "application/octet-stream");
                         $this->response->end(file_get_contents($path));
                         return $this;
                     }
                 }
             }
             $this->response->status(404);
-            $this->response->end(ZMUtil::getHttpCodePage(404));
+            $this->response->end(HttpUtil::getHttpCodePage(404));
             return $this;
         }
         context()->setCache("params", $params);
@@ -131,7 +133,7 @@ class RequestEvent implements SwooleEvent
                 }
             );
         }
-        foreach (ZMBuf::$events[SwooleEventAt::class] ?? [] as $v) {
+        foreach (ZMBuf::$events[SwooleEvent::class] ?? [] as $v) {
             if (strtolower($v->type) == "request" && $this->parseSwooleRule($v)) {
                 $c = $v->class;
                 EventHandler::callWithMiddleware($c, $v->method, ["request" => $this->request, "response" => $this->response], []);
@@ -141,7 +143,7 @@ class RequestEvent implements SwooleEvent
 
         if (!$this->response->isEnd()) {
             $this->response->status(404);
-            $this->response->end(ZMUtil::getHttpCodePage(404));
+            $this->response->end(HttpUtil::getHttpCodePage(404));
         }
         return $this;
     }

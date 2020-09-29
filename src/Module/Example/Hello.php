@@ -1,27 +1,27 @@
 <?php
 
-
 namespace Module\Example;
 
-
+use ZM\Annotation\Swoole\OnStart;
+use ZM\Annotation\Swoole\OnTick;
 use ZM\ConnectionManager\ConnectionObject;
 use ZM\Console\Console;
 use ZM\Annotation\CQ\CQCommand;
 use ZM\Annotation\Http\Middleware;
 use ZM\Annotation\Http\RequestMapping;
-use ZM\Annotation\Swoole\SwooleEventAt;
+use ZM\Annotation\Swoole\SwooleEvent;
 use ZM\Utils\ZMUtil;
 
 /**
  * Class Hello
  * @package Module\Example
- * @since 1.0
+ * @since 2.0
  */
 class Hello
 {
     /**
      * 在机器人连接后向终端输出信息
-     * @SwooleEventAt("open",rule="connectType:qq")
+     * @SwooleEvent("open",rule="connectIsQQ()")
      * @param $conn
      */
     public function onConnect(ConnectionObject $conn) {
@@ -29,11 +29,11 @@ class Hello
     }
 
     /**
-     * 在机器人连接后向终端输出信息
-     * @SwooleEventAt("close",rule="connectType:qq")
+     * 在机器人断开连接后向终端输出信息
+     * @SwooleEvent("close",rule="connectIsQQ()")
+     * @param ConnectionObject $conn
      */
-    public function onDisconnect() {
-        $conn = ctx()->getConnection();
+    public function onDisconnect(ConnectionObject $conn) {
         Console::info("机器人 " . $conn->getOption("connect_id") . " 已断开连接！");
     }
 
@@ -66,7 +66,7 @@ class Hello
         $a = min(intval($num1), intval($num2));
         $b = max(intval($num1), intval($num2));
         // 回复用户结果
-        ctx()->reply("随机数是：".mt_rand($a, $b));
+        ctx()->reply("随机数是：" . mt_rand($a, $b));
     }
 
     /**
@@ -87,10 +87,19 @@ class Hello
         return "Hello Zhamao!";
     }
 
+    /**
+     * 使用自定义参数的路由参数
+     * @RequestMapping("/whoami/{name}")
+     * @param $param
+     * @return string
+     */
+    public function paramGet($param) {
+        return "Your name: {$param["name"]}";
+    }
 
     /**
      * 框架会默认关闭未知的WebSocket链接，因为这个绑定的事件，你可以根据你自己的需求进行修改
-     * @SwooleEventAt(type="open",rule="connectType:unknown")
+     * @SwooleEvent(type="open",rule="connectIsDefault()")
      */
     public function closeUnknownConn() {
         Console::info("Unknown connection , I will close it.");

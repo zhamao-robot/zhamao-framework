@@ -8,6 +8,8 @@ use Co;
 use Doctrine\Common\Annotations\AnnotationException;
 use ZM\ConnectionManager\ConnectionObject;
 use ZM\Console\Console;
+use ZM\Event\EventDispatcher;
+use ZM\Event\EventManager;
 use ZM\Store\ZMBuf;
 use ZM\Annotation\CQ\CQAfter;
 use ZM\Annotation\CQ\CQBefore;
@@ -36,21 +38,23 @@ class MessageEvent
      * @throws AnnotationException
      */
     public function onBefore() {
-        $obj_list = ZMBuf::$events[CQBefore::class]["message"] ?? [];
-        foreach ($obj_list as $v) {
-            if ($v->level < 200) break;
-            EventHandler::callWithMiddleware(
-                $v->class,
-                $v->method,
-                ["data" => context()->getData(), "connection" => $this->connection],
-                [],
-                function ($r) {
-                    if (!$r) context()->setCache("block_continue", true);
-                }
-            );
-            if (context()->getCache("block_continue") === true) return false;
-        }
+        $dispatcher = new EventDispatcher(CQBefore::class . "::message");
+        $dispatcher->setRuleFunction(function ($v) {
+            if($v->level < 200) EventDispatcher::interrupt();
+            return true;
+        });
+        $dispatcher->setReturnFunction(function($result){
+            if(!$result) EventDispatcher::interrupt();
+        });
+        $dispatcher->dispatchEvents();
+
         foreach (ZMBuf::get("wait_api", []) as $k => $v) {
+            if(zm_data_hash(ctx()->getData()) == $v["hash"]) {
+                $v["result"] = context()->getData()["message"];
+                ZMBuf::appendKey("wait_api", $k, $v);
+                Co::resume($v["coroutine"]);
+                return false;
+            }
             if (context()->getData()["user_id"] == $v["user_id"] &&
                 context()->getData()["self_id"] == $v["self_id"] &&
                 context()->getData()["message_type"] == $v["message_type"] &&
@@ -62,7 +66,7 @@ class MessageEvent
                 return false;
             }
         }
-        foreach (ZMBuf::$events[CQBefore::class]["message"] ?? [] as $v) {
+        foreach (EventManager::$events[CQBefore::class]["message"] ?? [] as $v) {
             if ($v->level >= 200) continue;
             $c = $v->class;
             if (ctx()->getCache("level") != 0) continue;
@@ -95,70 +99,44 @@ class MessageEvent
                     $word[$k] = trim($word[$k]);
                 }
             }
-            $obj = [];
-            foreach (ZMBuf::$events[CQCommand::class] ?? [] as $v) {
-                /** @var CQCommand $v */
-                if ($v->match == "" && $v->regexMatch == "" && $v->fullMatch == "") continue;
-                elseif (($v->user_id == 0 || ($v->user_id != 0 && $v->user_id == context()->getData()["user_id"])) &&
-                    ($v->group_id == 0 || ($v->group_id != 0 && $v->group_id == (context()->getData()["group_id"] ?? 0))) &&
-                    ($v->discuss_id == 0 || ($v->discuss_id != 0 && $v->discuss_id == (context()->getData()["discuss_id"] ?? 0))) &&
-                    ($v->message_type == '' || ($v->message_type != '' && $v->message_type == context()->getData()["message_type"]))
-                    ) {
-                    $c = $v->class;
-                    if (!isset($obj[$c])) {
-                        $obj[$c] = new $c();
-                    }
-                    if ($word[0] != "" && $v->match == $word[0]) {
-                        Console::debug("Calling $c -> {$v->method}");
-                        $this->function_call = EventHandler::callWithMiddleware($obj[$c], $v->method, [], [$word], function ($r) {
-                            if (is_string($r)) context()->reply($r);
-                            return true;
-                        });
-                        return;
-                    } elseif (in_array($word[0], $v->alias)) {
-                        Console::debug("Calling $c -> {$v->method}");
-                        $this->function_call = EventHandler::callWithMiddleware($obj[$c], $v->method, [], [$word], function ($r) {
-                            if (is_string($r)) context()->reply($r);
-                            return true;
-                        });
-                        return;
-                    } elseif ($v->regexMatch != "" && ($args = matchArgs($v->regexMatch, context()->getMessage())) !== false) {
-                        Console::debug("Calling $c -> {$v->method}");
-                        $this->function_call = EventHandler::callWithMiddleware($obj[$c], $v->method, [], [$args], function ($r) {
-                            if (is_string($r)) context()->reply($r);
-                            return true;
-                        });
-                        return;
-                    } elseif ($v->fullMatch != "" && (preg_match("/".$v->fullMatch."/u", ctx()->getMessage(), $args)) != 0) {
-                        Console::debug("Calling $c -> {$v->method}");
-                        array_shift($args);
-                        $this->function_call = EventHandler::callWithMiddleware($obj[$c], $v->method, [], [$args], function ($r) {
-                            if (is_string($r)) context()->reply($r);
-                            return true;
-                        });
-                        return;
+
+            //分发CQCommand事件
+            $dispatcher = new EventDispatcher(CQCommand::class);
+            $dispatcher->setRuleFunction(function ($v) use ($word) {
+                if ($v->match == "" && $v->regexMatch == "" && $v->fullMatch == "") return false;
+                elseif (($v->user_id == 0 || ($v->user_id != 0 && $v->user_id == ctx()->getUserId())) &&
+                    ($v->group_id == 0 || ($v->group_id != 0 && $v->group_id == (ctx()->getGroupId() ?? 0))) &&
+                    ($v->message_type == '' || ($v->message_type != '' && $v->message_type == ctx()->getMessageType()))
+                ) {
+                    if (($word[0] != "" && $v->match == $word[0]) ||
+                        in_array($word[0], $v->alias) ||
+                        ($v->regexMatch != "" && ($args = matchArgs($v->regexMatch, ctx()->getMessage())) !== false) ||
+                        ($v->fullMatch != "" && (preg_match("/" . $v->fullMatch . "/u", ctx()->getMessage(), $args)) != 0)) {
+                        return true;
                     }
                 }
-            }
-            foreach (ZMBuf::$events[CQMessage::class] ?? [] as $v) {
-                /** @var CQMessage $v */
-                if (
-                    ($v->message == '' || ($v->message != '' && $v->message == context()->getData()["message"])) &&
+                return false;
+            });
+            $dispatcher->setReturnFunction(function ($result) {
+                if (is_string($result)) ctx()->reply($result);
+                EventDispatcher::interrupt();
+            });
+            $r = $dispatcher->dispatchEvents($word);
+            if ($r === false) return;
+
+            //分发CQMessage事件
+            $msg_dispatcher = new EventDispatcher(CQMessage::class);
+            $msg_dispatcher->setRuleFunction(function ($v) {
+                return ($v->message == '' || ($v->message != '' && $v->message == context()->getData()["message"])) &&
                     ($v->user_id == 0 || ($v->user_id != 0 && $v->user_id == context()->getData()["user_id"])) &&
                     ($v->group_id == 0 || ($v->group_id != 0 && $v->group_id == (context()->getData()["group_id"] ?? 0))) &&
-                    ($v->discuss_id == 0 || ($v->discuss_id != 0 && $v->discuss_id == (context()->getData()["discuss_id"] ?? 0))) &&
                     ($v->message_type == '' || ($v->message_type != '' && $v->message_type == context()->getData()["message_type"])) &&
-                    ($v->raw_message == '' || ($v->raw_message != '' && $v->raw_message == context()->getData()["raw_message"]))) {
-                    $c = $v->class;
-                    Console::debug("Calling CQMessage: $c -> {$v->method}");
-                    if (!isset($obj[$c]))
-                        $obj[$c] = new $c();
-                    EventHandler::callWithMiddleware($obj[$c], $v->method, [], [context()->getData()["message"]], function ($r) {
-                        if (is_string($r)) context()->reply($r);
-                    });
-                    if (context()->getCache("block_continue") === true) return;
-                }
-            }
+                    ($v->raw_message == '' || ($v->raw_message != '' && $v->raw_message == context()->getData()["raw_message"]));
+            });
+            $msg_dispatcher->setReturnFunction(function ($result) {
+                if (is_string($result)) ctx()->reply($result);
+            });
+            $msg_dispatcher->dispatchEvents(ctx()->getMessage());
         } catch (WaitTimeoutException $e) {
             $e->module->finalReply($e->getMessage());
         }

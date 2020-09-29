@@ -2,6 +2,8 @@
 
 use ZM\Config\ZMConfig;
 use ZM\Console\Console;
+use ZM\Context\Context;
+use ZM\Event\EventManager;
 use ZM\Framework;
 use ZM\Store\ZMBuf;
 use ZM\Utils\DataProvider;
@@ -162,13 +164,40 @@ function matchArgs($pattern, $context) {
     } else return false;
 }
 
+function connectIsQQ() {
+    return ctx()->getConnection()->getName() == 'qq';
+}
+
+function connectIsDefault() {
+    return ctx()->getConnection()->getName() == 'default';
+}
+
+function connectIs($type) {
+    return ctx()->getConnection()->getName() == $type;
+}
+
+function getAnnotations() {
+    $s = debug_backtrace()[1];
+    //echo json_encode($s, 128|256);
+    $list = [];
+    foreach(EventManager::$events as $event => $v) {
+        foreach($v as $ks => $vs) {
+            //echo get_class($vs).": ".$vs->class." => ".$vs->method.PHP_EOL;
+            if($vs->class == $s["class"] && $vs->method == $s["function"]) {
+                $list[get_class($vs)][]=$vs;
+            }
+        }
+    }
+    return $list;
+}
+
 function set_coroutine_params($array) {
     $cid = Co::getCid();
     if ($cid == -1) die("Cannot set coroutine params at none coroutine mode.");
-    if (isset(ZMBuf::$context[$cid])) ZMBuf::$context[$cid] = array_merge(ZMBuf::$context[$cid], $array);
-    else ZMBuf::$context[$cid] = $array;
-    foreach (ZMBuf::$context as $c => $v) {
-        if (!Co::exists($c)) unset(ZMBuf::$context[$c], ZMBuf::$context_class[$c]);
+    if (isset(Context::$context[$cid])) Context::$context[$cid] = array_merge(Context::$context[$cid], $array);
+    else Context::$context[$cid] = $array;
+    foreach (Context::$context as $c => $v) {
+        if (!Co::exists($c)) unset(Context::$context[$c], ZMBuf::$context_class[$c]);
     }
 }
 
@@ -185,13 +214,13 @@ function context() {
 function ctx() {
     $cid = Co::getCid();
     $c_class = ZMConfig::get("global", "context_class");
-    if (isset(ZMBuf::$context[$cid])) {
+    if (isset(Context::$context[$cid])) {
         return ZMBuf::$context_class[$cid] ?? (ZMBuf::$context_class[$cid] = new $c_class($cid));
     } else {
         Console::debug("未找到当前协程的上下文($cid)，正在找父进程的上下文");
         while (($pcid = Co::getPcid($cid)) !== -1) {
             $cid = $pcid;
-            if (isset(ZMBuf::$context[$cid])) return ZMBuf::$context_class[$cid] ?? (ZMBuf::$context_class[$cid] = new $c_class($cid));
+            if (isset(Context::$context[$cid])) return ZMBuf::$context_class[$cid] ?? (ZMBuf::$context_class[$cid] = new $c_class($cid));
         }
         return null;
     }
@@ -211,21 +240,23 @@ function zm_resume(int $cid) { Co::resume($cid); }
 
 function zm_timer_after($ms, callable $callable) {
     go(function () use ($ms, $callable) {
-        ZMUtil::checkWait();
         Swoole\Timer::after($ms, $callable);
     });
 }
 
 function zm_timer_tick($ms, callable $callable) {
     go(function () use ($ms, $callable) {
-        ZMUtil::checkWait();
         Console::debug("Adding extra timer tick of " . $ms . " ms");
         Swoole\Timer::tick($ms, $callable);
     });
 }
 
+function zm_data_hash($v) {
+    return md5($v["user_id"] . "^" . $v["self_id"] . "^" . $v["message_type"] . "^" . ($v[$v["message_type"] . "_id"] ?? $v["user_id"]));
+}
+
 function server() {
-    return Framework::getServer();
+    return Framework::$server;
 }
 
 

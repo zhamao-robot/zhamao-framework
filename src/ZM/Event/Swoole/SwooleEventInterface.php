@@ -6,15 +6,15 @@ namespace ZM\Event\Swoole;
 
 use ZM\Event\Event;
 
-interface SwooleEvent extends Event
+interface SwooleEventInterface extends Event
 {
     /**
-     * @return SwooleEvent
+     * @return SwooleEventInterface
      */
     public function onActivate();
 
     /**
-     * @return SwooleEvent
+     * @return SwooleEventInterface
      */
     public function onAfter();
 }

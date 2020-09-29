@@ -64,7 +64,7 @@ class MetaEvent
                     if (context()->getCache("block_continue") === true) return;
                 }
             }
-        } catch (WaitTimeoutException $e) {
+        } /** @noinspection PhpRedundantCatchClauseInspection */ catch (WaitTimeoutException $e) {
             $e->module->finalReply($e->getMessage());
         }
     }

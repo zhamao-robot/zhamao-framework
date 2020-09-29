@@ -6,9 +6,14 @@ namespace ZM;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Exception;
+use Swoole\Coroutine\Socket;
+use Swoole\Event;
+use Swoole\Process;
+use ZM\Annotation\Swoole\SwooleSetup;
 use ZM\Config\ZMConfig;
 use ZM\ConnectionManager\ManagerGM;
 use ZM\Event\ServerEventHandler;
+use ZM\Store\LightCache;
 use ZM\Store\ZMBuf;
 use ZM\Utils\DataProvider;
 use Framework\RemoteShell;
@@ -17,15 +22,16 @@ use ReflectionException;
 use ReflectionMethod;
 use Swoole\Runtime;
 use Swoole\WebSocket\Server;
-use ZM\Annotation\Swoole\OnEvent;
+use ZM\Annotation\Swoole\HandleEvent;
 use ZM\Console\Console;
+use ZM\Utils\ZMUtil;
 
 class Framework
 {
     /**
      * @var array
      */
-    private static $argv;
+    public static $argv;
     /**
      * @var Server
      */
@@ -37,43 +43,28 @@ class Framework
 
     public function __construct($args = []) {
         $tty_width = $this->getTtyWidth();
-        if (LOAD_MODE == 0) define("WORKING_DIR", getcwd());
-        elseif (LOAD_MODE == 1) define("WORKING_DIR", realpath(__DIR__ . "/../../"));
-        elseif (LOAD_MODE == 2) echo "Phar mode: " . WORKING_DIR . PHP_EOL;
-        require_once "Utils/DataProvider.php";
-        if (file_exists(DataProvider::getWorkingDir() . "/vendor/autoload.php")) {
-            /** @noinspection PhpIncludeInspection */
-            require_once DataProvider::getWorkingDir() . "/vendor/autoload.php";
-        }
-        if (LOAD_MODE == 2) {
-            // Phar 模式，2.0 不提供哦
-            //require_once FRAMEWORK_DIR . "/vendor/autoload.php";
-            spl_autoload_register('phar_classloader');
-        } elseif (LOAD_MODE == 0) {
-            /** @noinspection PhpIncludeInspection
-             * @noinspection RedundantSuppression
-             */
-            require_once WORKING_DIR . "/vendor/autoload.php";
-        }
-
-        if (!is_dir(DataProvider::getWorkingDir() . '/src/')) {
-            die("Unable to find source directory.\nMaybe you need to run \"init\"?");
-        }
-        ZMConfig::setDirectory(DataProvider::getWorkingDir().'/config');
-        ZMConfig::env($args["env"] ?? "");
-        if(ZMConfig::get("global") === false) die("Global config load failed: ".ZMConfig::$last_error);
 
         self::$argv = $args;
 
-        $this->defineProperties();
+        //定义常量
+        include_once "global_defines.php";
+
         ZMBuf::initAtomic();
-        ManagerGM::init(1024, 0.2, [
-            [
-                "key" => "connect_id",
-                "type" => "string",
-                "size" => 30
-            ]
-        ]);
+        try {
+            ManagerGM::init(ZMConfig::get("global", "swoole")["max_connection"] ?? 2048, 0.5, [
+                [
+                    "key" => "connect_id",
+                    "type" => "string",
+                    "size" => 30
+                ],
+                [
+                    "key" => "type",
+                    "type" => "int"
+                ]
+            ]);
+        } catch (ConnectionManager\TableException $e) {
+            die($e->getMessage());
+        }
         //start swoole Framework
         $this->selfCheck();
         try {
@@ -85,8 +76,6 @@ class Framework
                 $args["log-theme"] ?? "default",
                 ($o = ZMConfig::get("console_color")) === false ? [] : $o
             );
-            // 注册 Swoole Server 的事件
-            $this->registerServerEvents();
 
             $timezone = ZMConfig::get("global", "timezone") ?? "Asia/Shanghai";
             date_default_timezone_set($timezone);
@@ -107,27 +96,13 @@ class Framework
             if (($num = ZMConfig::get("global", "swoole")["worker_num"] ?? swoole_cpu_num()) != 1) {
                 $out["worker_num"] = $num;
             }
-            $store = "";
-            foreach ($out as $k => $v) {
-                $line = $k . ": " . $v;
-                if (strlen($line) > 19 && $store == "" || $tty_width < 53) {
-                    Console::log($line);
-                } else {
-                    if ($store === "") $store = str_pad($line, 19, " ", STR_PAD_RIGHT);
-                    else {
-                        $store .= (" |   " . $line);
-                        Console::log($store);
-                        $store = "";
-                    }
-                }
-            }
-            if ($store != "") Console::log($store);
+            Console::printProps($out, $tty_width);
 
             self::$server->set($this->server_set);
             if (file_exists(DataProvider::getWorkingDir() . "/config/motd.txt")) {
                 $motd = file_get_contents(DataProvider::getWorkingDir() . "/config/motd.txt");
             } else {
-                $motd = file_get_contents(__DIR__."/../../config/motd.txt");
+                $motd = file_get_contents(__DIR__ . "/../../config/motd.txt");
             }
             $motd = explode("\n", $motd);
             foreach ($motd as $k => $v) {
@@ -137,30 +112,19 @@ class Framework
             echo $motd;
             global $asd;
             $asd = get_included_files();
+            // 注册 Swoole Server 的事件
+            $this->registerServerEvents();
+            LightCache::init(ZMConfig::get("global", "light_cache") ?? [
+                    "size" => 2048,
+                    "max_strlen" => 4096,
+                    "hash_conflict_proportion" => 0.6,
+                ]);
             self::$server->start();
         } catch (Exception $e) {
             Console::error("Framework初始化出现错误，请检查！");
             Console::error($e->getMessage());
             die;
         }
-    }
-
-    private function defineProperties() {
-        define("ZM_START_TIME", microtime(true));
-        define("ZM_DATA", ZMConfig::get("global", "zm_data"));
-        define("ZM_VERSION", json_decode(file_get_contents(__DIR__ . "/../../composer.json"), true)["version"] ?? "unknown");
-        define("CONFIG_DIR", ZMConfig::get("global", "config_dir"));
-        define("CRASH_DIR", ZMConfig::get("global", "crash_dir"));
-        @mkdir(ZM_DATA);
-        @mkdir(CONFIG_DIR);
-        @mkdir(CRASH_DIR);
-        define("ZM_MATCH_ALL", 0);
-        define("ZM_MATCH_FIRST", 1);
-        define("ZM_MATCH_NUMBER", 2);
-        define("ZM_MATCH_SECOND", 3);
-        define("ZM_BREAKPOINT", 'if(Framework::$argv["debug-mode"]) extract(\Psy\debug(get_defined_vars(), isset($this) ? $this : @get_called_class()));');
-        define("BP", ZM_BREAKPOINT);
-        define("ZM_DEFAULT_FETCH_MODE", 4);
     }
 
     private function selfCheck() {
@@ -194,20 +158,25 @@ class Framework
                 $method_annotations = $reader->getMethodAnnotations($vs);
                 if ($method_annotations != []) {
                     $annotation = $method_annotations[0];
-                    if ($annotation instanceof OnEvent) {
+                    if ($annotation instanceof HandleEvent) {
                         $annotation->class = $v;
                         $annotation->method = $vs->getName();
                         $event_list[strtolower($annotation->event)] = $annotation;
+                    } elseif ($annotation instanceof SwooleSetup) {
+                        $annotation->class = $v;
+                        $annotation->method = $vs->getName();
+                        $c = new $v();
+                        $m = $annotation->method;
+                        $c->$m();
                     }
                 }
             }
         }
         foreach ($event_list as $k => $v) {
             self::$server->on($k, function (...$param) use ($v) {
-                $c = $v->class;
-                //echo $c.PHP_EOL;
-                $c = new $c();
-                call_user_func_array([$c, $v->method], $param);
+                $c = ZMUtil::getModInstance($v->class);
+                $m = $v->method;
+                $c->$m(...$param);
             });
         }
     }
@@ -232,6 +201,11 @@ class Framework
         });
         foreach ($args as $x => $y) {
             switch ($x) {
+                case 'disable-coroutine':
+                    if($y) {
+                        $coroutine_mode = false;
+                    }
+                    break;
                 case 'debug-mode':
                     if ($y) {
                         $coroutine_mode = false;
@@ -273,7 +247,7 @@ class Framework
                     if ($y) Console::setLevel(4);
                     break;
                 case 'log-theme':
-                    if($y !== null) {
+                    if ($y !== null) {
                         Console::$theme = $y;
                     }
                     break;

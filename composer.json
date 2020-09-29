@@ -3,7 +3,7 @@
     "description": "High performance QQ robot and web server development framework",
     "minimum-stability": "stable",
     "license": "Apache-2.0",
-    "version": "2.0.0-a1",
+    "version": "2.0.0-a2",
     "authors": [
         {
             "name": "whale",
@@ -16,24 +16,30 @@
     ],
     "prefer-stable": true,
     "bin": [
-        "bin/start"
+        "bin/start",
+        "bin/phpunit-swoole"
     ],
     "require": {
         "php": ">=7.2",
         "swoole/ide-helper": "@dev",
         "ext-mbstring": "*",
-        "swlib/saber": "^1.0",
         "doctrine/annotations": "~1.10",
         "ext-json": "*",
         "ext-posix": "*",
         "ext-ctype": "*",
-        "ext-pdo": "*",
         "psy/psysh": "@stable",
         "symfony/console": "^5.1",
         "symfony/polyfill-ctype": "^1.18",
         "zhamao/connection-manager": "^1.0",
         "zhamao/console": "^1.0",
-        "zhamao/config": "^1.0"
+        "zhamao/config": "^1.0",
+        "zhamao/request": "^1.0",
+        "symfony/routing": "^5.1"
+    },
+    "suggest": {
+        "ext-pdo": "Allows framework connecting with mysql server",
+        "ext-redis": "Allows framework connecting with redis server",
+        "ext-inotify": "Enable file watcher feature in framework"
     },
     "autoload": {
         "psr-4": {
@@ -43,6 +49,14 @@
         },
         "files": [
             "src/ZM/global_functions.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ZMTest\\": "test/ZMTest"
+        },
+        "files": [
+            "test/ZMTest/Mock/mock.php"
         ]
     },
     "require-dev": {

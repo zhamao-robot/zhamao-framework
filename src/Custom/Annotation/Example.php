@@ -16,5 +16,5 @@ use ZM\Annotation\Interfaces\CustomAnnotation;
 class Example extends AnnotationBase implements CustomAnnotation
 {
     /** @var string */
-    public $str;
+    public $str = '';
 }

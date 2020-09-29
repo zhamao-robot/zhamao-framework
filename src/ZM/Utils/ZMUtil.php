@@ -5,55 +5,45 @@ namespace ZM\Utils;
 
 
 use Co;
-use ZM\Config\ZMConfig;
+use Exception;
+use Swoole\Event;
+use Swoole\Timer;
 use ZM\Console\Console;
-use ZM\API\CQ;
+use ZM\Store\LightCache;
 use ZM\Store\ZMBuf;
 
 class ZMUtil
 {
-    /**
-     * 检查workerStart是否运行结束
-     */
-    public static function checkWait() {
-        if (ZMBuf::isset("wait_start")) {
-            ZMBuf::append("wait_start", Co::getCid());
-            Co::suspend();
+    public static function stop() {
+        Console::warning(Console::setColor("Stopping server...", "red"));
+        if (ZMBuf::$terminal !== null)
+            Event::del(ZMBuf::$terminal);
+        ZMBuf::atomic("stop_signal")->set(1);
+        try {
+            LightCache::set('stop', 'OK');
+        } catch (Exception $e) {
         }
+        server()->shutdown();
+        server()->stop();
     }
 
-    public static function stop($without_shutdown = false) {
-        Console::info(Console::setColor("Stopping server...", "red"));
-        foreach ((ZMBuf::$server->connections ?? []) as $v) {
-            ZMBuf::$server->close($v);
-        }
-        DataProvider::saveBuffer();
-        if (!$without_shutdown)
-            ZMBuf::$server->shutdown();
-        ZMBuf::$server->stop();
-    }
-
-    public static function getHttpCodePage(int $http_code) {
-        if (isset(ZMConfig::get("global", "http_default_code_page")[$http_code])) {
-            return Co::readFile(DataProvider::getResourceFolder() . "html/" . ZMConfig::get("global", "http_default_code_page")[$http_code]);
-        } else return null;
-    }
-
-    public static function reload() {
+    public static function reload($delay = 800) {
         Console::info(Console::setColor("Reloading server...", "gold"));
+        usleep($delay * 1000);
         foreach (ZMBuf::get("wait_api", []) as $k => $v) {
             if ($v["result"] === null) Co::resume($v["coroutine"]);
         }
-        foreach (ZMBuf::$server->connections as $v) {
-            ZMBuf::$server->close($v);
+        foreach (server()->connections as $v) {
+            server()->close($v);
         }
         DataProvider::saveBuffer();
-        ZMBuf::$server->reload();
+        Timer::clearAll();
+        server()->reload();
     }
 
     public static function getModInstance($class) {
         if (!isset(ZMBuf::$instance[$class])) {
-            Console::debug("Class instance $class not exist, so I created it.");
+            //Console::debug("Class instance $class not exist, so I created it.");
             return ZMBuf::$instance[$class] = new $class();
         } else {
             return ZMBuf::$instance[$class];

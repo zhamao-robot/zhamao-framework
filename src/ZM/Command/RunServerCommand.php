@@ -3,7 +3,6 @@
 
 namespace ZM\Command;
 
-use Framework\FrameworkLoader;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -26,6 +25,8 @@ class RunServerCommand extends Command
         $this->addOption("log-error", null, null, "调整消息等级到error (log-level=0)");
         $this->addOption("log-theme", null, InputOption::VALUE_REQUIRED, "改变终端的主题配色");
         $this->addOption("disable-console-input", null, null, "禁止终端输入内容 (后台服务时需要)");
+        $this->addOption("disable-coroutine", null, null, "关闭协程Hook");
+        $this->addOption("watch", null, null, "监听 src/ 目录的文件变化并热更新");
         $this->addOption("env", null, InputOption::VALUE_REQUIRED, "设置环境类型 (production, development, staging)");
         // ...
     }
@@ -34,6 +35,7 @@ class RunServerCommand extends Command
         if(($opt = $input->getOption("env")) !== null) {
             if(!in_array($opt, ["production", "staging", "development"])) {
                 $output->writeln("<error> \"--env\" option only accept production, development and staging ! </error>");
+                return Command::FAILURE;
             }
         }
         // ... put here the code to run in your command

@@ -10,13 +10,12 @@ use ZM\Console\Console;
 use Swoole\WebSocket\Frame;
 use Swoole\WebSocket\Server;
 use ZM\Annotation\Swoole\SwooleEventAfter;
-use ZM\Annotation\Swoole\SwooleEventAt;
+use ZM\Annotation\Swoole\SwooleEvent;
 use Exception;
 use ZM\Event\EventHandler;
 use ZM\Store\ZMBuf;
-use ZM\Utils\ZMUtil;
 
-class MessageEvent implements SwooleEvent
+class MessageEvent implements SwooleEventInterface
 {
     /**
      * @var Server
@@ -36,7 +35,6 @@ class MessageEvent implements SwooleEvent
      * @inheritDoc
      */
     public function onActivate() {
-        ZMUtil::checkWait();
         $conn = ManagerGM::get(context()->getFrame()->fd);
         try {
             if ($conn->getName() == "qq") {
@@ -51,7 +49,7 @@ class MessageEvent implements SwooleEvent
                     EventHandler::callCQResponse($data);
                 }
             }
-            foreach (ZMBuf::$events[SwooleEventAt::class] ?? [] as $v) {
+            foreach (ZMBuf::$events[SwooleEvent::class] ?? [] as $v) {
                 if (strtolower($v->type) == "message" && $this->parseSwooleRule($v)) {
                     $c = $v->class;
                     EventHandler::callWithMiddleware(

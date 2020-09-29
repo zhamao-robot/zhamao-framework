@@ -1,0 +1,65 @@
+#!/usr/bin/env php
+<?php
+/**
+ * Copyright: Swlib
+ * Author: Twosee <twose@qq.com>
+ * Date: 2018/4/14 下午10:58
+ */
+
+Co::set([
+    'log_level'   => SWOOLE_LOG_INFO,
+    'trace_flags' => 0
+]);
+
+if (!ini_get('date.timezone')) {
+    ini_set('date.timezone', 'UTC');
+}
+
+foreach ([
+             __DIR__ . '/../../../autoload.php',
+             __DIR__ . '/../../autoload.php',
+             __DIR__ . '/../vendor/autoload.php',
+             __DIR__ . '/vendor/autoload.php'
+         ] as $file
+) {
+    if (file_exists($file)) {
+        define('PHPUNIT_COMPOSER_INSTALL', $file);
+        break;
+    }
+}
+
+if (!defined('PHPUNIT_COMPOSER_INSTALL')) {
+    fwrite(
+        STDERR,
+        'You need to set up the project dependencies using Composer:' . PHP_EOL . PHP_EOL .
+        '        composer install' . PHP_EOL . PHP_EOL .
+        'You can learn all about Composer on https://getcomposer.org/.' . PHP_EOL
+    );
+
+    die(1);
+} else {
+    if (array_reverse(explode('/', __DIR__))[0] ?? '' === 'test') {
+        $vendor_dir = dirname(PHPUNIT_COMPOSER_INSTALL);
+        $bin_unit = "{$vendor_dir}/bin/phpunit";
+        $unit_uint = "{$vendor_dir}/phpunit/phpunit/phpunit";
+        if (file_exists($bin_unit)) {
+            @unlink($bin_unit);
+            @symlink(__FILE__, $bin_unit);
+        }
+        if (file_exists($unit_uint)) {
+            @unlink($unit_uint);
+            @symlink(__FILE__, $unit_uint);
+        }
+    }
+}
+require PHPUNIT_COMPOSER_INSTALL;
+$starttime = microtime(true);
+go(function (){
+    try{
+        PHPUnit\TextUI\Command::main(false);
+    } catch(Exception $e) {
+        echo $e->getMessage().PHP_EOL;
+    }
+});
+Swoole\Event::wait();
+echo "Took ".round(microtime(true) - $starttime, 4). "s\n";
