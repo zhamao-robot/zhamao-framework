@@ -33,7 +33,7 @@ zhamao-framework 是一个 PHP Swoole 的聊天机器人框架，兼容 OneBot �
 ## 开始
 先安装环境，环境安装见下方文档。
 1. `composer create-project zhamao/framework-starter` 从模板新建基础文档结构进行使用
-2. 你也可以直接到 **Release** 中下载最新的 phar 包，放入文件夹后 `php server.phar` 快速启动框架
+2. 你也可以直接拉取本项目，进入文件夹后 `composer update` 加载依赖后使用 `bin/start init` 快速初始化框架文件
 3. 还可以使用 Dockerfile 构建 Docker 容器
 
 ## 文档
