@@ -5,6 +5,7 @@ namespace ZM\Utils;
 
 
 use Exception;
+use Psy\Shell;
 use Swoole\Event;
 use ZM\Console\Console;
 use ZM\Framework;
@@ -35,8 +36,9 @@ class Terminal
                 $class->$function_name();
                 return true;
             case 'psysh':
-                if (Framework::$argv["disable-coroutine"])
-                    eval(\Psy\sh());
+                if (Framework::$argv["disable-coroutine"]) {
+                    (new Shell())->run();
+                }
                 else
                     Console::error("Only \"--disable-coroutine\" mode can use psysh!!!");
                 return true;

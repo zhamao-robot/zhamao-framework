@@ -65,8 +65,6 @@ class Framework
         } catch (ConnectionManager\TableException $e) {
             die($e->getMessage());
         }
-        //start swoole Framework
-        $this->selfCheck();
         try {
             self::$server = new Server(ZMConfig::get("global", "host"), ZMConfig::get("global", "port"));
             $this->server_set = ZMConfig::get("global", "swoole");
@@ -118,6 +116,7 @@ class Framework
                     "size" => 2048,
                     "max_strlen" => 4096,
                     "hash_conflict_proportion" => 0.6,
+                    "persistence_path" => realpath(DataProvider::getDataFolder()."_cache.json")
                 ]);
             self::$server->start();
         } catch (Exception $e) {
@@ -125,18 +124,6 @@ class Framework
             Console::error($e->getMessage());
             die;
         }
-    }
-
-    private function selfCheck() {
-        if (!extension_loaded("swoole")) die("Can not find swoole extension.\n");
-        if (version_compare(SWOOLE_VERSION, "4.4.13") == -1) die("You must install swoole version >= 4.4.13 !");
-        //if (!extension_loaded("gd")) die("Can not find gd extension.\n");
-        if (!extension_loaded("sockets")) die("Can not find sockets extension.\n");
-        if (substr(PHP_VERSION, 0, 1) != "7") die("PHP >=7 required.\n");
-        //if (!function_exists("curl_exec")) die("Can not find curl extension.\n");
-        //if (!class_exists("ZipArchive")) die("Can not find Zip extension.\n");
-        //if (!file_exists(CRASH_DIR . "last_error.log")) die("Can not find log file.\n");
-        return true;
     }
 
     /**

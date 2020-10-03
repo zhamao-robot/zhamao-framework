@@ -16,7 +16,7 @@ use Swoole\Process;
 use Swoole\Timer;
 use ZM\Annotation\AnnotationParser;
 use ZM\Annotation\Http\RequestMapping;
-use ZM\Annotation\Swoole\OnStart;
+use ZM\Annotation\Swoole\OnWorkerStart;
 use ZM\Annotation\Swoole\SwooleEvent;
 use ZM\Config\ZMConfig;
 use ZM\ConnectionManager\ManagerGM;
@@ -54,21 +54,23 @@ class ServerEventHandler
                 try {
                     Terminal::executeCommand($var, $r);
                 } catch (Exception $e) {
-                    Console::error("Uncaught exception ".get_class($e).": ".$e->getMessage()." at ".$e->getFile()."(".$e->getLine().")");
+                    Console::error("Uncaught exception " . get_class($e) . ": " . $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")");
                 } catch (Error $e) {
-                    Console::error("Uncaught error ".get_class($e).": ".$e->getMessage()." at ".$e->getFile()."(".$e->getLine().")");
+                    Console::error("Uncaught error " . get_class($e) . ": " . $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")");
                 }
             });
         }
         Process::signal(SIGINT, function () use ($r) {
+            echo "\r";
             Console::warning("Server interrupted by keyboard on Master.");
             if ((Framework::$server->inotify ?? null) !== null)
                 /** @noinspection PhpUndefinedFieldInspection */ Event::del(Framework::$server->inotify);
             ZMUtil::stop();
         });
-        if(Framework::$argv["watch"]) {
+        if (Framework::$argv["watch"]) {
             if (extension_loaded('inotify')) {
                 Console::warning("Enabled File watcher, do not use in production.");
+                /** @noinspection PhpUndefinedFieldInspection */
                 Framework::$server->inotify = $fd = inotify_init();
                 $this->addWatcher(DataProvider::getWorkingDir() . "/src", $fd);
                 Event::add($fd, function () use ($fd) {
@@ -117,7 +119,7 @@ class ServerEventHandler
                     if ($error["type"] != 0) {
                         Console::error("Internal fatal error: " . $error["message"] . " at " . $error["file"] . "({$error["line"]})");
                     }
-                    DataProvider::saveBuffer();
+                    //DataProvider::saveBuffer();
                     /** @var Server $server */
                     if (server() === null) $server->shutdown();
                     else server()->shutdown();
@@ -125,7 +127,7 @@ class ServerEventHandler
 
                 Console::info("Worker #{$server->worker_id} 启动中");
                 Framework::$server = $server;
-                ZMBuf::resetCache(); //清空变量缓存
+                //ZMBuf::resetCache(); //清空变量缓存
                 //ZMBuf::set("wait_start", []); //添加队列，在workerStart运行完成前先让其他协程等待执行
                 foreach ($server->connections as $v) {
                     $server->close($v);
@@ -193,12 +195,12 @@ class ServerEventHandler
                 EventManager::registerTimerTick(); //启动计时器
                 //ZMBuf::unsetCache("wait_start");
                 set_coroutine_params(["server" => $server, "worker_id" => $worker_id]);
-                $dispatcher = new EventDispatcher(OnStart::class);
+                $dispatcher = new EventDispatcher(OnWorkerStart::class);
                 $dispatcher->setRuleFunction(function ($v) {
                     return server()->worker_id === $v->worker_id || $v->worker_id === -1;
                 });
                 $dispatcher->dispatchEvents($server, $worker_id);
-                Console::debug("@OnStart 执行完毕");
+                Console::debug("@OnWorkerStart 执行完毕");
             } catch (Exception $e) {
                 Console::error("Worker加载出错！停止服务！");
                 Console::error($e->getMessage() . "\n" . $e->getTraceAsString());
@@ -289,9 +291,9 @@ class ServerEventHandler
 
         try {
             $no_interrupt = $dis->dispatchEvents($request, $response);
-            if (!$no_interrupt) {
+            if ($no_interrupt !== null) {
                 $result = HttpUtil::parseUri($request, $response, $request->server["request_uri"], $node, $params);
-                if (!$result) {
+                if ($result === true) {
                     ctx()->setCache("params", $params);
                     $dispatcher = new EventDispatcher(RequestMapping::class);
                     $div = new RequestMapping();
@@ -300,11 +302,13 @@ class ServerEventHandler
                     $div->method = $node["method"];
                     $div->request_method = $node["request_method"];
                     $div->class = $node["class"];
+                    //Console::success("正在执行路由：".$node["method"]);
                     $r = $dispatcher->dispatchEvent($div, null, $params, $request, $response);
                     if (is_string($r) && !$response->isEnd()) $response->end($r);
                 }
             }
             if (!$response->isEnd()) {
+                //Console::warning('返回了404');
                 HttpUtil::responseCodePage($response, 404);
             }
         } catch (Exception $e) {
@@ -380,9 +384,10 @@ class ServerEventHandler
      * @param $fd
      */
     public function onClose($server, $fd) {
-        Console::debug("Calling Swoole \"close\" event from fd=" . $fd);
         unset(Context::$context[Co::getCid()]);
         $conn = ManagerGM::get($fd);
+        if ($conn === null) return;
+        Console::debug("Calling Swoole \"close\" event from fd=" . $fd);
         set_coroutine_params(["server" => $server, "connection" => $conn, "fd" => $fd]);
         $dispatcher = new EventDispatcher(SwooleEvent::class);
         $dispatcher->setRuleFunction(function ($v) {

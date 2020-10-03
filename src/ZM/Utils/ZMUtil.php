@@ -30,13 +30,14 @@ class ZMUtil
     public static function reload($delay = 800) {
         Console::info(Console::setColor("Reloading server...", "gold"));
         usleep($delay * 1000);
-        foreach (ZMBuf::get("wait_api", []) as $k => $v) {
-            if ($v["result"] === null) Co::resume($v["coroutine"]);
+        foreach (LightCache::getAll() as $k => $v) {
+            if (mb_substr($k, 0, 8) == "wait_api")
+                if ($v["result"] === null) Co::resume($v["coroutine"]);
         }
         foreach (server()->connections as $v) {
             server()->close($v);
         }
-        DataProvider::saveBuffer();
+        //DataProvider::saveBuffer();
         Timer::clearAll();
         server()->reload();
     }

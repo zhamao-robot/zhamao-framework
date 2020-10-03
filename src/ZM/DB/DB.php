@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpComposerExtensionStubsInspection */
 
 
 namespace ZM\DB;
@@ -10,7 +10,6 @@ use ZM\Console\Console;
 use ZM\Store\ZMBuf;
 use PDOException;
 use PDOStatement;
-use Swoole\Coroutine;
 use Swoole\Database\PDOStatementProxy;
 use ZM\Exception\DbException;
 
@@ -63,9 +62,6 @@ class DB
      * @throws DbException
      */
     public static function unprepared($line) {
-        if (ZMBuf::get("sql_log") === true) {
-            $starttime = microtime(true);
-        }
         try {
             $conn = ZMBuf::$sql_pool->get();
             if ($conn === false) {
@@ -76,13 +72,6 @@ class DB
             ZMBuf::$sql_pool->put($conn);
             return $result;
         } catch (DBException $e) {
-            if (ZMBuf::get("sql_log") === true) {
-                $log =
-                    "[" . date("Y-m-d H:i:s") .
-                    " " . round(microtime(true) - $starttime, 5) .
-                    "] " . $line . " (Error:" . $e->getMessage() . ")\n";
-                Coroutine::writeFile(CRASH_DIR . "sql.log", $log, FILE_APPEND);
-            }
             Console::warning($e->getMessage());
             throw $e;
         }
@@ -96,9 +85,6 @@ class DB
      * @throws DbException
      */
     public static function rawQuery(string $line, $params = [], $fetch_mode = ZM_DEFAULT_FETCH_MODE) {
-        if (ZMBuf::get("sql_log") === true) {
-            $starttime = microtime(true);
-        }
         Console::debug("MySQL: ".$line." | ". implode(", ", $params));
         try {
             $conn = ZMBuf::$sql_pool->get();
@@ -126,23 +112,9 @@ class DB
                     //echo json_encode(debug_backtrace(), 128 | 256);
                 }
                 ZMBuf::$sql_pool->put($conn);
-                if (ZMBuf::get("sql_log") === true) {
-                    $log =
-                        "[" . date("Y-m-d H:i:s") .
-                        " " . round(microtime(true) - $starttime, 4) .
-                        "] " . $line . " " . json_encode($params, JSON_UNESCAPED_UNICODE) . "\n";
-                    Coroutine::writeFile(CRASH_DIR . "sql.log", $log, FILE_APPEND);
-                }
                 return $ps->fetchAll($fetch_mode);
             }
         } catch (DbException $e) {
-            if (ZMBuf::get("sql_log") === true) {
-                $log =
-                    "[" . date("Y-m-d H:i:s") .
-                    " " . round(microtime(true) - $starttime, 4) .
-                    "] " . $line . " " . json_encode($params, JSON_UNESCAPED_UNICODE) . " (Error:" . $e->getMessage() . ")\n";
-                Coroutine::writeFile(CRASH_DIR . "sql.log", $log, FILE_APPEND);
-            }
             if(mb_strpos($e->getMessage(), "has gone away") !== false) {
                 zm_sleep(0.2);
                 Console::warning("Gone away of MySQL! retrying!");
@@ -151,13 +123,6 @@ class DB
             Console::warning($e->getMessage());
             throw $e;
         } catch (PDOException $e) {
-            if (ZMBuf::get("sql_log") === true) {
-                $log =
-                    "[" . date("Y-m-d H:i:s") .
-                    " " . round(microtime(true) - $starttime, 4) .
-                    "] " . $line . " " . json_encode($params, JSON_UNESCAPED_UNICODE) . " (Error:" . $e->getMessage() . ")\n";
-                Coroutine::writeFile(CRASH_DIR . "sql.log", $log, FILE_APPEND);
-            }
             if(mb_strpos($e->getMessage(), "has gone away") !== false) {
                 zm_sleep(0.2);
                 Console::warning("Gone away of MySQL! retrying!");

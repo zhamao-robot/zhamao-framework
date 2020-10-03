@@ -22,6 +22,7 @@ use ZM\Annotation\Http\MiddlewareClass;
 use ZM\Context\Context;
 use ZM\Http\MiddlewareInterface;
 use ZM\Http\Response;
+use ZM\Store\LightCache;
 use ZM\Store\ZMBuf;
 use ZM\Utils\ZMUtil;
 
@@ -158,8 +159,8 @@ class EventHandler
         $status = $req["status"];
         $retcode = $req["retcode"];
         $data = $req["data"];
-        if (isset($req["echo"]) && ZMBuf::array_key_exists("sent_api", $req["echo"])) {
-            $origin = ZMBuf::get("sent_api")[$req["echo"]];
+        if (isset($req["echo"]) && LightCache::isset("sent_api_" . $req["echo"])) {
+            $origin = LightCache::get("sent_api_" . $req["echo"]);
             $self_id = $origin["self_id"];
             $response = [
                 "status" => $status,
@@ -188,12 +189,12 @@ class EventHandler
             if (($origin["func"] ?? null) !== null) {
                 call_user_func($origin["func"], $response, $origin["data"]);
             } elseif (($origin["coroutine"] ?? false) !== false) {
-                $p = ZMBuf::get("sent_api");
-                $p[$req["echo"]]["result"] = $response;
-                ZMBuf::set("sent_api", $p);
+                $r = LightCache::get("sent_api_" . $req["echo"]);
+                $r["result"] = $response;
+                LightCache::set("sent_api_" . $req["echo"], $r);
                 Co::resume($origin['coroutine']);
             }
-            ZMBuf::unsetByValue("sent_api", $req["echo"]);
+            LightCache::unset("sent_api_" . $req["echo"]);
         }
     }
 

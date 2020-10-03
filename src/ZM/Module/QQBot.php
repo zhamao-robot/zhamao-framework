@@ -5,7 +5,8 @@ namespace ZM\Module;
 
 /**
  * Class QQBot
- * @package ZM\Plugins
+ * @package ZM\Module
+ * @ExternalModule("qqbot")
  */
 class QQBot
 {

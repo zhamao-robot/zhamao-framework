@@ -39,8 +39,7 @@ $config['light_cache'] = [
     "status" => true,
     "size" => 2048,                     //最多允许储存的条数（需要2的倍数）
     "max_strlen" => 4096,               //单行字符串最大长度（需要2的倍数）
-    "hash_conflict_proportion" => 0.6,   //Hash冲突率（越大越好，但是需要的内存更多）
-    "persistence_path" => $config['zm_data']."_cache.json"
+    "hash_conflict_proportion" => 0.6   //Hash冲突率（越大越好，但是需要的内存更多）
 ];
 
 /** MySQL数据库连接信息，host留空则启动时不创建sql连接池 */
@@ -86,7 +85,7 @@ $config["info_level"] = 2;
 $config['auto_save_interval'] = 900;
 
 /** 上下文接口类 implemented from ContextInterface */
-$config['context_class'] = \ZM\Context\Context::class;
+$config['context_class'] = \ZMTest\Mock\Context::class;
 
 /** 静态文件访问 */
 $config['static_file_server'] = [

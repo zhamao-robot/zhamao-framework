@@ -2,7 +2,7 @@
 
 namespace Module\Example;
 
-use ZM\Annotation\Swoole\OnStart;
+use ZM\Annotation\Swoole\OnWorkerStart;
 use ZM\Annotation\Swoole\OnTick;
 use ZM\ConnectionManager\ConnectionObject;
 use ZM\Console\Console;
@@ -10,6 +10,8 @@ use ZM\Annotation\CQ\CQCommand;
 use ZM\Annotation\Http\Middleware;
 use ZM\Annotation\Http\RequestMapping;
 use ZM\Annotation\Swoole\SwooleEvent;
+use ZM\Store\LightCache;
+use ZM\Store\ZMBuf;
 use ZM\Utils\ZMUtil;
 
 /**
@@ -72,9 +74,9 @@ class Hello
     /**
      * 中间件测试的一个示例函数
      * @RequestMapping("/httpTimer")
-     * @Middleware("timer")
      */
     public function timer() {
+        ZMBuf::atomic("_tmp_2")->add(1);
         return "This page is used as testing TimerMiddleware! Do not use it in production.";
     }
 

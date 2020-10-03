@@ -31,7 +31,7 @@
         "symfony/console": "^5.1",
         "symfony/polyfill-ctype": "^1.18",
         "zhamao/connection-manager": "^1.0",
-        "zhamao/console": "^1.0",
+        "zhamao/console": "*@dev",
         "zhamao/config": "^1.0",
         "zhamao/request": "^1.0",
         "symfony/routing": "^5.1"
@@ -61,5 +61,11 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^9.3"
-    }
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "/Users/jerry/project/git-project/zhamao-console"
+        }
+    ]
 }

@@ -25,7 +25,15 @@ $route = new Route(
 
 // ...
 
-$routes->add('date', $route);
+$routes->add('date', new Route(
+    '/archive/{month}', // path
+    array('controller' => 'showArchive', 'asd' => 'feswf'), // default values
+    array('month' => '[0-9]{4}-[0-9]{2}', 'subdomain' => 'www|m'), // requirements
+    array(), // options
+    '', // host
+    array(), // schemes
+    array() // methods
+));
 
 $route = new Route('/archive/test');
 

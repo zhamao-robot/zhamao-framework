@@ -7,7 +7,6 @@ namespace ZM\Event;
 use Doctrine\Common\Annotations\AnnotationException;
 use Exception;
 use ZM\Annotation\AnnotationBase;
-use ZM\Annotation\Interfaces\Rule;
 use ZM\Exception\InterruptException;
 use ZM\Utils\ZMUtil;
 
@@ -20,6 +19,9 @@ class EventDispatcher
     /** @var null|callable */
     private $return_func = null;
 
+    /**
+     * @throws InterruptException
+     */
     public static function interrupt() {
         throw new InterruptException('interrupt');
     }
@@ -46,12 +48,20 @@ class EventDispatcher
             }
             return true;
         } catch (InterruptException $e) {
-            return false;
+            return null;
         } catch (AnnotationException $e) {
             return false;
         }
     }
 
+    /**
+     * @param AnnotationBase|null $v
+     * @param null $rule_func
+     * @param mixed ...$params
+     * @return bool
+     * @throws AnnotationException
+     * @throws InterruptException
+     */
     public function dispatchEvent(?AnnotationBase $v, $rule_func = null, ...$params) {
         $q_c = $v->class;
         $q_f = $v->method;

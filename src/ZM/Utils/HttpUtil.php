@@ -52,10 +52,10 @@ class HttpUtil
             }
             if (ZMConfig::get("global", "static_file_server")["status"]) {
                 HttpUtil::handleStaticPage($request->server["request_uri"], $response);
-                return true;
+                return null;
             }
         }
-        return false;
+        return !isset($node["route"]) ? false : true;
     }
 
     public static function getHttpCodePage(int $http_code) {

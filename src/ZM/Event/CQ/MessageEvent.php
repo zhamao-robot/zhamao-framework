@@ -85,7 +85,6 @@ class MessageEvent
     }
 
     /**
-     * @throws AnnotationException
      * @noinspection PhpRedundantCatchClauseInspection
      */
     public function onActivate() {
@@ -122,7 +121,7 @@ class MessageEvent
                 EventDispatcher::interrupt();
             });
             $r = $dispatcher->dispatchEvents($word);
-            if ($r === false) return;
+            if ($r === null) return;
 
             //分发CQMessage事件
             $msg_dispatcher = new EventDispatcher(CQMessage::class);

@@ -7,6 +7,7 @@ use Co;
 use ZM\ConnectionManager\ConnectionObject;
 use ZM\Console\Console;
 use ZM\Event\EventHandler;
+use ZM\Store\LightCache;
 use ZM\Store\ZMBuf;
 
 trait CQAPI
@@ -26,27 +27,20 @@ trait CQAPI
 
     }
 
-    public function processWebsocketAPI($connection, $reply, $function = null) {
+    public function processWebsocketAPI($connection, $reply, $function = false) {
         $api_id = ZMBuf::atomic("wait_msg_id")->get();
         $reply["echo"] = $api_id;
         ZMBuf::atomic("wait_msg_id")->add(1);
         EventHandler::callCQAPISend($reply, $connection);
-        if (is_callable($function)) {
-            ZMBuf::appendKey("sent_api", $api_id, [
-                "data" => $reply,
-                "time" => microtime(true),
-                "func" => $function,
-                "self_id" => $connection->getOption("connect_id")
-            ]);
-        } elseif ($function === true) {
-            ZMBuf::appendKey("sent_api", $api_id, [
+        if ($function === true) {
+            LightCache::set("sent_api_".$api_id, [
                 "data" => $reply,
                 "time" => microtime(true),
                 "coroutine" => Co::getuid(),
                 "self_id" => $connection->getOption("connect_id")
             ]);
         } else {
-            ZMBuf::appendKey("sent_api", $api_id, [
+            LightCache::set("sent_api_".$api_id, [
                 "data" => $reply,
                 "time" => microtime(true),
                 "self_id" => $connection->getOption("connect_id")
@@ -56,8 +50,8 @@ trait CQAPI
         if (server()->push($connection->getFd(), json_encode($reply))) {
             if ($function === true) {
                 Co::suspend();
-                $data = ZMBuf::get("sent_api")[$api_id];
-                ZMBuf::unsetByValue("sent_api", $reply["echo"]);
+                $data = LightCache::get("sent_api_".$api_id);
+                LightCache::unset("sent_api_".$api_id);
                 return isset($data['result']) ? $data['result'] : null;
             }
             return true;
@@ -69,10 +63,10 @@ trait CQAPI
                 "data" => null,
                 "self_id" => $connection->getOption("connect_id")
             ];
-            $s = ZMBuf::get("sent_api")[$reply["echo"]];
+            $s = LightCache::get("sent_api_".$reply["echo"]);
             if (($s["func"] ?? null) !== null)
                 call_user_func($s["func"], $response, $reply);
-            ZMBuf::unsetByValue("sent_api", $reply["echo"]);
+            LightCache::unset("sent_api_".$reply["echo"]);
             if ($function === true) return $response;
             return false;
         }

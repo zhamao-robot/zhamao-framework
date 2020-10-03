@@ -14,6 +14,7 @@ use ZM\Exception\InvalidArgumentException;
 use ZM\Exception\WaitTimeoutException;
 use ZM\Http\Response;
 use ZM\API\ZMRobot;
+use ZM\Store\LightCache;
 use ZM\Store\ZMBuf;
 
 class Context implements ContextInterface
@@ -153,17 +154,17 @@ class Context implements ContextInterface
         if ($hang["message_type"] == "group" || $hang["message_type"] == "discuss") {
             $hang[$hang["message_type"] . "_id"] = $this->getData()[$this->getData()["message_type"] . "_id"];
         }
-        ZMBuf::appendKey("wait_api", $api_id, $hang);
+        LightCache::set("wait_api_".$api_id, $hang);
         $id = swoole_timer_after($timeout * 1000, function () use ($api_id, $timeout_prompt) {
-            $r = ZMBuf::get("wait_api")[$api_id] ?? null;
-            if ($r !== null) {
+            $r = LightCache::get("wait_api_".$api_id);
+            if (is_array($r)) {
                 Co::resume($r["coroutine"]);
             }
         });
 
         Co::suspend();
-        $sess = ZMBuf::get("wait_api")[$api_id];
-        ZMBuf::unsetByValue("wait_api", $api_id);
+        $sess = LightCache::get("wait_api_".$api_id);
+        LightCache::unset("wait_api_".$api_id);
         $result = $sess["result"];
         if (isset($id)) swoole_timer_clear($id);
         if ($result === null) throw new WaitTimeoutException($this, $timeout_prompt);
