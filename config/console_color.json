@@ -10,11 +10,20 @@
     },
     "white-term": {
         "success": "green",
-        "info": "black",
+        "info": "",
         "warning": "yellow",
         "error": "red",
         "verbose": "blue",
         "debug": "gray",
         "trace": "gray"
+    },
+    "no-color": {
+        "success": "",
+        "info": "",
+        "warning": "",
+        "error": "",
+        "verbose": "",
+        "debug": "",
+        "trace": ""
     }
 }

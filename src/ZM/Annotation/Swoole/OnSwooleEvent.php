@@ -10,12 +10,12 @@ use ZM\Annotation\Interfaces\Level;
 use ZM\Annotation\Interfaces\Rule;
 
 /**
- * Class SwooleEvent
+ * Class OnSwooleEvent
  * @Annotation
  * @Target("ALL")
  * @package ZM\Annotation\Swoole
  */
-class SwooleEvent extends AnnotationBase implements Rule, Level
+class OnSwooleEvent extends AnnotationBase implements Rule, Level
 {
     /**
      * @var string

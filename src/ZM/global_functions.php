@@ -1,5 +1,6 @@
 <?php
 
+use Swoole\Coroutine;
 use ZM\Config\ZMConfig;
 use ZM\Console\Console;
 use ZM\Context\Context;
@@ -228,7 +229,15 @@ function ctx() {
 
 function debug($msg) { Console::debug($msg); }
 
-function zm_sleep($s = 1) { Co::sleep($s); }
+function onebot_target_id_name($message_type) {
+    return ($message_type == "group" ? "group_id" : "user_id");
+}
+
+function zm_sleep($s = 1) {
+    if (Coroutine::getCid() != -1) System::sleep($s);
+    else usleep($s * 1000 * 1000);
+    return true;
+}
 
 function zm_exec($cmd): array { return System::exec($cmd); }
 

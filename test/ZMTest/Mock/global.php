@@ -18,9 +18,6 @@ $config['debug_mode'] = false;
 /** 存放框架内文件数据的目录 */
 $config['zm_data'] = realpath(__DIR__ . "/../") . '/zm_data/';
 
-/** 存放各个模块配置文件的目录 */
-$config['config_dir'] = $config['zm_data'] . 'config/';
-
 /** 存放崩溃和运行日志的目录 */
 $config['crash_dir'] = $config['zm_data'] . 'crash/';
 
@@ -107,7 +104,7 @@ $config['command_register_class'] = [
 ];
 
 /** 服务器启用的外部第三方和内部插件 */
-$config['plugins'] = [
+$config['modules'] = [
     'qqbot' => true, // QQ机器人事件解析器，如果取消此项则默认为 true 开启状态，否则你手动填写 false 才会关闭
 ];
 

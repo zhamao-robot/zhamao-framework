@@ -21,7 +21,6 @@
     ],
     "require": {
         "php": ">=7.2",
-        "swoole/ide-helper": "@dev",
         "ext-mbstring": "*",
         "doctrine/annotations": "~1.10",
         "ext-json": "*",
@@ -60,12 +59,17 @@
         ]
     },
     "require-dev": {
-        "phpunit/phpunit": "^9.3"
+        "phpunit/phpunit": "^9.3",
+        "swoole/ide-helper": "@dev"
     },
     "repositories": [
         {
             "type": "path",
             "url": "/Users/jerry/project/git-project/zhamao-console"
+        },
+        {
+            "type": "path",
+            "url": "/Users/jerry/project/git-project/zhamao-lock"
         }
     ]
 }

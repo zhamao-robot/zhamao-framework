@@ -6,15 +6,14 @@ namespace ZM;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Exception;
-use Swoole\Coroutine\Socket;
-use Swoole\Event;
-use Swoole\Process;
 use ZM\Annotation\Swoole\SwooleSetup;
 use ZM\Config\ZMConfig;
 use ZM\ConnectionManager\ManagerGM;
 use ZM\Event\ServerEventHandler;
 use ZM\Store\LightCache;
-use ZM\Store\ZMBuf;
+use ZM\Store\LightCacheInside;
+use ZM\Store\Lock\SpinLock;
+use ZM\Store\ZMAtomic;
 use ZM\Utils\DataProvider;
 use Framework\RemoteShell;
 use ReflectionClass;
@@ -49,7 +48,7 @@ class Framework
         //定义常量
         include_once "global_defines.php";
 
-        ZMBuf::initAtomic();
+        ZMAtomic::init();
         try {
             ManagerGM::init(ZMConfig::get("global", "swoole")["max_connection"] ?? 2048, 0.5, [
                 [
@@ -85,8 +84,7 @@ class Framework
                 "port" => ZMConfig::get("global", "port"),
                 "log_level" => Console::getLevel(),
                 "version" => ZM_VERSION,
-                "config" => $args["env"] === null ? 'global.php' : $args["env"],
-                "working_dir" => DataProvider::getWorkingDir()
+                "config" => $args["env"] === null ? 'global.php' : $args["env"]
             ];
             if (isset(ZMConfig::get("global", "swoole")["task_worker_num"])) {
                 $out["task_worker_num"] = ZMConfig::get("global", "swoole")["task_worker_num"];
@@ -94,6 +92,7 @@ class Framework
             if (($num = ZMConfig::get("global", "swoole")["worker_num"] ?? swoole_cpu_num()) != 1) {
                 $out["worker_num"] = $num;
             }
+            $out["working_dir"] = DataProvider::getWorkingDir();
             Console::printProps($out, $tty_width);
 
             self::$server->set($this->server_set);
@@ -112,12 +111,16 @@ class Framework
             $asd = get_included_files();
             // 注册 Swoole Server 的事件
             $this->registerServerEvents();
-            LightCache::init(ZMConfig::get("global", "light_cache") ?? [
-                    "size" => 2048,
-                    "max_strlen" => 4096,
-                    "hash_conflict_proportion" => 0.6,
-                    "persistence_path" => realpath(DataProvider::getDataFolder()."_cache.json")
-                ]);
+            $r = ZMConfig::get("global", "light_cache") ?? [
+                "size" => 1024,
+                "max_strlen" => 8192,
+                "hash_conflict_proportion" => 0.6,
+                "persistence_path" => realpath(DataProvider::getDataFolder() . "_cache.json"),
+                "auto_save_interval" => 900
+            ];
+            LightCache::init($r);
+            LightCacheInside::init();
+            SpinLock::init($r["size"]);
             self::$server->start();
         } catch (Exception $e) {
             Console::error("Framework初始化出现错误，请检查！");
@@ -189,12 +192,12 @@ class Framework
         foreach ($args as $x => $y) {
             switch ($x) {
                 case 'disable-coroutine':
-                    if($y) {
+                    if ($y) {
                         $coroutine_mode = false;
                     }
                     break;
                 case 'debug-mode':
-                    if ($y) {
+                    if ($y || ZMConfig::get("global", "debug_mode")) {
                         $coroutine_mode = false;
                         $terminal_id = null;
                         Console::warning("You are in debug mode, do not use in production!");
@@ -243,11 +246,7 @@ class Framework
         if ($coroutine_mode) Runtime::enableCoroutine(true, SWOOLE_HOOK_ALL);
     }
 
-    private function getTtyWidth() {
+    public static function getTtyWidth() {
         return explode(" ", trim(exec("stty size")))[1];
-    }
-
-    public static function getServer() {
-        return self::$server;
     }
 }

@@ -15,19 +15,23 @@ class RunServerCommand extends Command
     protected static $defaultName = 'server';
 
     protected function configure() {
+        $this->setDefinition([
+            new InputOption("debug-mode", "D", null, "开启调试模式 (这将关闭协程化)"),
+            new InputOption("log-debug", null, null, "调整消息等级到debug (log-level=4)"),
+            new InputOption("log-verbose", null, null, "调整消息等级到verbose (log-level=3)"),
+            new InputOption("log-info", null, null, "调整消息等级到info (log-level=2)"),
+            new InputOption("log-warning", null, null, "调整消息等级到warning (log-level=1)"),
+            new InputOption("log-error", null, null, "调整消息等级到error (log-level=0)"),
+            new InputOption("log-theme", null, InputOption::VALUE_REQUIRED, "改变终端的主题配色"),
+            new InputOption("disable-console-input", null, null, "禁止终端输入内容 (后台服务时需要)"),
+            new InputOption("disable-coroutine", null, null, "关闭协程Hook"),
+            new InputOption("daemon", null, null, "以守护进程的方式运行框架"),
+            new InputOption("watch", null, null, "监听 src/ 目录的文件变化并热更新"),
+            new InputOption("env", null, InputOption::VALUE_REQUIRED, "设置环境类型 (production, development, staging)"),
+        ]);
         $this->setDescription("Run zhamao-framework | 启动框架");
         $this->setHelp("直接运行可以启动");
-        $this->addOption("debug-mode", "D", null, "开启调试模式 (这将关闭协程化)");
-        $this->addOption("log-debug", null, null, "调整消息等级到debug (log-level=4)");
-        $this->addOption("log-verbose", null, null, "调整消息等级到verbose (log-level=3)");
-        $this->addOption("log-info", null, null, "调整消息等级到info (log-level=2)");
-        $this->addOption("log-warning", null, null, "调整消息等级到warning (log-level=1)");
-        $this->addOption("log-error", null, null, "调整消息等级到error (log-level=0)");
-        $this->addOption("log-theme", null, InputOption::VALUE_REQUIRED, "改变终端的主题配色");
-        $this->addOption("disable-console-input", null, null, "禁止终端输入内容 (后台服务时需要)");
-        $this->addOption("disable-coroutine", null, null, "关闭协程Hook");
-        $this->addOption("watch", null, null, "监听 src/ 目录的文件变化并热更新");
-        $this->addOption("env", null, InputOption::VALUE_REQUIRED, "设置环境类型 (production, development, staging)");
+
         // ...
     }
 

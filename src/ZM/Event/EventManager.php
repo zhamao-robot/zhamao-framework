@@ -11,7 +11,7 @@ use ZM\Annotation\AnnotationBase;
 use ZM\Annotation\AnnotationParser;
 use ZM\Annotation\Swoole\OnTick;
 use ZM\Console\Console;
-use ZM\Store\ZMBuf;
+use ZM\Store\ZMAtomic;
 
 class EventManager
 {
@@ -20,7 +20,7 @@ class EventManager
     public static $middlewares = [];
     public static $req_mapping = [];
 
-    public static function addEvent($event_name, AnnotationBase $event_obj) {
+    public static function addEvent($event_name, ?AnnotationBase $event_obj) {
         self::$events[$event_name][] = $event_obj;
     }
 
@@ -43,7 +43,7 @@ class EventManager
             Console::debug("Added Middleware-based timer: " . $plain_class . " -> " . $vss->method);
             Timer::tick($vss->tick_ms, function () use ($vss, $dispatcher) {
                 set_coroutine_params([]);
-                if (ZMBuf::atomic("stop_signal")->get() != 0) {
+                if (ZMAtomic::get("stop_signal")->get() != 0) {
                     Timer::clearAll();
                     return;
                 }

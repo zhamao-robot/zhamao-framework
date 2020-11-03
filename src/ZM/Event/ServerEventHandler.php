@@ -17,7 +17,7 @@ use Swoole\Timer;
 use ZM\Annotation\AnnotationParser;
 use ZM\Annotation\Http\RequestMapping;
 use ZM\Annotation\Swoole\OnWorkerStart;
-use ZM\Annotation\Swoole\SwooleEvent;
+use ZM\Annotation\Swoole\OnSwooleEvent;
 use ZM\Config\ZMConfig;
 use ZM\ConnectionManager\ManagerGM;
 use ZM\Console\Console;
@@ -33,6 +33,8 @@ use ZM\Exception\DbException;
 use ZM\Framework;
 use ZM\Http\Response;
 use ZM\Module\QQBot;
+use ZM\Store\MySQL\SqlPoolStorage;
+use ZM\Store\Redis\ZMRedisPool;
 use ZM\Store\ZMBuf;
 use ZM\Utils\DataProvider;
 use ZM\Utils\HttpUtil;
@@ -132,9 +134,9 @@ class ServerEventHandler
                 foreach ($server->connections as $v) {
                     $server->close($v);
                 }
-                if (ZMBuf::$sql_pool !== null) {
-                    ZMBuf::$sql_pool->close();
-                    ZMBuf::$sql_pool = null;
+                if (SqlPoolStorage::$sql_pool !== null) {
+                    SqlPoolStorage::$sql_pool->close();
+                    SqlPoolStorage::$sql_pool = null;
                 }
 
                 // 这里执行的是只需要执行一遍的代码，比如终端监听器和键盘监听器
@@ -175,7 +177,7 @@ class ServerEventHandler
                         }
                     }
                     $sql = ZMConfig::get("global", "sql_config");
-                    ZMBuf::$sql_pool = new PDOPool((new PDOConfig())
+                    SqlPoolStorage::$sql_pool = new PDOPool((new PDOConfig())
                         ->withHost($sql["sql_host"])
                         ->withPort($sql["sql_port"])
                         // ->withUnixSocket('/tmp/mysql.sock')
@@ -186,6 +188,13 @@ class ServerEventHandler
                         ->withOptions($sql["sql_options"] ?? [PDO::ATTR_STRINGIFY_FETCHES => false])
                     );
                     DB::initTableList();
+                }
+
+                // 开箱即用的Redis
+                $redis = ZMConfig::get("global", "redis_config");
+                if($redis !== null && $redis["host"] != "") {
+                    if (!extension_loaded("redis")) Console::error("Can not find redis extension.\n");
+                    else ZMRedisPool::init($redis);
                 }
 
                 $this->loadAnnotations(); //加载composer资源、phar外置包、注解解析注册等
@@ -238,11 +247,11 @@ class ServerEventHandler
      * @param Frame $frame
      */
     public function onMessage($server, Frame $frame) {
-        Console::debug("Calling Swoole \"message\" from fd=" . $frame->fd);
+        Console::debug("Calling Swoole \"message\" from fd=" . $frame->fd.": ".TermColor::ITALIC.$frame->data.TermColor::RESET);
         unset(Context::$context[Co::getCid()]);
         $conn = ManagerGM::get($frame->fd);
         set_coroutine_params(["server" => $server, "frame" => $frame, "connection" => $conn]);
-        $dispatcher = new EventDispatcher(SwooleEvent::class);
+        $dispatcher = new EventDispatcher(OnSwooleEvent::class);
         $dispatcher->setRuleFunction(function ($v) {
             if ($v->getRule() == '') {
                 return strtolower($v->type) == 'message';
@@ -278,7 +287,7 @@ class ServerEventHandler
         Console::debug("Calling Swoole \"request\" event from fd=" . $request->fd);
         set_coroutine_params(["request" => $request, "response" => $response]);
 
-        $dis = new EventDispatcher();
+        $dis = new EventDispatcher(OnSwooleEvent::class);
         $dis->setRuleFunction(function ($v) {
             if ($v->getRule() == '') {
                 return strtolower($v->type) == 'request';
@@ -322,7 +331,7 @@ class ServerEventHandler
                 else
                     $response->end("Internal server error.");
             }
-            Console::error("Internal server exception (500), caused by " . get_class($e));
+            Console::error("Internal server exception (500), caused by " . get_class($e).": ".$e->getMessage());
             Console::log($e->getTraceAsString(), "gray");
         } catch (Error $e) {
             $response->status(500);
@@ -354,7 +363,8 @@ class ServerEventHandler
         ManagerGM::pushConnect($request->fd, $type_conn);
         $conn = ManagerGM::get($request->fd);
         set_coroutine_params(["server" => $server, "request" => $request, "connection" => $conn, "fd" => $request->fd]);
-        $dispatcher = new EventDispatcher(SwooleEvent::class);
+        $conn->setOption("connect_id", strval($request->header["x-self-id"]) ?? "");
+        $dispatcher = new EventDispatcher(OnSwooleEvent::class);
         $dispatcher->setRuleFunction(function ($v) {
             if ($v->getRule() == '') {
                 return strtolower($v->type) == 'open';
@@ -389,7 +399,7 @@ class ServerEventHandler
         if ($conn === null) return;
         Console::debug("Calling Swoole \"close\" event from fd=" . $fd);
         set_coroutine_params(["server" => $server, "connection" => $conn, "fd" => $fd]);
-        $dispatcher = new EventDispatcher(SwooleEvent::class);
+        $dispatcher = new EventDispatcher(OnSwooleEvent::class);
         $dispatcher->setRuleFunction(function ($v) {
             if ($v->getRule() == '') {
                 return strtolower($v->type) == 'close';
@@ -421,9 +431,13 @@ class ServerEventHandler
      */
     public function onPipeMessage(Server $server, $src_worker_id, $data) {
         //var_dump($data, $server->worker_id);
-        unset(Context::$context[Co::getCid()]);
+        //unset(Context::$context[Co::getCid()]);
         $data = json_decode($data, true);
-        switch ($data["action"]) {
+        switch ($data["action"] ?? '') {
+            case "resume_ws_message":
+                $obj = $data["data"];
+                Co::resume($obj["coroutine"]);
+                break;
             case "stop":
                 Console::verbose('正在清理 #' . $server->worker_id . ' 的计时器');
                 Timer::clearAll();
@@ -433,6 +447,9 @@ class ServerEventHandler
                 break;
             case 'echo':
                 Console::success('接收到来自 #' . $src_worker_id . ' 的消息');
+                break;
+            case 'send':
+                $server->sendMessage(json_encode(["action" => "echo"]), $data["target"]);
                 break;
             default:
                 echo $data . PHP_EOL;
@@ -481,17 +498,17 @@ class ServerEventHandler
         }
 
         //加载插件
-        $plugins = ZMConfig::get("global", "plugins") ?? [];
+        $plugins = ZMConfig::get("global", "modules") ?? [];
         if (!isset($plugins["qqbot"])) $plugins["qqbot"] = true;
 
         if ($plugins["qqbot"]) {
-            $obj = new SwooleEvent();
+            $obj = new OnSwooleEvent();
             $obj->class = QQBot::class;
             $obj->method = 'handle';
             $obj->type = 'message';
             $obj->level = 99999;
             $obj->rule = 'connectIsQQ()';
-            EventManager::addEvent(SwooleEvent::class, $obj);
+            EventManager::addEvent(OnSwooleEvent::class, $obj);
         }
 
         //TODO: 编写加载外部插件的方式

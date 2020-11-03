@@ -7,6 +7,7 @@ namespace ZM\Event;
 use Doctrine\Common\Annotations\AnnotationException;
 use Exception;
 use ZM\Annotation\AnnotationBase;
+use ZM\Annotation\CQ\CQMetaEvent;
 use ZM\Exception\InterruptException;
 use ZM\Utils\ZMUtil;
 
@@ -42,9 +43,13 @@ class EventDispatcher
 
     public function dispatchEvents(...$params) {
         try {
-            foreach (EventManager::$events[$this->class] ?? [] as $v) {
+
+            foreach ((EventManager::$events[$this->class] ?? []) as $v) {
+                if($this->class == CQMetaEvent::class) {
+                    //eval(BP);
+                }
                 $result = $this->dispatchEvent($v, $this->rule, ...$params);
-                if (is_callable($this->return_func)) ($this->return_func)($result);
+                if ($result !== false && is_callable($this->return_func)) ($this->return_func)($result);
             }
             return true;
         } catch (InterruptException $e) {

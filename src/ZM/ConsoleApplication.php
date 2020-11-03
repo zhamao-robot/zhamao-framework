@@ -31,7 +31,6 @@ class ConsoleApplication extends Application
             new PureHttpCommand()
         ]);
         //if (LOAD_MODE === 0) $this->add(new BuildCommand()); //只有在git源码模式才能使用打包指令
-
         if (LOAD_MODE === 0) define("WORKING_DIR", getcwd());
         elseif (LOAD_MODE == 1) define("WORKING_DIR", realpath(__DIR__ . "/../../"));
         elseif (LOAD_MODE == 2) echo "Phar mode: " . WORKING_DIR . PHP_EOL;

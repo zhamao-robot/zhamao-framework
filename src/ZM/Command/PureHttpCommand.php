@@ -17,7 +17,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use ZM\Config\ZMConfig;
 use ZM\Console\Console;
-use ZM\Store\ZMBuf;
+use ZM\Store\ZMAtomic;
 use ZM\Utils\HttpUtil;
 
 class PureHttpCommand extends Command
@@ -28,7 +28,7 @@ class PureHttpCommand extends Command
     protected function configure() {
         $this->setDescription("Run a simple http server | 启动一个简单的文件 HTTP 服务器");
         $this->setHelp("直接运行可以启动");
-        $this->addArgument('dir', InputArgument::OPTIONAL, 'Your directory');
+        $this->addArgument('dir', InputArgument::REQUIRED, 'Your directory');
         $this->addOption("host", 'H', InputOption::VALUE_REQUIRED, "启动监听地址");
         $this->addOption("port", 'P', InputOption::VALUE_REQUIRED, "启动监听地址的端口");
         // ...
@@ -36,19 +36,23 @@ class PureHttpCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output) {
         $tty_width = explode(" ", trim(exec("stty size")))[1];
+        if(realpath($input->getArgument('dir') ?? '.') === false) {
+            $output->writeln("<error>Directory error(".($input->getArgument('dir') ?? '.')."): no such file or directory.</error>");
+            return self::FAILURE;
+        }
         $global = ZMConfig::get("global");
         $host = $input->getOption("host") ?? $global["host"];
         $port = $input->getOption("port") ?? $global["port"];
         $server = new Server($host, $port);
         $server->set(ZMConfig::get("global", "swoole"));
         Console::init(0, $server);
-        ZMBuf::$atomics["request"] = [];
+        ZMAtomic::$atomics["request"] = [];
         for ($i = 0; $i < 32; ++$i) {
-            ZMBuf::$atomics["request"][$i] = new Atomic(0);
+            ZMAtomic::$atomics["request"][$i] = new Atomic(0);
         }
         $index = ["index.html", "index.htm"];
         $server->on("request", function (Request $request, Response $response) use ($input, $index, $server) {
-            ZMBuf::$atomics["request"][$server->worker_id]->add(1);
+            ZMAtomic::$atomics["request"][$server->worker_id]->add(1);
             HttpUtil::handleStaticPage(
                 $request->server["request_uri"],
                 $response,
@@ -62,7 +66,7 @@ class PureHttpCommand extends Command
             Process::signal(SIGINT, function () use ($server) {
                 Console::warning("Server interrupted by keyboard.");
                 for ($i = 0; $i < 32; ++$i) {
-                    $num = ZMBuf::$atomics["request"][$i]->get();
+                    $num = ZMAtomic::$atomics["request"][$i]->get();
                     if($num != 0)
                     echo "[$i]: ".$num."\n";
                 }

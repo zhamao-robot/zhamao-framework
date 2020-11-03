@@ -2,16 +2,15 @@
 
 namespace Module\Example;
 
+use ZM\Annotation\CQ\CQMetaEvent;
+use ZM\Annotation\Swoole\OnSwooleEvent;
 use ZM\Annotation\Swoole\OnWorkerStart;
-use ZM\Annotation\Swoole\OnTick;
 use ZM\ConnectionManager\ConnectionObject;
 use ZM\Console\Console;
 use ZM\Annotation\CQ\CQCommand;
-use ZM\Annotation\Http\Middleware;
 use ZM\Annotation\Http\RequestMapping;
-use ZM\Annotation\Swoole\SwooleEvent;
 use ZM\Store\LightCache;
-use ZM\Store\ZMBuf;
+use ZM\Store\Lock\SpinLock;
 use ZM\Utils\ZMUtil;
 
 /**
@@ -23,7 +22,7 @@ class Hello
 {
     /**
      * 在机器人连接后向终端输出信息
-     * @SwooleEvent("open",rule="connectIsQQ()")
+     * @OnSwooleEvent("open",rule="connectIsQQ()")
      * @param $conn
      */
     public function onConnect(ConnectionObject $conn) {
@@ -32,7 +31,7 @@ class Hello
 
     /**
      * 在机器人断开连接后向终端输出信息
-     * @SwooleEvent("close",rule="connectIsQQ()")
+     * @OnSwooleEvent("close",rule="connectIsQQ()")
      * @param ConnectionObject $conn
      */
     public function onDisconnect(ConnectionObject $conn) {
@@ -59,6 +58,7 @@ class Hello
      * @CQCommand("随机数")
      * @CQCommand(regexMatch="*从*到*的随机数")
      * @param $arg
+     * @return string
      */
     public function randNum($arg) {
         // 获取第一个数字类型的参数
@@ -68,7 +68,7 @@ class Hello
         $a = min(intval($num1), intval($num2));
         $b = max(intval($num1), intval($num2));
         // 回复用户结果
-        ctx()->reply("随机数是：" . mt_rand($a, $b));
+        return "随机数是：" . mt_rand($a, $b);
     }
 
     /**
@@ -76,7 +76,6 @@ class Hello
      * @RequestMapping("/httpTimer")
      */
     public function timer() {
-        ZMBuf::atomic("_tmp_2")->add(1);
         return "This page is used as testing TimerMiddleware! Do not use it in production.";
     }
 
@@ -101,7 +100,7 @@ class Hello
 
     /**
      * 框架会默认关闭未知的WebSocket链接，因为这个绑定的事件，你可以根据你自己的需求进行修改
-     * @SwooleEvent(type="open",rule="connectIsDefault()")
+     * @OnSwooleEvent(type="open",rule="connectIsDefault()")
      */
     public function closeUnknownConn() {
         Console::info("Unknown connection , I will close it.");

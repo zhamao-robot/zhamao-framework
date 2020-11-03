@@ -5,10 +5,8 @@ use ZM\Config\ZMConfig;
 define("ZM_START_TIME", microtime(true));
 define("ZM_DATA", ZMConfig::get("global", "zm_data"));
 define("ZM_VERSION", json_decode(file_get_contents(__DIR__ . "/../../composer.json"), true)["version"] ?? "unknown");
-define("CONFIG_DIR", ZMConfig::get("global", "config_dir"));
 define("CRASH_DIR", ZMConfig::get("global", "crash_dir"));
 @mkdir(ZM_DATA);
-@mkdir(CONFIG_DIR);
 @mkdir(CRASH_DIR);
 
 define("CONN_WEBSOCKET", 0);

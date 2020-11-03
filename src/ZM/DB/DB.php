@@ -7,7 +7,7 @@ namespace ZM\DB;
 use Exception;
 use ZM\Config\ZMConfig;
 use ZM\Console\Console;
-use ZM\Store\ZMBuf;
+use ZM\Store\MySQL\SqlPoolStorage;
 use PDOException;
 use PDOStatement;
 use Swoole\Database\PDOStatementProxy;
@@ -35,11 +35,11 @@ class DB
      * @return Table
      * @throws DbException
      */
-    public static function table($table_name, $enable_cache = null) {
+    public static function table($table_name) {
         if (Table::getTableInstance($table_name) === null) {
             if (in_array($table_name, self::$table_list))
-                return new Table($table_name, $enable_cache ?? ZMConfig::get("global", "sql_config")["sql_enable_cache"]);
-            elseif(ZMBuf::$sql_pool !== null){
+                return new Table($table_name);
+            elseif(SqlPoolStorage::$sql_pool !== null){
                 throw new DbException("Table " . $table_name . " not exist in database.");
             } else {
                 throw new DbException("Database connection not exist or connect failed. Please check sql configuration");
@@ -63,13 +63,13 @@ class DB
      */
     public static function unprepared($line) {
         try {
-            $conn = ZMBuf::$sql_pool->get();
+            $conn = SqlPoolStorage::$sql_pool->get();
             if ($conn === false) {
-                ZMBuf::$sql_pool->put(null);
+                SqlPoolStorage::$sql_pool->put(null);
                 throw new DbException("无法连接SQL！" . $line);
             }
             $result = $conn->query($line) === false ? false : true;
-            ZMBuf::$sql_pool->put($conn);
+            SqlPoolStorage::$sql_pool->put($conn);
             return $result;
         } catch (DBException $e) {
             Console::warning($e->getMessage());
@@ -87,19 +87,19 @@ class DB
     public static function rawQuery(string $line, $params = [], $fetch_mode = ZM_DEFAULT_FETCH_MODE) {
         Console::debug("MySQL: ".$line." | ". implode(", ", $params));
         try {
-            $conn = ZMBuf::$sql_pool->get();
+            $conn = SqlPoolStorage::$sql_pool->get();
             if ($conn === false) {
-                ZMBuf::$sql_pool->put(null);
+                SqlPoolStorage::$sql_pool->put(null);
                 throw new DbException("无法连接SQL！" . $line);
             }
             $ps = $conn->prepare($line);
             if ($ps === false) {
-                ZMBuf::$sql_pool->put(null);
+                SqlPoolStorage::$sql_pool->put(null);
                 throw new DbException("SQL语句查询错误，" . $line . "，错误信息：" . $conn->error);
             } else {
                 if (!($ps instanceof PDOStatement) && !($ps instanceof PDOStatementProxy)) {
                     var_dump($ps);
-                    ZMBuf::$sql_pool->put(null);
+                    SqlPoolStorage::$sql_pool->put(null);
                     throw new DbException("语句查询错误！返回的不是 PDOStatement" . $line);
                 }
                 if ($params == []) $result = $ps->execute();
@@ -107,11 +107,11 @@ class DB
                     $result = $ps->execute([$params]);
                 } else $result = $ps->execute($params);
                 if ($result !== true) {
-                    ZMBuf::$sql_pool->put(null);
+                    SqlPoolStorage::$sql_pool->put(null);
                     throw new DBException("语句[$line]错误！" . $ps->errorInfo()[2]);
                     //echo json_encode(debug_backtrace(), 128 | 256);
                 }
-                ZMBuf::$sql_pool->put($conn);
+                SqlPoolStorage::$sql_pool->put($conn);
                 return $ps->fetchAll($fetch_mode);
             }
         } catch (DbException $e) {

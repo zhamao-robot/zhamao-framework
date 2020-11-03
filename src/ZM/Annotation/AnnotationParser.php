@@ -201,6 +201,7 @@ class AnnotationParser
             $array[0]['method'] = $method;
             $array[0]['class'] = $class;
             $array[0]['request_method'] = $vss->request_method;
+            $array[0]['route'] = $vss->route;
             $this->req_mapping = $array;
             return;
         }

@@ -14,10 +14,7 @@ class Table
 
     private static $table_instance = [];
 
-    private $enable_cache;
-
-    public function __construct($table_name, $enable_cache) {
-        $this->enable_cache = $enable_cache;
+    public function __construct($table_name) {
         $this->table_name = $table_name;
         self::$table_instance[$table_name] = $this;
     }
@@ -75,5 +72,4 @@ class Table
      */
     public function getTableName() { return $this->table_name; }
 
-    public function isCacheEnabled() { return $this->enable_cache; }
 }

@@ -14,8 +14,10 @@ use ZM\Exception\InvalidArgumentException;
 use ZM\Exception\WaitTimeoutException;
 use ZM\Http\Response;
 use ZM\API\ZMRobot;
-use ZM\Store\LightCache;
-use ZM\Store\ZMBuf;
+use ZM\Store\LightCacheInside;
+use ZM\Store\Lock\SpinLock;
+use ZM\Store\ZMAtomic;
+use ZM\Utils\CoMessage;
 
 class Context implements ContextInterface
 {
@@ -137,12 +139,19 @@ class Context implements ContextInterface
      * @throws WaitTimeoutException
      */
     public function waitMessage($prompt = "", $timeout = 600, $timeout_prompt = "") {
-        if ($prompt != "") $this->reply($prompt);
         if (!isset($this->getData()["user_id"], $this->getData()["message"], $this->getData()["self_id"]))
             throw new InvalidArgumentException("协程等待参数缺失");
+
+
+        if ($prompt != "") $this->reply($prompt);
+
+        $r = CoMessage::yieldByWS($this->getData(), ["user_id", "self_id", "message_type", onebot_target_id_name($this->getMessageType())]);
+        if($r === false) {
+            throw new WaitTimeoutException($this, $timeout_prompt);
+        }
+
         $cid = Co::getuid();
-        $api_id = ZMBuf::atomic("wait_msg_id")->get();
-        ZMBuf::atomic("wait_msg_id")->add(1);
+        $api_id = ZMAtomic::get("wait_msg_id")->add(1);
         $hang = [
             "coroutine" => $cid,
             "user_id" => $this->getData()["user_id"],
@@ -154,17 +163,24 @@ class Context implements ContextInterface
         if ($hang["message_type"] == "group" || $hang["message_type"] == "discuss") {
             $hang[$hang["message_type"] . "_id"] = $this->getData()[$this->getData()["message_type"] . "_id"];
         }
-        LightCache::set("wait_api_".$api_id, $hang);
+        SpinLock::lock("wait_api");
+        $hw = LightCacheInside::get("wait_api", "wait_api") ?? [];
+        $hw[$api_id] = $hang;
+        LightCacheInside::set("wait_api", "wait_api", $hw);
+        SpinLock::unlock("wait_api");
         $id = swoole_timer_after($timeout * 1000, function () use ($api_id, $timeout_prompt) {
-            $r = LightCache::get("wait_api_".$api_id);
+            $r = LightCacheInside::get("wait_api", "wait_api")[$api_id] ?? null;
             if (is_array($r)) {
                 Co::resume($r["coroutine"]);
             }
         });
 
         Co::suspend();
-        $sess = LightCache::get("wait_api_".$api_id);
-        LightCache::unset("wait_api_".$api_id);
+        SpinLock::lock("wait_api");
+        $hw = LightCacheInside::get("wait_api", "wait_api") ?? [];
+        $sess = $hw[$api_id];
+        unset($hw[$api_id]);
+        LightCacheInside::set("wait_api", "wait_api", $hw);
         $result = $sess["result"];
         if (isset($id)) swoole_timer_clear($id);
         if ($result === null) throw new WaitTimeoutException($this, $timeout_prompt);
