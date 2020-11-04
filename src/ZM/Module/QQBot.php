@@ -11,8 +11,6 @@ use ZM\Annotation\CQ\CQMessage;
 use ZM\Annotation\CQ\CQMetaEvent;
 use ZM\Annotation\CQ\CQNotice;
 use ZM\Annotation\CQ\CQRequest;
-use ZM\Console\Console;
-use ZM\Console\TermColor;
 use ZM\Event\EventDispatcher;
 use ZM\Exception\InterruptException;
 use ZM\Exception\WaitTimeoutException;
@@ -39,8 +37,7 @@ class QQBot
                 ctx()->setCache("level", 0);
                 //Console::debug("Calling CQ Event from fd=" . ctx()->getConnection()->getFd());
                 $this->dispatchBeforeEvents($data); // >= 200 的level before在这里执行
-                if (false) {
-                    Console::error("哦豁，停下了");
+                if (CoMessage::resumeByWS()) {
                     EventDispatcher::interrupt();
                 }
                 //Console::warning("最上数据包：".json_encode($data));
@@ -70,7 +67,7 @@ class QQBot
         //Console::warning("最xia数据包：".json_encode($data));
         switch ($data["post_type"]) {
             case "message":
-                $word = split_explode(" ", str_replace("\r", "", context()->getMessage()));
+                $word = explodeMsg(str_replace("\r", "", context()->getMessage()));
                 if (count(explode("\n", $word[0])) >= 2) {
                     $enter = explode("\n", context()->getMessage());
                     $first = split_explode(" ", array_shift($enter));
@@ -82,17 +79,26 @@ class QQBot
 
                 //分发CQCommand事件
                 $dispatcher = new EventDispatcher(CQCommand::class);
-                $dispatcher->setRuleFunction(function ($v) use ($word) {
-                    if ($v->match == "" && $v->regexMatch == "" && $v->fullMatch == "") return false;
+                $dispatcher->setRuleFunction(function (CQCommand $v) use ($word) {
+                    if ($v->match == "" && $v->pattern == "" && $v->regex == "") return false;
                     elseif (($v->user_id == 0 || ($v->user_id != 0 && $v->user_id == ctx()->getUserId())) &&
                         ($v->group_id == 0 || ($v->group_id != 0 && $v->group_id == (ctx()->getGroupId() ?? 0))) &&
                         ($v->message_type == '' || ($v->message_type != '' && $v->message_type == ctx()->getMessageType()))
                     ) {
-                        if (($word[0] != "" && $v->match == $word[0]) ||
-                            in_array($word[0], $v->alias) ||
-                            ($v->regexMatch != "" && ($args = matchArgs($v->regexMatch, ctx()->getMessage())) !== false) ||
-                            ($v->fullMatch != "" && (preg_match("/" . $v->fullMatch . "/u", ctx()->getMessage(), $args)) != 0)) {
+                        if(($word[0] != "" && $v->match == $word[0]) || in_array($word[0], $v->alias)) {
+                            ctx()->setCache("match", $word);
                             return true;
+                        } elseif ($v->pattern != "") {
+                            $match = matchArgs($v->pattern, ctx()->getMessage());
+                            if($match !== false) {
+                                ctx()->setCache("match", $match);
+                                return true;
+                            }
+                        } elseif ($v->regex != "") {
+                            if(preg_match("/" . $v->regex . "/u", ctx()->getMessage(), $word2) != 0) {
+                                ctx()->setCache("match", $word2);
+                                return true;
+                            }
                         }
                     }
                     return false;
@@ -101,7 +107,7 @@ class QQBot
                     if (is_string($result)) ctx()->reply($result);
                     EventDispatcher::interrupt();
                 });
-                $r = $dispatcher->dispatchEvents($word);
+                $r = $dispatcher->dispatchEvents();
                 if ($r === null) EventDispatcher::interrupt();
 
                 //分发CQMessage事件

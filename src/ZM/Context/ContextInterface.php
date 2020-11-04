@@ -97,12 +97,11 @@ interface ContextInterface
     public function waitMessage($prompt = "", $timeout = 600, $timeout_prompt = "");
 
     /**
-     * @param $arg
      * @param $mode
      * @param $prompt_msg
      * @return mixed
      */
-    public function getArgs(&$arg, $mode, $prompt_msg);
+    public function getArgs($mode, $prompt_msg);
 
     public function setCache($key, $value);
 

@@ -34,8 +34,9 @@ class ZMUtil
         Console::info(Console::setColor("Reloading server...", "gold"));
         usleep($delay * 1000);
         foreach ((LightCacheInside::get("wait_api", "wait_api") ?? []) as $k => $v) {
-            if ($v["result"] === null && isset($v["coroutine"])) Co::resume($v["coroutine"]);
+            if (($v["result"] ?? false) === null && isset($v["coroutine"])) Co::resume($v["coroutine"]);
         }
+        LightCacheInside::unset("wait_api", "wait_api");
         foreach (server()->connections as $v) {
             server()->close($v);
         }

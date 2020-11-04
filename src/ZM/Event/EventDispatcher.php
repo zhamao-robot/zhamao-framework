@@ -45,9 +45,6 @@ class EventDispatcher
         try {
 
             foreach ((EventManager::$events[$this->class] ?? []) as $v) {
-                if($this->class == CQMetaEvent::class) {
-                    //eval(BP);
-                }
                 $result = $this->dispatchEvent($v, $this->rule, ...$params);
                 if ($result !== false && is_callable($this->return_func)) ($this->return_func)($result);
             }

@@ -2,15 +2,11 @@
 
 namespace Module\Example;
 
-use ZM\Annotation\CQ\CQMetaEvent;
 use ZM\Annotation\Swoole\OnSwooleEvent;
-use ZM\Annotation\Swoole\OnWorkerStart;
 use ZM\ConnectionManager\ConnectionObject;
 use ZM\Console\Console;
 use ZM\Annotation\CQ\CQCommand;
 use ZM\Annotation\Http\RequestMapping;
-use ZM\Store\LightCache;
-use ZM\Store\Lock\SpinLock;
 use ZM\Utils\ZMUtil;
 
 /**
@@ -56,15 +52,14 @@ class Hello
 
     /**
      * @CQCommand("随机数")
-     * @CQCommand(regexMatch="*从*到*的随机数")
-     * @param $arg
+     * @CQCommand(pattern="*从*到*的随机数")
      * @return string
      */
-    public function randNum($arg) {
+    public function randNum() {
         // 获取第一个数字类型的参数
-        $num1 = ctx()->getArgs($arg, ZM_MATCH_NUMBER, "请输入第一个数字");
+        $num1 = ctx()->getArgs(ZM_MATCH_NUMBER, "请输入第一个数字");
         // 获取第二个数字类型的参数
-        $num2 = ctx()->getArgs($arg, ZM_MATCH_NUMBER, "请输入第二个数字");
+        $num2 = ctx()->getArgs(ZM_MATCH_NUMBER, "请输入第二个数字");
         $a = min(intval($num1), intval($num2));
         $b = max(intval($num1), intval($num2));
         // 回复用户结果

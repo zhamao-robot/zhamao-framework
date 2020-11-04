@@ -247,6 +247,7 @@ class ServerEventHandler
      * @param Frame $frame
      */
     public function onMessage($server, Frame $frame) {
+
         Console::debug("Calling Swoole \"message\" from fd=" . $frame->fd.": ".TermColor::ITALIC.$frame->data.TermColor::RESET);
         unset(Context::$context[Co::getCid()]);
         $conn = ManagerGM::get($frame->fd);
@@ -264,7 +265,9 @@ class ServerEventHandler
             }
         });
         try {
+            $starttime = microtime(true);
             $dispatcher->dispatchEvents($conn);
+            Console::success("Used ".round((microtime(true) - $starttime) * 1000, 3)." ms!");
         } catch (Exception $e) {
             $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
             Console::error("Uncaught exception " . get_class($e) . " when calling \"message\": " . $error_msg);
@@ -274,6 +277,7 @@ class ServerEventHandler
             Console::error("Uncaught Error " . get_class($e) . " when calling \"message\": " . $error_msg);
             Console::trace();
         }
+
     }
 
     /**

@@ -10,6 +10,7 @@ use Swoole\WebSocket\Frame;
 use swoole_server;
 use ZM\ConnectionManager\ConnectionObject;
 use ZM\ConnectionManager\ManagerGM;
+use ZM\Console\Console;
 use ZM\Exception\InvalidArgumentException;
 use ZM\Exception\WaitTimeoutException;
 use ZM\Http\Response;
@@ -142,14 +143,15 @@ class Context implements ContextInterface
         if (!isset($this->getData()["user_id"], $this->getData()["message"], $this->getData()["self_id"]))
             throw new InvalidArgumentException("协程等待参数缺失");
 
-
+        Console::debug("==== 开始等待输入 ====");
         if ($prompt != "") $this->reply($prompt);
 
         $r = CoMessage::yieldByWS($this->getData(), ["user_id", "self_id", "message_type", onebot_target_id_name($this->getMessageType())]);
         if($r === false) {
             throw new WaitTimeoutException($this, $timeout_prompt);
         }
-
+        return $r["message"];
+        /*
         $cid = Co::getuid();
         $api_id = ZMAtomic::get("wait_msg_id")->add(1);
         $hang = [
@@ -184,18 +186,18 @@ class Context implements ContextInterface
         $result = $sess["result"];
         if (isset($id)) swoole_timer_clear($id);
         if ($result === null) throw new WaitTimeoutException($this, $timeout_prompt);
-        return $result;
+        return $result;*/
     }
 
     /**
-     * @param $arg
      * @param $mode
      * @param $prompt_msg
      * @return mixed|string
      * @throws InvalidArgumentException
      * @throws WaitTimeoutException
      */
-    public function getArgs(&$arg, $mode, $prompt_msg) {
+    public function getArgs($mode, $prompt_msg) {
+        $arg = ctx()->getCache("match");
         switch ($mode) {
             case ZM_MATCH_ALL:
                 $p = $arg;
@@ -205,6 +207,7 @@ class Context implements ContextInterface
                 foreach ($arg as $k => $v) {
                     if (is_numeric($v)) {
                         array_splice($arg, $k, 1);
+                        ctx()->setCache("match", $arg);
                         return $v;
                     }
                 }
@@ -213,6 +216,7 @@ class Context implements ContextInterface
                 if (isset($arg[1])) {
                     $a = $arg[1];
                     array_splice($arg, 1, 1);
+                    ctx()->setCache("match", $arg);
                     return $a;
                 } else {
                     return $this->waitMessage($prompt_msg);
