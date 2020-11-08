@@ -29,10 +29,10 @@
         "psy/psysh": "@stable",
         "symfony/console": "^5.1",
         "symfony/polyfill-ctype": "^1.18",
-        "zhamao/connection-manager": "^1.0",
+        "zhamao/connection-manager": "*@dev",
         "zhamao/console": "*@dev",
-        "zhamao/config": "^1.0",
-        "zhamao/request": "^1.0",
+        "zhamao/config": "*@dev",
+        "zhamao/request": "*@dev",
         "symfony/routing": "^5.1"
     },
     "suggest": {
