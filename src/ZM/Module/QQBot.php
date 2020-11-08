@@ -21,7 +21,7 @@ use ZM\Utils\CoMessage;
 /**
  * Class QQBot
  * @package ZM\Module
- * @ExternalModule("qqbot")
+ * @ExternalModule("onebot")
  */
 class QQBot
 {

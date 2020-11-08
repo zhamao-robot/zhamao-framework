@@ -5,6 +5,7 @@ namespace ZM\Context;
 
 
 use Co;
+use Exception;
 use Swoole\Http\Request;
 use Swoole\WebSocket\Frame;
 use swoole_server;
@@ -15,9 +16,6 @@ use ZM\Exception\InvalidArgumentException;
 use ZM\Exception\WaitTimeoutException;
 use ZM\Http\Response;
 use ZM\API\ZMRobot;
-use ZM\Store\LightCacheInside;
-use ZM\Store\Lock\SpinLock;
-use ZM\Store\ZMAtomic;
 use ZM\Utils\CoMessage;
 
 class Context implements ContextInterface
@@ -146,7 +144,11 @@ class Context implements ContextInterface
         Console::debug("==== 开始等待输入 ====");
         if ($prompt != "") $this->reply($prompt);
 
-        $r = CoMessage::yieldByWS($this->getData(), ["user_id", "self_id", "message_type", onebot_target_id_name($this->getMessageType())]);
+        try {
+            $r = CoMessage::yieldByWS($this->getData(), ["user_id", "self_id", "message_type", onebot_target_id_name($this->getMessageType())]);
+        } catch (Exception $e) {
+            $r = false;
+        }
         if($r === false) {
             throw new WaitTimeoutException($this, $timeout_prompt);
         }
@@ -231,4 +233,6 @@ class Context implements ContextInterface
     }
 
     public function copy() { return self::$context[$this->cid]; }
+
+    public function getOption() { return self::getCache("match"); }
 }

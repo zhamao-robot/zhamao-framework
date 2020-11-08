@@ -2,12 +2,13 @@
 
 namespace Module\Example;
 
+use ZM\Annotation\Http\Middleware;
 use ZM\Annotation\Swoole\OnSwooleEvent;
 use ZM\ConnectionManager\ConnectionObject;
 use ZM\Console\Console;
 use ZM\Annotation\CQ\CQCommand;
 use ZM\Annotation\Http\RequestMapping;
-use ZM\Utils\ZMUtil;
+use ZM\Store\Redis\ZMRedis;
 
 /**
  * Class Hello
@@ -17,25 +18,38 @@ use ZM\Utils\ZMUtil;
 class Hello
 {
     /**
-     * 在机器人连接后向终端输出信息
-     * @OnSwooleEvent("open",rule="connectIsQQ()")
-     * @param $conn
+     * 一个简单的redis连接池使用demo，将下方user_id改为你自己的QQ号即可(为了不被不法分子利用)
+     * @CQCommand("redis_test",user_id=627577391)
      */
-    public function onConnect(ConnectionObject $conn) {
-        Console::info("机器人 " . $conn->getOption("connect_id") . " 已连接！");
+    public function testCase() {
+        $a = new ZMRedis();
+        $redis = $a->get();
+        $r1 = ctx()->getArgs(ZM_MATCH_FIRST, "请说出你想设置的操作[r/w]");
+        switch ($r1) {
+            case "r":
+                $k = ctx()->getArgs(ZM_MATCH_FIRST, "请说出你想读取的键名");
+                $result = $redis->get($k);
+                ctx()->reply("结果：" . $result);
+                break;
+            case "w":
+                $k = ctx()->getArgs(ZM_MATCH_FIRST, "请说出你想写入的键名");
+                $v = ctx()->getArgs(ZM_MATCH_FIRST, "请说出你想写入的字符串");
+                $result = $redis->set($k, $v);
+                ctx()->reply("结果：" . ($result ? "成功" : "失败"));
+                break;
+        }
     }
 
     /**
-     * 在机器人断开连接后向终端输出信息
-     * @OnSwooleEvent("close",rule="connectIsQQ()")
-     * @param ConnectionObject $conn
+     * @CQCommand("我是谁")
      */
-    public function onDisconnect(ConnectionObject $conn) {
-        Console::info("机器人 " . $conn->getOption("connect_id") . " 已断开连接！");
+    public function whoami() {
+        $user = ctx()->getRobot()->setCallback(true)->getLoginInfo();
+        return "你是" . $user["data"]["nickname"] . "，QQ号是" . $user["data"]["user_id"];
     }
 
     /**
-     * 向机器人发送"你好"，即可回复这句话
+     * 向机器人发送"你好啊"，也可回复这句话
      * @CQCommand(match="你好",alias={"你好啊","你是谁"})
      */
     public function hello() {
@@ -43,14 +57,9 @@ class Hello
     }
 
     /**
-     * @CQCommand(".reload")
-     */
-    public function reload() {
-        context()->reply("reloading...");
-        ZMUtil::reload();
-    }
-
-    /**
+     * 一个简单随机数的功能demo
+     * 问法1：随机数 1 20
+     * 问法2：从1到20的随机数
      * @CQCommand("随机数")
      * @CQCommand(pattern="*从*到*的随机数")
      * @return string
@@ -69,6 +78,7 @@ class Hello
     /**
      * 中间件测试的一个示例函数
      * @RequestMapping("/httpTimer")
+     * @Middleware("timer")
      */
     public function timer() {
         return "This page is used as testing TimerMiddleware! Do not use it in production.";
@@ -91,6 +101,24 @@ class Hello
      */
     public function paramGet($param) {
         return "Your name: {$param["name"]}";
+    }
+
+    /**
+     * 在机器人连接后向终端输出信息
+     * @OnSwooleEvent("open",rule="connectIsQQ()")
+     * @param $conn
+     */
+    public function onConnect(ConnectionObject $conn) {
+        Console::info("机器人 " . $conn->getOption("connect_id") . " 已连接！");
+    }
+
+    /**
+     * 在机器人断开连接后向终端输出信息
+     * @OnSwooleEvent("close",rule="connectIsQQ()")
+     * @param ConnectionObject $conn
+     */
+    public function onDisconnect(ConnectionObject $conn) {
+        Console::info("机器人 " . $conn->getOption("connect_id") . " 已断开连接！");
     }
 
     /**

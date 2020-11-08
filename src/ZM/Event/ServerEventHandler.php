@@ -134,10 +134,7 @@ class ServerEventHandler
                 foreach ($server->connections as $v) {
                     $server->close($v);
                 }
-                if (SqlPoolStorage::$sql_pool !== null) {
-                    SqlPoolStorage::$sql_pool->close();
-                    SqlPoolStorage::$sql_pool = null;
-                }
+
 
                 // 这里执行的是只需要执行一遍的代码，比如终端监听器和键盘监听器
                 /*if ($server->worker_id === 0) {
@@ -163,6 +160,10 @@ class ServerEventHandler
                 }*/
                 //TODO: 单独抽出来MySQL和Redis连接池
                 if (ZMConfig::get("global", "sql_config")["sql_host"] != "") {
+                    if (SqlPoolStorage::$sql_pool !== null) {
+                        SqlPoolStorage::$sql_pool->close();
+                        SqlPoolStorage::$sql_pool = null;
+                    }
                     Console::info("新建SQL连接池中");
                     ob_start();
                     phpinfo();
@@ -503,9 +504,9 @@ class ServerEventHandler
 
         //加载插件
         $plugins = ZMConfig::get("global", "modules") ?? [];
-        if (!isset($plugins["qqbot"])) $plugins["qqbot"] = true;
+        if (!isset($plugins["onebot"])) $plugins["onebot"] = true;
 
-        if ($plugins["qqbot"]) {
+        if ($plugins["onebot"]) {
             $obj = new OnSwooleEvent();
             $obj->class = QQBot::class;
             $obj->method = 'handle';
@@ -516,7 +517,7 @@ class ServerEventHandler
         }
 
         //TODO: 编写加载外部插件的方式
-        //$this->loadExternalModules();
+        $this->loadExternalModules($plugins);
     }
 
     private function addWatcher($maindir, $fd) {
@@ -528,6 +529,13 @@ class ServerEventHandler
                 inotify_add_watch($fd, $maindir . "/" . $subdir, IN_ATTRIB | IN_ISDIR);
                 $this->addWatcher($maindir . "/" . $subdir, $fd);
             }
+        }
+    }
+
+    private function loadExternalModules($plugins) {
+        foreach ($plugins as $k => $v) {
+            if ($k == "onebot") continue;
+
         }
     }
 }

@@ -114,4 +114,6 @@ interface ContextInterface
     public function cloneFromParent();
 
     public function copy();
+
+    public function getOption();
 }
