@@ -1,0 +1,38 @@
+site_name: 炸毛框架 v2
+
+repo_name: '炸毛框架'
+repo_url: 'https://github.com/zhamao-robot/zhamao-framework'
+edit_uri: 'blob/master/docs/'
+
+theme:
+  name: material
+  logo: assets/logos.png
+  features:
+    - navigation.tabs
+extra_javascript:
+  - https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js
+  - javascripts/config.js
+extra_css:
+  - assets/extra.css
+  - https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/default.min.css
+markdown_extensions:
+  - admonition
+  - pymdownx.tabbed
+
+copyright: 'Copyright &copy; 2019 - 2020 CrazyBot Team'
+
+nav:
+  - 指南:
+      - 介绍: index.md
+      - 我需要做什么: guide/我需要做什么.md
+      - 选择聊天机器人实例: guide/OneBot实例.md
+  - 事件和注解:
+      - 事件和注解: event/index.md
+  - 框架组件:
+      - 框架组件: component/index.md
+  - 进阶开发:
+      - Swoole 进阶: test.md
+  - FAQ:
+      - FAQ: FAQ.md
+  - 更新日志:
+      - 更新日志: update.md
