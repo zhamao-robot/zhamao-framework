@@ -17,13 +17,9 @@
 ## 开发者注意
 **由于 CQHTTP 不再提供维护，转为 [OneBot 标准](https://github.com/howmanybots/onebot)（原 CQHTTP 插件衍生而来的机器人 HTTP 接口标准），本框架也将在未来改为兼容此标准。**
 
-**同时将标准实现层独立出来，但默认依赖，对于一些基础的定义层会发生变更。**
-
 **以上涉及的变更将在下一个大版本 (v2.0.0) 更新，请关注 2.0-dev 分支 和 Project 模块！**
 
-
-
-
+**v2.0版本即将到来，请持续关注 [新文档](https://zhamao.xin/docs-v2/) 进度和 Project 模块展示的测试进度！**
 
 ## 简介
 zhamao-framework 是一个 PHP Swoole 的聊天机器人框架，兼容 OneBot 标准，它会对微信公众号等终端收到的消息进行解析处理，并以模块化的形式进行开发，来完成机器人的自然语言对话等功能。
@@ -37,9 +33,7 @@ zhamao-framework 是一个 PHP Swoole 的聊天机器人框架，兼容 OneBot �
 3. 还可以使用 Dockerfile 构建 Docker 容器
 
 ## 文档
-Pages托管：[https://framework.zhamao.xin/](https://framework.zhamao.xin/)
-
-国内服务器：[http://framework2.zhamao.xin/](http://framework2.zhamao.xin/)
+[https://framework.zhamao.xin/](https://framework.zhamao.xin/)
 
 ## 特点
 - 支持多账号
