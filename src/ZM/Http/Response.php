@@ -184,7 +184,7 @@ class Response
      * @return mixed
      */
     public function redirect($location, $http_code = null) {
-        return $this->redirect($location, $http_code);
+        return $this->response->redirect($location, $http_code);
     }
 
     /**

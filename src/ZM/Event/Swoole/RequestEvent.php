@@ -27,7 +27,8 @@ class RequestEvent implements SwooleEvent
      */
     private $response;
 
-    public function __construct(Request $request, Response $response) {
+    public function __construct(Request $request, Response $response)
+    {
         $this->request = $request;
         $this->response = $response;
     }
@@ -36,7 +37,8 @@ class RequestEvent implements SwooleEvent
      * @return $this|SwooleEvent
      * @throws Exception
      */
-    public function onActivate() {
+    public function onActivate()
+    {
         ZMUtil::checkWait();
         foreach (ZMBuf::globals("http_header") as $k => $v) {
             $this->response->setHeader($k, $v);
@@ -49,7 +51,10 @@ class RequestEvent implements SwooleEvent
         $params = [];
         while (true) {
             $r = array_shift($uri);
-            if ($r === null) break;
+            if ($r === null) {
+                if ($node == ZMBuf::$req_mapping) goto statics;
+                else break;
+            }
             if (($cnt = count($node["son"] ?? [])) == 1) {
                 if (isset($node["param_route"])) {
                     foreach ($node["son"] as $k => $v) {
@@ -80,13 +85,18 @@ class RequestEvent implements SwooleEvent
                     }
                 }
             }
-
+            statics:
             if (ZMBuf::globals("static_file_server")["status"]) {
                 $base_dir = ZMBuf::globals("static_file_server")["document_root"];
                 $base_index = ZMBuf::globals("static_file_server")["document_index"];
                 $uri = $this->request->server["request_uri"];
                 $path = realpath($base_dir . urldecode($uri));
                 if ($path !== false) {
+                    if (is_dir($path) && mb_substr($uri, -1, 1) != "/") {
+                        $this->response->redirect($uri . "/", 301);
+                        $this->response->end();
+                        return $this;
+                    }
                     if (is_dir($path)) $path = $path . '/';
                     $work = realpath(DataProvider::getWorkingDir()) . '/';
                     if (strpos($path, $work) !== 0) {
@@ -150,7 +160,8 @@ class RequestEvent implements SwooleEvent
     /**
      * @inheritDoc
      */
-    public function onAfter() {
+    public function onAfter()
+    {
         foreach (ZMBuf::$events[SwooleEventAfter::class] ?? [] as $v) {
             if (strtolower($v->type) == "request" && $this->parseSwooleRule($v)) {
                 $c = $v->class;
@@ -162,12 +173,14 @@ class RequestEvent implements SwooleEvent
         return $this;
     }
 
-    private function responseStatus(int $int) {
+    private function responseStatus(int $int)
+    {
         $this->response->status($int);
         $this->response->end();
     }
 
-    private function parseSwooleRule($v) {
+    private function parseSwooleRule($v)
+    {
         switch (explode(":", $v->rule)[0]) {
             case "containsGet":
             case "containsPost":
