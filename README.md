@@ -33,7 +33,9 @@ zhamao-framework 是一个 PHP Swoole 的聊天机器人框架，兼容 OneBot �
 3. 还可以使用 Dockerfile 构建 Docker 容器
 
 ## 文档
-查看文档：[https://zhamao.xin/docs-v2/](https://zhamao.xin/docs-v2/)
+查看文档：[https://docs-v2.zhamao.xin/](https://docs-v2.zhamao.xin/)
+
+备用链接：[http://docs-v2.zhamao.me/](http://docs-v2.zhamao.me/)
 
 自行构建文档：`mkdocs build -d distribute`
 
