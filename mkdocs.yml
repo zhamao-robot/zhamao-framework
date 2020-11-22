@@ -7,6 +7,8 @@ edit_uri: 'blob/master/docs/'
 theme:
   name: material
   logo: assets/logos.png
+  favicon: assets/favicon.png
+  language: zh
   features:
     - navigation.tabs
 extra_javascript:
