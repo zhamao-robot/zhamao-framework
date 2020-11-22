@@ -2,7 +2,7 @@ site_name: 炸毛框架 v2
 
 repo_name: '炸毛框架'
 repo_url: 'https://github.com/zhamao-robot/zhamao-framework'
-edit_uri: 'blob/master/docs/'
+edit_uri: 'blob/2.0-dev/docs/'
 
 theme:
   name: material
@@ -23,11 +23,31 @@ markdown_extensions:
   - pymdownx.superfences
   - pymdownx.inlinehilite
   - pymdownx.snippets
+  - abbr
   - pymdownx.highlight:
       linenums: true
       linenums_style: pymdownx.inline
+extra:
+  version:
+    method: mike
 
-copyright: 'Copyright &copy; 2019 - 2020 CrazyBot Team'
+copyright: 'Copyright &copy; 2019 - 2020 CrazyBot Team&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tx-switch">
+                 <button data-md-color-scheme="default"><code>默认模式</code></button>
+                 <button data-md-color-scheme="slate"><code>暗黑模式</code></button>
+               </span>
+
+               <script>
+                 var buttons = document.querySelectorAll("button[data-md-color-scheme]");
+                 buttons.forEach(function(button) {
+                   button.addEventListener("click", function() {
+                     var attr = this.getAttribute("data-md-color-scheme");
+                     setCookie("_theme", attr);
+                     document.body.setAttribute("data-md-color-scheme", attr);
+                     var name = document.querySelector("#__code_0 code span:nth-child(7)");
+                     name.textContent = attr;
+                   })
+                 })
+               </script><br><a href="http://beian.miit.gov.cn">蒙ICP备18000198号-1</a>'
 
 nav:
   - 指南:
