@@ -7,7 +7,7 @@
 [![zhamao License](https://img.shields.io/hexpm/l/plug.svg?maxAge=2592000)](https://github.com/zhamao-robot/zhamao-framework/blob/master/LICENSE)
 [![Latest Stable Version](http://img.shields.io/packagist/v/zhamao/framework.svg)](https://packagist.org/packages/zhamao/framework)
 [![Banner](https://img.shields.io/badge/CQHTTP-v11-black)]()
-[![dev-version](https://img.shields.io/badge/dev--version-v2.0.0--beta1-green)]()
+[![dev-version](https://img.shields.io/badge/dev--version-v2.0.0--b3-green)]()
 
 [![stupid counter](https://img.shields.io/github/search/zhamao-robot/zhamao-framework/stupid.svg)](https://github.com/zhamao-robot/zhamao-framework/search?q=stupid)
 [![TODO counter](https://img.shields.io/github/search/zhamao-robot/zhamao-framework/TODO.svg)](https://github.com/zhamao-robot/zhamao-framework/search?q=TODO)
@@ -15,8 +15,6 @@
  </div>
 
 ## 开发者注意
-**此版本目前无法正常运行，还在持续开发中，请勿使用！！！**
-
 **2.0 版本开发完毕后，会发布测试版和并入 master 分支，敬请关注。**
 
 [![dev-version2](https://img.shields.io/badge/process-95%25-green)]()
@@ -35,9 +33,9 @@ zhamao-framework 是一个 PHP Swoole 的聊天机器人框架，兼容 OneBot �
 3. 还可以使用 Dockerfile 构建 Docker 容器
 
 ## 文档
-Pages托管：[https://framework.zhamao.xin/](https://framework.zhamao.xin/)
+查看文档：[https://zhamao.xin/docs-v2/](https://zhamao.xin/docs-v2/)
 
-国内服务器：[https://framework2.zhamao.xin/](https://framework2.zhamao.xin/)
+自行构建文档：`mkdocs build -d distribute`
 
 ## 特点
 - 支持多账号
@@ -65,12 +63,12 @@ Pages托管：[https://framework.zhamao.xin/](https://framework.zhamao.xin/)
 - [ ] 图灵机器人/腾讯AI 聊天模块
 - [ ] 分词模块（可能会放弃计划，因为目前好用的分词都是其他语言的）
 - [ ] HTTP 过滤器、Auth 模块、完整的 MVC 兼容（可能会放弃计划，因为框架主打机器人开发）
-- [ ] Redis 连接池或开箱即用的相应功能内置
+- [X] Redis 连接池或开箱即用的相应功能内置
 - [X] 1.3 版本使用上下文代替
 - [X] 更好的 Logger，稳定和漂亮的控制台输出
 - [ ] 日志服务
 - [X] 框架支持 Phar 打包（可能会比较靠后支持）
-- [ ] 完整的单元测试（如果有需求则尽快开发）
+- [X] 完整的单元测试（如果有需求则尽快开发）
 - [X] 静态文件服务器
 
 ## 从 cqbot-swoole 升级
