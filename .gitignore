@@ -6,3 +6,7 @@ zm.json
 /zm_data/
 composer.lock
 /resources/server.phar
+/distribute/
+/bin/.phpunit.result.cache
+/resources/zhamao.service
+.phpunit.result.cache

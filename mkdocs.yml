@@ -18,14 +18,23 @@ extra_css:
 markdown_extensions:
   - admonition
   - pymdownx.tabbed
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.highlight:
+      linenums: true
+      linenums_style: pymdownx.inline
 
 copyright: 'Copyright &copy; 2019 - 2020 CrazyBot Team'
 
 nav:
   - 指南:
       - 介绍: index.md
-      - 我需要做什么: guide/我需要做什么.md
+      - 安装框架: guide/安装.md
+      - 快速上手（机器人篇）: guide/快速上手-机器人.md
+      - 快速上手（HTTP篇）: guide/快速上手-http.md
       - 选择聊天机器人实例: guide/OneBot实例.md
+      - 基本配置: guide/基本配置.md
   - 事件和注解:
       - 事件和注解: event/index.md
   - 框架组件:

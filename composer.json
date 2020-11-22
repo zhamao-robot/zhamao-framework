@@ -3,7 +3,7 @@
     "description": "High performance QQ robot and web server development framework",
     "minimum-stability": "stable",
     "license": "Apache-2.0",
-    "version": "2.0.0-b1",
+    "version": "2.0.0-b3",
     "authors": [
         {
             "name": "whale",
@@ -66,10 +66,6 @@
         {
             "type": "path",
             "url": "/Users/jerry/project/git-project/zhamao-console"
-        },
-        {
-            "type": "path",
-            "url": "/Users/jerry/project/git-project/zhamao-lock"
         }
     ]
 }

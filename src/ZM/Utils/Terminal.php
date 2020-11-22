@@ -38,8 +38,7 @@ class Terminal
             case 'psysh':
                 if (Framework::$argv["disable-coroutine"]) {
                     (new Shell())->run();
-                }
-                else
+                } else
                     Console::error("Only \"--disable-coroutine\" mode can use psysh!!!");
                 return true;
             case 'bc':
