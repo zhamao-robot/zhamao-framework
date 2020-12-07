@@ -38,7 +38,9 @@ zhamao-framework 是一个 PHP Swoole 的聊天机器人框架，兼容 OneBot �
 
 ## 文档 (v1.x)
 国内服务器：[https://docs-v1.zhamao.xin/](https://docs-v1.zhamao.xin/)
+
 GitHub Pages：[https://docs-v1.zhamao.me/](https://docs-v1.zhamao.me/)
+
 ## 特点
 - 支持多账号
 - 灵活的注解事件绑定机制
