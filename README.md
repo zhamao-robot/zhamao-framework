@@ -36,9 +36,9 @@ zhamao-framework 是一个 PHP Swoole 的聊天机器人框架，兼容 OneBot �
 2. 你也可以直接拉取本项目，进入文件夹后 `composer update` 加载依赖后使用 `bin/start init` 快速初始化框架文件
 3. 还可以使用 Dockerfile 构建 Docker 容器
 
-## 文档
-[https://docs-v1.zhamao.xin/](https://docs-v1.zhamao.xin/)
-
+## 文档 (v1.x)
+国内服务器：[https://docs-v1.zhamao.xin/](https://docs-v1.zhamao.xin/)
+GitHub Pages：[https://docs-v1.zhamao.me/](https://docs-v1.zhamao.me/)
 ## 特点
 - 支持多账号
 - 灵活的注解事件绑定机制
