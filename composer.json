@@ -3,7 +3,7 @@
     "description": "High performance QQ robot and web server development framework",
     "minimum-stability": "stable",
     "license": "Apache-2.0",
-    "version": "1.6.3",
+    "version": "1.6.4",
     "authors": [
         {
             "name": "whale",
@@ -25,17 +25,15 @@
         "swlib/saber": "^1.0",
         "doctrine/annotations": "~1.10",
         "ext-json": "*",
-        "ext-posix": "*",
         "ext-ctype": "*",
-        "ext-pdo": "*",
         "psy/psysh": "@stable"
     },
     "autoload": {
         "psr-4": {
-            "Custom\\": "src/Custom",
             "Framework\\": "src/Framework",
             "ZM\\": "src/ZM",
-            "Module\\": "src/Module"
+            "Module\\": "src/Module",
+            "Custom\\": "src/Custom"
         }
     }
 }

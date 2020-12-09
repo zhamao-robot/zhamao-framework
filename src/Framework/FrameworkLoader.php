@@ -34,7 +34,8 @@ class FrameworkLoader
     /** @var Server */
     private $server;
 
-    public function __construct($args = []) {
+    public function __construct($args = [])
+    {
         $this->requireGlobalFunctions();
         if (LOAD_MODE == 0) define("WORKING_DIR", getcwd());
         elseif (LOAD_MODE == 1) define("WORKING_DIR", realpath(__DIR__ . "/../../"));
@@ -44,6 +45,29 @@ class FrameworkLoader
         if (file_exists(DataProvider::getWorkingDir() . "/vendor/autoload.php")) {
             /** @noinspection PhpIncludeInspection */
             require_once DataProvider::getWorkingDir() . "/vendor/autoload.php";
+        }
+        if (LOAD_MODE == 0) {
+            echo "* This is repository mode.\n";
+            $composer = json_decode(file_get_contents(DataProvider::getWorkingDir() . "/composer.json"), true);
+            if (!isset($composer["autoload"]["psr-4"]["Module\\"])) {
+                echo "框架源码模式需要在autoload文件中添加Module目录为自动加载，是否添加？[Y/n] ";
+                $r = strtolower(trim(fgets(STDIN)));
+                if ($r === "" || $r === "y") {
+                    $composer["autoload"]["psr-4"]["Module\\"] = "src/Module";
+                    $composer["autoload"]["psr-4"]["Custom\\"] = "src/Custom";
+                    $r = file_put_contents(DataProvider::getWorkingDir() . "/composer.json", json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+                    if ($r !== false) {
+                        echo "成功添加！请重新进行 composer update ！\n";
+                        exit(1);
+                    } else {
+                        echo "添加失败！请按任意键继续！";
+                        fgets(STDIN);
+                        exit(1);
+                    }
+                } else {
+                    exit(1);
+                }
+            }
         }
         if (LOAD_MODE == 2) {
             require_once FRAMEWORK_DIR . "/vendor/autoload.php";
@@ -136,11 +160,13 @@ class FrameworkLoader
         }
     }
 
-    private function requireGlobalFunctions() {
+    private function requireGlobalFunctions()
+    {
         require_once __DIR__ . '/global_functions.php';
     }
 
-    private function defineProperties() {
+    private function defineProperties()
+    {
         define("ZM_START_TIME", microtime(true));
         define("ZM_DATA", self::$settings->get("zm_data"));
         define("ZM_VERSION", json_decode(file_get_contents(__DIR__ . "/../../composer.json"), true)["version"] ?? "unknown");
@@ -158,11 +184,12 @@ class FrameworkLoader
         define("ZM_DEFAULT_FETCH_MODE", self::$settings->get("sql_config")["sql_default_fetch_mode"] ?? 4);
     }
 
-    private function selfCheck() {
+    private function selfCheck()
+    {
         if (!extension_loaded("swoole")) die("Can not find swoole extension.\n");
         if (version_compare(SWOOLE_VERSION, "4.4.13") == -1) die("You must install swoole version >= 4.4.13 !");
         //if (!extension_loaded("gd")) die("Can not find gd extension.\n");
-        if (!extension_loaded("sockets")) die("Can not find sockets extension.\n");
+        //if (!extension_loaded("sockets")) die("Can not find sockets extension.\n");
         if (!extension_loaded("ctype")) die("Can not find ctype extension.\n");
         if (!function_exists("mb_substr")) die("Can not find mbstring extension.\n");
         if (substr(PHP_VERSION, 0, 1) != "7") die("PHP >=7 required.\n");
