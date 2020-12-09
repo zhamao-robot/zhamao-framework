@@ -31,9 +31,7 @@
     "autoload": {
         "psr-4": {
             "Framework\\": "src/Framework",
-            "ZM\\": "src/ZM",
-            "Module\\": "src/Module",
-            "Custom\\": "src/Custom"
+            "ZM\\": "src/ZM"
         }
     }
 }
