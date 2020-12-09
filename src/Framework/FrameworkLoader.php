@@ -190,9 +190,9 @@ class FrameworkLoader
         if (version_compare(SWOOLE_VERSION, "4.4.13") == -1) die("You must install swoole version >= 4.4.13 !");
         //if (!extension_loaded("gd")) die("Can not find gd extension.\n");
         //if (!extension_loaded("sockets")) die("Can not find sockets extension.\n");
-        if (!extension_loaded("ctype")) die("Can not find ctype extension.\n");
+        if (!function_exists("ctype_alpha")) die("Can not find ctype extension.\n");
         if (!function_exists("mb_substr")) die("Can not find mbstring extension.\n");
-        if (substr(PHP_VERSION, 0, 1) != "7") die("PHP >=7 required.\n");
+        if (substr(PHP_VERSION, 0, 1) < "7") die("PHP >=7 required.\n");
         //if (!function_exists("curl_exec")) die("Can not find curl extension.\n");
         //if (!class_exists("ZipArchive")) die("Can not find Zip extension.\n");
         //if (!file_exists(CRASH_DIR . "last_error.log")) die("Can not find log file.\n");

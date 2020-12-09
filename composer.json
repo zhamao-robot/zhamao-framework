@@ -21,12 +21,12 @@
     "require": {
         "php": ">=7.2",
         "swoole/ide-helper": "@dev",
-        "ext-mbstring": "*",
         "swlib/saber": "^1.0",
         "doctrine/annotations": "~1.10",
         "ext-json": "*",
-        "ext-ctype": "*",
-        "psy/psysh": "@stable"
+        "psy/psysh": "@stable",
+        "symfony/polyfill-ctype": "^1.20",
+        "symfony/polyfill-mbstring": "^1.20"
     },
     "autoload": {
         "psr-4": {
