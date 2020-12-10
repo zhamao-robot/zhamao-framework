@@ -28,7 +28,7 @@ class Context implements ContextInterface
     /**
      * @return swoole_server|null
      */
-    public function getServer() { return self::$context[$this->cid]["server"] ?? null; }
+    public function getServer() { return self::$context[$this->cid]["server"] ?? server(); }
 
     /**
      * @return Frame|null

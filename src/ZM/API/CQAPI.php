@@ -30,7 +30,6 @@ trait CQAPI
     public function processWebsocketAPI($connection, $reply, $function = false) {
         $api_id = ZMAtomic::get("wait_msg_id")->add(1);
         $reply["echo"] = $api_id;
-        //EventHandler::callCQAPISend($reply, $connection);
         SpinLock::lock("wait_api");
         $r = LightCacheInside::get("wait_api", "wait_api");
         $r[$api_id] = [

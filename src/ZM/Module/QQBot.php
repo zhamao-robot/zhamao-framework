@@ -88,7 +88,13 @@ class QQBot
                         if(($word[0] != "" && $v->match == $word[0]) || in_array($word[0], $v->alias)) {
                             ctx()->setCache("match", $word);
                             return true;
-                        } elseif ($v->pattern != "") {
+                        } elseif ($v->start_with != "" && mb_strpos(ctx()->getMessage(), $v->start_with) === 0) {
+                            ctx()->setCache("match", [mb_substr(ctx()->getMessage(), mb_strlen($v->start_with))]);
+                            return true;
+                        } elseif ($v->end_with != "" && strlen(ctx()->getMessage()) == (strripos(ctx()->getMessage(), $v->end_with) + strlen($v->end_with))) {
+                            ctx()->setCache("match", [substr(ctx()->getMessage(), 0, strripos(ctx()->getMessage(), $v->end_with))]);
+                            return true;
+                        }elseif ($v->pattern != "") {
                             $match = matchArgs($v->pattern, ctx()->getMessage());
                             if($match !== false) {
                                 ctx()->setCache("match", $match);

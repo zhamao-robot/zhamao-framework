@@ -7,7 +7,7 @@ namespace ZM\Exception;
 use Exception;
 use Throwable;
 
-class WaitTimeoutException extends Exception
+class WaitTimeoutException extends ZMException
 {
     public $module;
 

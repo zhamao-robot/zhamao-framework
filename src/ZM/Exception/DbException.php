@@ -6,7 +6,7 @@ namespace ZM\Exception;
 
 use Exception;
 
-class DbException extends Exception
+class DbException extends ZMException
 {
 
 }

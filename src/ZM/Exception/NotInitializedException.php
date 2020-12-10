@@ -6,7 +6,7 @@ namespace ZM\Exception;
 
 use Exception;
 
-class NotInitializedException extends Exception
+class NotInitializedException extends ZMException
 {
 
 }

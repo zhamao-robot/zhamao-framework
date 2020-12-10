@@ -40,6 +40,7 @@ class ZMUtil
         foreach (server()->connections as $v) {
             server()->close($v);
         }
+        LightCache::savePersistence();
         //DataProvider::saveBuffer();
         Timer::clearAll();
         server()->reload();

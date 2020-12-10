@@ -6,7 +6,7 @@ namespace ZM;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Exception;
-use ZM\Annotation\Swoole\SwooleSetup;
+use ZM\Annotation\Swoole\ZMSetup;
 use ZM\Config\ZMConfig;
 use ZM\ConnectionManager\ManagerGM;
 use ZM\Event\ServerEventHandler;
@@ -15,7 +15,6 @@ use ZM\Store\LightCacheInside;
 use ZM\Store\Lock\SpinLock;
 use ZM\Store\ZMAtomic;
 use ZM\Utils\DataProvider;
-use Framework\RemoteShell;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
@@ -112,21 +111,24 @@ class Framework
             // 注册 Swoole Server 的事件
             $this->registerServerEvents();
             $r = ZMConfig::get("global", "light_cache") ?? [
-                "size" => 1024,
-                "max_strlen" => 8192,
-                "hash_conflict_proportion" => 0.6,
-                "persistence_path" => realpath(DataProvider::getDataFolder() . "_cache.json"),
-                "auto_save_interval" => 900
-            ];
+                    "size" => 1024,
+                    "max_strlen" => 8192,
+                    "hash_conflict_proportion" => 0.6,
+                    "persistence_path" => realpath(DataProvider::getDataFolder() . "_cache.json"),
+                    "auto_save_interval" => 900
+                ];
             LightCache::init($r);
             LightCacheInside::init();
             SpinLock::init($r["size"]);
-            self::$server->start();
         } catch (Exception $e) {
             Console::error("Framework初始化出现错误，请检查！");
             Console::error($e->getMessage());
             die;
         }
+    }
+
+    public function start() {
+        self::$server->start();
     }
 
     /**
@@ -152,7 +154,7 @@ class Framework
                         $annotation->class = $v;
                         $annotation->method = $vs->getName();
                         $event_list[strtolower($annotation->event)] = $annotation;
-                    } elseif ($annotation instanceof SwooleSetup) {
+                    } elseif ($annotation instanceof ZMSetup) {
                         $annotation->class = $v;
                         $annotation->method = $vs->getName();
                         $c = new $v();
@@ -212,14 +214,6 @@ class Framework
                     break;
                 case 'disable-console-input':
                     if ($y) $terminal_id = null;
-                    break;
-                case 'remote-shell':
-                    if ($y) {
-                        $host = "127.0.0.1";
-                        $port = 9599;
-                        RemoteShell::listen(self::$server, $host, $port);
-                        Console::log(Console::setColor("正在监听" . $host . ":" . strval($port) . "的调试接口，请注意安全", "yellow"));
-                    }
                     break;
                 case 'log-error':
                     if ($y) Console::setLevel(0);

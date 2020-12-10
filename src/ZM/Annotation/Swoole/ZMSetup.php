@@ -8,11 +8,11 @@ use Doctrine\Common\Annotations\Annotation\Target;
 use ZM\Annotation\AnnotationBase;
 
 /**
- * Class SwooleSetup
+ * Class ZMSetup
  * @package ZM\Annotation\Swoole
  * @Annotation
  * @Target("METHOD")
  */
-class SwooleSetup extends AnnotationBase
+class ZMSetup extends AnnotationBase
 {
 }

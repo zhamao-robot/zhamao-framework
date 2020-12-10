@@ -6,7 +6,7 @@ namespace ZM\Exception;
 
 use Exception;
 
-class InterruptException extends Exception
+class InterruptException extends ZMException
 {
 
 }

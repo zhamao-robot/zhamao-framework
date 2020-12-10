@@ -6,7 +6,7 @@ namespace ZM\Exception;
 
 use Exception;
 
-class InvalidArgumentException extends ZMException
+class ZMException extends Exception
 {
 
 }
