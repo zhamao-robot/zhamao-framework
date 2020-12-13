@@ -9,7 +9,7 @@ use Module\Example\Hello;
 use PHPUnit\Framework\TestCase;
 use ReflectionException;
 use ZM\Annotation\AnnotationParser;
-use ZM\Annotation\Swoole\OnWorkerStart;
+use ZM\Annotation\Swoole\OnStart;
 use ZM\Console\Console;
 
 class AnnotationParserRegisterTest extends TestCase
@@ -34,8 +34,8 @@ class AnnotationParserRegisterTest extends TestCase
     public function testAnnotation() {
         ob_start();
         $gen = $this->parser->generateAnnotationEvents();
-        $m = $gen[OnWorkerStart::class][0]->method;
-        $class = $gen[OnWorkerStart::class][0]->class;
+        $m = $gen[OnStart::class][0]->method;
+        $class = $gen[OnStart::class][0]->class;
         $c = new $class();
         try {
             $c->$m();

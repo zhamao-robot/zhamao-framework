@@ -9,7 +9,7 @@ use ZM\Console\Console;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
-use ZM\Annotation\Http\{After, Before, Controller, HandleException, Middleware, MiddlewareClass, RequestMapping};
+use ZM\Annotation\Http\{HandleAfter, HandleBefore, Controller, HandleException, Middleware, MiddlewareClass, RequestMapping};
 use ZM\Annotation\Interfaces\Level;
 use ZM\Annotation\Module\Closed;
 use ZM\Utils\DataProvider;
@@ -287,8 +287,8 @@ class AnnotationParser
         foreach ($reflection_class->getMethods() as $vss) {
             $method_annotations = $this->reader->getMethodAnnotations($vss);
             foreach ($method_annotations as $vsss) {
-                if ($vsss instanceof Before) $result["before"] = $vss->getName();
-                if ($vsss instanceof After) $result["after"] = $vss->getName();
+                if ($vsss instanceof HandleBefore) $result["before"] = $vss->getName();
+                if ($vsss instanceof HandleAfter) $result["after"] = $vss->getName();
                 if ($vsss instanceof HandleException) {
                     $result["exceptions"][$vsss->class_name] = $vss->getName();
                 }

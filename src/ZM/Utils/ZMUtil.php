@@ -37,9 +37,6 @@ class ZMUtil
             if (($v["result"] ?? false) === null && isset($v["coroutine"])) Co::resume($v["coroutine"]);
         }
         LightCacheInside::unset("wait_api", "wait_api");
-        foreach (server()->connections as $v) {
-            server()->close($v);
-        }
         LightCache::savePersistence();
         //DataProvider::saveBuffer();
         Timer::clearAll();

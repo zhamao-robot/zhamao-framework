@@ -21,7 +21,6 @@ use ZM\Utils\CoMessage;
 /**
  * Class QQBot
  * @package ZM\Module
- * @ExternalModule("onebot")
  */
 class QQBot
 {
@@ -80,12 +79,13 @@ class QQBot
                 //分发CQCommand事件
                 $dispatcher = new EventDispatcher(CQCommand::class);
                 $dispatcher->setRuleFunction(function (CQCommand $v) use ($word) {
-                    if ($v->match == "" && $v->pattern == "" && $v->regex == "") return false;
+                    if(array_diff([$v->match, $v->pattern, $v->regex, $v->keyword, $v->end_with, $v->start_with], [""]) == []) return false;
                     elseif (($v->user_id == 0 || ($v->user_id != 0 && $v->user_id == ctx()->getUserId())) &&
                         ($v->group_id == 0 || ($v->group_id != 0 && $v->group_id == (ctx()->getGroupId() ?? 0))) &&
                         ($v->message_type == '' || ($v->message_type != '' && $v->message_type == ctx()->getMessageType()))
                     ) {
                         if(($word[0] != "" && $v->match == $word[0]) || in_array($word[0], $v->alias)) {
+                            array_shift($word);
                             ctx()->setCache("match", $word);
                             return true;
                         } elseif ($v->start_with != "" && mb_strpos(ctx()->getMessage(), $v->start_with) === 0) {
@@ -93,6 +93,9 @@ class QQBot
                             return true;
                         } elseif ($v->end_with != "" && strlen(ctx()->getMessage()) == (strripos(ctx()->getMessage(), $v->end_with) + strlen($v->end_with))) {
                             ctx()->setCache("match", [substr(ctx()->getMessage(), 0, strripos(ctx()->getMessage(), $v->end_with))]);
+                            return true;
+                        } elseif ($v->keyword != "" && mb_strpos(ctx()->getMessage(), $v->keyword) !== false) {
+                            ctx()->setCache("match", explode($v->keyword, ctx()->getMessage()));
                             return true;
                         }elseif ($v->pattern != "") {
                             $match = matchArgs($v->pattern, ctx()->getMessage());

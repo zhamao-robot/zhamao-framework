@@ -16,7 +16,7 @@ use Swoole\Process;
 use Swoole\Timer;
 use ZM\Annotation\AnnotationParser;
 use ZM\Annotation\Http\RequestMapping;
-use ZM\Annotation\Swoole\OnWorkerStart;
+use ZM\Annotation\Swoole\OnStart;
 use ZM\Annotation\Swoole\OnSwooleEvent;
 use ZM\Config\ZMConfig;
 use ZM\ConnectionManager\ManagerGM;
@@ -24,7 +24,7 @@ use ZM\Console\Console;
 use Swoole\Http\Request;
 use Swoole\Server;
 use Swoole\WebSocket\Frame;
-use ZM\Annotation\Swoole\HandleEvent;
+use ZM\Annotation\Swoole\SwooleHandler;
 use ZM\Console\TermColor;
 use ZM\Context\Context;
 use ZM\Context\ContextInterface;
@@ -33,6 +33,7 @@ use ZM\Exception\DbException;
 use ZM\Framework;
 use ZM\Http\Response;
 use ZM\Module\QQBot;
+use ZM\Store\LightCacheInside;
 use ZM\Store\MySQL\SqlPoolStorage;
 use ZM\Store\Redis\ZMRedisPool;
 use ZM\Store\ZMBuf;
@@ -44,7 +45,7 @@ use ZM\Utils\ZMUtil;
 class ServerEventHandler
 {
     /**
-     * @HandleEvent("start")
+     * @SwooleHandler("start")
      */
     public function onStart() {
         global $terminal_id;
@@ -87,14 +88,14 @@ class ServerEventHandler
     }
 
     /**
-     * @HandleEvent("shutdown")
+     * @SwooleHandler("shutdown")
      */
     public function onShutdown() {
         Console::debug("正在关闭 Master 进程，pid=" . posix_getpid());
     }
 
     /**
-     * @HandleEvent("WorkerStop")
+     * @SwooleHandler("WorkerStop")
      * @param $server
      * @param $worker_id
      */
@@ -103,7 +104,7 @@ class ServerEventHandler
     }
 
     /**
-     * @HandleEvent("WorkerStart")
+     * @SwooleHandler("WorkerStart")
      * @param Server $server
      * @param $worker_id
      */
@@ -205,12 +206,12 @@ class ServerEventHandler
                 EventManager::registerTimerTick(); //启动计时器
                 //ZMBuf::unsetCache("wait_start");
                 set_coroutine_params(["server" => $server, "worker_id" => $worker_id]);
-                $dispatcher = new EventDispatcher(OnWorkerStart::class);
+                $dispatcher = new EventDispatcher(OnStart::class);
                 $dispatcher->setRuleFunction(function ($v) {
                     return server()->worker_id === $v->worker_id || $v->worker_id === -1;
                 });
                 $dispatcher->dispatchEvents($server, $worker_id);
-                Console::debug("@OnWorkerStart 执行完毕");
+                Console::debug("@OnStart 执行完毕");
             } catch (Exception $e) {
                 Console::error("Worker加载出错！停止服务！");
                 Console::error($e->getMessage() . "\n" . $e->getTraceAsString());
@@ -243,7 +244,7 @@ class ServerEventHandler
     }
 
     /**
-     * @HandleEvent("message")
+     * @SwooleHandler("message")
      * @param $server
      * @param Frame $frame
      */
@@ -266,9 +267,9 @@ class ServerEventHandler
             }
         });
         try {
-            $starttime = microtime(true);
+            //$starttime = microtime(true);
             $dispatcher->dispatchEvents($conn);
-            Console::success("Used ".round((microtime(true) - $starttime) * 1000, 3)." ms!");
+            //Console::success("Used ".round((microtime(true) - $starttime) * 1000, 3)." ms!");
         } catch (Exception $e) {
             $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
             Console::error("Uncaught exception " . get_class($e) . " when calling \"message\": " . $error_msg);
@@ -282,7 +283,7 @@ class ServerEventHandler
     }
 
     /**
-     * @HandleEvent("request")
+     * @SwooleHandler("request")
      * @param $request
      * @param $response
      */
@@ -356,7 +357,7 @@ class ServerEventHandler
     }
 
     /**
-     * @HandleEvent("open")
+     * @SwooleHandler("open")
      * @param $server
      * @param Request $request
      */
@@ -369,6 +370,7 @@ class ServerEventHandler
         $conn = ManagerGM::get($request->fd);
         set_coroutine_params(["server" => $server, "request" => $request, "connection" => $conn, "fd" => $request->fd]);
         $conn->setOption("connect_id", strval($request->header["x-self-id"]) ?? "");
+
         $dispatcher = new EventDispatcher(OnSwooleEvent::class);
         $dispatcher->setRuleFunction(function ($v) {
             if ($v->getRule() == '') {
@@ -380,6 +382,11 @@ class ServerEventHandler
             }
         });
         try {
+            if ($conn->getName() === 'qq' && ZMConfig::get("global", "modules")["onebot"]["status"] === true) {
+                if (ZMConfig::get("global", "modules")["onebot"]["single_bot_mode"]) {
+                    LightCacheInside::set("connect", "conn_fd", $request->fd);
+                }
+            }
             $dispatcher->dispatchEvents($conn);
         } catch (Exception $e) {
             $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
@@ -394,7 +401,7 @@ class ServerEventHandler
     }
 
     /**
-     * @HandleEvent("close")
+     * @SwooleHandler("close")
      * @param $server
      * @param $fd
      */
@@ -404,6 +411,8 @@ class ServerEventHandler
         if ($conn === null) return;
         Console::debug("Calling Swoole \"close\" event from fd=" . $fd);
         set_coroutine_params(["server" => $server, "connection" => $conn, "fd" => $fd]);
+
+
         $dispatcher = new EventDispatcher(OnSwooleEvent::class);
         $dispatcher->setRuleFunction(function ($v) {
             if ($v->getRule() == '') {
@@ -415,6 +424,11 @@ class ServerEventHandler
             }
         });
         try {
+            if ($conn->getName() === 'qq' && ZMConfig::get("global", "modules")["onebot"]["status"] === true) {
+                if (ZMConfig::get("global", "modules")["onebot"]["single_bot_mode"]) {
+                    LightCacheInside::set("connect", "conn_fd", -1);
+                }
+            }
             $dispatcher->dispatchEvents($conn);
         } catch (Exception $e) {
             $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
@@ -429,7 +443,7 @@ class ServerEventHandler
     }
 
     /**
-     * @HandleEvent("pipeMessage")
+     * @SwooleHandler("pipeMessage")
      * @param $server
      * @param $src_worker_id
      * @param $data
@@ -462,7 +476,7 @@ class ServerEventHandler
     }
 
     /**
-     * @HandleEvent("task")
+     * @SwooleHandler("task")
      */
     public function onTask() {
     }
@@ -504,7 +518,7 @@ class ServerEventHandler
 
         //加载插件
         $plugins = ZMConfig::get("global", "modules") ?? [];
-        if (!isset($plugins["onebot"])) $plugins["onebot"] = true;
+        if (!isset($plugins["onebot"])) $plugins["onebot"] = ["status" => true, "single_bot_mode" => false];
 
         if ($plugins["onebot"]) {
             $obj = new OnSwooleEvent();
@@ -514,6 +528,11 @@ class ServerEventHandler
             $obj->level = 99999;
             $obj->rule = 'connectIsQQ()';
             EventManager::addEvent(OnSwooleEvent::class, $obj);
+            if ($plugins["onebot"]["single_bot_mode"]) {
+                LightCacheInside::set("connect", "conn_fd", -1);
+            } else {
+                LightCacheInside::set("connect", "conn_fd", -2);
+            }
         }
 
         //TODO: 编写加载外部插件的方式

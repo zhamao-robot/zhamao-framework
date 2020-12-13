@@ -103,6 +103,10 @@ interface ContextInterface
      */
     public function getArgs($mode, $prompt_msg);
 
+    public function getNextArg($prompt_msg = "");
+
+    public function getFullArg($prompt_msg = "");
+
     public function setCache($key, $value);
 
     /**

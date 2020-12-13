@@ -68,9 +68,6 @@ class ConsoleApplication extends Application
             }
         }
 
-        if (!is_dir(DataProvider::getWorkingDir() . '/src/')) {
-            die("Unable to find source directory.\nMaybe you need to run \"init\"?");
-        }
         ZMConfig::setDirectory(DataProvider::getWorkingDir() . '/config');
         ZMConfig::env($args["env"] ?? "");
         if (ZMConfig::get("global") === false) {

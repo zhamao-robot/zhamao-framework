@@ -3,7 +3,7 @@
     "description": "High performance QQ robot and web server development framework",
     "minimum-stability": "stable",
     "license": "Apache-2.0",
-    "version": "2.0.0-b4",
+    "version": "2.0.0-b5",
     "extra": {},
     "authors": [
         {
@@ -34,6 +34,10 @@
         "zhamao/request": "*@dev",
         "symfony/routing": "^5.1",
         "symfony/polyfill-php80": "^1.20"
+    },
+    "suggest": {
+        "ext-ctype": "*",
+        "ext-mbstring": "*"
     },
     "autoload": {
         "psr-4": {

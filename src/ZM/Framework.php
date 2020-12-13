@@ -6,7 +6,7 @@ namespace ZM;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Exception;
-use ZM\Annotation\Swoole\ZMSetup;
+use ZM\Annotation\Swoole\OnSetup;
 use ZM\Config\ZMConfig;
 use ZM\ConnectionManager\ManagerGM;
 use ZM\Event\ServerEventHandler;
@@ -20,7 +20,7 @@ use ReflectionException;
 use ReflectionMethod;
 use Swoole\Runtime;
 use Swoole\WebSocket\Server;
-use ZM\Annotation\Swoole\HandleEvent;
+use ZM\Annotation\Swoole\SwooleHandler;
 use ZM\Console\Console;
 use ZM\Utils\ZMUtil;
 
@@ -67,7 +67,7 @@ class Framework
             self::$server = new Server(ZMConfig::get("global", "host"), ZMConfig::get("global", "port"));
             $this->server_set = ZMConfig::get("global", "swoole");
             Console::init(
-                ZMConfig::get("global", "info_level"),
+                ZMConfig::get("global", "info_level") ?? 2,
                 self::$server,
                 $args["log-theme"] ?? "default",
                 ($o = ZMConfig::get("console_color")) === false ? [] : $o
@@ -150,11 +150,11 @@ class Framework
                 $method_annotations = $reader->getMethodAnnotations($vs);
                 if ($method_annotations != []) {
                     $annotation = $method_annotations[0];
-                    if ($annotation instanceof HandleEvent) {
+                    if ($annotation instanceof SwooleHandler) {
                         $annotation->class = $v;
                         $annotation->method = $vs->getName();
                         $event_list[strtolower($annotation->event)] = $annotation;
-                    } elseif ($annotation instanceof ZMSetup) {
+                    } elseif ($annotation instanceof OnSetup) {
                         $annotation->class = $v;
                         $annotation->method = $vs->getName();
                         $c = new $v();

@@ -1,16 +1,20 @@
 <?php
 
 use Swoole\Coroutine;
+use ZM\API\ZMRobot;
 use ZM\Config\ZMConfig;
+use ZM\ConnectionManager\ManagerGM;
 use ZM\Console\Console;
 use ZM\Context\Context;
 use ZM\Event\EventManager;
+use ZM\Exception\RobotNotFoundException;
+use ZM\Exception\ZMException;
 use ZM\Framework;
+use ZM\Store\LightCacheInside;
 use ZM\Store\ZMBuf;
 use ZM\Utils\DataProvider;
 use Swoole\Coroutine\System;
 use ZM\Context\ContextInterface;
-use ZM\Utils\ZMUtil;
 
 
 function phar_classloader($p) {
@@ -181,11 +185,11 @@ function getAnnotations() {
     $s = debug_backtrace()[1];
     //echo json_encode($s, 128|256);
     $list = [];
-    foreach(EventManager::$events as $event => $v) {
-        foreach($v as $ks => $vs) {
+    foreach (EventManager::$events as $event => $v) {
+        foreach ($v as $ks => $vs) {
             //echo get_class($vs).": ".$vs->class." => ".$vs->method.PHP_EOL;
-            if($vs->class == $s["class"] && $vs->method == $s["function"]) {
-                $list[get_class($vs)][]=$vs;
+            if ($vs->class == $s["class"] && $vs->method == $s["function"]) {
+                $list[get_class($vs)][] = $vs;
             }
         }
     }
@@ -227,7 +231,7 @@ function ctx() {
     }
 }
 
-function debug($msg) { Console::debug($msg); }
+function zm_debug($msg) { Console::debug($msg); }
 
 function onebot_target_id_name($message_type) {
     return ($message_type == "group" ? "group_id" : "user_id");
@@ -266,6 +270,22 @@ function zm_data_hash($v) {
 
 function server() {
     return Framework::$server;
+}
+
+/**
+ * @return ZMRobot
+ * @throws RobotNotFoundException
+ * @throws ZMException
+ */
+function bot() {
+    if (($conn = LightCacheInside::get("connect", "conn_fd")) == -2) {
+        return ZMRobot::getRandom();
+    } elseif ($conn != -1) {
+        if (($obj = ManagerGM::get($conn)) !== null) return new ZMRobot($obj);
+        else throw new RobotNotFoundException("单机器人连接模式可能连接了多个机器人！");
+    } else {
+        throw new RobotNotFoundException("没有任何机器人连接到框架！");
+    }
 }
 
 

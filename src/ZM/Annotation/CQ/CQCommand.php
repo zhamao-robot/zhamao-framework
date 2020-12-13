@@ -25,6 +25,8 @@ class CQCommand extends AnnotationBase implements Level
     public $start_with = "";
     /** @var string */
     public $end_with = "";
+    /** @var string */
+    public $keyword = "";
     /** @var string[] */
     public $alias = [];
     /** @var string */

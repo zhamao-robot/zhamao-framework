@@ -9,12 +9,12 @@ use Doctrine\Common\Annotations\Annotation\Target;
 use ZM\Annotation\AnnotationBase;
 
 /**
- * Class HandleEvent
+ * Class SwooleHandler
  * @package ZM\Annotation\Swoole
  * @Annotation
  * @Target("METHOD")
  */
-class HandleEvent extends AnnotationBase
+class SwooleHandler extends AnnotationBase
 {
     /**
      * @var string

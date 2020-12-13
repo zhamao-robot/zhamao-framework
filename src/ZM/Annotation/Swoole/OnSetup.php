@@ -3,19 +3,16 @@
 
 namespace ZM\Annotation\Swoole;
 
+
 use Doctrine\Common\Annotations\Annotation\Target;
 use ZM\Annotation\AnnotationBase;
 
 /**
- * Class OnWorkerStart
+ * Class ZMSetup
  * @package ZM\Annotation\Swoole
  * @Annotation
- * @Target("ALL")
+ * @Target("METHOD")
  */
-class OnWorkerStart extends AnnotationBase
+class OnSetup extends AnnotationBase
 {
-    /**
-     * @var int
-     */
-    public $worker_id = 0;
 }

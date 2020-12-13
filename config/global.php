@@ -50,8 +50,6 @@ $config['sql_config'] = [
     'sql_username' => 'name',
     'sql_database' => 'db_name',
     'sql_password' => '',
-    'sql_enable_cache' => true,
-    'sql_reset_cache' => '0300',
     'sql_options' => [
         PDO::ATTR_STRINGIFY_FETCHES => false,
         PDO::ATTR_EMULATE_PREPARES => false
@@ -115,7 +113,10 @@ $config['command_register_class'] = [
 
 /** 服务器启用的外部第三方和内部插件 */
 $config['modules'] = [
-    'onebot' => true, // QQ机器人事件解析器，如果取消此项则默认为 true 开启状态，否则你手动填写 false 才会关闭
+    'onebot' => [
+        'status' => true,
+        'single_bot_mode' => false
+    ], // QQ机器人事件解析器，如果取消此项则默认为 true 开启状态，否则你手动填写 false 才会关闭
 ];
 
 return $config;

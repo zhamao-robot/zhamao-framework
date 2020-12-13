@@ -8,7 +8,9 @@ use ZM\ConnectionManager\ConnectionObject;
 use ZM\Console\Console;
 use ZM\Annotation\CQ\CQCommand;
 use ZM\Annotation\Http\RequestMapping;
+use ZM\Event\EventDispatcher;
 use ZM\Store\Redis\ZMRedis;
+use ZM\Utils\ZMUtil;
 
 /**
  * Class Hello
@@ -41,10 +43,19 @@ class Hello
     }
 
     /**
+     * 使用命令 .reload 发给机器人远程重载，注意将 user_id 换成你自己的 QQ
+     * @CQCommand(".reload",user_id=627577391)
+     */
+    public function reload() {
+        ctx()->reply("重启中...");
+        ZMUtil::reload();
+    }
+
+    /**
      * @CQCommand("我是谁")
      */
     public function whoami() {
-        $user = ctx()->getRobot()->setCallback(true)->getLoginInfo();
+        $user = ctx()->getRobot()->getLoginInfo();
         return "你是" . $user["data"]["nickname"] . "，QQ号是" . $user["data"]["user_id"];
     }
 
@@ -119,6 +130,14 @@ class Hello
      */
     public function onDisconnect(ConnectionObject $conn) {
         Console::info("机器人 " . $conn->getOption("connect_id") . " 已断开连接！");
+    }
+
+    /**
+     * 阻止 Chrome 自动请求 /favicon.ico 导致的多条请求并发和干扰
+     * @OnSwooleEvent("request",rule="ctx()->getRequest()->server['request_uri'] == '/favicon.ico'",level=200)
+     */
+    public function onRequest() {
+        EventDispatcher::interrupt();
     }
 
     /**

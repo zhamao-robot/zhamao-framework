@@ -2,8 +2,9 @@
 
 namespace Module\Middleware;
 
-use ZM\Annotation\Http\After;
-use ZM\Annotation\Http\Before;
+use ZM\Annotation\Http\HandleAfter;
+use ZM\Annotation\Http\HandleBefore;
+use ZM\Annotation\Http\HandleException;
 use ZM\Annotation\Http\MiddlewareClass;
 use ZM\Console\Console;
 use ZM\Http\MiddlewareInterface;
@@ -19,7 +20,7 @@ class TimerMiddleware implements MiddlewareInterface
     private $starttime;
 
     /**
-     * @Before()
+     * @HandleBefore()
      * @return bool
      */
     public function onBefore() {
@@ -28,9 +29,16 @@ class TimerMiddleware implements MiddlewareInterface
     }
 
     /**
-     * @After()
+     * @HandleAfter()
      */
     public function onAfter() {
         Console::info("Using " . round((microtime(true) - $this->starttime) * 1000, 2) . " ms.");
+    }
+
+    /**
+     * @HandleException(\Exception::class)
+     */
+    public function onException() {
+        Console::error("Using " . round((microtime(true) - $this->starttime) * 1000, 2) . " ms but an Exception occurred.");
     }
 }

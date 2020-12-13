@@ -149,7 +149,7 @@ class Context implements ContextInterface
         } catch (Exception $e) {
             $r = false;
         }
-        if($r === false) {
+        if ($r === false) {
             throw new WaitTimeoutException($this, $timeout_prompt);
         }
         return $r["message"];
@@ -203,7 +203,6 @@ class Context implements ContextInterface
         switch ($mode) {
             case ZM_MATCH_ALL:
                 $p = $arg;
-                array_shift($p);
                 return trim(implode(" ", $p)) == "" ? $this->waitMessage($prompt_msg) : trim(implode(" ", $p));
             case ZM_MATCH_NUMBER:
                 foreach ($arg as $k => $v) {
@@ -215,9 +214,9 @@ class Context implements ContextInterface
                 }
                 return $this->waitMessage($prompt_msg);
             case ZM_MATCH_FIRST:
-                if (isset($arg[1])) {
-                    $a = $arg[1];
-                    array_splice($arg, 1, 1);
+                if (isset($arg[0])) {
+                    $a = $arg[0];
+                    array_splice($arg, 0, 1);
                     ctx()->setCache("match", $arg);
                     return $a;
                 } else {
@@ -226,6 +225,22 @@ class Context implements ContextInterface
         }
         throw new InvalidArgumentException();
     }
+
+    /**
+     * @param string $prompt_msg
+     * @return int|mixed|string
+     * @throws InvalidArgumentException
+     * @throws WaitTimeoutException
+     */
+    public function getNextArg($prompt_msg = "") { return $this->getArgs(ZM_MATCH_FIRST, $prompt_msg); }
+
+    /**
+     * @param string $prompt_msg
+     * @return int|mixed|string
+     * @throws InvalidArgumentException
+     * @throws WaitTimeoutException
+     */
+    public function getFullArg($prompt_msg = "") { return $this->getArgs(ZM_MATCH_ALL, $prompt_msg); }
 
     public function cloneFromParent() {
         set_coroutine_params(self::$context[Co::getPcid()] ?? self::$context[$this->cid]);

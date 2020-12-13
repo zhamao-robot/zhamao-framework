@@ -4,6 +4,8 @@
 namespace ZM\Http;
 
 
+use ZM\Console\Console;
+
 class Response
 {
 
@@ -92,6 +94,7 @@ class Response
      */
     public function status($http_code, $reason = null) {
         $this->status_code = $http_code;
+        Console::trace();
         return $this->response->status($http_code, $reason);
     }
 
@@ -184,7 +187,8 @@ class Response
      * @return mixed
      */
     public function redirect($location, $http_code = null) {
-        return $this->redirect($location, $http_code);
+        $this->is_end = true;
+        return $this->response->redirect($location, $http_code);
     }
 
     /**

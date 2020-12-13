@@ -9,11 +9,11 @@ use Doctrine\Common\Annotations\Annotation\Target;
 use ZM\Annotation\AnnotationBase;
 
 /**
- * Class After
+ * Class HandleAfter
  * @package ZM\Annotation\Http
  * @Annotation
  * @Target("METHOD")
  */
-class After extends AnnotationBase
+class HandleAfter extends AnnotationBase
 {
 }

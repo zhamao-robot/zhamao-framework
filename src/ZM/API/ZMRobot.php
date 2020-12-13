@@ -24,7 +24,7 @@ class ZMRobot
     /** @var ConnectionObject|null */
     private $connection;
 
-    private $callback = null;
+    private $callback = true;
     private $prefix = 0;
 
     /**
@@ -48,6 +48,9 @@ class ZMRobot
         $r = ManagerGM::getAllByName('qq');
         if ($r == []) throw new RobotNotFoundException("没有任何机器人连接到框架！");
         return new ZMRobot($r[array_rand($r)]);
+    }
+
+    public static function getFirst() {
     }
 
     /**

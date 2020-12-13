@@ -29,6 +29,7 @@ class ZMAtomic
         }
         self::$atomics["stop_signal"] = new Atomic(0);
         self::$atomics["wait_msg_id"] = new Atomic(0);
+        self::$atomics["_event_id"] = new Atomic(0);
         for ($i = 0; $i < 10; ++$i) {
             self::$atomics["_tmp_" . $i] = new Atomic(0);
         }

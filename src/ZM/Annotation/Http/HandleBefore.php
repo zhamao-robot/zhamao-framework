@@ -1,18 +1,18 @@
 <?php
 
 
-namespace ZM\Annotation\Swoole;
+namespace ZM\Annotation\Http;
 
 
 use Doctrine\Common\Annotations\Annotation\Target;
 use ZM\Annotation\AnnotationBase;
 
 /**
- * Class ZMSetup
- * @package ZM\Annotation\Swoole
+ * Class HandleBefore
+ * @package ZM\Annotation\Http
  * @Annotation
  * @Target("METHOD")
  */
-class ZMSetup extends AnnotationBase
+class HandleBefore extends AnnotationBase
 {
 }

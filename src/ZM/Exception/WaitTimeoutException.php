@@ -4,7 +4,6 @@
 namespace ZM\Exception;
 
 
-use Exception;
 use Throwable;
 
 class WaitTimeoutException extends ZMException

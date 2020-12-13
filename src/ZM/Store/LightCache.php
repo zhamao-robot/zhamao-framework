@@ -92,7 +92,7 @@ class LightCache
         } elseif (is_bool($value)) {
             $data_type = "bool";
             $value = json_encode($value);
-        }else {
+        } else {
             throw new Exception("Only can set string, array and int");
         }
         try {
@@ -126,7 +126,7 @@ class LightCache
             throw new Exception("Only can set string, array and int");
         }
         try {
-            if(self::$kv_table->get($key) === false) return false;
+            if (self::$kv_table->get($key) === false) return false;
             return self::$kv_table->set($key, [
                 "value" => $value,
                 "data_type" => $data_type
@@ -170,7 +170,7 @@ class LightCache
     }
 
     public static function savePersistence() {
-        if(self::$kv_table === null) return;
+        if (self::$kv_table === null) return;
         $r = [];
         foreach (self::$kv_table as $k => $v) {
             if ($v["expire"] === -2) {
@@ -179,8 +179,10 @@ class LightCache
             }
         }
         if(self::$config["persistence_path"] == "") return;
-        $r = file_put_contents(self::$config["persistence_path"], json_encode($r, 128 | 256));
-        if ($r === false) Console::error("Not saved, please check your \"persistence_path\"!");
+        if (file_exists(self::$config["persistence_path"])) {
+            $r = file_put_contents(self::$config["persistence_path"], json_encode($r, 128 | 256));
+            if ($r === false) Console::error("Not saved, please check your \"persistence_path\"!");
+        }
     }
 
     private static function checkExpire($key) {
