@@ -105,4 +105,4 @@ GitHub Pages：[https://docs-v1.zhamao.me/](https://docs-v1.zhamao.me/)
 
 **注意**：在你使用 mirai 等 `AGPL-3.0` 协议的机器人软件与框架连接时，使用本框架需要将你编写或修改的部分使用 `AGPL-3.0` 协议重新分发。
 
-![star](https://starchart.cc/Ascotbe/Medusa.svg)
+![star](https://starchart.cc/zhamao-robot/zhamao-framework.svg)
