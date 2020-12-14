@@ -104,3 +104,5 @@ GitHub Pages：[https://docs-v1.zhamao.me/](https://docs-v1.zhamao.me/)
 项目框架采用 Apache-2.0 协议开源，在分发或重写修改等操作时需遵守协议。项目模块部分(`Module` 文件夹) 在非借鉴框架内代码时可不遵守 Apache-2.0 协议进行分发和修改(声明版权)。
 
 **注意**：在你使用 mirai 等 `AGPL-3.0` 协议的机器人软件与框架连接时，使用本框架需要将你编写或修改的部分使用 `AGPL-3.0` 协议重新分发。
+
+![star](https://starchart.cc/Ascotbe/Medusa.svg)
