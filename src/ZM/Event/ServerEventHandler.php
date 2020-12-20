@@ -351,7 +351,7 @@ class ServerEventHandler
                 else
                     $response->end("Internal server error.");
             }
-            Console::error("Internal server error (500), caused by " . get_class($e));
+            Console::error("Internal server error (500), caused by " . get_class($e).": ".$e->getMessage());
             Console::log($e->getTraceAsString(), "gray");
         }
     }
