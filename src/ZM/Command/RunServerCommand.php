@@ -7,7 +7,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use ZM\Config\ZMConfig;
 use ZM\Framework;
 
 class RunServerCommand extends Command
@@ -42,7 +41,6 @@ class RunServerCommand extends Command
                 $output->writeln("<error> \"--env\" option only accept production, development, staging and [empty] ! </error>");
                 return Command::FAILURE;
             }
-            ZMConfig::setEnv($opt);
         }
         // ... put here the code to run in your command
         // this method must return an integer number with the "exit status code"

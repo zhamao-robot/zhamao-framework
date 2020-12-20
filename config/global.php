@@ -106,11 +106,6 @@ $config['server_event_handler_class'] = [
     \ZM\Event\ServerEventHandler::class,
 ];
 
-/** 注册自定义指令的类 */
-$config['command_register_class'] = [
-    //\Custom\Command\CustomCommand::class
-];
-
 /** 服务器启用的外部第三方和内部插件 */
 $config['modules'] = [
     'onebot' => [

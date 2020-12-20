@@ -48,6 +48,11 @@ class Framework
         include_once "global_defines.php";
 
         ZMAtomic::init();
+        ZMConfig::setDirectory(DataProvider::getWorkingDir() . '/config');
+        ZMConfig::setEnv($args["env"] ?? "");
+        if (ZMConfig::get("global") === false) {
+            die ("Global config load failed: " . ZMConfig::$last_error . "\nPlease init first!\n");
+        }
         try {
             ManagerGM::init(ZMConfig::get("global", "swoole")["max_connection"] ?? 2048, 0.5, [
                 [

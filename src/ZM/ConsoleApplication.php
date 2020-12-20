@@ -5,27 +5,22 @@ namespace ZM;
 
 
 use Exception;
-use Symfony\Component\Console\Command\Command;
-use TypeError;
 use ZM\Command\InitCommand;
 use ZM\Command\PureHttpCommand;
 use ZM\Command\RunServerCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use ZM\Config\ZMConfig;
 use ZM\Utils\DataProvider;
 
 class ConsoleApplication extends Application
 {
-    public function __construct(string $name = 'UNKNOWN')
-    {
+    public function __construct(string $name = 'UNKNOWN') {
         $version = json_decode(file_get_contents(__DIR__ . "/../../composer.json"), true)["version"] ?? "UNKNOWN";
         parent::__construct($name, $version);
     }
 
-    public function initEnv()
-    {
+    public function initEnv() {
         $this->selfCheck();
 
         //if (LOAD_MODE === 0) $this->add(new BuildCommand()); //只有在git源码模式才能使用打包指令
@@ -68,24 +63,18 @@ class ConsoleApplication extends Application
             }
         }
 
-        ZMConfig::setDirectory(DataProvider::getWorkingDir() . '/config');
-        ZMConfig::setEnv($args["env"] ?? "");
-        if (ZMConfig::get("global") === false) {
-            echo ("Global config load failed: " . ZMConfig::$last_error."\nPlease init first!\n");
-            $this->add(new InitCommand());
-        } else {
-            $this->addCommands([
-                new RunServerCommand(), //运行主服务的指令控制器
-                new InitCommand(), //初始化用的，用于项目初始化和phar初始化
-                new PureHttpCommand() //纯HTTP服务器指令
-            ]);
-            $command_register = ZMConfig::get("global", "command_register_class") ?? [];
-            foreach ($command_register as $v) {
-                $obj = new $v();
-                if (!($obj instanceof Command)) throw new TypeError("Command register class must be extended by Symfony\\Component\\Console\\Command\\Command");
-                $this->add($obj);
-            }
-        }
+        $this->addCommands([
+            new RunServerCommand(), //运行主服务的指令控制器
+            new InitCommand(), //初始化用的，用于项目初始化和phar初始化
+            new PureHttpCommand() //纯HTTP服务器指令
+        ]);
+        /*
+        $command_register = ZMConfig::get("global", "command_register_class") ?? [];
+        foreach ($command_register as $v) {
+            $obj = new $v();
+            if (!($obj instanceof Command)) throw new TypeError("Command register class must be extended by Symfony\\Component\\Console\\Command\\Command");
+            $this->add($obj);
+        }*/
     }
 
     /**
@@ -93,8 +82,7 @@ class ConsoleApplication extends Application
      * @param OutputInterface|null $output
      * @return int
      */
-    public function run(InputInterface $input = null, OutputInterface $output = null)
-    {
+    public function run(InputInterface $input = null, OutputInterface $output = null) {
         try {
             return parent::run($input, $output);
         } catch (Exception $e) {
@@ -102,8 +90,7 @@ class ConsoleApplication extends Application
         }
     }
 
-    private function selfCheck()
-    {
+    private function selfCheck() {
         if (!extension_loaded("swoole")) die("Can not find swoole extension.\nSee: https://github.com/zhamao-robot/zhamao-framework/issues/19");
         if (version_compare(SWOOLE_VERSION, "4.4.13") == -1) die("You must install swoole version >= 4.4.13 !");
         //if (!extension_loaded("gd")) die("Can not find gd extension.\n");
