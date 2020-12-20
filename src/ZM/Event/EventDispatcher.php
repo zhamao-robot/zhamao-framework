@@ -29,10 +29,11 @@ class EventDispatcher
     private $eid = 0;
 
     /**
+     * @param null $return_var
      * @throws InterruptException
      */
-    public static function interrupt() {
-        throw new InterruptException('interrupt');
+    public static function interrupt($return_var = null) {
+        throw new InterruptException($return_var);
     }
 
     public static function enableEventTrace($event_class) {
@@ -85,7 +86,7 @@ class EventDispatcher
             }
             return true;
         } catch (InterruptException $e) {
-            return null;
+            return $e->return_var;
         } catch (AnnotationException $e) {
             return false;
         }
@@ -95,9 +96,9 @@ class EventDispatcher
      * @param AnnotationBase|null $v
      * @param null $rule_func
      * @param mixed ...$params
-     * @return bool
      * @throws AnnotationException
      * @throws InterruptException
+     * @return mixed
      */
     public function dispatchEvent(?AnnotationBase $v, $rule_func = null, ...$params) {
         $q_c = $v->class;
