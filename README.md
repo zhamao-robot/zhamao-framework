@@ -1,7 +1,7 @@
 <div align="center">
   <img src="/resources/images/logo_trans.png" height = "150" alt="炸毛框架"><br>
   <h2>炸毛框架</h2>
-  炸毛框架 (zhamao-frameowork) 是一个协程高性能的聊天机器人 + Web 服务器开发框架<br><br>
+  炸毛框架 (zhamao-framework) 是一个协程高性能的聊天机器人 + Web 服务器开发框架<br><br>
 
 [![作者QQ](https://img.shields.io/badge/作者QQ-627577391-orange.svg)]()
 [![zhamao License](https://img.shields.io/hexpm/l/plug.svg?maxAge=2592000)](https://github.com/zhamao-robot/zhamao-framework/blob/master/LICENSE)
@@ -21,16 +21,10 @@
 
 **炸毛框架目前经过实验可以直接在 PHP8 环境上运行，但是细节部分未经充分测试，如果在 PHP8 环境下运行出现问题，请及时提出 Issue，谢谢！**
 
-**由于 CQHTTP 不再提供维护，转为 [OneBot 标准](https://github.com/howmanybots/onebot)（原 CQHTTP 插件衍生而来的机器人 HTTP 接口标准），本框架也将在未来改为兼容此标准。**
-
-**以上涉及的变更将在下一个大版本 (v2.0.0) 更新，请关注 2.0-dev 分支 和 Project 模块！**
-
-**v2.0版本即将到来，请持续关注 [新文档](https://docs-v2.zhamao.xin/) 进度和 Project 模块展示的测试进度！**
+**v2.0版本即将到来，请持续关注 [新文档](https://docs-v2.zhamao.xin/) 的更新进度！**
 
 ## 简介
-zhamao-framework 是一个 PHP Swoole 的聊天机器人框架，兼容 OneBot 标准，它会对微信公众号等终端收到的消息进行解析处理，并以模块化的形式进行开发，来完成机器人的自然语言对话等功能。
-
-炸毛框架使用 PHP 编写，采用 Swoole 扩展为基础，主要面向 API 服务，聊天机器人（OneBot 兼容的 QQ 机器人对接），包含 websocket、http 等监听和请求库，用户代码采用模块化处理，使用注解可以方便地编写各类功能。
+炸毛框架使用 PHP 编写，采用 Swoole 扩展为基础，主要面向 API 服务，聊天机器人（OneBot 兼容的 QQ 机器人对接），包含 Websocket、HTTP 等监听和请求库，用户代码采用模块化处理，使用注解可以方便地编写各类功能。
 
 框架主要用途为 HTTP 服务器，机器人搭建框架。尤其对于 QQ 机器人消息处理较为方便和全面，提供了众多会话机制和内部调用机制，可以以各种方式设计你自己的模块。
 
