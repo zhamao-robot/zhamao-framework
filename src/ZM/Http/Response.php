@@ -94,7 +94,6 @@ class Response
      */
     public function status($http_code, $reason = null) {
         $this->status_code = $http_code;
-        Console::trace();
         return $this->response->status($http_code, $reason);
     }
 

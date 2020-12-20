@@ -69,7 +69,7 @@ class ConsoleApplication extends Application
         }
 
         ZMConfig::setDirectory(DataProvider::getWorkingDir() . '/config');
-        ZMConfig::env($args["env"] ?? "");
+        ZMConfig::setEnv($args["env"] ?? "");
         if (ZMConfig::get("global") === false) {
             echo ("Global config load failed: " . ZMConfig::$last_error."\nPlease init first!\n");
             $this->add(new InitCommand());
