@@ -57,6 +57,7 @@ nav:
       - 快速上手（HTTP篇）: guide/快速上手-http.md
       - 选择聊天机器人实例: guide/OneBot实例.md
       - 基本配置: guide/基本配置.md
+      - 编写模块: guide/编写模块.md
   - 事件和注解:
       - 事件和注解: event/index.md
   - 框架组件:
