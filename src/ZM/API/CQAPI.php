@@ -232,7 +232,7 @@ class CQAPI
         if ($connection->push(json_encode($reply))) {
             //Console::msg($reply, $connection->getQQ());
             ZMBuf::$atomics["out_count"]->add(1);
-            if ($function === true) {
+            if ($function === true || is_callable($function)) {
                 Co::suspend();
                 $data = ZMBuf::get("sent_api")[$api_id];
                 ZMBuf::unsetByValue("sent_api", $reply["echo"]);
