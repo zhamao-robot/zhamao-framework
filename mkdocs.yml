@@ -69,4 +69,6 @@ nav:
   - FAQ:
       - FAQ: FAQ.md
   - 更新日志:
-      - 更新日志: update.md
+      - 更新日志（v2）: update/v2.md
+      - 更新日志（v1）: update/v1.md
+  - <u>炸毛框架 v1</u>: https://docs-v1.zhamao.xin/
