@@ -32,6 +32,7 @@
 }
 
 .doc-chat-box {
+    color: #000000de;
     position: relative;
     width: fit-content;
     max-width: 55%;
