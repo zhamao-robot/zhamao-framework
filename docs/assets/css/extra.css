@@ -13,7 +13,8 @@
     border-radius: 6px;
     width: 100%;
     min-height: 30px;
-    background-color: #f3f6f9;
+    /*noinspection CssUnresolvedCustomProperty*/
+    background-color: var(--md-code-bg-color);
     padding: 12px;
     margin-right: auto;
     margin-left: auto;
