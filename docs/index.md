@@ -2,6 +2,8 @@
 
 > 本文档为炸毛框架 v2 版本，如需查看 v1 版本，[点我](https://docs-v1.zhamao.xin/)。
 
+> 如果是从 v1.x 版本升级到 v2.x，[点我看升级指南](/advanced/to-v2/)。
+
 炸毛框架使用 PHP 编写，采用 Swoole 扩展为基础，主要面向 API 服务，聊天机器人（CQHTTP 对接），包含 websocket、http 等监听和请求库，用户代码采用模块化处理，使用注解可以方便地编写各类功能。
 
 框架主要用途为 HTTP 服务器，机器人搭建框架。尤其对于 QQ 机器人消息处理较为方便和全面，提供了众多会话机制和内部调用机制，可以以各种方式设计你自己的模块。
@@ -54,6 +56,7 @@ public function index() {
 
 ## 文档主题
 
+### 主题
 <div class="tx-switch">
   <button data-md-color-scheme="default"><code>默认模式</code></button>
   <button data-md-color-scheme="slate"><code>暗黑模式</code></button>
@@ -72,6 +75,7 @@ public function index() {
   })
 </script>
 
+### 主色调
 <div class="tx-switch">
   <button data-md-color-primary="red"><code>red</code></button>
   <button data-md-color-primary="pink"><code>pink</code></button>
@@ -96,6 +100,9 @@ public function index() {
   <button data-md-color-primary="white"><code>white</code></button>
 </div>
 
+### 辅色调
+<div class="tx-switch"> <button data-md-color-accent="red"><code>red</code></button> <button data-md-color-accent="pink"><code>pink</code></button> <button data-md-color-accent="purple"><code>purple</code></button> <button data-md-color-accent="deep-purple"><code>deep purple</code></button> <button data-md-color-accent="indigo"><code>indigo</code></button> <button data-md-color-accent="blue"><code>blue</code></button> <button data-md-color-accent="light-blue"><code>light blue</code></button> <button data-md-color-accent="cyan"><code>cyan</code></button> <button data-md-color-accent="teal"><code>teal</code></button> <button data-md-color-accent="green"><code>green</code></button> <button data-md-color-accent="light-green"><code>light green</code></button> <button data-md-color-accent="lime"><code>lime</code></button> <button data-md-color-accent="yellow"><code>yellow</code></button> <button data-md-color-accent="amber"><code>amber</code></button> <button data-md-color-accent="orange"><code>orange</code></button> <button data-md-color-accent="deep-orange"><code>deep orange</code></button> </div>
+
 <script>
   var buttons = document.querySelectorAll("button[data-md-color-primary]")
   buttons.forEach(function(button) {
@@ -104,6 +111,19 @@ public function index() {
       setCookie("_primary_color", attr)
       document.body.setAttribute("data-md-color-primary", attr)
       var name = document.querySelector("#__code_2 code span:nth-child(7)")
+      name.textContent = attr.replace("-", " ")
+    })
+  })
+</script>
+
+<script>
+  var buttons2 = document.querySelectorAll("button[data-md-color-accent]")
+  buttons2.forEach(function(button) {
+    button.addEventListener("click", function() {
+      var attr = this.getAttribute("data-md-color-accent")
+      setCookie("_accent_color", attr)
+      document.body.setAttribute("data-md-color-accent", attr)
+      var name = document.querySelector("#__code_3 code span:nth-child(7)")
       name.textContent = attr.replace("-", " ")
     })
   })

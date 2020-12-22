@@ -15,7 +15,7 @@ extra_javascript:
   - https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js
   - javascripts/config.js
 extra_css:
-  - assets/extra.css
+  - assets/css/extra.css
   - https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/default.min.css
 markdown_extensions:
   - admonition
@@ -58,12 +58,14 @@ nav:
       - 选择聊天机器人实例: guide/OneBot实例.md
       - 基本配置: guide/基本配置.md
       - 编写模块: guide/编写模块.md
+      - 注册事件响应: guide/注册事件响应.md
   - 事件和注解:
       - 事件和注解: event/index.md
   - 框架组件:
       - 框架组件: component/index.md
   - 进阶开发:
-      - Swoole 进阶: test.md
+      - 进阶开发: advanced/index.md
+      - 从 v1 升级: advanced/to-v2.md
   - FAQ:
       - FAQ: FAQ.md
   - 更新日志:
