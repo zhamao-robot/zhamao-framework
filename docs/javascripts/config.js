@@ -78,6 +78,8 @@ setTimeout(() => {
                     '    <img class="doc-chat-avatar" src="https://docs-v1.zhamao.xin/logo.png" alt=""/>\n' +
                     '    <div class="doc-chat-box doc-chat-box-robot">' + j.substr(2) + '</div>\n' +
                     '  </div>';
+            } else if (j.substr(0, 2) === '^ ') {
+                final += '<div class="doc-chat-row doc-chat-banner">' + j.substr(2) + '</div>';
             }
         }
         i.innerHTML = final;

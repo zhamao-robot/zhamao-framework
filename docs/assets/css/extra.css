@@ -29,6 +29,17 @@
     justify-content: flex-end;
 }
 
+.doc-chat-banner {
+    justify-content: center;
+    background: rgba(0,0,0,0.1);
+    width: max-content;
+    margin: 8px auto;
+    padding: 4px 14px;
+    border-radius: 8px;
+    color: gray;
+    font-size: 14px;
+}
+
 .doc-chat-row-robot {
     justify-content: flex-start !important;
 }
@@ -85,4 +96,8 @@
     width: 36px !important;
     height: 36px !important;
     border-radius: 18px;
+}
+
+.md-typeset .admonition, .md-typeset details {
+    font-size: .72rem;
 }

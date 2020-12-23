@@ -2,7 +2,7 @@ site_name: 炸毛框架 v2
 
 repo_name: '炸毛框架'
 repo_url: 'https://github.com/zhamao-robot/zhamao-framework'
-edit_uri: 'blob/2.0-dev/docs/'
+edit_uri: 'blob/master/docs/'
 
 theme:
   name: material
@@ -61,6 +61,11 @@ nav:
       - 注册事件响应: guide/注册事件响应.md
   - 事件和注解:
       - 事件和注解: event/index.md
+      - 机器人注解事件: event/机器人注解事件.md
+      - HTTP 路由注解事件: event/路由注解事件.md
+      - 框架核心注解事件: event/框架注解事件.md
+      - 中间件注解: event/中间件.md
+      - 自定义注解: event/自定义注解.md
   - 框架组件:
       - 框架组件: component/index.md
   - 进阶开发:

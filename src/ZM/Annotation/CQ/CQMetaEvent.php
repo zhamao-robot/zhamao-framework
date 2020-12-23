@@ -21,8 +21,6 @@ class CQMetaEvent extends AnnotationBase implements Level
      * @Required()
      */
     public $meta_event_type = '';
-    /** @var string */
-    public $sub_type = '';
     /** @var int */
     public $level;
 
