@@ -54,6 +54,10 @@ class Framework
         }
         ZMAtomic::init();
         try {
+            $sw = ZMConfig::get("global");
+            if(!is_dir($sw["zm_data"])) mkdir($sw["zm_data"]);
+            if(!is_dir($sw["config_dir"])) mkdir($sw["config_dir"]);
+            if(!is_dir($sw["crash_dir"])) mkdir($sw["crash_dir"]);
             ManagerGM::init(ZMConfig::get("global", "swoole")["max_connection"] ?? 2048, 0.5, [
                 [
                     "key" => "connect_id",
