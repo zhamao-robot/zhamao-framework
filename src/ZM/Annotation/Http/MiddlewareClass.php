@@ -4,6 +4,7 @@
 namespace ZM\Annotation\Http;
 
 
+use Doctrine\Common\Annotations\Annotation\Required;
 use Doctrine\Common\Annotations\Annotation\Target;
 use ZM\Annotation\AnnotationBase;
 
@@ -15,5 +16,9 @@ use ZM\Annotation\AnnotationBase;
  */
 class MiddlewareClass extends AnnotationBase
 {
-
+    /**
+     * @var string
+     * @Required()
+     */
+    public $name = '';
 }

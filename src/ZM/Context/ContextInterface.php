@@ -7,9 +7,9 @@ namespace ZM\Context;
 use Swoole\Http\Request;
 use Swoole\WebSocket\Frame;
 use Swoole\WebSocket\Server;
-use ZM\Connection\WSConnection;
+use ZM\ConnectionManager\ConnectionObject;
 use ZM\Http\Response;
-use ZM\Utils\ZMRobot;
+use ZM\API\ZMRobot;
 
 interface ContextInterface
 {
@@ -26,7 +26,7 @@ interface ContextInterface
 
     public function setData($data);
 
-    /** @return WSConnection */
+    /** @return ConnectionObject */
     public function getConnection();
 
     /** @return int|null */
@@ -97,12 +97,15 @@ interface ContextInterface
     public function waitMessage($prompt = "", $timeout = 600, $timeout_prompt = "");
 
     /**
-     * @param $arg
      * @param $mode
      * @param $prompt_msg
      * @return mixed
      */
-    public function getArgs(&$arg, $mode, $prompt_msg);
+    public function getArgs($mode, $prompt_msg);
+
+    public function getNextArg($prompt_msg = "");
+
+    public function getFullArg($prompt_msg = "");
 
     public function setCache($key, $value);
 
@@ -115,4 +118,6 @@ interface ContextInterface
     public function cloneFromParent();
 
     public function copy();
+
+    public function getOption();
 }

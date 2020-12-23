@@ -4,8 +4,7 @@
 namespace ZM\API;
 
 
-use Framework\Console;
-use ZM\Utils\ZMUtil;
+use ZM\Console\Console;
 
 class CQ
 {

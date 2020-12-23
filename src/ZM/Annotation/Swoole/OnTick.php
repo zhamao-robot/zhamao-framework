@@ -22,4 +22,9 @@ class OnTick extends AnnotationBase
      * @Required()
      */
     public $tick_ms;
+
+    /**
+     * @var int
+     */
+    public $worker_id = 0;
 }

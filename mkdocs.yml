@@ -1,0 +1,74 @@
+site_name: 炸毛框架 v2
+
+repo_name: '炸毛框架'
+repo_url: 'https://github.com/zhamao-robot/zhamao-framework'
+edit_uri: 'blob/2.0-dev/docs/'
+
+theme:
+  name: material
+  logo: assets/logos.png
+  favicon: assets/favicon.png
+  language: zh
+  features:
+    - navigation.tabs
+extra_javascript:
+  - https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js
+  - javascripts/config.js
+extra_css:
+  - assets/css/extra.css
+  - https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/default.min.css
+markdown_extensions:
+  - admonition
+  - pymdownx.tabbed
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - abbr
+  - pymdownx.highlight:
+      linenums: true
+      linenums_style: pymdownx.inline
+extra:
+  version:
+    method: mike
+
+copyright: 'Copyright &copy; 2019 - 2020 CrazyBot Team&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tx-switch">
+                 <button data-md-color-scheme="default"><code>默认模式</code></button>
+                 <button data-md-color-scheme="slate"><code>暗黑模式</code></button>
+               </span>
+
+               <script>
+                 var buttons = document.querySelectorAll("button[data-md-color-scheme]");
+                 buttons.forEach(function(button) {
+                   button.addEventListener("click", function() {
+                     var attr = this.getAttribute("data-md-color-scheme");
+                     setCookie("_theme", attr);
+                     document.body.setAttribute("data-md-color-scheme", attr);
+                     var name = document.querySelector("#__code_0 code span:nth-child(7)");
+                     name.textContent = attr;
+                   })
+                 })
+               </script><br><a href="http://beian.miit.gov.cn">蒙ICP备18000198号-1</a>'
+
+nav:
+  - 指南:
+      - 介绍: index.md
+      - 安装框架: guide/安装.md
+      - 快速上手（机器人篇）: guide/快速上手-机器人.md
+      - 快速上手（HTTP篇）: guide/快速上手-http.md
+      - 选择聊天机器人实例: guide/OneBot实例.md
+      - 基本配置: guide/基本配置.md
+      - 编写模块: guide/编写模块.md
+      - 注册事件响应: guide/注册事件响应.md
+  - 事件和注解:
+      - 事件和注解: event/index.md
+  - 框架组件:
+      - 框架组件: component/index.md
+  - 进阶开发:
+      - 进阶开发: advanced/index.md
+      - 从 v1 升级: advanced/to-v2.md
+  - FAQ:
+      - FAQ: FAQ.md
+  - 更新日志:
+      - 更新日志（v2）: update/v2.md
+      - 更新日志（v1）: update/v1.md
+  - <u>炸毛框架 v1</u>: https://docs-v1.zhamao.xin/

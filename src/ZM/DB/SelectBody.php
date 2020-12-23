@@ -4,7 +4,6 @@
 namespace ZM\DB;
 
 
-use Framework\Console;
 use ZM\Exception\DbException;
 
 class SelectBody
@@ -46,17 +45,7 @@ class SelectBody
      * @throws DbException
      */
     public function fetchAll($fetch_mode = ZM_DEFAULT_FETCH_MODE) {
-        if ($this->table->isCacheEnabled()) {
-            $rr = md5(implode(",", $this->select_thing) . serialize($this->where_thing));
-            if (array_key_exists($rr, $this->table->cache)) {
-                Console::debug('SQL query cached: ' . $rr);
-                return $this->table->cache[$rr]->getResult();
-            }
-        }
         $this->execute($fetch_mode);
-        if ($this->table->isCacheEnabled() && !in_array($rr, $this->table->cache)) {
-            $this->table->cache[$rr] = $this;
-        }
         return $this->getResult();
     }
 

@@ -4,9 +4,9 @@
 namespace ZM\Http;
 
 
-use Framework\Console;
-use Framework\ZMBuf;
-use ZM\Utils\ZMUtil;
+use ZM\Config\ZMConfig;
+use ZM\Console\Console;
+use ZM\Utils\HttpUtil;
 
 class StaticFileHandler
 {
@@ -22,14 +22,14 @@ class StaticFileHandler
             } else {
                 if(is_file($full_path)) {
                     $exp = strtolower(pathinfo($full_path)['extension'] ?? "unknown");
-                    $response->setHeader("Content-Type", ZMBuf::config("file_header")[$exp] ?? "application/octet-stream");
+                    $response->setHeader("Content-Type", ZMConfig::get("file_header")[$exp] ?? "application/octet-stream");
                     $response->end(file_get_contents($full_path));
                     return true;
                 }
             }
         }
         $response->status(404);
-        $response->end(ZMUtil::getHttpCodePage(404));
+        $response->end(HttpUtil::getHttpCodePage(404));
         return true;
     }
 }

@@ -2,24 +2,25 @@
 
 namespace Module\Middleware;
 
-use Framework\Console;
-use ZM\Annotation\Http\After;
-use ZM\Annotation\Http\Before;
+use ZM\Annotation\Http\HandleAfter;
+use ZM\Annotation\Http\HandleBefore;
+use ZM\Annotation\Http\HandleException;
 use ZM\Annotation\Http\MiddlewareClass;
+use ZM\Console\Console;
 use ZM\Http\MiddlewareInterface;
 
 /**
- * Class AuthMiddleware
+ * Class TimerMiddleware
  * 示例中间件：用于统计路由函数运行时间用的
  * @package Module\Middleware
- * @MiddlewareClass()
+ * @MiddlewareClass("timer")
  */
 class TimerMiddleware implements MiddlewareInterface
 {
     private $starttime;
 
     /**
-     * @Before()
+     * @HandleBefore()
      * @return bool
      */
     public function onBefore() {
@@ -28,11 +29,16 @@ class TimerMiddleware implements MiddlewareInterface
     }
 
     /**
-     * @After()
+     * @HandleAfter()
      */
     public function onAfter() {
         Console::info("Using " . round((microtime(true) - $this->starttime) * 1000, 2) . " ms.");
     }
 
-    public function getName() { return "timer"; }
+    /**
+     * @HandleException(\Exception::class)
+     */
+    public function onException() {
+        Console::error("Using " . round((microtime(true) - $this->starttime) * 1000, 2) . " ms but an Exception occurred.");
+    }
 }

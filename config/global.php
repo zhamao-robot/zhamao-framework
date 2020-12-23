@@ -1,4 +1,6 @@
 <?php
+/** @noinspection PhpFullyQualifiedNameUsageInspection */
+/** @noinspection PhpComposerExtensionStubsInspection */
 global $config;
 
 /** bind host */
@@ -25,10 +27,20 @@ $config['crash_dir'] = $config['zm_data'] . 'crash/';
 /** 对应swoole的server->set参数 */
 $config['swoole'] = [
     'log_file' => $config['crash_dir'] . 'swoole_error.log',
-    'worker_num' => 1,
-    'dispatch_mode' => 2,
-    //'task_worker_num' => 1,
+    'worker_num' => swoole_cpu_num(), //如果你只有一个 OneBot 实例连接到框架并且代码没有复杂的CPU密集计算，则可把这里改为1使用全局变量
+    'dispatch_mode' => 2, //包分配原则，见 https://wiki.swoole.com/#/server/setting?id=dispatch_mode
+    'max_coroutine' => 300000,
+    //'task_worker_num' => 4,
     //'task_enable_coroutine' => true
+];
+
+/** 轻量字符串缓存，默认开启 */
+$config['light_cache'] = [
+    'size' => 1024,                     //最多允许储存的条数（需要2的倍数）
+    'max_strlen' => 16384,               //单行字符串最大长度（需要2的倍数）
+    'hash_conflict_proportion' => 0.6,   //Hash冲突率（越大越好，但是需要的内存更多）
+    'persistence_path' => $config['zm_data'].'_cache.json',
+    'auto_save_interval' => 900
 ];
 
 /** MySQL数据库连接信息，host留空则启动时不创建sql连接池 */
@@ -38,18 +50,25 @@ $config['sql_config'] = [
     'sql_username' => 'name',
     'sql_database' => 'db_name',
     'sql_password' => '',
-    'sql_enable_cache' => true,
-    'sql_reset_cache' => '0300',
     'sql_options' => [
         PDO::ATTR_STRINGIFY_FETCHES => false,
         PDO::ATTR_EMULATE_PREPARES => false
     ],
     'sql_no_exception' => false,
-    'sql_default_fetch_mode' => PDO::FETCH_BOTH         // added in 1.5.6
+    'sql_default_fetch_mode' => PDO::FETCH_ASSOC         // added in 1.5.6
 ];
 
-/** CQHTTP连接约定的token */
-$config["access_token"] = "";
+/** Redis连接信息，host留空则启动时不创建Redis连接池 */
+$config['redis_config'] = [
+    'host' => '',
+    'port' => 6379,
+    'timeout' => 1,
+    'db_index' => 0,
+    'auth' => ''
+];
+
+/** onebot连接约定的token */
+$config["access_token"] = '';
 
 /** HTTP服务器固定请求头的返回 */
 $config['http_header'] = [
@@ -64,15 +83,11 @@ $config['http_default_code_page'] = [
 
 /** zhamao-framework在框架启动时初始化的atomic们 */
 $config['init_atomics'] = [
-    'in_count' => 0,        //消息接收message的统计数量
-    'out_count' => 0,       //消息发送（调用send_*_msg的统计数量）
-    'reload_time' => 0,     //调用reload功能统计数量
-    'wait_msg_id' => 0,     //协程挂起id自增
-    'info_level' => 2,      //终端显示的log等级
+    //'custom_atomic_name' => 0,  //自定义添加的Atomic
 ];
 
-/** 自动保存的缓存保存时间（秒） */
-$config['auto_save_interval'] = 900;
+/** 终端日志显示等级（0-4） */
+$config["info_level"] = 2;
 
 /** 上下文接口类 implemented from ContextInterface */
 $config['context_class'] = \ZM\Context\Context::class;
@@ -88,7 +103,15 @@ $config['static_file_server'] = [
 
 /** 注册 Swoole Server 事件注解的类列表 */
 $config['server_event_handler_class'] = [
-    \Framework\ServerEventHandler::class,
+    \ZM\Event\ServerEventHandler::class,
+];
+
+/** 服务器启用的外部第三方和内部插件 */
+$config['modules'] = [
+    'onebot' => [
+        'status' => true,
+        'single_bot_mode' => false
+    ], // QQ机器人事件解析器，如果取消此项则默认为 true 开启状态，否则你手动填写 false 才会关闭
 ];
 
 return $config;

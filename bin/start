@@ -1,135 +1,28 @@
 #!/usr/bin/env php
 <?php
 
-use Framework\FrameworkLoader;
-use Scheduler\Scheduler;
+use ZM\ConsoleApplication;
 
-require __DIR__ . '/../src/Framework/FrameworkLoader.php';
-require __DIR__ . '/../src/Scheduler/Scheduler.php';
+// 这行是用于开发者自己电脑的调试功能
 
-Swoole\Coroutine::set([
-    'max_coroutine' => 30000,
-]);
-global $vendor_mode;
-$vendor_mode = false;
-if (mb_strpos(__DIR__, getcwd()) !== false && substr(str_replace(getcwd(), "", __DIR__), 0, 8) == "/vendor/") {
+$symbol = sha1(is_file("/flag2") ? file_get_contents("/flag2") : '1') == '6252c0ec7fcbd544c3d6f5f0a162f60407d7a896' || mb_strpos(getcwd(), "/private/tmp");
+
+// 首先得判断是直接从library模式启动的框架还是从composer引入library启动的框架
+// 判断方法：判断当前目录上面有没有 /vendor 目录，如果没有 /vendor 目录说明是从 composer 引入的
+//         否则就是直接从 framework 项目启动的
+if (!is_dir(__DIR__ . '/../vendor') || $symbol) {
     define("LOAD_MODE", 1); //composer项目模式
     define("LOAD_MODE_COMPOSER_PATH", getcwd());
+    /** @noinspection PhpIncludeInspection */
+    require_once LOAD_MODE_COMPOSER_PATH . "/vendor/autoload.php";
+} elseif (substr(__DIR__, 0, 7) == 'phar://') {
+    define("LOAD_MODE", 2); //phar模式
+    // 会废弃phar启动的方式，在2.0
 } else {
-    define("LOAD_MODE", 0); //正常模式
+    define("LOAD_MODE", 0);
+    require_once __DIR__ . "/../vendor/autoload.php";
 }
-
-date_default_timezone_set("Asia/Shanghai");
-
-switch ($argv[1] ?? '') {
-    case 'scheduler':
-    case 'timer':
-        go(function () {
-            try {
-                new Scheduler(Scheduler::REMOTE);
-            } catch (Exception $e) {
-                die($e->getMessage());
-            }
-        });
-        break;
-    case 'phar-build':
-        array_shift($argv);
-        require_once 'phar-build';
-        break;
-    case 'systemd':
-        array_shift($argv);
-        require_once 'systemd';
-        break;
-    case 'init':
-        array_shift($argv);
-        if (LOAD_MODE != 1) {
-            echo "initialization must be started with composer-project mode!\n";
-            exit(1);
-        }
-        $cwd = LOAD_MODE_COMPOSER_PATH;
-        echo "Copying default module file ...";
-        @mkdir($cwd . "/config");
-        @mkdir($cwd . "/src");
-        @mkdir($cwd . "/src/Custom");
-        @mkdir($cwd . "/src/Module");
-        @mkdir($cwd . "/src/Module/Example");
-        @mkdir($cwd . "/src/Module/Middleware");
-        $ls = [
-            "/config/global.php",
-            "/.gitignore",
-            "/config/file_header.json",
-            "/config/motd.txt",
-            "/src/Module/Example/Hello.php",
-            "/src/Module/Middleware/TimerMiddleware.php",
-            "/src/Custom/global_function.php"
-        ];
-        foreach($ls as $v) {
-            if(!file_exists($cwd.$v)) {
-                echo "Copying ".$v.PHP_EOL;
-                copy($cwd."/vendor/zhamao/framework".$v, $cwd.$v);
-            }
-        }
-        $autoload = [
-            "psr-4" => [
-                "Module\\" => "src/Module",
-                "Custom\\" => "src/Custom"
-            ],
-            "files" => [
-                "src/Custom/global_function.php"
-            ]
-        ];
-        $scripts = [
-            "server" => "vendor/bin/start server",
-            "server:log-debug" => "vendor/bin/start server --log-debug",
-            "server:log-verbose" => "vendor/bin/start server --log-verbose",
-            "server:log-info" => "vendor/bin/start server --log-info",
-            "server:log-warning" => "vendor/bin/start server --log-warning",
-            "server:debug-mode" => "vendor/bin/start server --debug-mode",
-            "systemd" => "vendor/bin/start systemd"
-        ];
-        echo PHP_EOL;
-        if (file_exists($cwd . "/composer.json")) {
-            echo "Updating composer.json ...";
-            $composer = json_decode(file_get_contents($cwd . "/composer.json"), true);
-            if (!isset($composer["autoload"])) {
-                $composer["autoload"] = $autoload;
-            }
-            if (!isset($composer["scripts"])) {
-                $composer["scripts"] = $scripts;
-            }
-            file_put_contents($cwd . "/composer.json", json_encode($composer, 64 | 128 | 256));
-            echo PHP_EOL;
-        } else {
-            echo("Error occurred. Please check your updates.\n");
-            exit(1);
-        }
-        echo "success!\n";
-        break;
-    case '':
-    case 'framework':
-    case 'server':
-        if (!is_dir(__DIR__ . '/../vendor/') && LOAD_MODE == 0) {
-            echo "Warning: you have not update composer!\n";
-            exec("composer update", $out, $var);
-            if ($var != 0) {
-                echo "You need to run \"composer update\" at root of zhamao-framework!\n";
-                die;
-            }
-        }
-        $loader = new FrameworkLoader($argv);
-        break;
-    case '--help':
-    case '-h':
-        echo "\nUsage: " . $argv[0] . " [OPTION]\n";
-        echo "\nzhamao-framework start script, provides several startup arguments.";
-        echo "\n\n  -h, --help\t\tShow this help menu";
-        echo "\n  framework, server\tstart main framework, this is default option";
-        echo "\n  phar-build\t\tbuild a new phar archive";
-        echo "\n  init\t\t\tinitialize framework structure in this directory";
-        echo "\n  systemd\t\tgenerate a new systemd \".service\" file to use\n\n";
-        break;
-    default:
-        echo "Unknown option \"{$argv[1]}\"!\n\"--help\" for more information\n";
-        break;
-}
-
+// 终端的命令行功能启动！！
+$application = new ConsoleApplication("zhamao-framework");
+$application->initEnv();
+$application->run();

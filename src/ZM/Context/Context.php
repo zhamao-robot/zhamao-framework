@@ -5,21 +5,22 @@ namespace ZM\Context;
 
 
 use Co;
-use Framework\ZMBuf;
+use Exception;
 use Swoole\Http\Request;
 use Swoole\WebSocket\Frame;
 use swoole_server;
-use ZM\API\CQAPI;
-use ZM\Connection\ConnectionManager;
-use ZM\Connection\CQConnection;
-use ZM\Connection\WSConnection;
+use ZM\ConnectionManager\ConnectionObject;
+use ZM\ConnectionManager\ManagerGM;
+use ZM\Console\Console;
 use ZM\Exception\InvalidArgumentException;
 use ZM\Exception\WaitTimeoutException;
 use ZM\Http\Response;
-use ZM\Utils\ZMRobot;
+use ZM\API\ZMRobot;
+use ZM\Utils\CoMessage;
 
 class Context implements ContextInterface
 {
+    public static $context = [];
     private $cid;
 
     public function __construct($cid) { $this->cid = $cid; }
@@ -27,34 +28,34 @@ class Context implements ContextInterface
     /**
      * @return swoole_server|null
      */
-    public function getServer() { return ZMBuf::$context[$this->cid]["server"] ?? null; }
+    public function getServer() { return self::$context[$this->cid]["server"] ?? server(); }
 
     /**
      * @return Frame|null
      */
-    public function getFrame() { return ZMBuf::$context[$this->cid]["frame"] ?? null; }
+    public function getFrame() { return self::$context[$this->cid]["frame"] ?? null; }
 
-    public function getFd() { return ZMBuf::$context[$this->cid]["fd"] ?? $this->getFrame()->fd ?? null; }
+    public function getFd() { return self::$context[$this->cid]["fd"] ?? $this->getFrame()->fd ?? null; }
 
     /**
      * @return array|null
      */
-    public function getData() { return ZMBuf::$context[$this->cid]["data"] ?? null; }
+    public function getData() { return self::$context[$this->cid]["data"] ?? null; }
 
-    public function setData($data) { ZMBuf::$context[$this->cid]["data"] = $data; }
+    public function setData($data) { self::$context[$this->cid]["data"] = $data; }
 
     /**
      * @return Request|null
      */
-    public function getRequest() { return ZMBuf::$context[$this->cid]["request"] ?? null; }
+    public function getRequest() { return self::$context[$this->cid]["request"] ?? null; }
 
     /**
      * @return Response|null
      */
-    public function getResponse() { return ZMBuf::$context[$this->cid]["response"] ?? null; }
+    public function getResponse() { return self::$context[$this->cid]["response"] ?? null; }
 
-    /** @return WSConnection */
-    public function getConnection() { return ConnectionManager::get($this->getFd()); }
+    /** @return ConnectionObject|null */
+    public function getConnection() { return ManagerGM::get($this->getFd()); }
 
     /**
      * @return int|null
@@ -65,37 +66,37 @@ class Context implements ContextInterface
      * @return ZMRobot|null
      */
     public function getRobot() {
-        $conn = ConnectionManager::get($this->getFrame()->fd);
-        return $conn instanceof CQConnection ? new ZMRobot($conn) : null;
+        $conn = ManagerGM::get($this->getFrame()->fd);
+        return $conn instanceof ConnectionObject ? new ZMRobot($conn) : null;
     }
 
-    public function getMessage() { return ZMBuf::$context[$this->cid]["data"]["message"] ?? null; }
+    public function getMessage() { return self::$context[$this->cid]["data"]["message"] ?? null; }
 
-    public function setMessage($msg) { ZMBuf::$context[$this->cid]["data"]["message"] = $msg; }
+    public function setMessage($msg) { self::$context[$this->cid]["data"]["message"] = $msg; }
 
     public function getUserId() { return $this->getData()["user_id"] ?? null; }
 
-    public function setUserId($id) { ZMBuf::$context[$this->cid]["data"]["user_id"] = $id; }
+    public function setUserId($id) { self::$context[$this->cid]["data"]["user_id"] = $id; }
 
     public function getGroupId() { return $this->getData()["group_id"] ?? null; }
 
-    public function setGroupId($id) { ZMBuf::$context[$this->cid]["data"]["group_id"] = $id; }
+    public function setGroupId($id) { self::$context[$this->cid]["data"]["group_id"] = $id; }
 
     public function getDiscussId() { return $this->getData()["discuss_id"] ?? null; }
 
-    public function setDiscussId($id) { ZMBuf::$context[$this->cid]["data"]["discuss_id"] = $id; }
+    public function setDiscussId($id) { self::$context[$this->cid]["data"]["discuss_id"] = $id; }
 
     public function getMessageType() { return $this->getData()["message_type"] ?? null; }
 
-    public function setMessageType($type) { ZMBuf::$context[$this->cid]["data"]["message_type"] = $type; }
+    public function setMessageType($type) { self::$context[$this->cid]["data"]["message_type"] = $type; }
 
     public function getRobotId() { return $this->getData()["self_id"] ?? null; }
 
-    public function getCache($key) { return ZMBuf::$context[$this->cid]["cache"][$key] ?? null; }
+    public function getCache($key) { return self::$context[$this->cid]["cache"][$key] ?? null; }
 
-    public function setCache($key, $value) { ZMBuf::$context[$this->cid]["cache"][$key] = $value; }
+    public function setCache($key, $value) { self::$context[$this->cid]["cache"][$key] = $value; }
 
-    public function getCQResponse() { return ZMBuf::$context[$this->cid]["cq_response"] ?? null; }
+    public function getCQResponse() { return self::$context[$this->cid]["cq_response"] ?? null; }
 
     /**
      * only can used by cq->message event function
@@ -109,13 +110,21 @@ class Context implements ContextInterface
             case "private":
             case "discuss":
                 $this->setCache("has_reply", true);
-                return CQAPI::quick_reply(ConnectionManager::get($this->getFrame()->fd), $this->getData(), $msg, $yield);
+                $data = $this->getData();
+                $conn = $this->getConnection();
+                switch ($data["message_type"]) {
+                    case "group":
+                        return (new ZMRobot($conn))->setCallback($yield)->sendGroupMsg($data["group_id"], $msg);
+                    case "private":
+                        return (new ZMRobot($conn))->setCallback($yield)->sendPrivateMsg($data["user_id"], $msg);
+                }
+                return null;
         }
         return false;
     }
 
     public function finalReply($msg, $yield = false) {
-        ZMBuf::$context[$this->cid]["cache"]["block_continue"] = true;
+        self::$context[$this->cid]["cache"]["block_continue"] = true;
         if ($msg == "") return true;
         return $this->reply($msg, $yield);
     }
@@ -129,12 +138,24 @@ class Context implements ContextInterface
      * @throws WaitTimeoutException
      */
     public function waitMessage($prompt = "", $timeout = 600, $timeout_prompt = "") {
-        if ($prompt != "") $this->reply($prompt);
         if (!isset($this->getData()["user_id"], $this->getData()["message"], $this->getData()["self_id"]))
             throw new InvalidArgumentException("协程等待参数缺失");
+
+        Console::debug("==== 开始等待输入 ====");
+        if ($prompt != "") $this->reply($prompt);
+
+        try {
+            $r = CoMessage::yieldByWS($this->getData(), ["user_id", "self_id", "message_type", onebot_target_id_name($this->getMessageType())]);
+        } catch (Exception $e) {
+            $r = false;
+        }
+        if ($r === false) {
+            throw new WaitTimeoutException($this, $timeout_prompt);
+        }
+        return $r["message"];
+        /*
         $cid = Co::getuid();
-        $api_id = ZMBuf::$atomics["wait_msg_id"]->get();
-        ZMBuf::$atomics["wait_msg_id"]->add(1);
+        $api_id = ZMAtomic::get("wait_msg_id")->add(1);
         $hang = [
             "coroutine" => $cid,
             "user_id" => $this->getData()["user_id"],
@@ -146,49 +167,57 @@ class Context implements ContextInterface
         if ($hang["message_type"] == "group" || $hang["message_type"] == "discuss") {
             $hang[$hang["message_type"] . "_id"] = $this->getData()[$this->getData()["message_type"] . "_id"];
         }
-        ZMBuf::appendKey("wait_api", $api_id, $hang);
+        SpinLock::lock("wait_api");
+        $hw = LightCacheInside::get("wait_api", "wait_api") ?? [];
+        $hw[$api_id] = $hang;
+        LightCacheInside::set("wait_api", "wait_api", $hw);
+        SpinLock::unlock("wait_api");
         $id = swoole_timer_after($timeout * 1000, function () use ($api_id, $timeout_prompt) {
-            $r = ZMBuf::get("wait_api")[$api_id] ?? null;
-            if ($r !== null) {
+            $r = LightCacheInside::get("wait_api", "wait_api")[$api_id] ?? null;
+            if (is_array($r)) {
                 Co::resume($r["coroutine"]);
             }
         });
 
         Co::suspend();
-        $sess = ZMBuf::get("wait_api")[$api_id];
-        ZMBuf::unsetByValue("wait_api", $api_id);
+        SpinLock::lock("wait_api");
+        $hw = LightCacheInside::get("wait_api", "wait_api") ?? [];
+        $sess = $hw[$api_id];
+        unset($hw[$api_id]);
+        LightCacheInside::set("wait_api", "wait_api", $hw);
         $result = $sess["result"];
         if (isset($id)) swoole_timer_clear($id);
         if ($result === null) throw new WaitTimeoutException($this, $timeout_prompt);
-        return $result;
+        return $result;*/
     }
 
     /**
-     * @param $arg
      * @param $mode
      * @param $prompt_msg
      * @return mixed|string
      * @throws InvalidArgumentException
      * @throws WaitTimeoutException
      */
-    public function getArgs(&$arg, $mode, $prompt_msg) {
+    public function getArgs($mode, $prompt_msg) {
+        $arg = ctx()->getCache("match");
         switch ($mode) {
             case ZM_MATCH_ALL:
                 $p = $arg;
-                array_shift($p);
                 return trim(implode(" ", $p)) == "" ? $this->waitMessage($prompt_msg) : trim(implode(" ", $p));
             case ZM_MATCH_NUMBER:
                 foreach ($arg as $k => $v) {
                     if (is_numeric($v)) {
                         array_splice($arg, $k, 1);
+                        ctx()->setCache("match", $arg);
                         return $v;
                     }
                 }
                 return $this->waitMessage($prompt_msg);
             case ZM_MATCH_FIRST:
-                if (isset($arg[1])) {
-                    $a = $arg[1];
-                    array_splice($arg, 1, 1);
+                if (isset($arg[0])) {
+                    $a = $arg[0];
+                    array_splice($arg, 0, 1);
+                    ctx()->setCache("match", $arg);
                     return $a;
                 } else {
                     return $this->waitMessage($prompt_msg);
@@ -197,10 +226,28 @@ class Context implements ContextInterface
         throw new InvalidArgumentException();
     }
 
+    /**
+     * @param string $prompt_msg
+     * @return int|mixed|string
+     * @throws InvalidArgumentException
+     * @throws WaitTimeoutException
+     */
+    public function getNextArg($prompt_msg = "") { return $this->getArgs(ZM_MATCH_FIRST, $prompt_msg); }
+
+    /**
+     * @param string $prompt_msg
+     * @return int|mixed|string
+     * @throws InvalidArgumentException
+     * @throws WaitTimeoutException
+     */
+    public function getFullArg($prompt_msg = "") { return $this->getArgs(ZM_MATCH_ALL, $prompt_msg); }
+
     public function cloneFromParent() {
-        set_coroutine_params(ZMBuf::$context[Co::getPcid()] ?? ZMBuf::$context[$this->cid]);
+        set_coroutine_params(self::$context[Co::getPcid()] ?? self::$context[$this->cid]);
         return context();
     }
 
-    public function copy() { return ZMBuf::$context[$this->cid]; }
+    public function copy() { return self::$context[$this->cid]; }
+
+    public function getOption() { return self::getCache("match"); }
 }

@@ -4,6 +4,8 @@
 namespace ZM\Http;
 
 
+use ZM\Console\Console;
+
 class Response
 {
 
@@ -184,6 +186,7 @@ class Response
      * @return mixed
      */
     public function redirect($location, $http_code = null) {
+        $this->is_end = true;
         return $this->response->redirect($location, $http_code);
     }
 

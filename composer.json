@@ -3,7 +3,8 @@
     "description": "High performance QQ robot and web server development framework",
     "minimum-stability": "stable",
     "license": "Apache-2.0",
-    "version": "1.6.5",
+    "version": "2.0.0-b5",
+    "extra": {},
     "authors": [
         {
             "name": "whale",
@@ -16,22 +17,48 @@
     ],
     "prefer-stable": true,
     "bin": [
-        "bin/start"
+        "bin/start",
+        "bin/phpunit-swoole"
     ],
     "require": {
         "php": ">=7.2",
-        "swoole/ide-helper": "@dev",
-        "swlib/saber": "^1.0",
         "doctrine/annotations": "~1.10",
         "ext-json": "*",
         "psy/psysh": "@stable",
         "symfony/polyfill-ctype": "^1.20",
-        "symfony/polyfill-mbstring": "^1.20"
+        "symfony/polyfill-mbstring": "^1.20",
+        "symfony/console": "^5.1",
+        "zhamao/connection-manager": "*@dev",
+        "zhamao/console": "^1.0",
+        "zhamao/config": "^1.0",
+        "zhamao/request": "*@dev",
+        "symfony/routing": "^5.1",
+        "symfony/polyfill-php80": "^1.20"
+    },
+    "suggest": {
+        "ext-ctype": "*",
+        "ext-mbstring": "*"
     },
     "autoload": {
         "psr-4": {
-            "Framework\\": "src/Framework",
-            "ZM\\": "src/ZM"
-        }
+            "ZM\\": "src/ZM",
+            "Module\\": "src/Module",
+            "Custom\\": "src/Custom"
+        },
+        "files": [
+            "src/ZM/global_functions.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ZMTest\\": "test/ZMTest"
+        },
+        "files": [
+            "test/ZMTest/Mock/mock.php"
+        ]
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.3",
+        "swoole/ide-helper": "@dev"
     }
 }
