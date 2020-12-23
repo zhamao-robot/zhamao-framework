@@ -46,7 +46,7 @@ public function index() {
 ## 文档（v2 版本）
 查看文档：[https://docs-v2.zhamao.xin/](https://docs-v2.zhamao.xin/)
 
-备用链接：[http://docs-v2.zhamao.me/](http://docs-v2.zhamao.me/)
+备用链接：[https://docs-v2.zhamao.me/](https://docs-v2.zhamao.me/)
 
 自行构建文档：`mkdocs build -d distribute`
 
