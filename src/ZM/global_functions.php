@@ -288,6 +288,16 @@ function bot() {
     }
 }
 
+function getAllFdByConnectType(string $type = 'default'): array
+{
+    $fd = [];
+    foreach (ManagerGM::getAllByName($type) as $ConnectionObjectObj) {
+        array_push($fd, $ConnectionObjectObj->getFd());
+    }
+    return $fd;
+}
+
+
 
 
 
