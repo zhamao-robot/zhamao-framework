@@ -71,6 +71,7 @@ nav:
   - 进阶开发:
       - 进阶开发: advanced/index.md
       - 从 v1 升级: advanced/to-v2.md
+      - 内部类文件手册: advanced/inside-class.md
   - FAQ:
       - FAQ: FAQ.md
   - 更新日志:

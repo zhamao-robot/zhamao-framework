@@ -290,8 +290,9 @@ function bot() {
 
 /**
  * 获取同类型所有连接的文件描述符 ID
- * @author 854854321
+ * @param string $type
  * @return array
+ * @author 854854321
  */
 function getAllFdByConnectType(string $type = 'default'): array {
     $fds = [];
