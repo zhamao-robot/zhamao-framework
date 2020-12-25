@@ -288,16 +288,15 @@ function bot() {
     }
 }
 
-function getAllFdByConnectType(string $type = 'default'): array
-{
-    $fd = [];
-    foreach (ManagerGM::getAllByName($type) as $ConnectionObjectObj) {
-        array_push($fd, $ConnectionObjectObj->getFd());
+/**
+ * 获取同类型所有连接的文件描述符 ID
+ * @author 854854321
+ * @return array
+ */
+function getAllFdByConnectType(string $type = 'default'): array {
+    $fds = [];
+    foreach (ManagerGM::getAllByName($type) as $obj) {
+        array_push($fd, $obj->getFd());
     }
-    return $fd;
+    return $fds;
 }
-
-
-
-
-
