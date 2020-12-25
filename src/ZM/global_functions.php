@@ -296,7 +296,7 @@ function bot() {
 function getAllFdByConnectType(string $type = 'default'): array {
     $fds = [];
     foreach (ManagerGM::getAllByName($type) as $obj) {
-        array_push($fd, $obj->getFd());
+        $fds[] = $obj->getFd();
     }
     return $fds;
 }
