@@ -369,7 +369,7 @@ class ServerEventHandler
         ManagerGM::pushConnect($request->fd, $type_conn);
         $conn = ManagerGM::get($request->fd);
         set_coroutine_params(["server" => $server, "request" => $request, "connection" => $conn, "fd" => $request->fd]);
-        $conn->setOption("connect_id", strval($request->header["x-self-id"]) ?? "");
+        $conn->setOption("connect_id", strval($request->header["x-self-id"] ?? ""));
 
         $dispatcher = new EventDispatcher(OnSwooleEvent::class);
         $dispatcher->setRuleFunction(function ($v) {
