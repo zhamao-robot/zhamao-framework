@@ -1,7 +1,7 @@
 <div align="center">
   <img src="/resources/images/logo_trans.png" height = "150" alt="炸毛框架"><br>
   <h2>炸毛框架</h2>
-  炸毛框架 (zhamao-frameowork) 是一个协程高性能的聊天机器人 + Web 服务器开发框架<br><br>
+  炸毛框架 (zhamao-framework) 是一个协程高性能的聊天机器人 + Web 服务器开发框架<br><br>
 
 [![作者QQ](https://img.shields.io/badge/作者QQ-627577391-orange.svg)]()
 [![zhamao License](https://img.shields.io/hexpm/l/plug.svg?maxAge=2592000)](https://github.com/zhamao-robot/zhamao-framework/blob/master/LICENSE)
