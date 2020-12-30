@@ -80,6 +80,11 @@ setTimeout(() => {
                     '  </div>';
             } else if (j.substr(0, 2) === '^ ') {
                 final += '<div class="doc-chat-row doc-chat-banner">' + j.substr(2) + '</div>';
+            } else if (j.substr(0, 2) === '[ ') {
+                final += '<div class="doc-chat-row doc-chat-row-robot">\n' +
+                    '    <img class="doc-chat-avatar" src="https://docs-v1.zhamao.xin/logo.png" alt=""/>\n' +
+                    '    <div class="doc-chat-box doc-chat-box-robot"><img src="' + j.substr(2) + '" alt=""/></div>\n' +
+                    '  </div>';
             }
         }
         i.innerHTML = final;

@@ -69,12 +69,13 @@ nav:
       - 事件分发器: event/事件分发器.md
   - 框架组件:
       - 框架组件: component/index.md
+      - 机器人 API: component/机器人API.md
+      - CQ 码（多媒体消息）: component/CQ码.md
   - 进阶开发:
       - 进阶开发: advanced/index.md
       - 从 v1 升级: advanced/to-v2.md
       - 内部类文件手册: advanced/inside-class.md
-  - FAQ:
-      - FAQ: FAQ.md
+  - FAQ: FAQ.md
   - 更新日志:
       - 更新日志（v2）: update/v2.md
       - 更新日志（v1）: update/v1.md
