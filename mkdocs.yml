@@ -66,6 +66,7 @@ nav:
       - 框架核心注解事件: event/框架注解事件.md
       - 中间件注解: event/中间件.md
       - 自定义注解: event/自定义注解.md
+      - 事件分发器: event/事件分发器.md
   - 框架组件:
       - 框架组件: component/index.md
   - 进阶开发:
