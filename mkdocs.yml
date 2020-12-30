@@ -71,6 +71,7 @@ nav:
       - 框架组件: component/index.md
       - 机器人 API: component/机器人API.md
       - CQ 码（多媒体消息）: component/CQ码.md
+      - 上下文: component/上下文.md
   - 进阶开发:
       - 进阶开发: advanced/index.md
       - 从 v1 升级: advanced/to-v2.md
