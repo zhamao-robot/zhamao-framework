@@ -47,16 +47,7 @@
             "src/ZM/global_functions.php"
         ]
     },
-    "autoload-dev": {
-        "psr-4": {
-            "ZMTest\\": "test/ZMTest"
-        },
-        "files": [
-            "test/ZMTest/Mock/mock.php"
-        ]
-    },
     "require-dev": {
-        "phpunit/phpunit": "^9.3",
         "swoole/ide-helper": "@dev"
     }
 }

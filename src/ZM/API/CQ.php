@@ -35,69 +35,58 @@ class CQ
     }
 
     /**
-     * 发送emoji表情
-     * @param $id
-     * @return string
-     */
-    public static function emoji($id) {
-        if (is_numeric($id)) {
-            return "[CQ:emoji,id=" . $id . "]";
-        }
-        Console::warning("传入的emoji id($id)错误！");
-        return " ";
-    }
-
-    /**
-     * 发送原创表情，存放在酷Q目录的data/bface/下
-     * @param $id
-     * @return string
-     */
-    public static function bface($id) {
-        return "[CQ:bface,id=" . $id . "]";
-    }
-
-    /**
-     * 发送小表情
-     * @param $id
-     * @return string
-     */
-    public static function sface($id) {
-        if (is_numeric($id)) {
-            return "[CQ:sface,id=" . $id . "]";
-        }
-        Console::warning("传入的sface id($id)错误！");
-        return " ";
-    }
-
-    /**
      * 发送图片
-     * cache为<FALSE>时禁用CQ-HTTP-API插件的缓存
      * @param $file
      * @param bool $cache
+     * @param bool $flash
+     * @param bool $proxy
+     * @param int $timeout
      * @return string
      */
-    public static function image($file, $cache = true) {
-        if ($cache === false)
-            return "[CQ:image,file=" . $file . ",cache=0]";
-        else
-            return "[CQ:image,file=" . $file . "]";
+    public static function image($file, $cache = true, $flash = false, $proxy = true, $timeout = -1) {
+        return
+            "[CQ:image,file=" . $file .
+            (!$cache ? ",cache=0" : "") .
+            ($flash ? ",type=flash" : "") .
+            (!$proxy ? ",proxy=false" : "") .
+            ($timeout != -1 ? (",timeout=" . $timeout) : "") .
+            "]";
     }
 
     /**
      * 发送语音
-     * cache为<FALSE>时禁用CQ-HTTP-API插件的缓存
-     * magic为<TRUE>时标记为变声
      * @param $file
      * @param bool $magic
      * @param bool $cache
+     * @param bool $proxy
+     * @param int $timeout
      * @return string
      */
-    public static function record($file, $magic = false, $cache = true) {
-        if ($cache === false) $c = ",cache=0";
-        else $c = "";
-        if ($magic === true) $m = ",magic=true";
-        else $m = "";
-        return "[CQ:record,file=" . $file . $c . $m . "]";
+    public static function record($file, $magic = false, $cache = true, $proxy = true, $timeout = -1) {
+        return
+            "[CQ:record,file=" . $file .
+            (!$cache ? ",cache=0" : "") .
+            ($magic ? ",magic=1" : "") .
+            (!$proxy ? ",proxy=false" : "") .
+            ($timeout != -1 ? (",timeout=" . $timeout) : "") .
+            "]";
+    }
+
+    /**
+     * 发送短视频
+     * @param $file
+     * @param bool $cache
+     * @param bool $proxy
+     * @param int $timeout
+     * @return string
+     */
+    public static function video($file, $cache = true, $proxy = true, $timeout = -1) {
+        return
+            "[CQ:video,file=" . $file .
+            (!$cache ? ",cache=0" : "") .
+            (!$proxy ? ",proxy=false" : "") .
+            ($timeout != -1 ? (",timeout=" . $timeout) : "") .
+            "]";
     }
 
     /**
@@ -125,6 +114,56 @@ class CQ
     }
 
     /**
+     * 发送新的戳一戳
+     * @param $type
+     * @param $id
+     * @param string $name
+     * @return string
+     */
+    public static function poke($type, $id, $name = "") {
+        return "[CQ:poke,type=$type,id=$id" . ($name != "" ? ",name=$name" : "") . "]";
+    }
+
+    /**
+     * 发送匿名消息
+     * @param int $ignore
+     * @return string
+     */
+    public static function anonymous($ignore = 1) {
+        return "[CQ:anonymous".($ignore != 1 ? ",ignore=0" : "")."]";
+    }
+
+    /**
+     * 发送链接分享（只能在单条回复中单独使用）
+     * @param $url
+     * @param $title
+     * @param null $content
+     * @param null $image
+     * @return string
+     */
+    public static function share($url, $title, $content = null, $image = null) {
+        if ($content === null) $c = "";
+        else $c = ",content=" . $content;
+        if ($image === null) $i = "";
+        else $i = ",image=" . $image;
+        return "[CQ:share,url=" . $url . ",title=" . $title . $c . $i . "]";
+    }
+
+    /**
+     * 发送好友或群推荐名片
+     * @param $type
+     * @param $id
+     * @return string
+     */
+    public static function contact($type, $id) {
+        return "[CQ:contact,type=$type,id=$id]";
+    }
+
+    public static function location($lat, $lon, $title = "", $content = "") {
+
+    }
+
+    /**
      * 发送音乐分享（只能在单条回复中单独使用）
      * qq、163、xiami为内置分享，需要先通过搜索功能获取id后使用
      * custom为自定义分享
@@ -136,10 +175,10 @@ class CQ
      *  $image 为音乐卡片的图片链接地址（可忽略）
      * @param $type
      * @param $id_or_url
-     * @param string $audio
-     * @param string $title
-     * @param string $content
-     * @param string $image
+     * @param null $audio
+     * @param null $title
+     * @param null $content
+     * @param null $image
      * @return string
      */
     public static function music($type, $id_or_url, $audio = null, $title = null, $content = null, $image = null) {
@@ -164,20 +203,12 @@ class CQ
         }
     }
 
-    /**
-     * 发送链接分享（只能在单条回复中单独使用）
-     * @param $url
-     * @param $title
-     * @param null $content
-     * @param null $image
-     * @return string
-     */
-    public static function share($url, $title, $content = null, $image = null) {
-        if ($content === null) $c = "";
-        else $c = ",content=" . $content;
-        if ($image === null) $i = "";
-        else $i = ",image=" . $image;
-        return "[CQ:share,url=" . $url . ",title=" . $title . $c . $i . "]";
+    public static function forward($id) {
+        return "[CQ:forward,id=$id]";
+    }
+
+    public static function node($user_id, $nickname, $content) {
+        return "[CQ:node,user_id=$user_id,nickname=$nickname,content=".self::escape($content)."]";
     }
 
     /**
