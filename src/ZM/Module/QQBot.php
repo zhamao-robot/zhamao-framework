@@ -52,9 +52,7 @@ class QQBot
     public function dispatchBeforeEvents($data) {
         $before = new EventDispatcher(CQBefore::class);
         $before->setRuleFunction(function ($v) use ($data) {
-            if ($v->level < 200) EventDispatcher::interrupt();
-            elseif ($v->cq_event != $data["post_type"]) return false;
-            return true;
+            return $v->cq_event == $data["post_type"];
         });
         $before->setReturnFunction(function ($result) {
             if (!$result) EventDispatcher::interrupt();
@@ -137,8 +135,7 @@ class QQBot
                 //Console::success("当前数据包：".json_encode(ctx()->getData()));
                 $dispatcher = new EventDispatcher(CQMetaEvent::class);
                 $dispatcher->setRuleFunction(function (CQMetaEvent $v) {
-                    return ($v->meta_event_type == '' || ($v->meta_event_type != '' && $v->meta_event_type == ctx()->getData()["meta_event_type"])) &&
-                        ($v->sub_type == '' || ($v->sub_type != '' && $v->sub_type == (ctx()->getData()["sub_type"] ?? '')));
+                    return ($v->meta_event_type == '' || ($v->meta_event_type != '' && $v->meta_event_type == ctx()->getData()["meta_event_type"]));
                 });
                 //eval(BP);
                 $dispatcher->dispatchEvents(ctx()->getData());
