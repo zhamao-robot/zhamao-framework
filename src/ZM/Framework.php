@@ -94,6 +94,7 @@ class Framework
                 "version" => ZM_VERSION,
                 "config" => $args["env"] === null ? 'global.php' : $args["env"]
             ];
+            if(APP_VERSION !== "unknown") $out["app_version"] = APP_VERSION;
             if (isset(ZMConfig::get("global", "swoole")["task_worker_num"])) {
                 $out["task_worker_num"] = ZMConfig::get("global", "swoole")["task_worker_num"];
             }

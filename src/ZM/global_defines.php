@@ -1,10 +1,12 @@
 <?php #plain
 
 use ZM\Config\ZMConfig;
+use ZM\Utils\DataProvider;
 
 define("ZM_START_TIME", microtime(true));
 define("ZM_DATA", ZMConfig::get("global", "zm_data"));
 define("ZM_VERSION", json_decode(file_get_contents(__DIR__ . "/../../composer.json"), true)["version"] ?? "unknown");
+define("APP_VERSION", json_decode(file_get_contents(DataProvider::getWorkingDir() . "/composer.json"), true)["version"] ?? "unknown");
 define("CRASH_DIR", ZMConfig::get("global", "crash_dir"));
 @mkdir(ZM_DATA);
 @mkdir(CRASH_DIR);
