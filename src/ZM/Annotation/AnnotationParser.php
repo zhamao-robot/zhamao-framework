@@ -88,7 +88,7 @@ class AnnotationParser
 
                     //预处理1：将适用于每一个函数的注解到类注解重新注解到每个函数下面
                     if ($vs instanceof ErgodicAnnotation) {
-                        foreach ($this->annotation_map[$v]["methods"] as $method) {
+                        foreach (($this->annotation_map[$v]["methods"] ?? []) as $method) {
                             $copy = clone $vs;
                             $copy->method = $method->getName();
                             $this->annotation_map[$v]["methods_annotations"][$method->getName()][] = $copy;
@@ -107,7 +107,7 @@ class AnnotationParser
                 }
 
                 //预处理3：处理每个函数上面的特殊注解，就是需要操作一些东西的
-                foreach ($this->annotation_map[$v]["methods_annotations"] as $method_name => $methods_annotations) {
+                foreach (($this->annotation_map[$v]["methods_annotations"] ?? []) as $method_name => $methods_annotations) {
                     foreach ($methods_annotations as $method_anno) {
                         /** @var AnnotationBase $method_anno */
                         $method_anno->class = $v;
@@ -135,11 +135,11 @@ class AnnotationParser
     public function generateAnnotationEvents() {
         $o = [];
         foreach ($this->annotation_map as $module => $obj) {
-            foreach ($obj["class_annotations"] as $class_annotation) {
+            foreach (($obj["class_annotations"] ?? []) as $class_annotation) {
                 if ($class_annotation instanceof ErgodicAnnotation) continue;
                 else $o[get_class($class_annotation)][] = $class_annotation;
             }
-            foreach ($obj["methods_annotations"] as $method_name => $methods_annotations) {
+            foreach (($obj["methods_annotations"] ?? []) as $method_name => $methods_annotations) {
                 foreach ($methods_annotations as $annotation) {
                     $o[get_class($annotation)][] = $annotation;
                 }
