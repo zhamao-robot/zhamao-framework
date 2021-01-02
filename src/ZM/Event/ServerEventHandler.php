@@ -359,7 +359,6 @@ class ServerEventHandler
         try {
             $dis1->dispatchEvents($request, $response);
             $dis->dispatchEvents($request, $response);
-            var_dump($dis->status);
             if ($dis->status === EventDispatcher::STATUS_NORMAL && $dis1->status === EventDispatcher::STATUS_NORMAL) {
                 $result = HttpUtil::parseUri($request, $response, $request->server["request_uri"], $node, $params);
                 if ($result === true) {
