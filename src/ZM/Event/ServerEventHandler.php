@@ -233,7 +233,7 @@ class ServerEventHandler
 
                 // 开箱即用的Redis
                 $redis = ZMConfig::get("global", "redis_config");
-                if($redis !== null && $redis["host"] != "") {
+                if ($redis !== null && $redis["host"] != "") {
                     if (!extension_loaded("redis")) Console::error("Can not find redis extension.\n");
                     else ZMRedisPool::init($redis);
                 }
@@ -290,12 +290,12 @@ class ServerEventHandler
      */
     public function onMessage($server, Frame $frame) {
 
-        Console::debug("Calling Swoole \"message\" from fd=" . $frame->fd.": ".TermColor::ITALIC.$frame->data.TermColor::RESET);
+        Console::debug("Calling Swoole \"message\" from fd=" . $frame->fd . ": " . TermColor::ITALIC . $frame->data . TermColor::RESET);
         unset(Context::$context[\Swoole\Coroutine::getCid()]);
         $conn = ManagerGM::get($frame->fd);
         set_coroutine_params(["server" => $server, "frame" => $frame, "connection" => $conn]);
         $dispatcher1 = new EventDispatcher(OnMessageEvent::class);
-        $dispatcher1->setRuleFunction(function($v) {
+        $dispatcher1->setRuleFunction(function ($v) {
             return ctx()->getConnection()->getName() == $v->connect_type && eval("return " . $v->getRule() . ";");
         });
 
@@ -341,8 +341,8 @@ class ServerEventHandler
         set_coroutine_params(["request" => $request, "response" => $response]);
 
         $dis1 = new EventDispatcher(OnRequestEvent::class);
-        $dis1->setRuleFunction(function($v) {
-            return eval("return ".$v->getRule().";") ? true : false;
+        $dis1->setRuleFunction(function ($v) {
+            return eval("return " . $v->getRule() . ";") ? true : false;
         });
 
         $dis = new EventDispatcher(OnSwooleEvent::class);
@@ -391,7 +391,7 @@ class ServerEventHandler
                 else
                     $response->end("Internal server error.");
             }
-            Console::error("Internal server exception (500), caused by " . get_class($e).": ".$e->getMessage());
+            Console::error("Internal server exception (500), caused by " . get_class($e) . ": " . $e->getMessage());
             Console::log($e->getTraceAsString(), "gray");
         } catch (Error $e) {
             $response->status(500);
@@ -405,7 +405,7 @@ class ServerEventHandler
                 else
                     $response->end("Internal server error.");
             }
-            Console::error("Internal server error (500), caused by " . get_class($e).": ".$e->getMessage());
+            Console::error("Internal server error (500), caused by " . get_class($e) . ": " . $e->getMessage());
             Console::log($e->getTraceAsString(), "gray");
         }
     }
@@ -426,8 +426,8 @@ class ServerEventHandler
         $conn->setOption("connect_id", strval($request->header["x-self-id"] ?? ""));
 
         $dispatcher1 = new EventDispatcher(OnOpenEvent::class);
-        $dispatcher1->setRuleFunction(function($v) {
-            return ctx()->getConnection()->getName() == $v->connect_type && eval("return ".$v->getRule().";");
+        $dispatcher1->setRuleFunction(function ($v) {
+            return ctx()->getConnection()->getName() == $v->connect_type && eval("return " . $v->getRule() . ";");
         });
 
         $dispatcher = new EventDispatcher(OnSwooleEvent::class);
@@ -473,7 +473,7 @@ class ServerEventHandler
         set_coroutine_params(["server" => $server, "connection" => $conn, "fd" => $fd]);
 
         $dispatcher1 = new EventDispatcher(OnCloseEvent::class);
-        $dispatcher1->setRuleFunction(function($v){
+        $dispatcher1->setRuleFunction(function ($v) {
             return $v->connect_type == ctx()->getConnection()->getName() && eval("return " . $v->getRule() . ";");
         });
 
@@ -570,14 +570,14 @@ class ServerEventHandler
         //加载各个模块的注解类，以及反射
         Console::debug("检索Module中");
         $parser = new AnnotationParser();
-        $path = DataProvider::getWorkingDir()."/src/";
+        $path = DataProvider::getWorkingDir() . "/src/";
         $dir = scandir($path);
         unset($dir[0], $dir[1]);
-        $composer = json_decode(file_get_contents(__DIR__."/../../../composer.json"), true);
-        foreach($dir as $v) {
-            if(is_dir($path."/".$v) && isset($composer["autoload"]["psr-4"][$v."\\"]) && !in_array($composer["autoload"]["psr-4"][$v."\\"], $composer["extra"]["exclude_annotate"])) {
-                Console::verbose("Add ".$v . " to register path");
-                $parser->addRegisterPath(DataProvider::getWorkingDir()."/src/".$v."/", $v);
+        $composer = json_decode(file_get_contents(DataProvider::getWorkingDir() . "/composer.json"), true);
+        foreach ($dir as $v) {
+            if (is_dir($path . "/" . $v) && isset($composer["autoload"]["psr-4"][$v . "\\"]) && !in_array($composer["autoload"]["psr-4"][$v . "\\"], $composer["extra"]["exclude_annotate"])) {
+                Console::verbose("Add " . $v . " to register path");
+                $parser->addRegisterPath(DataProvider::getWorkingDir() . "/src/" . $v . "/", $v);
             }
         }
         $parser->registerMods();
