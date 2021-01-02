@@ -26,19 +26,19 @@ public function hello() {
 
 获取 Swoole WebSocker Server 对象。此对象是 Swoole 的对象，详情见 [Swoole 文档](https://wiki.swoole.com/#/websocket_server)。
 
-可以使用的事件：`@OnSwooleEvent("message")`，`@OnSwooleEvent("open")`，`@OnSwooleEvent("close")`，`@OnStart()` 以及所有 HTTP API 发来的事件：`@CQCommand()`，`@CQMessage()` 等。
+可以使用的事件：`@OnMessageEvent()`，`@OnOpenEvent()`，`@OnCloseEvent()`，`@OnStart()` 以及所有 HTTP API 发来的事件：`@CQCommand()`，`@CQMessage()` 等。
 
 ## getFrame() - 获取 WS 数据帧
 
 获取 `\Swoole\Websocket\Frame` 对象，此对象是 Swoole 的对象，详情见 [Swoole 文档](https://wiki.swoole.com/#/websocket_server?id=swoolewebsocketframe)。
 
-可以使用的事件：`@OnSwooleEvent("message")` 以及所有 HTTP API 发来的事件：`@CQCommand()`，`@CQMessage()` 等，
+可以使用的事件：`@OnMessageEvent()` 以及所有 HTTP API 发来的事件：`@CQCommand()`，`@CQMessage()` 等，
 
 ## getFd() - 返回 fd 值
 
 获取当前连入 Swoole 服务器的连接文件描述符 ID。返回 int。一般代表连接号，可用来绑定对应链接。
 
-可以使用的事件：所有 **getFrame()** 可以使用的，`@OnSwooleEvent("open")`，`@OnSwooleEvent("close")`
+可以使用的事件：所有 **getFrame()** 可以使用的，`@OnOpenEvent()`，`@OnCloseEvent()`
 
 !!! tip "提示"
 
@@ -92,13 +92,13 @@ public function onMessage() {
 
 返回 `\Swoole\Http\Request` 对象，可在 `@RequestMapping` 中使用，获取 Cookie，请求头，GET 参数什么的。[Swoole 文档](https://wiki.swoole.com/#/http_server?id=httprequest)。
 
-可以使用的事件：`@RequestMapping()`，`@OnSwooleEvent("request")`，`@OnSwooleEvent("open")`。
+可以使用的事件：`@RequestMapping()`，`@OnRequestEvent()`，`@OnOpenEvent()`。
 
 ## getResponse() - HTTP 响应对象
 
 返回 `\Swoole\Http\Response` 对象的增强版，可在 HTTP 请求相关的事件中使用，返回内容和设置 Cookie 什么的。[Swoole 文档](https://wiki.swoole.com/#/http_server?id=httpresponse)。
 
-可以使用的事件：`@RequestMapping()`，`@OnSwooleEvent("request")`。
+可以使用的事件：`@RequestMapping()`，`@OnRequestEvent()`。
 
 下面是使用以上两个功能的组合示例：
 

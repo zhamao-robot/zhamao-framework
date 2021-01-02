@@ -4,7 +4,7 @@
 
 ## Swoole\Http\Request
 
-此类是 Swoole 内部的一个类，一般在收到 HTTP 请求时，在 `@RequestMapping` 或 `@OnSwooleEvent("request")` 两个注解下可用，用作获取 GET、POST参数，上传到后端的文件、Cookies 等。详见 [Swoole 文档 - Request](http://wiki.swoole.com/#/http_server?id=httprequest) 。
+此类是 Swoole 内部的一个类，一般在收到 HTTP 请求时，在 `@RequestMapping` 或 `@OnRequestEvent()` 两个注解下可用，用作获取 GET、POST参数，上传到后端的文件、Cookies 等。详见 [Swoole 文档 - Request](http://wiki.swoole.com/#/http_server?id=httprequest) 。
 
 ### 属性
 

@@ -575,7 +575,7 @@ class ServerEventHandler
         unset($dir[0], $dir[1]);
         $composer = json_decode(file_get_contents(DataProvider::getWorkingDir() . "/composer.json"), true);
         foreach ($dir as $v) {
-            if (is_dir($path . "/" . $v) && isset($composer["autoload"]["psr-4"][$v . "\\"]) && !in_array($composer["autoload"]["psr-4"][$v . "\\"], $composer["extra"]["exclude_annotate"])) {
+            if (is_dir($path . "/" . $v) && isset($composer["autoload"]["psr-4"][$v . "\\"]) && !in_array($composer["autoload"]["psr-4"][$v . "\\"], $composer["extra"]["exclude_annotate"] ?? [])) {
                 Console::verbose("Add " . $v . " to register path");
                 $parser->addRegisterPath(DataProvider::getWorkingDir() . "/src/" . $v . "/", $v);
             }

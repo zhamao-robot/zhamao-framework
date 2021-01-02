@@ -4,7 +4,7 @@
 
 ## OnSwooleEvent()
 
-绑定 Swoole 所相关的事件，例如 WebSocket 接入、收到 WS 消息、关闭 WS 连接，HTTP 请求到达等。
+绑定 Swoole 所相关的事件，例如 WebSocket 接入、收到 WS 消息、关闭 WS 连接，HTTP 请求到达等。这个是旧的统一的 Swoole 事件分发注解。请尽量使用上面几个新的注解。
 
 ### 属性
 
