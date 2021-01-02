@@ -3,8 +3,12 @@
     "description": "High performance QQ robot and web server development framework",
     "minimum-stability": "stable",
     "license": "Apache-2.0",
-    "version": "2.0.3",
-    "extra": [],
+    "version": "2.1.0",
+    "extra": {
+        "exclude_annotate": [
+            "src/ZM"
+        ]
+    },
     "authors": [
         {
             "name": "whale",
@@ -41,7 +45,9 @@
     },
     "autoload": {
         "psr-4": {
-            "ZM\\": "src/ZM"
+            "ZM\\": "src/ZM",
+            "Module\\": "src/Module",
+            "Custom\\": "src/Custom"
         },
         "files": [
             "src/ZM/global_functions.php"

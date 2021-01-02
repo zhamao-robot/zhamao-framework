@@ -22,6 +22,7 @@ class EventManager
 
     public static function addEvent($event_name, ?AnnotationBase $event_obj) {
         self::$events[$event_name][] = $event_obj;
+        (new AnnotationParser())->sortByLevel(self::$events, $event_name);
     }
 
     public static function loadEventByParser(AnnotationParser $parser) {

@@ -35,7 +35,10 @@ class QQBot
                 set_coroutine_params(["data" => $data]);
                 ctx()->setCache("level", 0);
                 //Console::debug("Calling CQ Event from fd=" . ctx()->getConnection()->getFd());
-                $this->dispatchBeforeEvents($data); // >= 200 的level before在这里执行
+                if ($data["post_type"] != "meta_event") {
+                    $r = $this->dispatchBeforeEvents($data); // before在这里执行，元事件不执行before为减少不必要的调试日志
+                    if ($r->store === "block") EventDispatcher::interrupt();
+                }
                 if (CoMessage::resumeByWS()) {
                     EventDispatcher::interrupt();
                 }
@@ -49,17 +52,27 @@ class QQBot
         }
     }
 
+    /**
+     * @param $data
+     * @return EventDispatcher
+     * @throws InterruptException
+     */
     public function dispatchBeforeEvents($data) {
         $before = new EventDispatcher(CQBefore::class);
         $before->setRuleFunction(function ($v) use ($data) {
             return $v->cq_event == $data["post_type"];
         });
         $before->setReturnFunction(function ($result) {
-            if (!$result) EventDispatcher::interrupt();
+            if (!$result) EventDispatcher::interrupt("block");
         });
         $before->dispatchEvents($data);
+        return $before;
     }
 
+    /**
+     * @param $data
+     * @throws InterruptException
+     */
     private function dispatchEvents($data) {
         //Console::warning("最xia数据包：".json_encode($data));
         switch ($data["post_type"]) {
@@ -73,16 +86,15 @@ class QQBot
                         $word[$k] = trim($word[$k]);
                     }
                 }
-
                 //分发CQCommand事件
                 $dispatcher = new EventDispatcher(CQCommand::class);
                 $dispatcher->setRuleFunction(function (CQCommand $v) use ($word) {
-                    if(array_diff([$v->match, $v->pattern, $v->regex, $v->keyword, $v->end_with, $v->start_with], [""]) == []) return false;
+                    if (array_diff([$v->match, $v->pattern, $v->regex, $v->keyword, $v->end_with, $v->start_with], [""]) == []) return false;
                     elseif (($v->user_id == 0 || ($v->user_id != 0 && $v->user_id == ctx()->getUserId())) &&
                         ($v->group_id == 0 || ($v->group_id != 0 && $v->group_id == (ctx()->getGroupId() ?? 0))) &&
                         ($v->message_type == '' || ($v->message_type != '' && $v->message_type == ctx()->getMessageType()))
                     ) {
-                        if(($word[0] != "" && $v->match == $word[0]) || in_array($word[0], $v->alias)) {
+                        if (($word[0] != "" && $v->match == $word[0]) || in_array($word[0], $v->alias)) {
                             array_shift($word);
                             ctx()->setCache("match", $word);
                             return true;
@@ -95,14 +107,14 @@ class QQBot
                         } elseif ($v->keyword != "" && mb_strpos(ctx()->getMessage(), $v->keyword) !== false) {
                             ctx()->setCache("match", explode($v->keyword, ctx()->getMessage()));
                             return true;
-                        }elseif ($v->pattern != "") {
+                        } elseif ($v->pattern != "") {
                             $match = matchArgs($v->pattern, ctx()->getMessage());
-                            if($match !== false) {
+                            if ($match !== false) {
                                 ctx()->setCache("match", $match);
                                 return true;
                             }
                         } elseif ($v->regex != "") {
-                            if(preg_match("/" . $v->regex . "/u", ctx()->getMessage(), $word2) != 0) {
+                            if (preg_match("/" . $v->regex . "/u", ctx()->getMessage(), $word2) != 0) {
                                 ctx()->setCache("match", $word2);
                                 return true;
                             }
@@ -112,10 +124,10 @@ class QQBot
                 });
                 $dispatcher->setReturnFunction(function ($result) {
                     if (is_string($result)) ctx()->reply($result);
-                    EventDispatcher::interrupt();
+                    if (ctx()->getCache("has_reply") === true) EventDispatcher::interrupt();
                 });
-                $r = $dispatcher->dispatchEvents();
-                if ($r === null) EventDispatcher::interrupt();
+                $dispatcher->dispatchEvents();
+                if ($dispatcher->status == EventDispatcher::STATUS_INTERRUPTED) EventDispatcher::interrupt();
 
                 //分发CQMessage事件
                 $msg_dispatcher = new EventDispatcher(CQMessage::class);

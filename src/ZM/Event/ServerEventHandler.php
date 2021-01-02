@@ -9,6 +9,7 @@ use Error;
 use Exception;
 use PDO;
 use ReflectionException;
+use Swoole\Coroutine;
 use Swoole\Database\PDOConfig;
 use Swoole\Database\PDOPool;
 use Swoole\Event;
@@ -16,6 +17,10 @@ use Swoole\Process;
 use Swoole\Timer;
 use ZM\Annotation\AnnotationParser;
 use ZM\Annotation\Http\RequestMapping;
+use ZM\Annotation\Swoole\OnCloseEvent;
+use ZM\Annotation\Swoole\OnMessageEvent;
+use ZM\Annotation\Swoole\OnOpenEvent;
+use ZM\Annotation\Swoole\OnRequestEvent;
 use ZM\Annotation\Swoole\OnStart;
 use ZM\Annotation\Swoole\OnSwooleEvent;
 use ZM\Config\ZMConfig;
@@ -70,6 +75,40 @@ class ServerEventHandler
                 /** @noinspection PhpUndefinedFieldInspection */ Event::del(Framework::$server->inotify);
             ZMUtil::stop();
         });
+        set_error_handler(function ($error_no, $error_msg, $error_file, $error_line) {
+            switch ($error_no) {
+                case E_WARNING:
+                    $level_tips = 'PHP Warning: ';
+                    break;
+                case E_NOTICE:
+                    $level_tips = 'PHP Notice: ';
+                    break;
+                case E_DEPRECATED:
+                    $level_tips = 'PHP Deprecated: ';
+                    break;
+                case E_USER_ERROR:
+                    $level_tips = 'User Error: ';
+                    break;
+                case E_USER_WARNING:
+                    $level_tips = 'User Warning: ';
+                    break;
+                case E_USER_NOTICE:
+                    $level_tips = 'User Notice: ';
+                    break;
+                case E_USER_DEPRECATED:
+                    $level_tips = 'User Deprecated: ';
+                    break;
+                case E_STRICT:
+                    $level_tips = 'PHP Strict: ';
+                    break;
+                default:
+                    $level_tips = 'Unkonw Type Error: ';
+                    break;
+            }      // do some handle
+            $error = $level_tips . $error_msg . ' in ' . $error_file . ' on ' . $error_line;
+            Console::warning($error);      // 如果 return false 则错误会继续递交给 PHP 标准错误处理     /
+            return true;
+        }, E_ALL | E_STRICT);
         if (Framework::$argv["watch"]) {
             if (extension_loaded('inotify')) {
                 Console::warning("Enabled File watcher, do not use in production.");
@@ -114,7 +153,7 @@ class ServerEventHandler
             Console::debug("正在关闭 " . ($server->taskworker ? "Task" : "") . "Worker 进程 " . Console::setColor("#" . \server()->worker_id, "gold") . TermColor::frontColor256(59) . ", pid=" . posix_getpid());
             server()->stop($worker_id);
         });
-        unset(Context::$context[Co::getCid()]);
+        unset(Context::$context[Coroutine::getCid()]);
         if ($server->taskworker === false) {
             try {
                 register_shutdown_function(function () use ($server) {
@@ -211,7 +250,8 @@ class ServerEventHandler
                     return server()->worker_id === $v->worker_id || $v->worker_id === -1;
                 });
                 $dispatcher->dispatchEvents($server, $worker_id);
-                Console::debug("@OnStart 执行完毕");
+                if ($dispatcher->status === EventDispatcher::STATUS_NORMAL) Console::debug("@OnStart 执行完毕");
+                else Console::warning("@OnStart 执行异常！");
             } catch (Exception $e) {
                 Console::error("Worker加载出错！停止服务！");
                 Console::error($e->getMessage() . "\n" . $e->getTraceAsString());
@@ -251,9 +291,15 @@ class ServerEventHandler
     public function onMessage($server, Frame $frame) {
 
         Console::debug("Calling Swoole \"message\" from fd=" . $frame->fd.": ".TermColor::ITALIC.$frame->data.TermColor::RESET);
-        unset(Context::$context[Co::getCid()]);
+        unset(Context::$context[\Swoole\Coroutine::getCid()]);
         $conn = ManagerGM::get($frame->fd);
         set_coroutine_params(["server" => $server, "frame" => $frame, "connection" => $conn]);
+        $dispatcher1 = new EventDispatcher(OnMessageEvent::class);
+        $dispatcher1->setRuleFunction(function($v) {
+            return ctx()->getConnection()->getName() == $v->connect_type && eval("return " . $v->getRule() . ";");
+        });
+
+
         $dispatcher = new EventDispatcher(OnSwooleEvent::class);
         $dispatcher->setRuleFunction(function ($v) {
             if ($v->getRule() == '') {
@@ -268,6 +314,7 @@ class ServerEventHandler
         });
         try {
             //$starttime = microtime(true);
+            $dispatcher1->dispatchEvents($conn);
             $dispatcher->dispatchEvents($conn);
             //Console::success("Used ".round((microtime(true) - $starttime) * 1000, 3)." ms!");
         } catch (Exception $e) {
@@ -293,6 +340,11 @@ class ServerEventHandler
         Console::debug("Calling Swoole \"request\" event from fd=" . $request->fd);
         set_coroutine_params(["request" => $request, "response" => $response]);
 
+        $dis1 = new EventDispatcher(OnRequestEvent::class);
+        $dis1->setRuleFunction(function($v) {
+            return eval("return ".$v->getRule().";") ? true : false;
+        });
+
         $dis = new EventDispatcher(OnSwooleEvent::class);
         $dis->setRuleFunction(function ($v) {
             if ($v->getRule() == '') {
@@ -305,8 +357,10 @@ class ServerEventHandler
         });
 
         try {
-            $no_interrupt = $dis->dispatchEvents($request, $response);
-            if ($no_interrupt !== null) {
+            $dis1->dispatchEvents($request, $response);
+            $dis->dispatchEvents($request, $response);
+            var_dump($dis->status);
+            if ($dis->status === EventDispatcher::STATUS_NORMAL && $dis1->status === EventDispatcher::STATUS_NORMAL) {
                 $result = HttpUtil::parseUri($request, $response, $request->server["request_uri"], $node, $params);
                 if ($result === true) {
                     ctx()->setCache("params", $params);
@@ -318,8 +372,8 @@ class ServerEventHandler
                     $div->request_method = $node["request_method"];
                     $div->class = $node["class"];
                     //Console::success("正在执行路由：".$node["method"]);
-                    $r = $dispatcher->dispatchEvent($div, null, $params, $request, $response);
-                    if (is_string($r) && !$response->isEnd()) $response->end($r);
+                    $dispatcher->dispatchEvent($div, null, $params, $request, $response);
+                    if (is_string($dispatcher->store) && !$response->isEnd()) $response->end($dispatcher->store);
                 }
             }
             if (!$response->isEnd()) {
@@ -371,6 +425,11 @@ class ServerEventHandler
         set_coroutine_params(["server" => $server, "request" => $request, "connection" => $conn, "fd" => $request->fd]);
         $conn->setOption("connect_id", strval($request->header["x-self-id"] ?? ""));
 
+        $dispatcher1 = new EventDispatcher(OnOpenEvent::class);
+        $dispatcher1->setRuleFunction(function($v) {
+            return ctx()->getConnection()->getName() == $v->connect_type && eval("return ".$v->getRule().";");
+        });
+
         $dispatcher = new EventDispatcher(OnSwooleEvent::class);
         $dispatcher->setRuleFunction(function ($v) {
             if ($v->getRule() == '') {
@@ -387,6 +446,7 @@ class ServerEventHandler
                     LightCacheInside::set("connect", "conn_fd", $request->fd);
                 }
             }
+            $dispatcher1->dispatchEvents($conn);
             $dispatcher->dispatchEvents($conn);
         } catch (Exception $e) {
             $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
@@ -412,6 +472,10 @@ class ServerEventHandler
         Console::debug("Calling Swoole \"close\" event from fd=" . $fd);
         set_coroutine_params(["server" => $server, "connection" => $conn, "fd" => $fd]);
 
+        $dispatcher1 = new EventDispatcher(OnCloseEvent::class);
+        $dispatcher1->setRuleFunction(function($v){
+            return $v->connect_type == ctx()->getConnection()->getName() && eval("return " . $v->getRule() . ";");
+        });
 
         $dispatcher = new EventDispatcher(OnSwooleEvent::class);
         $dispatcher->setRuleFunction(function ($v) {
@@ -429,6 +493,7 @@ class ServerEventHandler
                     LightCacheInside::set("connect", "conn_fd", -1);
                 }
             }
+            $dispatcher1->dispatchEvents($conn);
             $dispatcher->dispatchEvents($conn);
         } catch (Exception $e) {
             $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
@@ -505,7 +570,16 @@ class ServerEventHandler
         //加载各个模块的注解类，以及反射
         Console::debug("检索Module中");
         $parser = new AnnotationParser();
-        $parser->addRegisterPath(DataProvider::getWorkingDir() . "/src/Module/", "Module");
+        $path = DataProvider::getWorkingDir()."/src/";
+        $dir = scandir($path);
+        unset($dir[0], $dir[1]);
+        $composer = json_decode(file_get_contents(__DIR__."/../../../composer.json"), true);
+        foreach($dir as $v) {
+            if(is_dir($path."/".$v) && isset($composer["autoload"]["psr-4"][$v."\\"]) && !in_array($composer["autoload"]["psr-4"][$v."\\"], $composer["extra"]["exclude_annotate"])) {
+                Console::verbose("Add ".$v . " to register path");
+                $parser->addRegisterPath(DataProvider::getWorkingDir()."/src/".$v."/", $v);
+            }
+        }
         $parser->registerMods();
         EventManager::loadEventByParser($parser); //加载事件
 
@@ -518,14 +592,14 @@ class ServerEventHandler
 
         //加载插件
         $plugins = ZMConfig::get("global", "modules") ?? [];
-        if (!isset($plugins["onebot"])) $plugins["onebot"] = ["status" => true, "single_bot_mode" => false];
+        if (!isset($plugins["onebot"])) $plugins["onebot"] = ["status" => true, "single_bot_mode" => false, "message_level" => 99999];
 
         if ($plugins["onebot"]) {
             $obj = new OnSwooleEvent();
             $obj->class = QQBot::class;
             $obj->method = 'handle';
             $obj->type = 'message';
-            $obj->level = 99999;
+            $obj->level = $plugins["onebot"]["message_level"] ?? 99999;
             $obj->rule = 'connectIsQQ()';
             EventManager::addEvent(OnSwooleEvent::class, $obj);
             if ($plugins["onebot"]["single_bot_mode"]) {
@@ -536,7 +610,6 @@ class ServerEventHandler
         }
 
         //TODO: 编写加载外部插件的方式
-        $this->loadExternalModules($plugins);
     }
 
     private function addWatcher($maindir, $fd) {
@@ -548,13 +621,6 @@ class ServerEventHandler
                 inotify_add_watch($fd, $maindir . "/" . $subdir, IN_ATTRIB | IN_ISDIR);
                 $this->addWatcher($maindir . "/" . $subdir, $fd);
             }
-        }
-    }
-
-    private function loadExternalModules($plugins) {
-        foreach ($plugins as $k => $v) {
-            if ($k == "onebot") continue;
-
         }
     }
 }

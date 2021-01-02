@@ -1,4 +1,4 @@
-<?php
+<?php #plain
 
 use ZM\Config\ZMConfig;
 

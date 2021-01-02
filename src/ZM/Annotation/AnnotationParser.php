@@ -33,7 +33,7 @@ class AnnotationParser
      */
     public function __construct() {
         $this->start_time = microtime(true);
-        $this->loadAnnotationClasses();
+        //$this->loadAnnotationClasses();
         $this->req_mapping[0] = [
             'id' => 0,
             'pid' => -1,
@@ -100,7 +100,7 @@ class AnnotationParser
                         unset($this->annotation_map[$v]);
                         continue 2;
                     } elseif ($vs instanceof MiddlewareClass) {
-                        Console::verbose("正在注册中间件 " . $reflection_class->getName());
+                        Console::debug("正在注册中间件 " . $reflection_class->getName());
                         $rs = $this->registerMiddleware($vs, $reflection_class);
                         $this->middlewares[$rs["name"]] = $rs;
                     }
@@ -297,7 +297,7 @@ class AnnotationParser
         return $result;
     }
 
-    private function sortByLevel(&$events, string $class_name, $prefix = "") {
+    public function sortByLevel(&$events, string $class_name, $prefix = "") {
         if (is_a($class_name, Level::class, true)) {
             $class_name .= $prefix;
             usort($events[$class_name], function ($a, $b) {

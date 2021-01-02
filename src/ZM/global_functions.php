@@ -1,4 +1,4 @@
-<?php
+<?php #plain
 
 use Swoole\Coroutine;
 use ZM\API\ZMRobot;
@@ -88,6 +88,7 @@ function getAllClasses($dir, $indoor_name) {
         //echo "At " . $indoor_name . PHP_EOL;
         if (is_dir($dir . $v)) $classes = array_merge($classes, getAllClasses($dir . $v . "/", $indoor_name . "\\" . $v));
         elseif (mb_substr($v, -4) == ".php") {
+            if(substr(file_get_contents($dir.$v), 6, 6) == "#plain") continue;
             $class_name = $indoor_name . "\\" . mb_substr($v, 0, -4);
             $classes [] = $class_name;
         }

@@ -5,31 +5,20 @@ namespace ZM\Annotation\Swoole;
 
 use Doctrine\Common\Annotations\Annotation\Required;
 use Doctrine\Common\Annotations\Annotation\Target;
-use ZM\Annotation\AnnotationBase;
-use ZM\Annotation\Interfaces\Level;
-use ZM\Annotation\Interfaces\Rule;
 
 /**
  * Class OnSwooleEvent
  * @Annotation
- * @Target("ALL")
+ * @Target("METHOD")
  * @package ZM\Annotation\Swoole
  */
-class OnSwooleEvent extends AnnotationBase implements Rule, Level
+class OnSwooleEvent extends OnSwooleEventBase
 {
     /**
      * @var string
      * @Required
      */
     public $type;
-
-    /** @var string */
-    public $rule = "";
-
-    /** @var int */
-    public $level = 20;
-
-    public $callback = null;
 
     /**
      * @return string
@@ -44,33 +33,4 @@ class OnSwooleEvent extends AnnotationBase implements Rule, Level
     public function setType(string $type) {
         $this->type = $type;
     }
-
-    /**
-     * @return string
-     */
-    public function getRule(): string {
-        return $this->rule;
-    }
-
-    /**
-     * @param string $rule
-     */
-    public function setRule(string $rule) {
-        $this->rule = $rule;
-    }
-
-    /**
-     * @return int
-     */
-    public function getLevel(): int {
-        return $this->level;
-    }
-
-    /**
-     * @param int $level
-     */
-    public function setLevel(int $level) {
-        $this->level = $level;
-    }
-
 }
