@@ -162,8 +162,12 @@ class Response
      * @return mixed
      */
     public function end($content = null) {
-        $this->is_end = true;
-        return $this->response->end($content);
+        if(!$this->is_end) {
+            $this->is_end = true;
+            return $this->response->end($content);
+        } else {
+            return false;
+        }
     }
 
     public function isEnd() { return $this->is_end; }
