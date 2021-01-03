@@ -35,6 +35,7 @@ use ZM\Context\Context;
 use ZM\Context\ContextInterface;
 use ZM\DB\DB;
 use ZM\Exception\DbException;
+use ZM\Exception\InterruptException;
 use ZM\Framework;
 use ZM\Http\Response;
 use ZM\Module\QQBot;
@@ -345,6 +346,8 @@ class ServerEventHandler
                 //Console::warning('返回了404');
                 HttpUtil::responseCodePage($response, 404);
             }
+        } catch (InterruptException $e) {
+            // do nothing
         } catch (Exception $e) {
             $response->status(500);
             Console::info($request->server["remote_addr"] . ":" . $request->server["remote_port"] .
