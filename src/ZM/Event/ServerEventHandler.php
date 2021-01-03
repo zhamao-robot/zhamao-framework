@@ -75,40 +75,6 @@ class ServerEventHandler
                 /** @noinspection PhpUndefinedFieldInspection */ Event::del(Framework::$server->inotify);
             ZMUtil::stop();
         });
-        set_error_handler(function ($error_no, $error_msg, $error_file, $error_line) {
-            switch ($error_no) {
-                case E_WARNING:
-                    $level_tips = 'PHP Warning: ';
-                    break;
-                case E_NOTICE:
-                    $level_tips = 'PHP Notice: ';
-                    break;
-                case E_DEPRECATED:
-                    $level_tips = 'PHP Deprecated: ';
-                    break;
-                case E_USER_ERROR:
-                    $level_tips = 'User Error: ';
-                    break;
-                case E_USER_WARNING:
-                    $level_tips = 'User Warning: ';
-                    break;
-                case E_USER_NOTICE:
-                    $level_tips = 'User Notice: ';
-                    break;
-                case E_USER_DEPRECATED:
-                    $level_tips = 'User Deprecated: ';
-                    break;
-                case E_STRICT:
-                    $level_tips = 'PHP Strict: ';
-                    break;
-                default:
-                    $level_tips = 'Unkonw Type Error: ';
-                    break;
-            }      // do some handle
-            $error = $level_tips . $error_msg . ' in ' . $error_file . ' on ' . $error_line;
-            Console::warning($error);      // 如果 return false 则错误会继续递交给 PHP 标准错误处理     /
-            return true;
-        }, E_ALL | E_STRICT);
         if (Framework::$argv["watch"]) {
             if (extension_loaded('inotify')) {
                 Console::warning("Enabled File watcher, do not use in production.");
