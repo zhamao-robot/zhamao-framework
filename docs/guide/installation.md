@@ -61,12 +61,12 @@ pecl install swoole
 如果你是通过**主机安装 PHP 部署的环境**，下方是通过脚手架来构建项目的命令行。
 
 ```bash
-git clone https://github.com/zhamao-robot/zhamao-framework-starter.git
-cd zhamao-framework-starter/
-composer update
+composer create-project zhamao/framework-starter zhamao-app
+cd zhamao-app/ # 这个是你可以自己定义的名称
+vendor/bin/start server # 启动框架
 ```
 
-如果是通过 **Docker 部署的环境**，则需要在先克隆脚手架后在文件夹内使用 Docker 命令下的 `composer update`。
+如果是通过 **Docker 部署的环境**，则需要在先克隆脚手架后在文件夹内使用 Docker 命令下的 `composer update`。（如果主机环境有 composer 也可以使用 `composer create-project` 的方式拉取脚手架。）
 
 ```bash
 git clone https://github.com/zhamao-robot/zhamao-framework-starter.git
