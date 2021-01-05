@@ -75,6 +75,12 @@ nav:
       - 机器人 API: component/robot-api.md
       - CQ 码（多媒体消息）: component/cqcode.md
       - 上下文: component/context.md
+      - 存储:
+          - LightCache 轻量缓存: component/light-cache.md
+          - MySQL 数据库: component/mysql.md
+          - Redis 数据库: component/redis.md
+          - ZMAtomic 原子计数器: component/atomics.md
+          - SpinLock 自旋锁: component/spin-lock.md
   - 进阶开发:
       - 进阶开发: advanced/index.md
       - 从 v1 升级: advanced/to-v2.md

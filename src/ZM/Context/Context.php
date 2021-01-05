@@ -242,6 +242,14 @@ class Context implements ContextInterface
      */
     public function getFullArg($prompt_msg = "") { return $this->getArgs(ZM_MATCH_ALL, $prompt_msg); }
 
+    /**
+     * @param string $prompt_msg
+     * @return int|mixed|string
+     * @throws InvalidArgumentException
+     * @throws WaitTimeoutException
+     */
+    public function getNumArg($prompt_msg = "") { return $this->getArgs(ZM_MATCH_NUMBER, $prompt_msg); }
+
     public function cloneFromParent() {
         set_coroutine_params(self::$context[Co::getPcid()] ?? self::$context[$this->cid]);
         return context();

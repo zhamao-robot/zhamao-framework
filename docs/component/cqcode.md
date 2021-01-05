@@ -76,6 +76,41 @@ class Hello {
 [ https://zhamao.xin/file/hello.jpg
 </chat-box>
 
+## CQ 码操作
+
+### CQ::decode()
+
+CQ 码字符反转义。
+
+| 反转义前 | 反转义后 |
+| -------- | -------- |
+| `&amp;`  | `&`      |
+| `&#91;`  | `[`      |
+| `&#93;`  | `]`      |
+
+```php
+$str = CQ::decode("&#91;我只是一条普通的文本&#93;");
+// 转换为 "[我只是一条普通的文本]"
+```
+
+### CQ::encode()
+
+转义 CQ 码的敏感符号，防止 酷Q 把不该解析为 CQ 码的消息内容当作 CQ 码处理。
+
+```php
+$str = CQ::encode("[CQ:我只是一条普通的文本]");
+// $str: "&#91;CQ:我只是一条普通的文本&#93;"
+```
+
+### CQ::removeCQ()
+
+去除字符串中所有的 CQ 码。
+
+```php
+$str = CQ::removeCQ("[CQ:at,qq=all]这是带表情的全体消息[CQ:face,id=8]");
+// $str: "这是带表情的全体消息"
+```
+
 ## CQ 码列表
 
 ### CQ::face() - 发送 QQ 表情

@@ -254,7 +254,7 @@ if($r["retcode"] == 0) Console::success("消息发送成功！");
 
 参数同 `reply()`。
 
-## waitMessage()
+## waitMessage() - 等待用户消息
 
 - 参数：`waitMessage($prompt = "", $timeout = 600, $timeout_prompt = "")`
 - 用途：等待用户输入消息
@@ -286,14 +286,139 @@ function yourName(){
 ( 你都10分钟不理我了，嘤嘤嘤
 </chat-box>
 
-## getArgs()
+## getArgs() - 自动获取参数
 
-TODO：还没写到这里，下次更新，今晚太困了。
+为 `waitMessage()` 的封装，目的是让机器人的回复更加智能化。最好的例子就是在框架自带的默认示例中“随机数”的例子，我们假设要写一个随机数功能，但是用户从来都是不思考就使用机器人的。抛开人工智能，我们能做的就是“专家系统”，同时让我们写的代码尽可能适配用户所说的每一句话：
+
+- 随机数 1 100
+- 随机数（一般不知道怎么用这个功能的人都会只说一个关键词）
+- 从2到9的随机数
+
+所以，在匹配第一和第二种情况时候，我们不需要重复写代码，而第一种的话用户已经将参数给你的时候，你不需要再次使用 `waitMessage()` 方式进行等待询问，只需要取到使用就好了。`getArgs()` 就是做这个的。
+
+定义：`getArgs($mode, $prompt_msg)`
+
+`$mode`：获取模式，有三种：
+
+- `ZM_MATCH_ALL`：效果等同于 `getFullArg()`，获取全部的内容，把空格也当作一部分
+- `ZM_MATCH_NUMBER`：效果等同于 `getNumArg()`，获取下一个数字参数
+- `ZM_MATCH_FIRST`：效果等同于 `getNextArg()`，获取下一个参数
+
+`$prompt_msg`：字符串，指定如果参数缺失时询问用户的内容。
+
+```php
+/**
+ * @CQCommand("test")
+ */
+public function argTest1() {
+    $s = ctx()->getArgs(ZM_MATCH_FIRST, "请输入你要传入的参数内容");
+    return "参数内容：".$s;
+}
+```
+
+<chat-box>
+) test
+( 请输入你要传入的参数内容
+) test2
+( 参数内容：test2
+</chat-box>
+
+`getArgs()` 也有三层封装，在使用过程中避免麻烦的话，推荐使用下面这几种 `get*Arg()` 方式。
+
+## getFullArg() 
+
+获取关键词后的整个字符串参数，包括空格，如果不存在则询问。
+
+典型例子：`复读机 你好 你好`，获取参数时会将 `你好 你好` 当作一个参数来获取。
+
+```php
+/**
+ * @CQCommand("test")
+ */
+public function argTest1() {
+    $s = ctx()->getFullArg("请输入你要传入的参数内容");
+    return "参数内容：".$s;
+}
+```
+
+<chat-box>
+) test abc def argtest
+( 参数内容：abc def argtest
+) test
+( 请输入你要传入的参数内容
+) abc def
+( 参数内容：abc def
+</chat-box>
+
+## getNextArg()
+
+获取下一个参数，分隔符可以是空格，tab。
+
+```php
+/**
+ * @CQCommand("test")
+ */
+public function argTest1() {
+    $s = ctx()->getNextArg("请输入你要传入的参数内容");
+    return "参数内容：".$s;
+}
+```
+
+<chat-box>
+) test abc def argtest
+( 参数内容：abc
+) test
+( 请输入你要传入的参数内容
+) abc
+( 参数内容：abc
+</chat-box>
+
+## getNumArg()
+
+> 2.1.5 版本起可用。
+
+获取下一个数字型参数，如果 `is_numeric()` 为 true 则获取成功，如果没有符合的则询问用户。
+
+```php
+/**
+ * @CQCommand("test")
+ */
+public function argTest1() {
+    $s = ctx()->getNextArg("请输入你要传入的数字内容");
+    return "数字参数内容：".$s;
+}
+```
+
+<chat-box>
+) test abc 334 argtest
+( 数字参数内容：334
+) test abc
+( 请输入你要传入的数字内容
+) 998
+( 参数内容：998
+</chat-box>
 
 ## copy()
 
-t
+获取整个上下文的所有内容的数组形式。
+
+```php
+$arr = ctx()->copy();
+dump($arr);
+```
 
 ## getOption() - 获取匹配参数内容
 
+```php
+/**
+ * @CQCommand("test")
+ */
+public function argTest1() {
+    return "参数内容：".implode(", ", ctx()->getOption());
+}
+```
 
+<chat-box>
+) test abc 334 argtest
+( 参数内容：abc, 334, argtest
+</chat-box>

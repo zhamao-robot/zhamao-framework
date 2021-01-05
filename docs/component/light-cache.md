@@ -1,0 +1,226 @@
+# LightCache 轻量缓存
+
+在炸毛框架 1.x 时代，框架里有非常方便使用的 ZMBuf 缓存，但是由于 2.x 版本框架加入了多进程模式，所以不能再以传统的存到全局变量的方式来构建和管理缓存了，LightCache 就是替代方案。LightCache 依旧是 key-value 键值对形式的存储，支持多种类型的变量。
+
+定义：`ZM\Store\LightCache`。
+
+## 与 ZMBuf 的不同
+
+从存储内容角度，LightCache 存入的是 Swoole 初始化的共享内存，基于 Swoole/Table 编写。优势在于多进程下的性能极佳，而且没有数据同步问题；劣势在于它需要在启动框架前就声明总大小，不能根据存储数据的大小来划定，需提前指定最大能存储的容量。而 ZMBuf 基于直接把变量存到静态成员中 `public static $data` 类似这样，且 1.x 框架基于单进程单线程，无任何数据同步的问题。
+
+总之来说，LightCache 是让用户在涉及多进程编程时，一个折中的解决方案，提出和解决了很多多进程开发时存储数据遇到的问题：数据同步、进程间通信效率、数据是否需要上锁等。
+
+- 数据同步：多进程下因为是固定的内存大小区域，所以每个进程读取和写入都是只有一份数据的，不存在数据不同步的问题。
+- 进程间通信：因为多个进程共享一片区域的内存，所以不需要进程间通信，无协程切换。
+- 镀锡是否需要上锁：看情况。一般情况下 Swoole/Table 模块自带一个行锁，只有两个进程在两个 CPU 上同时读取一行数据时才会发生抢锁，作为框架的使用者，如果只写或只读，是无需手动上任何锁的。只有在先 `get()` 再 `set()` 这样的情况才需要上自旋锁。后面的段会详细讲述。
+
+使用体验上，基本和 ZMBuf 无差，如果没有用过 1.x 的版本，可无视此段话。
+
+## 使用
+
+### 配置和初始化
+
+配置文件还是在 `config/global.php` 文件里，字段是 `light_cache`。
+
+```php
+/** 轻量字符串缓存，默认开启 */
+$config['light_cache'] = [
+    'size' => 1024,                     //最多允许储存的条数（需要2的倍数）
+    'max_strlen' => 16384,               //单行字符串最大长度（需要2的倍数）
+    'hash_conflict_proportion' => 0.6,   //Hash冲突率（越大越好，但是需要的内存更多）
+    'persistence_path' => $config['zm_data'].'_cache.json',
+    'auto_save_interval' => 900
+];
+```
+
+其中 `$size` 是最多保存的键值对数目，填写非 2 的倍数时底层会自动修正为 2 的倍数值。
+
+`$max_strlen` 为单条值最长保存的长度。因为 Swoole/Table 只能存数字、字符串，所以在存取数组等变量时会先将其序列化为字符串形式保存，get 时自动反序列化回来。在存数组等非字符串变量时，请先自行计算你要存取的内容序列化后的最大长度。如果长度超出最大长度，则无法保存，`set()` 将返回 false。
+
+`hash_conflict_proportion`：Table 模块底层使用 hash 表，会存在 hash 冲突，调大 Hash 冲突率会提升 `size` 指定条目数的准确性，但也将增加物理内存的使用。这里单位是百分比，`0.6` 为 `60%`。
+
+`persistence_path` 是持久化保存变量的文件保存位置，默认在 `zm_data/_cache.json` 文件。
+
+`auto_save_interval` 是持久化保存变量的自动保存时间，单位秒。
+
+### LightCache::set()
+
+设置内容。
+
+定义：`LightCache::set($key, $value, $expire = -1)`
+
+返回值：`bool`。当 value 超出了最大长度或内存不足时，返回 false，其余 true。
+
+参数：
+
+`$key` 的长度不能超过 64 字节，且不能存入二进制内容。
+
+`$value` 可存入 `bool`、`string`、`int`、`array` 等可被 `json_encode()` 的变量，闭包函数和对象不可存入。
+
+`$expire` 是 `int`，超时时间（秒）。如果设定了大于 0 的值，则表明是在 `$expire` 秒后自动删除。如果为 -1 则什么都不做，如果框架使用了 `stop` 或 Ctrl+C 或意外退出时数据会丢失。如果为 -2，则会将此数据持久化保存，保存在上方配置文件指定的 json 文件中，待关闭后再次启动框架会自动加载回来，不会丢失。
+
+```php
+// use ZM\Store\LightCache;
+/**
+ * @CQCommand("store")
+ */
+public function store() {
+    LightCache::set("key1", ["value1" => "strOrInt", "value2" => 123]);
+    return "OK!";
+}
+/**
+ * @CQCommand("storeAfterRemove")
+ */
+public function storeAfterRemove() {
+    LightCache::set("store1", "remove1", 30);
+    ctx()->reply(LightCache::get("store1") !== null ? "内容存在！" : "内容不存在！");
+    zm_sleep(30);
+    ctx()->reply(LightCache::get("store1") !== null ? "内容存在！" : "内容不存在！");
+}
+```
+
+<chat-box>
+) store
+( OK！
+) storeAfterRemove
+( 内容存在！
+^ 等待 30 秒
+( 内容不存在！
+</chat-box>
+
+### LightCache::get()
+
+获取内容。
+
+返回值：`mixed|null`。当无内容或过期时返回 null，剩余情况返回原数据。
+
+### LightCache::getExpire()
+
+获取存储项剩余过期时间（秒）。
+
+定义：`LightCache::getExpire(string $key)`
+
+```php
+$s = LightCache::set("test", "hello", 20);
+zm_sleep(10);
+dump(LightCache::getExpire("test")); // 返回 10
+```
+
+### LightCache::getMemoryUsage()
+
+获取轻量缓存使用的总空间大小（字节）
+
+```php
+LightCache::getMemoryUsage());
+```
+
+轻量缓存的内存手工计算方式：(Table 结构体长度` + `KEY 长度 64 字节 + `$size`) * (1 + `$conflict_proportion`) * 列尺寸。
+
+Table 结构体长度根据你所设定的 `max_strlen` 会变化。
+
+> 框架默认配置下的轻量缓存启动后大约占用内存 25MB 左右。
+
+### LightCache::isset()
+
+判断某项是否存在。
+
+```php
+LightCache::set("foo", "bar");
+dump(LightCache::isset("foo")); // true
+```
+
+### LightCache::unset()
+
+删除某项。
+
+```php
+LightCache::set("foo", "bar");
+LightCache::unset("foo");
+dump(LightCache::isset("foo")); // false
+```
+
+### LightCache::getAll()
+
+获取所有项。
+
+```php
+LightCache::set("k1", ["I", "am", "array"]);
+LightCache::set("k2", "v2");
+LightCache::set("k3", 20001);
+dump(LightCache::getAll());
+/*
+{
+"k1": ["I", "am", "array"],
+"k2": "v2",
+"k3": 20001
+}
+*/
+```
+
+### LightCache::savePersistence()
+
+立刻保存所有被标记为持久化的缓存项到磁盘。
+
+!!! note "提示"
+
+	在一般情况下，框架定时执行此方法来保存，在停止框架、reload 框架和 Ctrl+C 停止框架的时候，均会执行保存。
+
+### 持久化
+
+将 `set()` 的 expire 设置为 -2 即可。
+
+```php
+/**
+ * @CQCommand("store")
+ */
+public function store() {
+    LightCache::set("msg_time", time(), -2);
+    return "OK!";
+}
+/**
+ * @CQCommand("getStore")
+ */
+public function getStore() {
+    return "存储时间：".date("Y-m-d H:i:s", LightCache::get("msg_time"));
+}
+```
+
+<chat-box>
+^ 我在 2021-01-05 15:21:00 发送这条消息
+) store
+( OK!
+^ 这时我用 Ctrl+C 停止框架，过一会儿再启动
+) getStore
+( 存储时间：2021-01-05 15:21:00
+</chat-box>
+
+### 数据加锁
+
+在特定情况下，使用 LightCache 必须配合锁使用，否则会出现数据错乱。我们来看下面的例子：
+
+```php
+/**
+ * @RequestMapping("/test")
+ */
+public function test() {
+    $s = LightCache::get("web_count");
+    if($s === null) $s = 1;
+    else $s += 1;
+    LightCache::set("web_count", $s);
+    return "<h1>It works!</h1>";
+}
+```
+
+我们使用压测工具，例如 `ab`，对此路由接口开很多很多线程进行测试，假设我们设置请求总数为 200000 次，框架的工作进程数为 8（我用的是 2020 年末的 i5 MacBook Pro 13 inch）。
+
+> 懒得再测了，下面就口述过程吧。
+
+在运行完测试后，通过 `LightCache::get("web_count")`，获取到的数你会发现不是 200000。怎么回事呢？请自行翻阅多进程开发相关的书籍哦！（或者简单理解为，有一些情况下，进程 1 执行到了 `if-else` 语句，另一个进程也执行到了这里，两次在代码层面加的数是相同的，则虽然请求了两次，但是后执行 set 的那个进程又覆盖了前一个进程执行的值，导致最终结果加了 1 而不是 2）
+
+!!! note "提示"
+
+	同样的场景，使用 ZMAtomic 就不需要使用锁了。Atomic 是一句话：`add(1)` 立即加值的。而 LightCache 需要加锁的情况一般都是 `get->改值->set` 这样的代码。
+
+
+解决这一问题，就需要用到锁。这种情况下，我们首先考虑的是自旋锁，框架也因此内置了一个方便使用的自旋锁组件。详见下一章：自旋锁。
+
