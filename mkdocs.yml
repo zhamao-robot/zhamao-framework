@@ -10,8 +10,8 @@ theme:
   favicon: assets/favicon.png
   language: zh
   palette:
-    primary: deep orange
-    accent: deep orange
+    primary: blue
+    accent: blue
   features:
     - navigation.tabs
 extra_javascript:
@@ -81,6 +81,12 @@ nav:
           - Redis 数据库: component/redis.md
           - ZMAtomic 原子计数器: component/atomics.md
           - SpinLock 自旋锁: component/spin-lock.md
+      - 协程池: component/coroutine-pool.md
+      - 单例类: component/singleton-trait.md
+      - ZMUtil 杂项: component/zmutil.md
+      - 全局方法: component/global-functions.md
+      - HTTP 和 WebSocket 客户端: component/zmrequest.md
+      - Console 终端: component/console.md
   - 进阶开发:
       - 进阶开发: advanced/index.md
       - 从 v1 升级: advanced/to-v2.md

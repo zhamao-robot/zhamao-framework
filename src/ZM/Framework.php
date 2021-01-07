@@ -255,6 +255,7 @@ class Framework
                     }
                     break;
                 case 'disable-console-input':
+                case 'no-interaction':
                     if ($y) $terminal_id = null;
                     break;
                 case 'log-error':
@@ -267,6 +268,7 @@ class Framework
                     if ($y) Console::setLevel(2);
                     break;
                 case 'log-verbose':
+                case 'verbose':
                     if ($y) Console::setLevel(3);
                     break;
                 case 'log-debug':
@@ -276,6 +278,10 @@ class Framework
                     if ($y !== null) {
                         Console::$theme = $y;
                     }
+                    break;
+                default:
+                    Console::info("Calculating ".$x);
+                    dump($y);
                     break;
             }
         }
