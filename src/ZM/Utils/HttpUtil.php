@@ -5,57 +5,47 @@ namespace ZM\Utils;
 
 
 use Co;
+use Symfony\Component\Routing\Exception\MethodNotAllowedException;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\Matcher\UrlMatcher;
+use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\RouteCollection;
 use ZM\Config\ZMConfig;
 use ZM\Console\Console;
-use ZM\Event\EventManager;
 use ZM\Http\Response;
+use ZM\Http\RouteManager;
 
 class HttpUtil
 {
     public static function parseUri($request, $response, $uri, &$node, &$params) {
-        $uri = explode("/", $uri);
-        $uri = array_diff($uri, ["..", "", "."]);
-        $node = EventManager::$req_mapping;
-        $params = [];
-        while (true) {
-            $r = array_shift($uri);
-            if ($r === null) break;
-            if (($cnt = count($node["son"] ?? [])) == 1) {
-                if (isset($node["param_route"])) {
-                    foreach ($node["son"] as $k => $v) {
-                        if ($v["id"] == $node["param_route"]) {
-                            $node = $v;
-                            $params[mb_substr($v["name"], 1, -1)] = $r;
-                            continue 2;
-                        }
-                    }
-                } elseif ($node["son"][0]["name"] == $r) {
-                    $node = $node["son"][0];
-                    continue;
-                }
-            } elseif ($cnt >= 1) {
-                if (isset($node["param_route"])) {
-                    foreach ($node["son"] as $k => $v) {
-                        if ($v["id"] == $node["param_route"]) {
-                            $node = $v;
-                            $params[mb_substr($v["name"], 1, -1)] = $r;
-                            continue 2;
-                        }
-                    }
-                }
-                foreach ($node["son"] as $k => $v) {
-                    if ($v["name"] == $r) {
-                        $node = $v;
-                        continue 2;
-                    }
-                }
-            }
+        $context = new RequestContext();
+        $context->setMethod($request->server['request_method']);
+
+        try {
+            $matcher = new UrlMatcher(RouteManager::$routes ?? new RouteCollection(), $context);
+            $matched = $matcher->match($uri);
+        } catch (ResourceNotFoundException $e) {
             if (ZMConfig::get("global", "static_file_server")["status"]) {
                 HttpUtil::handleStaticPage($request->server["request_uri"], $response);
                 return null;
             }
+            $matched = null;
+        } catch (MethodNotAllowedException $e) {
+            $matched = null;
         }
-        return !isset($node["route"]) ? false : true;
+        if ($matched !== null) {
+            $node = [
+                "route" => RouteManager::$routes->get($matched["_route"])->getPath(),
+                "class" => $matched["_class"],
+                "method" => $matched["_method"],
+                "request_method" => $request->server['request_method']
+            ];
+            unset($matched["_class"], $matched["_method"]);
+            $params = $matched;
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public static function getHttpCodePage(int $http_code) {
@@ -83,9 +73,9 @@ class HttpUtil
                 return true;
             }
             if (is_dir($path)) {
-                if(mb_substr($uri, -1, 1) != "/") {
+                if (mb_substr($uri, -1, 1) != "/") {
                     Console::info("[302] " . $uri);
-                    $response->redirect($uri."/", 302);
+                    $response->redirect($uri . "/", 302);
                     return true;
                 }
                 foreach ($base_index as $vp) {

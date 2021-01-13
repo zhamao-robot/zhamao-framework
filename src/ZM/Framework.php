@@ -280,8 +280,8 @@ class Framework
                     }
                     break;
                 default:
-                    Console::info("Calculating ".$x);
-                    dump($y);
+                    //Console::info("Calculating ".$x);
+                    //dump($y);
                     break;
             }
         }

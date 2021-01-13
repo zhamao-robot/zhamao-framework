@@ -301,7 +301,7 @@ class ServerEventHandler
      * @param $request
      * @param $response
      */
-    public function onRequest($request, $response) {
+    public function onRequest(?Request $request, ?\Swoole\Http\Response $response) {
         $response = new Response($response);
         unset(Context::$context[Co::getCid()]);
         Console::debug("Calling Swoole \"request\" event from fd=" . $request->fd);

@@ -12,6 +12,7 @@ use ReflectionMethod;
 use ZM\Annotation\Http\{HandleAfter, HandleBefore, Controller, HandleException, Middleware, MiddlewareClass, RequestMapping};
 use ZM\Annotation\Interfaces\Level;
 use ZM\Annotation\Module\Closed;
+use ZM\Http\RouteManager;
 use ZM\Utils\DataProvider;
 
 class AnnotationParser
@@ -113,7 +114,7 @@ class AnnotationParser
                         $method_anno->class = $v;
                         $method_anno->method = $method_name;
                         if ($method_anno instanceof RequestMapping) {
-                            $this->registerRequestMapping($method_anno, $method_name, $v, $methods_annotations); //TODO: 用symfony的routing重写
+                            RouteManager::importRouteByAnnotation($method_anno, $method_name, $v, $methods_annotations);
                         } elseif ($method_anno instanceof Middleware) {
                             $this->middleware_map[$method_anno->class][$method_anno->method][] = $method_anno->middleware;
                         }
@@ -121,11 +122,6 @@ class AnnotationParser
                 }
             }
         }
-
-        //预处理4：生成路由树（换成symfony后就不需要了）
-        $tree = $this->genTree($this->req_mapping);
-        $this->req_mapping = $tree[0];
-
         Console::debug("解析注解完毕！");
     }
 
@@ -174,109 +170,6 @@ class AnnotationParser
     public function addRegisterPath($path, $indoor_name) { $this->path_list[] = [$path, $indoor_name]; }
 
     //private function below
-
-    private function registerRequestMapping(RequestMapping $vss, $method, $class, $methods_annotations) {
-        $prefix = '';
-        foreach ($methods_annotations as $annotation) {
-            if ($annotation instanceof Controller) {
-                $prefix = $annotation->prefix;
-                break;
-            }
-        }
-        $array = $this->req_mapping;
-        $uid = count($array);
-        $prefix_exp = explode("/", $prefix);
-        $route_exp = explode("/", $vss->route);
-        foreach ($prefix_exp as $k => $v) {
-            if ($v == "" || $v == ".." || $v == ".") {
-                unset($prefix_exp[$k]);
-            }
-        }
-        foreach ($route_exp as $k => $v) {
-            if ($v == "" || $v == ".." || $v == ".") {
-                unset($route_exp[$k]);
-            }
-        }
-        if ($prefix_exp == [] && $route_exp == []) {
-            $array[0]['method'] = $method;
-            $array[0]['class'] = $class;
-            $array[0]['request_method'] = $vss->request_method;
-            $array[0]['route'] = $vss->route;
-            $this->req_mapping = $array;
-            return;
-        }
-        $pid = 0;
-        while (($shift = array_shift($prefix_exp)) !== null) {
-            foreach ($array as $k => $v) {
-                if ($v["name"] == $shift && $pid == ($v["pid"] ?? -1)) {
-                    $pid = $v["id"];
-                    continue 2;
-                }
-            }
-            $array[$uid++] = [
-                'id' => $uid - 1,
-                'pid' => $pid,
-                'name' => $shift
-            ];
-            $pid = $uid - 1;
-        }
-        while (($shift = array_shift($route_exp)) !== null) {
-            /*if (mb_substr($shift, 0, 1) == "{" && mb_substr($shift, -1, 1) == "}") {
-                $p->removeAllRoute();
-                Console::info("移除本节点其他所有路由中");
-            }*/
-            foreach ($array as $k => $v) {
-                if ($v["name"] == $shift && $pid == ($v["pid"] ?? -1)) {
-                    $pid = $v["id"];
-                    continue 2;
-                }
-            }
-            if (mb_substr($shift, 0, 1) == "{" && mb_substr($shift, -1, 1) == "}") {
-                foreach ($array as $k => $v) {
-                    if ($pid == $v["id"]) {
-                        $array[$k]["param_route"] = $uid;
-                    }
-                }
-            }
-            $array[$uid++] = [
-                'id' => $uid - 1,
-                'pid' => $pid,
-                'name' => $shift
-            ];
-            $pid = $uid - 1;
-        }
-        $array[$uid - 1]['method'] = $method;
-        $array[$uid - 1]['class'] = $class;
-        $array[$uid - 1]['request_method'] = $vss->request_method;
-        $array[$uid - 1]['route'] = $vss->route;
-        $this->req_mapping = $array;
-    }
-
-    /** @noinspection PhpIncludeInspection */
-    private function loadAnnotationClasses() {
-        $class = getAllClasses(WORKING_DIR . "/src/ZM/Annotation/", "ZM\\Annotation");
-        foreach ($class as $v) {
-            $s = WORKING_DIR . '/src/' . str_replace("\\", "/", $v) . ".php";
-            //Console::debug("Requiring annotation " . $s);
-            require_once $s;
-        }
-        $class = getAllClasses(DataProvider::getWorkingDir() . "/src/Custom/Annotation/", "Custom\\Annotation");
-        foreach ($class as $v) {
-            $s = DataProvider::getWorkingDir() . '/src/' . str_replace("\\", "/", $v) . ".php";
-            Console::debug("Requiring custom annotation " . $s);
-            require_once $s;
-        }
-    }
-
-    private function genTree($items) {
-        $tree = array();
-        foreach ($items as $item)
-            if (isset($items[$item['pid']]))
-                $items[$item['pid']]['son'][] = &$items[$item['id']];
-            else
-                $tree[] = &$items[$item['id']];
-        return $tree;
-    }
 
     private function registerMiddleware(MiddlewareClass $vs, ReflectionClass $reflection_class) {
         $result = [
