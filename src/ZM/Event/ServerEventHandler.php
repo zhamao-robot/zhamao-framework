@@ -386,7 +386,7 @@ class ServerEventHandler
     public function onOpen($server, Request $request) {
         Console::debug("Calling Swoole \"open\" event from fd=" . $request->fd);
         unset(Context::$context[Co::getCid()]);
-        $type = strtolower($request->get["type"] ?? $request->header["x-client-role"] ?? "");
+        $type = strtolower($request->header["x-client-role"] ?? $request->get["type"] ?? "");
         $type_conn = ManagerGM::getTypeClassName($type);
         ManagerGM::pushConnect($request->fd, $type_conn);
         $conn = ManagerGM::get($request->fd);

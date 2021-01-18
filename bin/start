@@ -1,28 +1,14 @@
 #!/usr/bin/env php
 <?php
 
-use ZM\ConsoleApplication;
-
-// 这行是用于开发者自己电脑的调试功能
-
-$symbol = sha1(is_file("/flag2") ? file_get_contents("/flag2") : '1') == '6252c0ec7fcbd544c3d6f5f0a162f60407d7a896' || mb_strpos(getcwd(), "/private/tmp");
-
-// 首先得判断是直接从library模式启动的框架还是从composer引入library启动的框架
-// 判断方法：判断当前目录上面有没有 /vendor 目录，如果没有 /vendor 目录说明是从 composer 引入的
-//         否则就是直接从 framework 项目启动的
-if (!is_dir(__DIR__ . '/../vendor') || $symbol) {
+if (!is_dir(__DIR__ . '/../vendor')) {
     define("LOAD_MODE", 1); //composer项目模式
     define("LOAD_MODE_COMPOSER_PATH", getcwd());
     /** @noinspection PhpIncludeInspection */
     require_once LOAD_MODE_COMPOSER_PATH . "/vendor/autoload.php";
-} elseif (substr(__DIR__, 0, 7) == 'phar://') {
-    define("LOAD_MODE", 2); //phar模式
-    // 会废弃phar启动的方式，在2.0
 } else {
-    define("LOAD_MODE", 0);
+    define("LOAD_MODE", 0); //源码模式
     require_once __DIR__ . "/../vendor/autoload.php";
 }
-// 终端的命令行功能启动！！
-$application = new ConsoleApplication("zhamao-framework");
-$application->initEnv();
-$application->run();
+
+(new ZM\ConsoleApplication("zhamao-framework"))->initEnv()->run();

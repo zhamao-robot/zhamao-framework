@@ -75,6 +75,7 @@ class ConsoleApplication extends Application
             if (!($obj instanceof Command)) throw new TypeError("Command register class must be extended by Symfony\\Component\\Console\\Command\\Command");
             $this->add($obj);
         }*/
+        return $this;
     }
 
     /**

@@ -75,13 +75,13 @@ setTimeout(() => {
             if(j === '') continue;
             if(j.substr(0, 2) === ') ') {
                 final += '<div class="doc-chat-row">\n' +
-                    '    <div class="doc-chat-box">' + j.substr(2) + '</div>\n' +
+                    '    <div class="doc-chat-box">' + j.substr(2).replaceAll("\\n", "<br>") + '</div>\n' +
                     '    <img class="doc-chat-avatar" src="http://api.btstu.cn/sjtx/api.php"  alt=""/>\n' +
                     '  </div>';
             } else if (j.substr(0, 2) === '( ') {
                 final += '<div class="doc-chat-row doc-chat-row-robot">\n' +
                     '    <img class="doc-chat-avatar" src="https://docs-v1.zhamao.xin/logo.png" alt=""/>\n' +
-                    '    <div class="doc-chat-box doc-chat-box-robot">' + j.substr(2) + '</div>\n' +
+                    '    <div class="doc-chat-box doc-chat-box-robot">' + j.substr(2).replaceAll("\\n", "<br>") + '</div>\n' +
                     '  </div>';
             } else if (j.substr(0, 2) === '^ ') {
                 final += '<div class="doc-chat-row doc-chat-banner">' + j.substr(2) + '</div>';

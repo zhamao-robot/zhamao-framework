@@ -89,8 +89,11 @@ nav:
       - Console 终端: component/console.md
   - 进阶开发:
       - 进阶开发: advanced/index.md
+      - 框架剖析: advanced/framework-structure.md
+      - 框架启动模式: advanced/custom-start.md
       - 从 v1 升级: advanced/to-v2.md
       - 内部类文件手册: advanced/inside-class.md
+      - 接入 WebSocket 客户端: advanced/connect-ws-client.md
   - FAQ: FAQ.md
   - 更新日志:
       - 更新日志（v2）: update/v2.md

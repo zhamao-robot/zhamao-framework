@@ -159,3 +159,19 @@ color green 我是绿色的字
 在 1.4 版本开始，框架支持启动时的 motd 内容修改。
 
 文件位置：`config/motd.txt`
+
+## 设置输出主题
+
+Console 组件支持为多种不同的终端设置不同的主题，比如有些人喜欢使用白色的终端，但是白色终端下 info 的颜色很浅，看不到，还有人使用不能显示颜色的黑白终端.....
+
+```bash
+vendor/bin/start server --log-theme={主题名}
+```
+
+现有支持的主题有：`default`，`white-term`，`no-color`
+
+```bash
+vendor/bin/start server --log-theme=white-term # 如果用的是白色终端，这个主题更友好
+vendor/bin/start server --log-theme=no-color   # 如果不想让 log 带有任何颜色，使用无色主题
+```
+

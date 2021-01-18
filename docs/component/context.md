@@ -114,7 +114,7 @@ public function ping() {
 
 ## getConnection() - WS 连接对象
 
-返回此上下文相关联的 WebSocket 连接对象。
+返回此上下文相关联的 WebSocket 连接对象。详见 [进阶 - 接入 WebSocket 客户端](/advanced/connect-ws-client)。
 
 可以使用的事件：所有 **getFrame()** 可以使用的都可以使用。
 

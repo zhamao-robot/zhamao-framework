@@ -55,9 +55,9 @@ class Hello
      */
     public function randNum() {
         // 获取第一个数字类型的参数
-        $num1 = ctx()->getArgs(ZM_MATCH_NUMBER, "请输入第一个数字");
+        $num1 = ctx()->getNumArg("请输入第一个数字");
         // 获取第二个数字类型的参数
-        $num2 = ctx()->getArgs(ZM_MATCH_NUMBER, "请输入第二个数字");
+        $num2 = ctx()->getNumArg("请输入第二个数字");
         $a = min(intval($num1), intval($num2));
         $b = max(intval($num1), intval($num2));
         // 回复用户结果

@@ -78,6 +78,7 @@ class QQBot
         switch ($data["post_type"]) {
             case "message":
                 $word = explodeMsg(str_replace("\r", "", context()->getMessage()));
+                if (empty($word)) $word = [""];
                 if (count(explode("\n", $word[0])) >= 2) {
                     $enter = explode("\n", context()->getMessage());
                     $first = split_explode(" ", array_shift($enter));
