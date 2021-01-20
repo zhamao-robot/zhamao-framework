@@ -501,6 +501,11 @@ class ServerEventHandler
                 $action = ["action" => "returnWorkerCache", "cid" => $data["cid"], "value" => $r];
                 $server->sendMessage(json_encode($action, 256), $src_worker_id);
                 break;
+            case "unsetWorkerCache":
+                $r = WorkerCache::unset($data["key"]);
+                $action = ["action" => "returnWorkerCache", "cid" => $data["cid"], "value" => $r];
+                $server->sendMessage(json_encode($action, 256), $src_worker_id);
+                break;
             case "asyncAddWorkerCache":
                 WorkerCache::add($data["key"], $data["value"], true);
                 break;
@@ -509,6 +514,9 @@ class ServerEventHandler
                 break;
             case "asyncSetWorkerCache":
                 WorkerCache::set($data["key"], $data["value"], true);
+                break;
+            case "asyncUnsetWorkerCache":
+                WorkerCache::unset($data["key"], true);
                 break;
             case "addWorkerCache":
                 $r = WorkerCache::add($data["key"], $data["value"]);

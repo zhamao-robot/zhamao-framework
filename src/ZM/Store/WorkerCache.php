@@ -45,6 +45,23 @@ class WorkerCache
         }
     }
 
+    public static function unset($key, $async = false) {
+        $config = self::$config ?? ZMConfig::get("global", "worker_cache");
+        if ($config["worker"] === server()->worker_id) {
+            unset(self::$store[$key]);
+            return true;
+        } else {
+            $action = ["action" => $async ? "asyncUnsetWorkerCache" : "unsetWorkerCache", "key" => $key, "cid" => zm_cid()];
+            $ss = server()->sendMessage(json_encode($action, JSON_UNESCAPED_UNICODE), $config["worker"]);
+            if(!$ss) return false;
+            if ($async) return true;
+            zm_yield();
+            $p = self::$transfer[zm_cid()] ?? null;
+            unset(self::$transfer[zm_cid()]);
+            return $p;
+        }
+    }
+
     public static function add($key, int $value, $async = false) {
         $config = self::$config ?? ZMConfig::get("global", "worker_cache");
         if ($config["worker"] === server()->worker_id) {
