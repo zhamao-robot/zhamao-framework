@@ -1,4 +1,6 @@
-<?php /** @noinspection PhpComposerExtensionStubsInspection */
+<?php /** @noinspection PhpUnreachableStatementInspection */
+
+/** @noinspection PhpComposerExtensionStubsInspection */
 
 
 namespace ZM\Event;
@@ -14,12 +16,12 @@ use Swoole\Database\PDOConfig;
 use Swoole\Database\PDOPool;
 use Swoole\Event;
 use Swoole\Process;
-use Swoole\Timer;
 use ZM\Annotation\AnnotationParser;
 use ZM\Annotation\Http\RequestMapping;
 use ZM\Annotation\Swoole\OnCloseEvent;
 use ZM\Annotation\Swoole\OnMessageEvent;
 use ZM\Annotation\Swoole\OnOpenEvent;
+use ZM\Annotation\Swoole\OnPipeMessageEvent;
 use ZM\Annotation\Swoole\OnRequestEvent;
 use ZM\Annotation\Swoole\OnStart;
 use ZM\Annotation\Swoole\OnSwooleEvent;
@@ -42,6 +44,7 @@ use ZM\Module\QQBot;
 use ZM\Store\LightCacheInside;
 use ZM\Store\MySQL\SqlPoolStorage;
 use ZM\Store\Redis\ZMRedisPool;
+use ZM\Store\WorkerCache;
 use ZM\Store\ZMBuf;
 use ZM\Utils\DataProvider;
 use ZM\Utils\HttpUtil;
@@ -258,11 +261,12 @@ class ServerEventHandler
     public function onMessage($server, Frame $frame) {
 
         Console::debug("Calling Swoole \"message\" from fd=" . $frame->fd . ": " . TermColor::ITALIC . $frame->data . TermColor::RESET);
-        unset(Context::$context[\Swoole\Coroutine::getCid()]);
+        unset(Context::$context[Coroutine::getCid()]);
         $conn = ManagerGM::get($frame->fd);
         set_coroutine_params(["server" => $server, "frame" => $frame, "connection" => $conn]);
         $dispatcher1 = new EventDispatcher(OnMessageEvent::class);
         $dispatcher1->setRuleFunction(function ($v) {
+            /** @noinspection PhpUnreachableStatementInspection */
             return ctx()->getConnection()->getName() == $v->connect_type && eval("return " . $v->getRule() . ";");
         });
 
@@ -480,38 +484,73 @@ class ServerEventHandler
      * @param $server
      * @param $src_worker_id
      * @param $data
+     * @throws InterruptException
      */
     public function onPipeMessage(Server $server, $src_worker_id, $data) {
         //var_dump($data, $server->worker_id);
         //unset(Context::$context[Co::getCid()]);
         $data = json_decode($data, true);
         switch ($data["action"] ?? '') {
-            case "resume_ws_message":
-                $obj = $data["data"];
-                Co::resume($obj["coroutine"]);
+            case "getWorkerCache":
+                $r = WorkerCache::get($data["key"]);
+                $action = ["action" => "returnWorkerCache", "cid" => $data["cid"], "value" => $r];
+                $server->sendMessage(json_encode($action, 256), $src_worker_id);
                 break;
-            case "stop":
-                Console::verbose('正在清理 #' . $server->worker_id . ' 的计时器');
-                Timer::clearAll();
+            case "setWorkerCache":
+                $r = WorkerCache::set($data["key"], $data["value"]);
+                $action = ["action" => "returnWorkerCache", "cid" => $data["cid"], "value" => $r];
+                $server->sendMessage(json_encode($action, 256), $src_worker_id);
                 break;
-            case "terminate":
-                $server->stop();
+            case "asyncAddWorkerCache":
+                WorkerCache::add($data["key"], $data["value"], true);
                 break;
-            case 'echo':
-                Console::success('接收到来自 #' . $src_worker_id . ' 的消息');
+            case "asyncSubWorkerCache":
+                WorkerCache::sub($data["key"], $data["value"], true);
                 break;
-            case 'send':
-                $server->sendMessage(json_encode(["action" => "echo"]), $data["target"]);
+            case "asyncSetWorkerCache":
+                WorkerCache::set($data["key"], $data["value"], true);
+                break;
+            case "addWorkerCache":
+                $r = WorkerCache::add($data["key"], $data["value"]);
+                $action = ["action" => "returnWorkerCache", "cid" => $data["cid"], "value" => $r];
+                $server->sendMessage(json_encode($action, 256), $src_worker_id);
+                break;
+            case "subWorkerCache":
+                $r = WorkerCache::sub($data["key"], $data["value"]);
+                $action = ["action" => "returnWorkerCache", "cid" => $data["cid"], "value" => $r];
+                $server->sendMessage(json_encode($action, 256), $src_worker_id);
+                break;
+            case "returnWorkerCache":
+                WorkerCache::$transfer[$data["cid"]] = $data["value"];
+                zm_resume($data["cid"]);
                 break;
             default:
-                echo $data . PHP_EOL;
+                $dispatcher = new EventDispatcher(OnPipeMessageEvent::class);
+                $dispatcher->setRuleFunction(function (OnPipeMessageEvent $v) use ($data) {
+                    return $v->action == $data["action"];
+                });
+                $dispatcher->dispatchEvents($data);
+                break;
         }
     }
 
     /**
      * @SwooleHandler("task")
+     * @param Server|null $server
+     * @param Server\Task $task
+     * @return mixed
      */
-    public function onTask() {
+    public function onTask(?Server $server, Server\Task $task) {
+        $data = $task->data;
+        switch($data["action"]) {
+            case "runMethod":
+                $c = $data["class"];
+                $ss = new $c();
+                $method = $data["method"];
+                $ps = $data["params"];
+                $task->finish($ss->$method(...$ps));
+        }
+        return null;
     }
 
     /**

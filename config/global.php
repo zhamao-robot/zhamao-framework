@@ -43,6 +43,11 @@ $config['light_cache'] = [
     'auto_save_interval' => 900
 ];
 
+$config["worker_cache"] = [
+    "worker" => 0,
+    "transaction_timeout" => 30000
+];
+
 /** MySQL数据库连接信息，host留空则启动时不创建sql连接池 */
 $config['sql_config'] = [
     'sql_host' => '',

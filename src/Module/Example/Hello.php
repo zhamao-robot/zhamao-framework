@@ -2,6 +2,8 @@
 
 namespace Module\Example;
 
+use Swoole\Coroutine;
+use ZM\Annotation\Http\Controller;
 use ZM\Annotation\Http\Middleware;
 use ZM\Annotation\Swoole\OnCloseEvent;
 use ZM\Annotation\Swoole\OnOpenEvent;
@@ -11,12 +13,16 @@ use ZM\Console\Console;
 use ZM\Annotation\CQ\CQCommand;
 use ZM\Annotation\Http\RequestMapping;
 use ZM\Event\EventDispatcher;
+use ZM\Store\Lock\SpinLock;
+use ZM\Store\WorkerCache;
+use ZM\Utils\ProcessManager;
 use ZM\Utils\ZMUtil;
 
 /**
  * Class Hello
  * @package Module\Example
  * @since 2.0
+ * @Controller("/sdd")
  */
 class Hello
 {
@@ -79,6 +85,7 @@ class Hello
      * @RequestMapping("/")
      */
     public function index() {
+        Console::info("Called!!");
         return "Hello Zhamao!";
     }
 
@@ -89,7 +96,42 @@ class Hello
      * @return string
      */
     public function paramGet($param) {
-        return "Your name: {$param["name"]}";
+        //WorkerCache::set("ss_cnt", 0);
+        return json_encode(Coroutine::stats());
+    }
+
+    /**
+     * @param $param
+     * @RequestMapping("/wc/set/{key}/{value}")
+     * @return string
+     */
+    public function wcSet($param) {
+        WorkerCache::set($param["key"], $param["value"], true);
+        //SpinLock::lock("ss");
+        WorkerCache::add("ss_cnt", 1);
+        //SpinLock::unlock("ss");
+        return json_encode(Coroutine::stats());
+    }
+
+    /**
+     * @param $param
+     * @return mixed|string
+     * @RequestMapping("/wc/get/{key}")
+     * @Middleware("timer")
+     */
+    public function wcGet($param) {
+        $obj = WorkerCache::get($param["key"]);
+        if(is_string($obj)) return $obj;
+        return json_encode($obj);
+    }
+
+    /**
+     * @return mixed
+     * @RequestMapping("/task")
+     */
+    public function runTask() {
+        $r = ProcessManager::runOnTask(["class" => Hello::class, "method" => "index", "params" => []]);
+        return $r;
     }
 
     /**

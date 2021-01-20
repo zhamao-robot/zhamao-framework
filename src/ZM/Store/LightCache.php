@@ -7,6 +7,7 @@ namespace ZM\Store;
 use Exception;
 use Swoole\Table;
 use ZM\Console\Console;
+use ZM\Exception\ZMException;
 
 class LightCache
 {
@@ -19,6 +20,11 @@ class LightCache
 
     public static $last_error = '';
 
+    /**
+     * @param $config
+     * @return bool|mixed
+     * @throws Exception
+     */
     public static function init($config) {
         self::$config = $config;
         self::$kv_table = new Table($config["size"], $config["hash_conflict_proportion"]);
@@ -50,11 +56,11 @@ class LightCache
 
     /**
      * @param string $key
-     * @return null|string
-     * @throws Exception
+     * @return null|mixed
+     * @throws ZMException
      */
     public static function get(string $key) {
-        if (self::$kv_table === null) throw new Exception("not initialized LightCache");
+        if (self::$kv_table === null) throw new ZMException("not initialized LightCache");
         self::checkExpire($key);
         $r = self::$kv_table->get($key);
         return $r === false ? null : self::parseGet($r);
@@ -63,10 +69,10 @@ class LightCache
     /**
      * @param string $key
      * @return mixed|null
-     * @throws Exception
+     * @throws ZMException
      */
     public static function getExpire(string $key) {
-        if (self::$kv_table === null) throw new Exception("not initialized LightCache");
+        if (self::$kv_table === null) throw new ZMException("not initialized LightCache");
         self::checkExpire($key);
         $r = self::$kv_table->get($key, "expire");
         return $r === false ? null : $r - time();
@@ -77,10 +83,10 @@ class LightCache
      * @param string|array|int $value
      * @param int $expire
      * @return mixed
-     * @throws Exception
+     * @throws ZMException
      */
     public static function set(string $key, $value, int $expire = -1) {
-        if (self::$kv_table === null) throw new Exception("not initialized LightCache");
+        if (self::$kv_table === null) throw new ZMException("not initialized LightCache");
         if (is_array($value)) {
             $value = json_encode($value, JSON_UNESCAPED_UNICODE);
             if (strlen($value) >= self::$config["max_strlen"]) return false;
@@ -93,7 +99,7 @@ class LightCache
             $data_type = "bool";
             $value = json_encode($value);
         } else {
-            throw new Exception("Only can set string, array and int");
+            throw new ZMException("Only can set string, array and int");
         }
         try {
             return self::$kv_table->set($key, [
@@ -110,10 +116,10 @@ class LightCache
      * @param string $key
      * @param $value
      * @return bool|mixed
-     * @throws Exception
+     * @throws ZMException
      */
     public static function update(string $key, $value) {
-        if (self::$kv_table === null) throw new Exception("not initialized LightCache.");
+        if (self::$kv_table === null) throw new ZMException("not initialized LightCache.");
         if (is_array($value)) {
             $value = json_encode($value, JSON_UNESCAPED_UNICODE);
             if (strlen($value) >= self::$config["max_strlen"]) return false;
@@ -123,7 +129,7 @@ class LightCache
         } elseif (is_int($value)) {
             $data_type = "int";
         } else {
-            throw new Exception("Only can set string, array and int");
+            throw new ZMException("Only can set string, array and int");
         }
         try {
             if (self::$kv_table->get($key) === false) return false;
