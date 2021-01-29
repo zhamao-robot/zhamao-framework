@@ -37,7 +37,8 @@
         "zhamao/config": "^1.0",
         "zhamao/request": "*@dev",
         "symfony/routing": "^5.1",
-        "symfony/polyfill-php80": "^1.20"
+        "symfony/polyfill-php80": "^1.20",
+        "ext-posix": "*"
     },
     "suggest": {
         "ext-ctype": "*",

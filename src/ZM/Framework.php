@@ -250,6 +250,7 @@ class Framework
                 case 'daemon':
                     if ($y) {
                         $this->server_set["daemonize"] = 1;
+                        Console::$theme = "no-color";
                         Console::log("已启用守护进程，输出重定向到 " . $this->server_set["log_file"]);
                         $terminal_id = null;
                     }

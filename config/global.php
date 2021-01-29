@@ -36,13 +36,14 @@ $config['swoole'] = [
 
 /** 轻量字符串缓存，默认开启 */
 $config['light_cache'] = [
-    'size' => 1024,                     //最多允许储存的条数（需要2的倍数）
-    'max_strlen' => 16384,               //单行字符串最大长度（需要2的倍数）
+    'size' => 512,                     //最多允许储存的条数（需要2的倍数）
+    'max_strlen' => 32768,               //单行字符串最大长度（需要2的倍数）
     'hash_conflict_proportion' => 0.6,   //Hash冲突率（越大越好，但是需要的内存更多）
     'persistence_path' => $config['zm_data'].'_cache.json',
     'auto_save_interval' => 900
 ];
 
+/** 大容量跨进程变量存储（2.2.0可用） */
 $config["worker_cache"] = [
     "worker" => 0,
     "transaction_timeout" => 30000
@@ -77,7 +78,7 @@ $config["access_token"] = '';
 
 /** HTTP服务器固定请求头的返回 */
 $config['http_header'] = [
-    'X-Powered-By' => 'zhamao-framework',
+    'Server' => 'zhamao-framework',
     'Content-Type' => 'text/html; charset=utf-8'
 ];
 

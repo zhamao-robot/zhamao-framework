@@ -5,6 +5,9 @@ namespace ZM;
 
 
 use Exception;
+use ZM\Command\DaemonReloadCommand;
+use ZM\Command\DaemonStatusCommand;
+use ZM\Command\DaemonStopCommand;
 use ZM\Command\InitCommand;
 use ZM\Command\PureHttpCommand;
 use ZM\Command\RunServerCommand;
@@ -40,7 +43,6 @@ class ConsoleApplication extends Application
              * @noinspection RedundantSuppression
              */
             require_once WORKING_DIR . "/vendor/autoload.php";
-            echo "* This is repository mode.\n";
             $composer = json_decode(file_get_contents(DataProvider::getWorkingDir() . "/composer.json"), true);
             if (!isset($composer["autoload"]["psr-4"]["Module\\"])) {
                 echo "框架源码模式需要在autoload文件中添加Module目录为自动加载，是否添加？[Y/n] ";
@@ -64,6 +66,9 @@ class ConsoleApplication extends Application
         }
 
         $this->addCommands([
+            new DaemonStatusCommand(),
+            new DaemonReloadCommand(),
+            new DaemonStopCommand(),
             new RunServerCommand(), //运行主服务的指令控制器
             new InitCommand(), //初始化用的，用于项目初始化和phar初始化
             new PureHttpCommand() //纯HTTP服务器指令

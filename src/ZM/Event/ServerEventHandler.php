@@ -79,6 +79,13 @@ class ServerEventHandler
                 /** @noinspection PhpUndefinedFieldInspection */ Event::del(Framework::$server->inotify);
             ZMUtil::stop();
         });
+        if(Framework::$argv["daemon"]) {
+            $daemon_data = json_encode([
+                "pid" => \server()->master_pid,
+                "stdout" => ZMConfig::get("global")["swoole"]["log_file"]
+            ],128|256);
+            file_put_contents(DataProvider::getWorkingDir()."/.daemon_pid", $daemon_data);
+        }
         if (Framework::$argv["watch"]) {
             if (extension_loaded('inotify')) {
                 Console::warning("Enabled File watcher, do not use in production.");
@@ -87,11 +94,11 @@ class ServerEventHandler
                 $this->addWatcher(DataProvider::getWorkingDir() . "/src", $fd);
                 Event::add($fd, function () use ($fd) {
                     $r = inotify_read($fd);
-                    var_dump($r);
+                    dump($r);
                     ZMUtil::reload();
                 });
             } else {
-                Console::warning("You have not loaded inotify extension.");
+                Console::warning("You have not loaded \"inotify\" extension, please install first.");
             }
         }
     }
@@ -307,6 +314,9 @@ class ServerEventHandler
      */
     public function onRequest(?Request $request, ?\Swoole\Http\Response $response) {
         $response = new Response($response);
+        foreach(ZMConfig::get("global")["http_header"] as $k => $v) {
+            $response->setHeader($k, $v);
+        }
         unset(Context::$context[Co::getCid()]);
         Console::debug("Calling Swoole \"request\" event from fd=" . $request->fd);
         set_coroutine_params(["request" => $request, "response" => $response]);
