@@ -31,7 +31,6 @@ class DB
 
     /**
      * @param $table_name
-     * @param bool $enable_cache
      * @return Table
      * @throws DbException
      */
@@ -95,6 +94,7 @@ class DB
             $ps = $conn->prepare($line);
             if ($ps === false) {
                 SqlPoolStorage::$sql_pool->put(null);
+                /** @noinspection PhpUndefinedFieldInspection */
                 throw new DbException("SQL语句查询错误，" . $line . "，错误信息：" . $conn->error);
             } else {
                 if (!($ps instanceof PDOStatement) && !($ps instanceof PDOStatementProxy)) {

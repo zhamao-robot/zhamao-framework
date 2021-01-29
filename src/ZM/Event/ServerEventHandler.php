@@ -74,17 +74,17 @@ class ServerEventHandler
         }
         Process::signal(SIGINT, function () use ($r) {
             echo "\r";
-            Console::warning("Server interrupted by keyboard on Master.");
+            Console::warning("Server interrupted(SIGINT) on Master.");
             if ((Framework::$server->inotify ?? null) !== null)
                 /** @noinspection PhpUndefinedFieldInspection */ Event::del(Framework::$server->inotify);
             ZMUtil::stop();
         });
-        if(Framework::$argv["daemon"]) {
+        if (Framework::$argv["daemon"]) {
             $daemon_data = json_encode([
                 "pid" => \server()->master_pid,
                 "stdout" => ZMConfig::get("global")["swoole"]["log_file"]
-            ],128|256);
-            file_put_contents(DataProvider::getWorkingDir()."/.daemon_pid", $daemon_data);
+            ], 128 | 256);
+            file_put_contents(DataProvider::getWorkingDir() . "/.daemon_pid", $daemon_data);
         }
         if (Framework::$argv["watch"]) {
             if (extension_loaded('inotify')) {
@@ -238,7 +238,7 @@ class ServerEventHandler
                 Console::error("PHP Error: " . $e->getMessage() . " in " . $e->getFile() . " on line " . $e->getLine());
                 Console::error("Maybe it caused by your own code if in your own Module directory.");
                 Console::log($e->getTraceAsString(), 'gray');
-                ZMUtil::stop();
+                posix_kill($server->master_pid, SIGINT);
             }
         } else {
             // 这里是TaskWorker初始化的内容部分
@@ -255,7 +255,7 @@ class ServerEventHandler
                 Console::error("PHP Error: " . $e->getMessage() . " in " . $e->getFile() . " on line " . $e->getLine());
                 Console::error("Maybe it caused by your own code if in your own Module directory.");
                 Console::log($e->getTraceAsString(), 'gray');
-                ZMUtil::stop();
+                posix_kill($server->master_pid, SIGINT);
             }
         }
     }
@@ -314,7 +314,7 @@ class ServerEventHandler
      */
     public function onRequest(?Request $request, ?\Swoole\Http\Response $response) {
         $response = new Response($response);
-        foreach(ZMConfig::get("global")["http_header"] as $k => $v) {
+        foreach (ZMConfig::get("global")["http_header"] as $k => $v) {
             $response->setHeader($k, $v);
         }
         unset(Context::$context[Co::getCid()]);
@@ -491,10 +491,10 @@ class ServerEventHandler
 
     /**
      * @SwooleHandler("pipeMessage")
-     * @param $server
+     * @param Server $server
      * @param $src_worker_id
      * @param $data
-     * @throws InterruptException
+     * @throws Exception
      */
     public function onPipeMessage(Server $server, $src_worker_id, $data) {
         //var_dump($data, $server->worker_id);
@@ -561,10 +561,11 @@ class ServerEventHandler
      * @param Server|null $server
      * @param Server\Task $task
      * @return mixed
+     * @noinspection PhpUnusedParameterInspection
      */
     public function onTask(?Server $server, Server\Task $task) {
         $data = $task->data;
-        switch($data["action"]) {
+        switch ($data["action"]) {
             case "runMethod":
                 $c = $data["class"];
                 $ss = new $c();

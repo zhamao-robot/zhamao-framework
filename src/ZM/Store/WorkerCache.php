@@ -35,14 +35,18 @@ class WorkerCache
             return true;
         } else {
             $action = ["action" => $async ? "asyncSetWorkerCache" : "setWorkerCache", "key" => $key, "value" => $value, "cid" => zm_cid()];
-            $ss = server()->sendMessage(json_encode($action, JSON_UNESCAPED_UNICODE), $config["worker"]);
-            if(!$ss) return false;
-            if ($async) return true;
-            zm_yield();
-            $p = self::$transfer[zm_cid()] ?? null;
-            unset(self::$transfer[zm_cid()]);
-            return $p;
+            return self::processRemote($action, $async, $config);
         }
+    }
+    
+    private static function processRemote($action, $async, $config) {
+        $ss = server()->sendMessage(json_encode($action, JSON_UNESCAPED_UNICODE), $config["worker"]);
+        if(!$ss) return false;
+        if ($async) return true;
+        zm_yield();
+        $p = self::$transfer[zm_cid()] ?? null;
+        unset(self::$transfer[zm_cid()]);
+        return $p;
     }
 
     public static function unset($key, $async = false) {
@@ -52,13 +56,7 @@ class WorkerCache
             return true;
         } else {
             $action = ["action" => $async ? "asyncUnsetWorkerCache" : "unsetWorkerCache", "key" => $key, "cid" => zm_cid()];
-            $ss = server()->sendMessage(json_encode($action, JSON_UNESCAPED_UNICODE), $config["worker"]);
-            if(!$ss) return false;
-            if ($async) return true;
-            zm_yield();
-            $p = self::$transfer[zm_cid()] ?? null;
-            unset(self::$transfer[zm_cid()]);
-            return $p;
+            return self::processRemote($action, $async, $config);
         }
     }
 
@@ -70,13 +68,7 @@ class WorkerCache
             return true;
         } else {
             $action = ["action" => $async ? "asyncAddWorkerCache" : "addWorkerCache", "key" => $key, "value" => $value, "cid" => zm_cid()];
-            $ss = server()->sendMessage(json_encode($action, JSON_UNESCAPED_UNICODE), $config["worker"]);
-            // if(!$ss) return false;
-            if ($async) return true;
-            zm_yield();
-            $p = self::$transfer[zm_cid()] ?? null;
-            unset(self::$transfer[zm_cid()]);
-            return $p;
+            return self::processRemote($action, $async, $config);
         }
     }
 
@@ -88,13 +80,7 @@ class WorkerCache
             return true;
         } else {
             $action = ["action" => $async ? "asyncSubWorkerCache" : "subWorkerCache", "key" => $key, "value" => $value, "cid" => zm_cid()];
-            $ss = server()->sendMessage(json_encode($action, JSON_UNESCAPED_UNICODE), $config["worker"]);
-            // if(!$ss) return false;
-            if ($async) return true;
-            zm_yield();
-            $p = self::$transfer[zm_cid()] ?? null;
-            unset(self::$transfer[zm_cid()]);
-            return $p;
+            return self::processRemote($action, $async, $config);
         }
     }
 }

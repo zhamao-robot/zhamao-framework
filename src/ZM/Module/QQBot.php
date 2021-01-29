@@ -3,7 +3,7 @@
 
 namespace ZM\Module;
 
-use Swoole\Coroutine;
+use Exception;
 use ZM\Annotation\CQ\CQAPIResponse;
 use ZM\Annotation\CQ\CQBefore;
 use ZM\Annotation\CQ\CQCommand;
@@ -14,8 +14,6 @@ use ZM\Annotation\CQ\CQRequest;
 use ZM\Event\EventDispatcher;
 use ZM\Exception\InterruptException;
 use ZM\Exception\WaitTimeoutException;
-use ZM\Store\LightCacheInside;
-use ZM\Store\Lock\SpinLock;
 use ZM\Utils\CoMessage;
 
 /**
@@ -26,21 +24,24 @@ class QQBot
 {
     /**
      * @throws InterruptException
+     * @throws Exception
      */
     public function handle() {
         try {
             $data = json_decode(context()->getFrame()->data, true);
+            set_coroutine_params(["data" => $data]);
+            if (isset($data["echo"])) {
+                if (CoMessage::resumeByWS()) {
+                    EventDispatcher::interrupt();
+                }
+            }
             if (isset($data["post_type"])) {
                 //echo TermColor::ITALIC.json_encode($data, 128|256).TermColor::RESET.PHP_EOL;
-                set_coroutine_params(["data" => $data]);
                 ctx()->setCache("level", 0);
                 //Console::debug("Calling CQ Event from fd=" . ctx()->getConnection()->getFd());
                 if ($data["post_type"] != "meta_event") {
                     $r = $this->dispatchBeforeEvents($data); // before在这里执行，元事件不执行before为减少不必要的调试日志
                     if ($r->store === "block") EventDispatcher::interrupt();
-                }
-                if (CoMessage::resumeByWS()) {
-                    EventDispatcher::interrupt();
                 }
                 //Console::warning("最上数据包：".json_encode($data));
                 $this->dispatchEvents($data);
@@ -55,7 +56,7 @@ class QQBot
     /**
      * @param $data
      * @return EventDispatcher
-     * @throws InterruptException
+     * @throws Exception
      */
     public function dispatchBeforeEvents($data) {
         $before = new EventDispatcher(CQBefore::class);
@@ -177,45 +178,16 @@ class QQBot
         }
     }
 
+    /**
+     * @param $req
+     * @throws Exception
+     */
     private function dispatchAPIResponse($req) {
-        $status = $req["status"];
-        $retcode = $req["retcode"];
-        $data = $req["data"];
-        if (isset($req["echo"]) && is_numeric($req["echo"])) {
-            $r = LightCacheInside::get("wait_api", "wait_api");
-            if (isset($r[$req["echo"]])) {
-                $origin = $r[$req["echo"]];
-                $self_id = $origin["self_id"];
-                $response = [
-                    "status" => $status,
-                    "retcode" => $retcode,
-                    "data" => $data,
-                    "self_id" => $self_id,
-                    "echo" => $req["echo"]
-                ];
-                set_coroutine_params(["cq_response" => $response]);
-                $dispatcher = new EventDispatcher(CQAPIResponse::class);
-                $dispatcher->setRuleFunction(function (CQAPIResponse $response) {
-                    return $response->retcode == ctx()->getCQResponse()["retcode"];
-                });
-                $dispatcher->dispatchEvents($response);
-
-                $origin_ctx = ctx()->copy();
-                set_coroutine_params($origin_ctx);
-                if (($origin["coroutine"] ?? false) !== false) {
-                    SpinLock::lock("wait_api");
-                    $r = LightCacheInside::get("wait_api", "wait_api");
-                    $r[$req["echo"]]["result"] = $response;
-                    LightCacheInside::set("wait_api", "wait_api", $r);
-                    SpinLock::unlock("wait_api");
-                    Coroutine::resume($origin['coroutine']);
-                }
-                SpinLock::lock("wait_api");
-                $r = LightCacheInside::get("wait_api", "wait_api");
-                unset($r[$req["echo"]]);
-                LightCacheInside::set("wait_api", "wait_api", $r);
-                SpinLock::unlock("wait_api");
-            }
-        }
+        set_coroutine_params(["cq_response" => $req]);
+        $dispatcher = new EventDispatcher(CQAPIResponse::class);
+        $dispatcher->setRuleFunction(function (CQAPIResponse $response) {
+            return $response->retcode == ctx()->getCQResponse()["retcode"];
+        });
+        $dispatcher->dispatchEvents($req);
     }
 }

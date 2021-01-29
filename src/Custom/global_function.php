@@ -1,4 +1,4 @@
-<?php #plain
+<?php /** @noinspection PhpFullyQualifiedNameUsageInspection */ #plain
 
 //这里写你的全局函数
 function pgo(callable $func, $name = "default") {

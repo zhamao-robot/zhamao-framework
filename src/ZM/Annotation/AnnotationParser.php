@@ -90,6 +90,7 @@ class AnnotationParser
                     if ($vs instanceof ErgodicAnnotation) {
                         foreach (($this->annotation_map[$v]["methods"] ?? []) as $method) {
                             $copy = clone $vs;
+                            /** @noinspection PhpUndefinedFieldInspection */
                             $copy->method = $method->getName();
                             $this->annotation_map[$v]["methods_annotations"][$method->getName()][] = $copy;
                         }

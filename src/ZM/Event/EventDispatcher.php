@@ -87,7 +87,6 @@ class EventDispatcher
     /**
      * @param mixed ...$params
      * @throws Exception
-     * @throws InterruptException
      */
     public function dispatchEvents(...$params) {
         try {

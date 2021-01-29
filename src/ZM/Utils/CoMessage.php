@@ -16,7 +16,7 @@ class CoMessage
      * @param array $hang
      * @param array $compare
      * @param int $timeout
-     * @return bool
+     * @return mixed
      * @throws Exception
      */
     public static function yieldByWS(array $hang, array $compare, $timeout = 600) {
@@ -57,7 +57,8 @@ class CoMessage
         foreach ($all as $k => $v) {
             if(!isset($v["compare"])) continue;
             foreach ($v["compare"] as $vs) {
-                if ($v[$vs] != ($dat[$vs] ?? null)) {
+                if (!isset($v[$vs], $dat[$vs])) continue 2;
+                if ($v[$vs] != $dat[$vs]) {
                     continue 2;
                 }
             }
@@ -68,7 +69,7 @@ class CoMessage
             LightCacheInside::set("wait_api", "wait_api", $all);
             SpinLock::unlock("wait_api");
             if ($all[$last]["worker_id"] != server()->worker_id) {
-                ZMUtil::sendActionToWorker($all[$k]["worker_id"], "resume_ws_message", $all[$last]);
+                ZMUtil::sendActionToWorker($all[$last]["worker_id"], "resume_ws_message", $all[$last]);
             } else {
                 Co::resume($all[$last]["coroutine"]);
             }

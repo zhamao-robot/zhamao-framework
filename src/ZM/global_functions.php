@@ -24,6 +24,7 @@ function phar_classloader($p) {
         return;
     }
     try {
+        /** @noinspection PhpIncludeInspection */
         require_once $filepath;
     } catch (Exception $e) {
         echo "Error when finding class: " . $p . PHP_EOL;
@@ -75,7 +76,7 @@ function unicode_decode($str) {
 /**
  * 获取模块文件夹下的每个类文件的类名称
  * @param $dir
- * @param string $indoor_name
+ * @param $indoor_name
  * @return array
  */
 function getAllClasses($dir, $indoor_name) {
@@ -95,6 +96,7 @@ function getAllClasses($dir, $indoor_name) {
                     continue 2;
                 }
             }
+            if ($v == "global_function.php") continue;
             $class_name = $indoor_name . "\\" . mb_substr($v, 0, -4);
             $classes [] = $class_name;
         }

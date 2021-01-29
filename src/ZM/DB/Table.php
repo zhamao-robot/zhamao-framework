@@ -47,7 +47,7 @@ class Table
         return new DeleteBody($this);
     }
 
-    public function statement($line){
+    public function statement(){
         $this->cache = [];
         //TODO: 无返回的statement语句
     }
