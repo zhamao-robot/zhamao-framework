@@ -401,6 +401,14 @@ class ServerEventHandler
         Console::debug("Calling Swoole \"open\" event from fd=" . $request->fd);
         unset(Context::$context[Co::getCid()]);
         $type = strtolower($request->header["x-client-role"] ?? $request->get["type"] ?? "");
+        $access_token = explode(" ", $request->header["authorization"] ?? $request->get["token"] ?? "")[1] ?? "";
+        if (($a = ZMConfig::get("global", "access_token")) != "") {
+            if ($access_token !== $a) {
+                $server->close($request->fd);
+                Console::warning("Unauthorized access_token: ".$access_token);
+                return;
+            }
+        }
         $type_conn = ManagerGM::getTypeClassName($type);
         ManagerGM::pushConnect($request->fd, $type_conn);
         $conn = ManagerGM::get($request->fd);

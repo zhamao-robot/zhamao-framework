@@ -30,11 +30,6 @@ class QQBot
         try {
             $data = json_decode(context()->getFrame()->data, true);
             set_coroutine_params(["data" => $data]);
-            if (isset($data["echo"])) {
-                if (CoMessage::resumeByWS()) {
-                    EventDispatcher::interrupt();
-                }
-            }
             if (isset($data["post_type"])) {
                 //echo TermColor::ITALIC.json_encode($data, 128|256).TermColor::RESET.PHP_EOL;
                 ctx()->setCache("level", 0);
@@ -44,10 +39,12 @@ class QQBot
                     if ($r->store === "block") EventDispatcher::interrupt();
                 }
                 //Console::warning("最上数据包：".json_encode($data));
-                $this->dispatchEvents($data);
-            } else {
-                $this->dispatchAPIResponse($data);
             }
+            if (isset($data["echo"]) || isset($data["post_type"])) {
+                if (CoMessage::resumeByWS()) EventDispatcher::interrupt();
+            }
+            if (isset($data["post_type"])) $this->dispatchEvents($data);
+            else $this->dispatchAPIResponse($data);
         } /** @noinspection PhpRedundantCatchClauseInspection */ catch (WaitTimeoutException $e) {
             $e->module->finalReply($e->getMessage());
         }
