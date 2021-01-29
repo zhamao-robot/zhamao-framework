@@ -4,8 +4,6 @@
 namespace ZM\Http;
 
 
-use ZM\Console\Console;
-
 class Response
 {
 

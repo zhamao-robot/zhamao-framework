@@ -48,4 +48,34 @@ class CoMessage
         if ($result === null) return false;
         return $result;
     }
+
+    public static function resumeByWS() {
+        $dat = ctx()->getData();
+        $last = null;
+        SpinLock::lock("wait_api");
+        $all = LightCacheInside::get("wait_api", "wait_api") ?? [];
+        foreach ($all as $k => $v) {
+            if(!isset($v["compare"])) continue;
+            foreach ($v["compare"] as $vs) {
+                if ($v[$vs] != ($dat[$vs] ?? null)) {
+                    continue 2;
+                }
+            }
+            $last = $k;
+        }
+        if($last !== null) {
+            $all[$last]["result"] = $dat;
+            LightCacheInside::set("wait_api", "wait_api", $all);
+            SpinLock::unlock("wait_api");
+            if ($all[$last]["worker_id"] != server()->worker_id) {
+                ZMUtil::sendActionToWorker($all[$k]["worker_id"], "resume_ws_message", $all[$last]);
+            } else {
+                Co::resume($all[$last]["coroutine"]);
+            }
+            return true;
+        } else {
+            SpinLock::unlock("wait_api");
+            return false;
+        }
+    }
 }

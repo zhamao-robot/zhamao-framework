@@ -9,11 +9,10 @@ use ZM\Console\Console;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
-use ZM\Annotation\Http\{HandleAfter, HandleBefore, Controller, HandleException, Middleware, MiddlewareClass, RequestMapping};
+use ZM\Annotation\Http\{HandleAfter, HandleBefore, HandleException, Middleware, MiddlewareClass, RequestMapping};
 use ZM\Annotation\Interfaces\Level;
 use ZM\Annotation\Module\Closed;
 use ZM\Http\RouteManager;
-use ZM\Utils\DataProvider;
 
 class AnnotationParser
 {

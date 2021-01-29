@@ -104,10 +104,7 @@ class EventDispatcher
         } catch (InterruptException $e) {
             $this->store = $e->return_var;
             $this->status = self::STATUS_INTERRUPTED;
-        } catch (Exception $e) {
-            $this->status = self::STATUS_EXCEPTION;
-            throw $e;
-        } catch (Error $e) {
+        } catch (Exception | Error $e) {
             $this->status = self::STATUS_EXCEPTION;
             throw $e;
         }

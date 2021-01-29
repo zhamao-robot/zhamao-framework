@@ -5,7 +5,6 @@ namespace ZM\Annotation\Swoole;
 
 
 use Doctrine\Common\Annotations\Annotation\Target;
-use ZM\Annotation\Interfaces\Rule;
 
 /**
  * @Annotation

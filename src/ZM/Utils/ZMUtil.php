@@ -51,4 +51,8 @@ class ZMUtil
             return ZMBuf::$instance[$class];
         }
     }
+
+    public static function sendActionToWorker($target_id, $action, $data) {
+        server()->sendMessage(json_encode(["action" => $action, "data" => $data]), $target_id);
+    }
 }

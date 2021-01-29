@@ -501,6 +501,10 @@ class ServerEventHandler
         //unset(Context::$context[Co::getCid()]);
         $data = json_decode($data, true);
         switch ($data["action"] ?? '') {
+            case "resume_ws_message":
+                $obj = $data["data"];
+                Co::resume($obj["coroutine"]);
+                break;
             case "getWorkerCache":
                 $r = WorkerCache::get($data["key"]);
                 $action = ["action" => "returnWorkerCache", "cid" => $data["cid"], "value" => $r];
