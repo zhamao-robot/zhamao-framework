@@ -224,3 +224,97 @@ public function test() {
 
 解决这一问题，就需要用到锁。这种情况下，我们首先考虑的是自旋锁，框架也因此内置了一个方便使用的自旋锁组件。详见下一章：自旋锁。
 
+## 如何临时缓存大变量
+
+由于 LightCache 需要提前声明最大大小，所以在某些情况下，比如第三方 API 接口结果临时缓存，可能不太适合使用，这时对于 2.x 版本的多进程炸毛框架是一个新的问题。
+
+解决方案有三种：
+
+- 将 `global.php` 中的 `swoole.worker_num` 调整为 `1` 即可，所有除所有主 handler 事件的用户类外其他类均可使用如 `Hello::$store` 类似的静态变量全局存取
+- 使用 WorkerCache（需要 2.2.0 以上版本）
+- 使用 Redis（需要安装 `redis` 扩展）
+
+以上，WorkerCache 是为了弥补 LightCache 的不足而诞生的，以下就是 WorkerCache 的具体内容。
+
+### WorkerCache 跨进程大缓存
+
+WorkerCache 和 LightCache 几乎完全不同，WorkerCache 存储的方式说白了就是 PHP 的静态变量，不过框架支持使用封装好的进程间通信进行跨进程读取。但由于需要设置一个存储变量的进程，所以配置文件必须先指定要将数据存到哪个 Worker/TaskWorker 进程中。关于框架内多进程的说明，请见 [进阶 - 多进程 Hack](/advanced/multi-process/)。
+
+定义：`ZM\Store\WorkerCache`。
+
+#### 配置
+
+见 [基本配置](/guide/basic-config/)。
+
+#### WorkerCache::get()
+
+定义：`get($key)`。
+
+`$key` 为指定要获取的键值对的值，如果不存在则返回 null。
+
+#### WorkerCache::set()
+
+定义：`set($key, $value, $async = false)`。
+
+设置变量，你懂的。
+
+注意，`$value` 可以是被无损 `json_encode` 和 `json_decode` 的变量，闭包（Closure）、资源（resource）等类型不支持存储。
+
+`$async` 默认为 false，当为 true 时候，不会返回是否成功设置与否，否则会协程等待是否目标进程存储成功。
+
+#### WorkerCache::unset()
+
+定义：`unset($key, $async = false)` 
+
+删除键对应的值。`$async` 的意义同上。
+
+#### WorkerCache::add()
+
+定义：`add($key, int $value, $async = false)`
+
+给 int 类型的值加一，如果值不存在，则默认为 0 且加上目标的 `$value`。
+
+#### WorkerCache::sub()
+
+定义：`sub($key, int $value, $async = false)`
+
+给 int 类型的值减一，如果值不存在，则默认为 0 且减去目标的 `$value`。
+
+```php
+<?php
+namespace Module\Example;
+
+use ZM\Store\WorkerCache;
+use ZM\Annotation\CQ\CQCommand;
+
+class Hello {
+    /**
+     * @CQCommand("set_store")
+     */
+    public function setStorage() {
+        $arg1 = ctx()->getFullArg("请输入要设置的内容名称");
+        $arg2 = ctx()->getFullArg("请输入要设置的内容");
+        WorkerCache::set($arg1, $arg2);
+        return "成功！";
+    }
+    
+    /**
+     * @CQCommand("get_store")
+     */
+    public function getStorage() {
+        $arg1 = ctx()->getFullArg("请输入要获取的内容名称");
+        $data = WorkerCache::get($arg1);
+        return $data ?? "内容不存在！";
+    }
+}
+```
+
+<chat-box>
+) set_store hello world
+( 成功！
+) get_store hello
+( world
+) get_store foo
+( 内容不存在！
+</chat-box>
+

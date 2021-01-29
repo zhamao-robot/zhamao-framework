@@ -91,6 +91,18 @@ bin/start server # 通过源码模式启动框架
 - `--watch`：监控 `src/` 目录下的文件变化，有变化则自动重新载入代码。开启监控需要安装 PHP 扩展：inotify。使用 pecl 就可以安装：`pecl install inotify`。
 - `--env`：设置运行环境，设置运行环境后将优先加载指定环境的配置文件，支持 `--env=production`，`--env=staging`，`--env=development`，见 [基本配置](/guide/basic-config/#_2)。
 
+## 守护进程操作命令
+
+守护进程在 2.2.0 版本开始，可以使用命令行快速操作，如重启、停止、查看状态等。
+
+注意，这里的守护进程操作命令是指 **使用 `--daemon` 方式启动的框架**，如使用 Docker、screen、tmux 等方式挂后台跑则此命令不可用！
+
+```bash
+vendor/bin/start daemon:status # 查看守护进程的状态
+vendor/bin/start daemon:reload # 重载框架
+vendor/bin/start daemon:stop # 停止运行守护进程的框架
+```
+
 ## 独立启动其他组件
 
 框架默认不止启动框架的 `server` 命令，还有 `init` 命令和 `simple-http-server` 命令。`init` 命令在上方 Composer 依赖模式中提到过，就是初始化各个文件的。

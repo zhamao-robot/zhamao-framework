@@ -94,6 +94,7 @@ nav:
       - 从 v1 升级: advanced/to-v2.md
       - 内部类文件手册: advanced/inside-class.md
       - 接入 WebSocket 客户端: advanced/connect-ws-client.md
+      - 框架多进程: advanced/multi-process.md
   - FAQ: FAQ.md
   - 更新日志:
       - 更新日志（v2）: update/v2.md

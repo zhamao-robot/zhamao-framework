@@ -33,7 +33,7 @@ public function index() {
 
 首先，你需要了解你需要知道哪些事情才能开始着手使用框架：
 
-1. Linux 命令行基础
+1. Linux 命令行（会跑 Linux 程序）
 2. php 7.2+ 开发环境
 3. HTTP 协议（可选）
 4. OneBot 机器人聊天接口标准（可选）

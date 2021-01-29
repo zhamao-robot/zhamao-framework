@@ -20,6 +20,7 @@
 | `crash_dir`                  | 存放崩溃和运行日志的目录                         | `zm_data` 下的 `crash/`      |
 | `swoole`                     | 对应 Swoole server 中 set 的参数，参考Swoole文档 | 见子表 `swoole`              |
 | `light_cache`                | 轻量内置 key-value 缓存                          | 见字表 `light_cache`         |
+| `worker_cache`               | 跨进程变量级缓存                                 | 见子表 `worker_cache`        |
 | `sql_config`                 | MySQL 数据库连接信息                             | 见子表 `sql_config`          |
 | `redis_config`               | Redis 连接信息                                   | 见子表 `redis_config`        |
 | `access_token`               | OneBot 客户端连接约定的token，留空则无           | 空                           |
@@ -81,6 +82,12 @@
 | `status`         | 是否开启静态文件服务器 | false                          |
 | `document_root`  | 静态文件的根目录       | `{WORKING_DIR}/resources/html` |
 | `document_index` | 默认索引的文件名列表   | `["index.html"]`               |
+
+### 子表 worker_cache
+
+| 配置名称 | 说明                        | 默认值 |
+| -------- | --------------------------- | ------ |
+| `worker` | 跨进程缓存的存储工作进程 id | 0      |
 
 ## 多环境下的配置文件
 

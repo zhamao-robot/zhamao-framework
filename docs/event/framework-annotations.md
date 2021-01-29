@@ -116,6 +116,44 @@
 
 `$conn`: [ConnectionObject](/advanced/connect-ws-client/) 类型，返回一个当前 WS 连接的连接对象。
 
+## OnPipeMessageEvent()
+
+当有 其他 Worker 进程通信发来指令，激活响应。（2.2.0 版本可用）
+
+### 属性
+
+| 类型       | 值                                                      |
+| ---------- | ------------------------------------------------------- |
+| 名称       | `@OnPipeMessageEvent`                                   |
+| 触发前提   | 当有 WebSocket 连接接入框架后发送过来消息，触发注解事件 |
+| 命名空间   | `ZM\Annotation\Swoole\OnPipeMessageEvent`               |
+| 适用位置   | 方法                                                    |
+| 返回值处理 | 无                                                      |
+
+### 参数
+
+| 参数名称 | 参数范围 | 用途         | 默认 |
+| -------- | -------- | ------------ | ---- |
+| action   | `string` | 限定动作名称 |      |
+
+### 用法
+
+```java
+@OnPipeMessageEvent("foo")
+@OnPipeMessageEvent(action="bar")
+```
+
+### 事件绑定参数
+
+`$data`: 数组，内容如下：
+
+```php
+[
+    "action" => "你的上面的名称",
+    ... //其他自己发送时随便定义，带什么都行
+]
+```
+
 ## OnSwooleEvent()
 
 绑定 Swoole 所相关的事件，例如 WebSocket 接入、收到 WS 消息、关闭 WS 连接，HTTP 请求到达等。这个是旧的统一的 Swoole 事件分发注解。**请尽量使用上面几个新的注解**。
