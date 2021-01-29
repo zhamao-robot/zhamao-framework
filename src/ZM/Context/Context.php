@@ -145,7 +145,7 @@ class Context implements ContextInterface
         if ($prompt != "") $this->reply($prompt);
 
         try {
-            $r = CoMessage::yieldByWS($this->getData(), ["user_id", "self_id", "message_type", onebot_target_id_name($this->getMessageType())]);
+            $r = CoMessage::yieldByWS($this->getData(), ["user_id", "self_id", "message_type", onebot_target_id_name($this->getMessageType())], $timeout);
         } catch (Exception $e) {
             $r = false;
         }
