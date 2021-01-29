@@ -15,7 +15,7 @@ class WorkerCache
     public static $transfer = [];
 
     public static function get($key) {
-        $config = self::$config ?? ZMConfig::get("global", "worker_cache");
+        $config = self::$config ?? ZMConfig::get("global", "worker_cache") ?? ["worker" => 0];
         if ($config["worker"] === server()->worker_id) {
             return self::$store[$key] ?? null;
         } else {
