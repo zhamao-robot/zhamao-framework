@@ -119,7 +119,7 @@ $str = CQ::removeCQ("[CQ:at,qq=all]这是带表情的全体消息[CQ:face,id=8]"
 
 定义：`CQ::face($id)`
 
-参数：`$id` 为 QQ 表情对应的 ID 号，一些常见的表情 ID 对应的表情样式见 [炸毛框架 1.x 版本文档](https://docs-v1.zhamao.xin/face_list.html)。
+参数：`$id` 为 QQ 表情对应的 ID 号，一些常见的表情 ID 对应的表情样式见 [QQ 对应表情ID表](/assets/face_id.html)。
 
 ```php
 /**

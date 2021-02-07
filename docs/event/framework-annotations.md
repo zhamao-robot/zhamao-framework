@@ -246,7 +246,7 @@
 ```php
 <?php
 namespace Module\Example;
-use ZM\Annotation\Swoole\OnSwooleEvent;
+use ZM\Annotation\Swoole\OnOpenEvent;
 use ZM\ConnectionManager\ConnectionObject;
 use ZM\Console\Console;
 class Hello {

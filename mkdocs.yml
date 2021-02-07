@@ -34,7 +34,7 @@ extra:
   version:
     method: mike
 
-copyright: 'Copyright &copy; 2019 - 2020 CrazyBot Team&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tx-switch">
+copyright: 'Copyright &copy; 2019 - 2021 CrazyBot Team&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tx-switch">
                  <button data-md-color-scheme="default"><code>默认模式</code></button>
                  <button data-md-color-scheme="slate"><code>暗黑模式</code></button>
                </span>

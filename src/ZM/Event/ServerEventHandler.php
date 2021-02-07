@@ -62,7 +62,12 @@ class ServerEventHandler
         if ($terminal_id !== null) {
             ZMBuf::$terminal = $r = STDIN;
             Event::add($r, function () use ($r) {
-                $var = trim(fgets($r));
+                $fget = fgets($r);
+                if ($fget === false) {
+                    Event::del($r);
+                    return;
+                }
+                $var = trim($fget);
                 try {
                     Terminal::executeCommand($var, $r);
                 } catch (Exception $e) {
@@ -405,7 +410,7 @@ class ServerEventHandler
         if (($a = ZMConfig::get("global", "access_token")) != "") {
             if ($access_token !== $a) {
                 $server->close($request->fd);
-                Console::warning("Unauthorized access_token: ".$access_token);
+                Console::warning("Unauthorized access_token: " . $access_token);
                 return;
             }
         }

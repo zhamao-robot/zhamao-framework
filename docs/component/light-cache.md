@@ -292,7 +292,7 @@ class Hello {
      * @CQCommand("set_store")
      */
     public function setStorage() {
-        $arg1 = ctx()->getFullArg("请输入要设置的内容名称");
+        $arg1 = ctx()->getNextArg("请输入要设置的内容名称");
         $arg2 = ctx()->getFullArg("请输入要设置的内容");
         WorkerCache::set($arg1, $arg2);
         return "成功！";

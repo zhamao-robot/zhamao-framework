@@ -29,7 +29,7 @@ class WorkerCache
     }
 
     public static function set($key, $value, $async = false) {
-        $config = self::$config ?? ZMConfig::get("global", "worker_cache");
+        $config = self::$config ?? ZMConfig::get("global", "worker_cache") ?? ["worker" => 0];
         if ($config["worker"] === server()->worker_id) {
             self::$store[$key] = $value;
             return true;
@@ -50,7 +50,7 @@ class WorkerCache
     }
 
     public static function unset($key, $async = false) {
-        $config = self::$config ?? ZMConfig::get("global", "worker_cache");
+        $config = self::$config ?? ZMConfig::get("global", "worker_cache") ?? ["worker" => 0];
         if ($config["worker"] === server()->worker_id) {
             unset(self::$store[$key]);
             return true;
@@ -61,7 +61,7 @@ class WorkerCache
     }
 
     public static function add($key, int $value, $async = false) {
-        $config = self::$config ?? ZMConfig::get("global", "worker_cache");
+        $config = self::$config ?? ZMConfig::get("global", "worker_cache") ?? ["worker" => 0];
         if ($config["worker"] === server()->worker_id) {
             if(!isset(self::$store[$key])) self::$store[$key] = 0;
             self::$store[$key] += $value;
@@ -73,7 +73,7 @@ class WorkerCache
     }
 
     public static function sub($key, int $value, $async = false) {
-        $config = self::$config ?? ZMConfig::get("global", "worker_cache");
+        $config = self::$config ?? ZMConfig::get("global", "worker_cache") ?? ["worker" => 0];
         if ($config["worker"] === server()->worker_id) {
             if(!isset(self::$store[$key])) self::$store[$key] = 0;
             self::$store[$key] -= $value;

@@ -310,3 +310,7 @@ function getAllFdByConnectType(string $type = 'default'): array {
     }
     return $fds;
 }
+
+function zm_atomic($name) {
+    return \ZM\Store\ZMAtomic::get($name);
+}
