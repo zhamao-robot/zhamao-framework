@@ -8,7 +8,7 @@
 [![Latest Stable Version](http://img.shields.io/packagist/v/zhamao/framework.svg)](https://packagist.org/packages/zhamao/framework)
 [![Banner](https://img.shields.io/badge/CQHTTP-v11-black)]()
 
-[![注解数量](https://img.shields.io/github/search/zhamao-robot/zhamao-framework/注解数量.svg)](https://github.com/zhamao-robot/zhamao-framework/search?q=AnnotationBase)
+[![注解数量](https://img.shields.io/github/search/zhamao-robot/zhamao-framework/AnnotationBase.svg)](https://github.com/zhamao-robot/zhamao-framework/search?q=AnnotationBase)
 [![TODO 数量](https://img.shields.io/github/search/zhamao-robot/zhamao-framework/TODO.svg)](https://github.com/zhamao-robot/zhamao-framework/search?q=TODO)
 
 </div>
