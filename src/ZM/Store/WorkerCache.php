@@ -38,10 +38,10 @@ class WorkerCache
             return self::processRemote($action, $async, $config);
         }
     }
-    
+
     private static function processRemote($action, $async, $config) {
         $ss = server()->sendMessage(json_encode($action, JSON_UNESCAPED_UNICODE), $config["worker"]);
-        if(!$ss) return false;
+        if (!$ss) return false;
         if ($async) return true;
         zm_yield();
         $p = self::$transfer[zm_cid()] ?? null;
@@ -63,7 +63,7 @@ class WorkerCache
     public static function add($key, int $value, $async = false) {
         $config = self::$config ?? ZMConfig::get("global", "worker_cache") ?? ["worker" => 0];
         if ($config["worker"] === server()->worker_id) {
-            if(!isset(self::$store[$key])) self::$store[$key] = 0;
+            if (!isset(self::$store[$key])) self::$store[$key] = 0;
             self::$store[$key] += $value;
             return true;
         } else {
@@ -75,7 +75,7 @@ class WorkerCache
     public static function sub($key, int $value, $async = false) {
         $config = self::$config ?? ZMConfig::get("global", "worker_cache") ?? ["worker" => 0];
         if ($config["worker"] === server()->worker_id) {
-            if(!isset(self::$store[$key])) self::$store[$key] = 0;
+            if (!isset(self::$store[$key])) self::$store[$key] = 0;
             self::$store[$key] -= $value;
             return true;
         } else {

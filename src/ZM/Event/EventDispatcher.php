@@ -93,13 +93,13 @@ class EventDispatcher
             foreach ((EventManager::$events[$this->class] ?? []) as $v) {
                 $this->dispatchEvent($v, $this->rule, ...$params);
                 if ($this->log) Console::verbose("[事件分发{$this->eid}] 单一对象 " . $v->class . "::" . $v->method . " 分发结束。");
-                if($this->status == self::STATUS_BEFORE_FAILED || $this->status == self::STATUS_RULE_FAILED) continue;
+                if ($this->status == self::STATUS_BEFORE_FAILED || $this->status == self::STATUS_RULE_FAILED) continue;
                 if (is_callable($this->return_func) && $this->status === self::STATUS_NORMAL) {
                     if ($this->log) Console::verbose("[事件分发{$this->eid}] 单一对象 " . $v->class . "::" . $v->method . " 正在执行返回值处理函数 ...");
                     ($this->return_func)($this->store);
                 }
             }
-            if($this->status === self::STATUS_RULE_FAILED) $this->status = self::STATUS_NORMAL;
+            if ($this->status === self::STATUS_RULE_FAILED) $this->status = self::STATUS_NORMAL;
         } catch (InterruptException $e) {
             $this->store = $e->return_var;
             $this->status = self::STATUS_INTERRUPTED;
@@ -113,9 +113,9 @@ class EventDispatcher
      * @param mixed $v
      * @param null $rule_func
      * @param mixed ...$params
-     * @throws AnnotationException
-     * @throws InterruptException
      * @return bool
+     * @throws InterruptException
+     * @throws AnnotationException
      */
     public function dispatchEvent($v, $rule_func = null, ...$params) {
         $q_c = $v->class;

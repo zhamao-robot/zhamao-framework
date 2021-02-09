@@ -15,18 +15,16 @@ class SpinLock
 
     private static $delay = 1;
 
-    public static function init($key_cnt, $delay = 1)
-    {
+    public static function init($key_cnt, $delay = 1) {
         self::$kv_lock = new Table($key_cnt, 0.7);
         self::$delay = $delay;
         self::$kv_lock->column('lock_num', Table::TYPE_INT, 8);
         return self::$kv_lock->create();
     }
 
-    public static function lock(string $key)
-    {
+    public static function lock(string $key) {
         while (($r = self::$kv_lock->incr($key, 'lock_num')) > 1) { //此资源已经被锁上了
-            if(Coroutine::getCid() != -1) System::sleep(self::$delay / 1000);
+            if (Coroutine::getCid() != -1) System::sleep(self::$delay / 1000);
             else usleep(self::$delay * 1000);
         }
     }

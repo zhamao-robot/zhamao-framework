@@ -184,7 +184,7 @@ class LightCache
                 $r[$k] = self::parseGet($v);
             }
         }
-        if(self::$config["persistence_path"] == "") return;
+        if (self::$config["persistence_path"] == "") return;
         if (file_exists(self::$config["persistence_path"])) {
             $r = file_put_contents(self::$config["persistence_path"], json_encode($r, 128 | 256));
             if ($r === false) Console::error("Not saved, please check your \"persistence_path\"!");

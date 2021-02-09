@@ -47,7 +47,7 @@ class AnnotationParser
      */
     public function registerMods() {
         foreach ($this->path_list as $path) {
-            Console::debug("parsing annotation in ".$path[0]);
+            Console::debug("parsing annotation in " . $path[0]);
             $all_class = getAllClasses($path[0], $path[1]);
             $this->reader = new AnnotationReader();
             foreach ($all_class as $v) {

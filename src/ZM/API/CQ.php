@@ -130,7 +130,7 @@ class CQ
      * @return string
      */
     public static function anonymous($ignore = 1) {
-        return "[CQ:anonymous".($ignore != 1 ? ",ignore=0" : "")."]";
+        return "[CQ:anonymous" . ($ignore != 1 ? ",ignore=0" : "") . "]";
     }
 
     /**
@@ -208,7 +208,7 @@ class CQ
     }
 
     public static function node($user_id, $nickname, $content) {
-        return "[CQ:node,user_id=$user_id,nickname=$nickname,content=".self::escape($content)."]";
+        return "[CQ:node,user_id=$user_id,nickname=$nickname,content=" . self::escape($content) . "]";
     }
 
     /**

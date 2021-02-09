@@ -38,7 +38,7 @@ class DB
         if (Table::getTableInstance($table_name) === null) {
             if (in_array($table_name, self::$table_list))
                 return new Table($table_name);
-            elseif(SqlPoolStorage::$sql_pool !== null){
+            elseif (SqlPoolStorage::$sql_pool !== null) {
                 throw new DbException("Table " . $table_name . " not exist in database.");
             } else {
                 throw new DbException("Database connection not exist or connect failed. Please check sql configuration");
@@ -84,7 +84,7 @@ class DB
      * @throws DbException
      */
     public static function rawQuery(string $line, $params = [], $fetch_mode = ZM_DEFAULT_FETCH_MODE) {
-        Console::debug("MySQL: ".$line." | ". implode(", ", $params));
+        Console::debug("MySQL: " . $line . " | " . implode(", ", $params));
         try {
             $conn = SqlPoolStorage::$sql_pool->get();
             if ($conn === false) {
@@ -115,7 +115,7 @@ class DB
                 return $ps->fetchAll($fetch_mode);
             }
         } catch (DbException $e) {
-            if(mb_strpos($e->getMessage(), "has gone away") !== false) {
+            if (mb_strpos($e->getMessage(), "has gone away") !== false) {
                 zm_sleep(0.2);
                 Console::warning("Gone away of MySQL! retrying!");
                 return self::rawQuery($line, $params);
@@ -123,7 +123,7 @@ class DB
             Console::warning($e->getMessage());
             throw $e;
         } catch (PDOException $e) {
-            if(mb_strpos($e->getMessage(), "has gone away") !== false) {
+            if (mb_strpos($e->getMessage(), "has gone away") !== false) {
                 zm_sleep(0.2);
                 Console::warning("Gone away of MySQL! retrying!");
                 return self::rawQuery($line, $params);

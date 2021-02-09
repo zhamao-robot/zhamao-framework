@@ -16,7 +16,7 @@ class ZMRedis
      * @throws NotInitializedException
      */
     public static function call(callable $callable) {
-        if(ZMRedisPool::$pool === null) throw new NotInitializedException("Redis pool is not initialized.");
+        if (ZMRedisPool::$pool === null) throw new NotInitializedException("Redis pool is not initialized.");
         $r = ZMRedisPool::$pool->get();
         $result = $callable($r);
         if (isset($r->wasted)) ZMRedisPool::$pool->put(null);
@@ -29,7 +29,7 @@ class ZMRedis
      * @throws NotInitializedException
      */
     public function __construct() {
-        if(ZMRedisPool::$pool === null) throw new NotInitializedException("Redis pool is not initialized.");
+        if (ZMRedisPool::$pool === null) throw new NotInitializedException("Redis pool is not initialized.");
         $this->conn = ZMRedisPool::$pool->get();
     }
 

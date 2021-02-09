@@ -89,10 +89,10 @@ function getAllClasses($dir, $indoor_name) {
         //echo "At " . $indoor_name . PHP_EOL;
         if (is_dir($dir . $v)) $classes = array_merge($classes, getAllClasses($dir . $v . "/", $indoor_name . "\\" . $v));
         elseif (mb_substr($v, -4) == ".php") {
-            if(substr(file_get_contents($dir.$v), 6, 6) == "#plain") continue;
-            $composer = json_decode(file_get_contents(DataProvider::getWorkingDir()."/composer.json"), true);
-            foreach($composer["autoload"]["files"] as $fi) {
-                if(realpath(DataProvider::getWorkingDir()."/".$fi) == realpath($dir.$v)) {
+            if (substr(file_get_contents($dir . $v), 6, 6) == "#plain") continue;
+            $composer = json_decode(file_get_contents(DataProvider::getWorkingDir() . "/composer.json"), true);
+            foreach ($composer["autoload"]["files"] as $fi) {
+                if (realpath(DataProvider::getWorkingDir() . "/" . $fi) == realpath($dir . $v)) {
                     continue 2;
                 }
             }

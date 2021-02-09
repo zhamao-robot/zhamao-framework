@@ -55,7 +55,7 @@ class CoMessage
         SpinLock::lock("wait_api");
         $all = LightCacheInside::get("wait_api", "wait_api") ?? [];
         foreach ($all as $k => $v) {
-            if(!isset($v["compare"])) continue;
+            if (!isset($v["compare"])) continue;
             foreach ($v["compare"] as $vs) {
                 if (!isset($v[$vs], $dat[$vs])) continue 2;
                 if ($v[$vs] != $dat[$vs]) {
@@ -64,7 +64,7 @@ class CoMessage
             }
             $last = $k;
         }
-        if($last !== null) {
+        if ($last !== null) {
             $all[$last]["result"] = $dat;
             LightCacheInside::set("wait_api", "wait_api", $all);
             SpinLock::unlock("wait_api");

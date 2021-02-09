@@ -16,7 +16,7 @@ class RouteManager
     public static $routes = null;
 
     public static function importRouteByAnnotation(RequestMapping $vss, $method, $class, $methods_annotations) {
-        if(self::$routes === null) self::$routes = new RouteCollection();
+        if (self::$routes === null) self::$routes = new RouteCollection();
 
         // 拿到所属方法的类上面有没有控制器的注解
         $prefix = '';
@@ -27,8 +27,8 @@ class RouteManager
             }
         }
         $tail = trim($vss->route, "/");
-        $route_name = $prefix.($tail === "" ? "" : "/").$tail;
-        Console::debug("添加路由：".$route_name);
+        $route_name = $prefix . ($tail === "" ? "" : "/") . $tail;
+        Console::debug("添加路由：" . $route_name);
         $route = new Route($route_name, ['_class' => $class, '_method' => $method]);
         $route->setMethods($vss->request_method);
 

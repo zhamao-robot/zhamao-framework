@@ -59,7 +59,7 @@ class ZMRobot
     public static function getAllRobot() {
         $r = ManagerGM::getAllByName('qq');
         $obj = [];
-        foreach($r as $v) {
+        foreach ($r as $v) {
             $obj[] = new ZMRobot($v);
         }
         return $obj;

@@ -4,7 +4,6 @@
 namespace ZM\DB;
 
 
-
 class Table
 {
     private $table_name;
@@ -28,7 +27,7 @@ class Table
         return new SelectBody($this, $what == [] ? ["*"] : $what);
     }
 
-    public function where($column, $operation_or_value, $value = null){
+    public function where($column, $operation_or_value, $value = null) {
         return (new SelectBody($this, ["*"]))->where($column, $operation_or_value, $value);
     }
 
@@ -47,7 +46,7 @@ class Table
         return new DeleteBody($this);
     }
 
-    public function statement(){
+    public function statement() {
         $this->cache = [];
         //TODO: 无返回的statement语句
     }

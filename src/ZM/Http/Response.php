@@ -160,7 +160,7 @@ class Response
      * @return mixed
      */
     public function end($content = null) {
-        if(!$this->is_end) {
+        if (!$this->is_end) {
             $this->is_end = true;
             return $this->response->end($content);
         } else {
