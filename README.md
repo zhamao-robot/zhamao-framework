@@ -73,7 +73,7 @@ public function index() {
 
 本项目为作者闲暇时间开发，如果觉得好用，不妨进行捐助～你的捐助会让我更加有动力完善插件，感谢你的支持！
 
-我们会将捐赠的资金用于本项目驱动的炸毛机器人和框架文档的服务器开销上。
+我们会将捐赠的资金用于本项目驱动的炸毛机器人和框架文档的服务器开销上。[捐赠列表](https://github.com/zhamao-robot/thanks)
 
 ### 支付宝
 ![支付宝二维码](/resources/images/alipay_img.jpg)
