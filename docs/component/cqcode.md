@@ -111,6 +111,20 @@ $str = CQ::removeCQ("[CQ:at,qq=all]这是带表情的全体消息[CQ:face,id=8]"
 // $str: "这是带表情的全体消息"
 ```
 
+### CQ::getCQ()
+
+解析CQ码。
+
+- 参数：`getCQ($msg);`：要解析出 CQ 码的消息。
+- 返回：`数组 | null`，见下表
+
+| 键名   | 说明                                                         |
+| ------ | ------------------------------------------------------------ |
+| type   | CQ码类型，比如 `[CQ:at]` 中的 `at`                           |
+| params | 参数列表，比如 `[CQ:image,file=123.jpg,url=http://a.com/a.jpg]`，params 为  `["file" => "123","url" => "http://a.com/a.jpg"]` |
+| start  | 此 CQ 码在字符串中的起始位置                                 |
+| end    | 此 CQ 码在字符串中的结束位置                                 |
+
 ## CQ 码列表
 
 ### CQ::face() - 发送 QQ 表情

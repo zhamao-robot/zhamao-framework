@@ -41,6 +41,7 @@ use ZM\Exception\InterruptException;
 use ZM\Framework;
 use ZM\Http\Response;
 use ZM\Module\QQBot;
+use ZM\Store\LightCache;
 use ZM\Store\LightCacheInside;
 use ZM\Store\MySQL\SqlPoolStorage;
 use ZM\Store\Redis\ZMRedisPool;
@@ -121,6 +122,9 @@ class ServerEventHandler
      * @param $worker_id
      */
     public function onWorkerStop(Server $server, $worker_id) {
+        if ($worker_id == (ZMConfig::get("worker_cache")["worker"] ?? 0)) {
+            LightCache::savePersistence();
+        }
         Console::debug(($server->taskworker ? "Task" : "") . "Worker #$worker_id 已停止");
     }
 
@@ -530,6 +534,11 @@ class ServerEventHandler
                 break;
             case "unsetWorkerCache":
                 $r = WorkerCache::unset($data["key"]);
+                $action = ["action" => "returnWorkerCache", "cid" => $data["cid"], "value" => $r];
+                $server->sendMessage(json_encode($action, 256), $src_worker_id);
+                break;
+            case "hasKeyWorkerCache":
+                $r = WorkerCache::hasKey($data["key"], $data["subkey"]);
                 $action = ["action" => "returnWorkerCache", "cid" => $data["cid"], "value" => $r];
                 $server->sendMessage(json_encode($action, 256), $src_worker_id);
                 break;

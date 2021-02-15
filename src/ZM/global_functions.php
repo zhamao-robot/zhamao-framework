@@ -267,10 +267,14 @@ function zm_timer_after($ms, callable $callable) {
 }
 
 function zm_timer_tick($ms, callable $callable) {
-    go(function () use ($ms, $callable) {
-        Console::debug("Adding extra timer tick of " . $ms . " ms");
-        Swoole\Timer::tick($ms, $callable);
-    });
+    if (zm_cid() === -1) {
+        return go(function () use ($ms, $callable) {
+            Console::debug("Adding extra timer tick of " . $ms . " ms");
+            Swoole\Timer::tick($ms, $callable);
+        });
+    } else {
+        return Swoole\Timer::tick($ms, $callable);
+    }
 }
 
 function zm_data_hash($v) {

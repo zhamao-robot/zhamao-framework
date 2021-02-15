@@ -39,6 +39,16 @@ class WorkerCache
         }
     }
 
+    public static function hasKey($key, $subkey) {
+        $config = self::$config ?? ZMConfig::get("global", "worker_cache") ?? ["worker" => 0];
+        if ($config["worker"] === server()->worker_id) {
+            return isset(self::$store[$key][$subkey]);
+        } else {
+            $action = ["hasKeyWorkerCache", "key" => $key, "subkey" => $subkey, "cid" => zm_cid()];
+            return self::processRemote($action, false, $config);
+        }
+    }
+
     private static function processRemote($action, $async, $config) {
         $ss = server()->sendMessage(json_encode($action, JSON_UNESCAPED_UNICODE), $config["worker"]);
         if (!$ss) return false;

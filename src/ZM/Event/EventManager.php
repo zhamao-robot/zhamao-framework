@@ -9,8 +9,11 @@ use Exception;
 use Swoole\Timer;
 use ZM\Annotation\AnnotationBase;
 use ZM\Annotation\AnnotationParser;
+use ZM\Annotation\Swoole\OnSave;
 use ZM\Annotation\Swoole\OnTick;
+use ZM\Config\ZMConfig;
 use ZM\Console\Console;
+use ZM\Store\LightCache;
 use ZM\Store\ZMAtomic;
 
 class EventManager
@@ -57,6 +60,12 @@ class EventManager
                     echo Console::setColor($e->getTraceAsString(), "gray");
                     Console::error("Please check your code!");
                 }
+            });
+        }
+        $conf = ZMConfig::get("global", "worker_cache") ?? ["worker" => 0];
+        if (server()->worker_id == $conf["worker"]) {
+            zm_timer_tick(ZMConfig::get("global", "light_cache")["auto_save_interval"] * 1000, function () {
+                LightCache::savePersistence();
             });
         }
     }

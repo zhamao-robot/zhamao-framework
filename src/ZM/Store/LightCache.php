@@ -6,7 +6,10 @@ namespace ZM\Store;
 
 use Exception;
 use Swoole\Table;
+use ZM\Annotation\Swoole\OnSave;
+use ZM\Config\ZMConfig;
 use ZM\Console\Console;
+use ZM\Event\EventDispatcher;
 use ZM\Exception\ZMException;
 
 class LightCache
@@ -175,7 +178,16 @@ class LightCache
         return $r;
     }
 
-    public static function savePersistence() {
+    public static function savePersistence($only_worker = false) {
+
+        // 下面将OnSave激活一下
+        if (server()->worker_id == (ZMConfig::get("global", "worker_cache")["worker"] ?? 0)) {
+            $dispatcher = new EventDispatcher(OnSave::class);
+            $dispatcher->dispatchEvents();
+        }
+
+        if($only_worker) return;
+
         if (self::$kv_table === null) return;
         $r = [];
         foreach (self::$kv_table as $k => $v) {
@@ -189,6 +201,8 @@ class LightCache
             $r = file_put_contents(self::$config["persistence_path"], json_encode($r, 128 | 256));
             if ($r === false) Console::error("Not saved, please check your \"persistence_path\"!");
         }
+
+
     }
 
     private static function checkExpire($key) {
