@@ -11,9 +11,24 @@ QQ 机器人事件是指 CQHTTP 插件发来的 Event 事件，被框架处理�
 事件是用户需要从 OneBot 被动接收的数据，有以下几个大类：
 
 - [消息事件](#cqmessage)，包括私聊消息、群消息等，被 [`@CQCommand`](#cqcommand)，`@CQMessage` 注解处理。
+
 - [通知事件](#cqnotice)，包括群成员变动、好友变动等，被 `@CQNotice` 注解事件处理。
+
 - [请求事件](#cqrequest)，包括加群请求、加好友请求等，被 `@CQRequest` 注解事件处理。
+
 - [元事件](#cqmetaevent)，包括 OneBot 生命周期、心跳等，被 `@CQMetaEvent` 注解事件处理。
+
+## 注解事件参照表
+
+| 注解名称                                                | 类所在命名全称               | 作用                                                         |
+| ------------------------------------------------------- | ---------------------------- | ------------------------------------------------------------ |
+| [`@CQBefore`](/event/robot-annotations/#cqbefore)       | `\ZM\Annotation\CQBefore`    | OneBot 各类事件前触发的，可当作事件过滤器使用                |
+| [`@CQAfter`](/event/robot-annotations/#cqafter)         | `\ZM\Annotation\CQAfter`     | OneBot 各类事件后触发的                                      |
+| [`@CQMessage`](/event/robot-annotations/#cqmessage)     | `\ZM\Annotation\CQMessage`   | OneBot 中消息类事件的触发（机器人消息）事件                  |
+| [`@CQCommand`](/event/robot-annotations/#cqcommand)     | `\ZM\Annotation\CQCommand`   | OneBot 中消息类事件的触发（机器人消息）事件，但是被封装为指令型的，无需自己切割命令式 |
+| [`@CQNotice`](/event/robot-annotations/#cqnotice)       | `\ZM\Annotation\CQNotice`    | OneBot 中通知类事件的触发（机器人消息）事件                  |
+| [`@CQRequest`](/event/robot-annotations/#cqrequest)     | `\ZM\Annotation\CQRequest`   | OneBot 中请求类事件的触发（机器人消息）事件，一般带有请求信息，可联动相关响应的 API 完成功能编写 |
+| [`@CQMetaEvent`](/event/robot-annotations/#cqmetaevent) | `\ZM\Annotation\CQMetaEvent` | OneBot 中涉及 OneBot 实现本身的一些和机器人事件无关的元事件，比如 WS 连接的心跳包 |
 
 ## CQMessage()
 

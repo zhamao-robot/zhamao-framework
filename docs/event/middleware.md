@@ -163,5 +163,5 @@ public function onThrowing(?Exception $e) {
 
 这里的 `@HandleException` 中的参数为要捕获的类名，注意这里面的类名的命名空间需要写全称，不能上面 use 再使用，否则会无法找到异常类。
 
-`context()` 为获取当前协程空间绑定的 `request` 和 `response` 对象。
+`ctx()` 为获取当前协程空间绑定的 `request` 和 `response` 对象。
 

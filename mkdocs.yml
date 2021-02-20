@@ -10,8 +10,8 @@ theme:
   favicon: assets/favicon.png
   language: zh
   palette:
-    primary: blue
-    accent: blue
+    primary: red
+    accent: red
   features:
     - navigation.tabs
 extra_javascript:
@@ -95,6 +95,8 @@ nav:
       - 内部类文件手册: advanced/inside-class.md
       - 接入 WebSocket 客户端: advanced/connect-ws-client.md
       - 框架多进程: advanced/multi-process.md
+      - 开发实战教程:
+          - 编写管理员才能触发的功能: advanced/example/admin.md
   - FAQ: FAQ.md
   - 更新日志:
       - 更新日志（v2）: update/v2.md

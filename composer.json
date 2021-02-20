@@ -53,6 +53,7 @@
         ]
     },
     "require-dev": {
-        "swoole/ide-helper": "@dev"
+        "swoole/ide-helper": "@dev",
+        "phpunit/phpunit": "^9.5"
     }
 }

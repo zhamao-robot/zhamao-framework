@@ -39,4 +39,10 @@ class SpinLock
     public static function unlock(string $key) {
         return self::$kv_lock->set($key, ['lock_num' => 0]);
     }
+
+    public static function transaction(string $key, callable $function) {
+        SpinLock::lock($key);
+        $function();
+        SpinLock::unlock($key);
+    }
 }

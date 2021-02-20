@@ -82,15 +82,20 @@ class Hello {
 
 CQ 码字符反转义。
 
+定义：`CQ::encode($msg, $is_content = false)`
+
+当 `$is_content` 为 true 时，会将 `&#44;` 转义为 `,`。
+
 | 反转义前 | 反转义后 |
 | -------- | -------- |
 | `&amp;`  | `&`      |
 | `&#91;`  | `[`      |
 | `&#93;`  | `]`      |
+| `&#44;`  | `,`      |
 
 ```php
-$str = CQ::decode("&#91;我只是一条普通的文本&#93;");
-// 转换为 "[我只是一条普通的文本]"
+$str = CQ::decode("&#91;CQ:at,qq=我只是一条普通的文本&#93;");
+// 转换为 "[CQ:at,qq=我只是一条普通的文本]"
 ```
 
 ### CQ::encode()
@@ -101,6 +106,14 @@ $str = CQ::decode("&#91;我只是一条普通的文本&#93;");
 $str = CQ::encode("[CQ:我只是一条普通的文本]");
 // $str: "&#91;CQ:我只是一条普通的文本&#93;"
 ```
+
+定义：`CQ::encode($msg, $is_content = false)`
+
+当 `$is_content` 为 true 时，会将 `,` 转义为 `&#44;`。
+
+### CQ::escape()
+
+同 `CQ::encode()`。
 
 ### CQ::removeCQ()
 
@@ -113,7 +126,7 @@ $str = CQ::removeCQ("[CQ:at,qq=all]这是带表情的全体消息[CQ:face,id=8]"
 
 ### CQ::getCQ()
 
-解析CQ码。
+解析 CQ 码。
 
 - 参数：`getCQ($msg);`：要解析出 CQ 码的消息。
 - 返回：`数组 | null`，见下表
@@ -124,6 +137,34 @@ $str = CQ::removeCQ("[CQ:at,qq=all]这是带表情的全体消息[CQ:face,id=8]"
 | params | 参数列表，比如 `[CQ:image,file=123.jpg,url=http://a.com/a.jpg]`，params 为  `["file" => "123","url" => "http://a.com/a.jpg"]` |
 | start  | 此 CQ 码在字符串中的起始位置                                 |
 | end    | 此 CQ 码在字符串中的结束位置                                 |
+
+### CQ::getAllCQ()
+
+解析 CQ 码，和 `getCQ()` 的区别是，这个会将字符串中的所有 CQ 码都解析出来，并以同样上方解析出来的数组格式返回。
+
+```php
+CQ::getAllCQ("[CQ:at,qq=123]你好啊[CQ:at,qq=456]");
+/*
+[
+  [
+    "type" => "at",
+    "params" => [
+      "qq" => "123",
+    ],
+    "start" => 0,
+    "end" => 13,
+  ],
+  [
+    "type" => "at",
+    "params" => [
+      "qq" => "456",
+    ],
+    "start" => 17,
+    "end" => 30,
+  ],
+]
+*/
+```
 
 ## CQ 码列表
 
@@ -463,11 +504,31 @@ public function xmlTest() {
 
 发送 QQ 兼容的 JSON 多媒体消息。
 
-定义：`CQ::json($data)`
+定义：`CQ::json($data, $resid = 0)`
 
 参数同上，内含 JSON 字符串即可。
+
+其中 `$resid` 是面向 go-cqhttp 扩展的参数，默认不填为 0，走小程序通道，填了走富文本通道发送。
 
 !!! tip "提示"
 
 	因为某些众所周知的原因，XML 和 JSON 的返回不提供实例，有兴趣的可以自行研究如何编写，文档不含任何相关教程。
+
+### CQ::_custom() - 扩展自定义 CQ 码
+
+用于兼容各类含有被支持的扩展 CQ 码，比如 go-cqhttp 的 `[CQ:gift]` 礼物类型。
+
+定义：`CQ::_custom(string $type_name, array $params)`
+
+| 参数名      | 说明                                                |
+| ----------- | --------------------------------------------------- |
+| `type_name` | CQ 码类型，如 `music`，`at`                         |
+| `params`    | 发送的 CQ 码中的参数数组，例如 `["qq" => "123456"]` |
+
+下面是一个例子：
+
+```php
+CQ::_custom("at",["qq" => "123456","qwe" => "asd"]);
+// 返回：[CQ:at,qq=123456,qwe=asd]
+```
 
