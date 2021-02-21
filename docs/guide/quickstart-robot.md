@@ -8,7 +8,7 @@
 
 一切都安装成功后，你就已经做好了进行简单配置以运行一个最小的 **机器人问答模块** 的准备。
 
-炸毛框架和机器人客户端是什么关系呢？炸毛框架就好比我们传统的一系列例如 Spring 框架、ThinkPHP 框架等，是服务端，而机器人客户端是一个 HTTP / WebSocket 客户端，时刻准备着连接到炸毛框架的。
+炸毛框架和机器人客户端是什么关系呢？炸毛框架就好比我们传统的一系列例如 Spring 框架、ThinkPHP 框架等，是服务端，而机器人客户端是一个 HTTP / WebSocket 客户端，时刻准备着连接到炸毛框架。
 
 ## 机器人客户端
 
@@ -29,51 +29,6 @@ OneBot 机器人部分的选择详情见 [OneBot 实例](/guide/OneBot实例/)�
 !!! warning "注意"
 
     由于 go-cqhttp 项目还处于开发期，而且配置文件格式也发生了多次变化，但大体内容没有变（比如编写此文档时发布的版本中配置文件格式变成了 `hjson` 取代了原来的 `json`。
-
-=== "config.json（旧格式）" 
-
-    ``` json hl_lines="2 3 30 31"
-    {
-      "uin": 你的QQ号,
-      "password": "你的密码",
-      "encrypt_password": false,
-      "password_encrypted": "",
-      "enable_db": true,
-      "access_token": "",
-      "relogin": {
-        "enabled": true,
-        "relogin_delay": 3,
-        "max_relogin_times": 0
-      },
-      "ignore_invalid_cqcode": false,
-      "force_fragmented": true,
-      "heartbeat_interval": 0,
-      "http_config": {
-        "enabled": false,
-        "host": "0.0.0.0",
-        "port": 5700,
-        "timeout": 0,
-        "post_urls": {}
-      },
-      "ws_config": {
-        "enabled": false,
-        "host": "0.0.0.0",
-        "port": 6700
-      },
-      "ws_reverse_servers": [
-        {
-          "enabled": true,
-          "reverse_url": "ws://127.0.0.1:20001/",
-          "reverse_api_url": "",
-          "reverse_event_url": "",
-          "reverse_reconnect_interval": 3000
-        }
-      ],
-      "post_message_format": "string",
-      "debug": false,
-      "log_level": ""
-    }
-    ```
 
 === "config.hjson（新格式）"
 
@@ -193,6 +148,51 @@ OneBot 机器人部分的选择详情见 [OneBot 实例](/guide/OneBot实例/)�
     }
     ```
 
+=== "config.json（旧格式）" 
+
+    ``` json hl_lines="2 3 30 31"
+    {
+      "uin": 你的QQ号,
+      "password": "你的密码",
+      "encrypt_password": false,
+      "password_encrypted": "",
+      "enable_db": true,
+      "access_token": "",
+      "relogin": {
+        "enabled": true,
+        "relogin_delay": 3,
+        "max_relogin_times": 0
+      },
+      "ignore_invalid_cqcode": false,
+      "force_fragmented": true,
+      "heartbeat_interval": 0,
+      "http_config": {
+        "enabled": false,
+        "host": "0.0.0.0",
+        "port": 5700,
+        "timeout": 0,
+        "post_urls": {}
+      },
+      "ws_config": {
+        "enabled": false,
+        "host": "0.0.0.0",
+        "port": 6700
+      },
+      "ws_reverse_servers": [
+        {
+          "enabled": true,
+          "reverse_url": "ws://127.0.0.1:20001/",
+          "reverse_api_url": "",
+          "reverse_event_url": "",
+          "reverse_reconnect_interval": 3000
+        }
+      ],
+      "post_message_format": "string",
+      "debug": false,
+      "log_level": ""
+    }
+    ```
+
 其中 ws://127.0.0.1:20001/ 中的 127.0.0.1 和 20001 应分别对应炸毛框架配置的 HOST 和 PORT
 
 ## 第一次对话
@@ -229,8 +229,8 @@ public function repeat() {
 ( 你好啊
 ) echo
 ( 请输入你要回复的内容
-) 哦豁，完蛋
-( 哦豁，完蛋
+) 哦豁
+( 哦豁
 </chat-box>
 
 > 如果你只回复 `echo` 的话，它会先和你进入一个会话状态，并问你 `请输入你要回复的内容`，这时你再次说一些内容例如 `哦豁`，会回复你 `哦豁`。效果和直接输入 `echo 哦豁` 是一致的，这是炸毛框架内的一个封装好的命令参数对话询问功能。有关参数询问功能，请看后面的进阶模块。
