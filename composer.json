@@ -3,7 +3,7 @@
     "description": "High performance QQ robot and web server development framework",
     "minimum-stability": "stable",
     "license": "Apache-2.0",
-    "version": "2.2.5",
+    "version": "2.2.6",
     "extra": {
         "exclude_annotate": [
             "src/ZM"
@@ -26,19 +26,18 @@
     ],
     "require": {
         "php": ">=7.2",
-        "doctrine/annotations": "~1.10",
         "ext-json": "*",
+        "ext-posix": "*",
+        "doctrine/annotations": "~1.10",
         "psy/psysh": "@stable",
         "symfony/polyfill-ctype": "^1.20",
         "symfony/polyfill-mbstring": "^1.20",
         "symfony/console": "^5.1",
+        "symfony/routing": "^5.1",
         "zhamao/connection-manager": "*@dev",
         "zhamao/console": "^1.0",
         "zhamao/config": "^1.0",
-        "zhamao/request": "*@dev",
-        "symfony/routing": "^5.1",
-        "symfony/polyfill-php80": "^1.20",
-        "ext-posix": "*"
+        "zhamao/request": "*@dev"
     },
     "suggest": {
         "ext-ctype": "*",

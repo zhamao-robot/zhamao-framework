@@ -82,8 +82,19 @@ cd zhamao-framework-starter
 ./run-docker.sh # 在正式版炸毛框架 v2 发布后可用，测试版暂不放出
 ```
 
+!!! tip "提示"
+
+	如果国内 Composer 下载过慢，可以使用阿里云的 Composer 镜像加速。
+	```bash
+	# 仅对当前的项目使用阿里云加速
+	composer config repo.packagist composer https://mirrors.aliyun.com/composer/
+	# 对全局的 Composer 使用阿里云加速
+	composer config -g repo.packagist composer https://mirrors.aliyun.com/composer/
+	```
+
 
 ## 启动框架
+
 本地环境启动方式：
 ```bash
 cd zhamao-framework-starter
