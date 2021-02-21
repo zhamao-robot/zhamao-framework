@@ -1,12 +1,12 @@
 <div align="center">
-  <img src="/resources/images/logo_trans.png" height = "150" alt="炸毛框架"><br>
+  <img src="https://cdn.jsdelivr.net/gh/zhamao-robot/zhamao-framework/resources/images/logo_trans.png" width = "150" height = "150" alt="炸毛框架"><br>
   <h2>炸毛框架</h2>
   炸毛框架 (zhamao-framework) 是一个协程高性能的聊天机器人 + Web 服务器开发框架<br><br>
 
-[![作者QQ](https://img.shields.io/badge/作者QQ-627577391-orange.svg)]()
+[![作者QQ](https://img.shields.io/badge/作者QQ-627577391-orange.svg)](http://wpa.qq.com/msgrd?v=3&uin=627577391&site=qq&menu=yes)
 [![zhamao License](https://img.shields.io/hexpm/l/plug.svg?maxAge=2592000)](https://github.com/zhamao-robot/zhamao-framework/blob/master/LICENSE)
 [![Latest Stable Version](http://img.shields.io/packagist/v/zhamao/framework.svg)](https://packagist.org/packages/zhamao/framework)
-[![Banner](https://img.shields.io/badge/OneBot-v11-black)]()
+[![Banner](https://img.shields.io/badge/OneBot-v11-success)](https://github.com/howmanybots/onebot)
 
 [![注解数量](https://img.shields.io/github/search/zhamao-robot/zhamao-framework/AnnotationBase.svg)](https://github.com/zhamao-robot/zhamao-framework/search?q=AnnotationBase)
 [![TODO 数量](https://img.shields.io/github/search/zhamao-robot/zhamao-framework/TODO.svg)](https://github.com/zhamao-robot/zhamao-framework/search?q=TODO)
@@ -14,7 +14,7 @@
 </div>
 
 ## 开发者注意
-开发者 QQ 群：**670821194**
+开发者 QQ 群：**670821194** [点击链接加入群聊](https://jq.qq.com/?_wv=1027&k=YkNI3AIr)
 
 当前 v2 版本已正式发布，此 master 分支为 2.0 版本，如需查看 v1 版本，请移步 `v1-legacy` 分支！
 
@@ -76,7 +76,7 @@ public function index() {
 我们会将捐赠的资金用于本项目驱动的炸毛机器人和框架文档的服务器开销上。[捐赠列表](https://github.com/zhamao-robot/thanks)
 
 ### 支付宝
-![支付宝二维码](/resources/images/alipay_img.jpg)
+![支付宝二维码](https://cdn.jsdelivr.net/gh/zhamao-robot/zhamao-framework/resources/images/alipay_img.jpg)
 
 如果你对我们的周边感兴趣，我们还有炸毛机器人定制 logo 的雨伞，详情咨询作者 QQ，我们会作为您捐助了本项目！
 
@@ -85,7 +85,7 @@ public function index() {
 
 作者的炸毛机器人已从2018年初起稳定运行了**三年**，并且持续迭代。
 
-欢迎随时在 HTTP-API 插件群里提问，当然更好的话可以加作者 QQ（627577391）或提交 Issue 进行疑难解答。
+欢迎随时在 HTTP-API 插件群里提问，当然更好的话可以加作者 QQ（[627577391](http://wpa.qq.com/msgrd?v=3&uin=627577391&site=qq&menu=yes)）或提交 Issue 进行疑难解答。
 
 本项目在更新内容时，请及时关注 GitHub 动态，更新前请将自己的模块代码做好备份。
 
