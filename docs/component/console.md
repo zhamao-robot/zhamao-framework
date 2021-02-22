@@ -25,7 +25,7 @@ vendor/bin/start server --log-error # 以 error 等级启动框架
 vendor/bin/start server --log-warning # 以 warning 等级启动框架
 vendor/bin/start server --log-info # 以 info 等级启动框架
 vendor/bin/start server --log-verbose # 以 verbose 等级启动框架
-vendor/bin/start server --log-debug # 以 debug 等级 启动框架
+vendor/bin/start server --log-debug # 以 debug 等级启动框架
 ```
 
 ## 使用 Log 输出内容
@@ -100,11 +100,9 @@ $str = Console::setColor("I am gold color.", "gold");
 
 炸毛框架支持从终端输入命令来进行一些操作，例如重启框架、停止框架、执行函数等。
 
-::: warning 注意
+!!! warning 注意
 
-在 Docker、systemd、daemon 状态下启动的框架会自动关闭终端等待输入，交互不可用。
-
-:::
+	在 Docker、systemd、daemon 状态下启动的框架会自动关闭终端等待输入，交互不可用。
 
 ### reload
 
