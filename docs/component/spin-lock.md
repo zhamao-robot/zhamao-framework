@@ -31,7 +31,7 @@ SpinLock::unlock("foo");
 给信号量 `$key` 上锁。如果该信号量已经被上锁，则立刻返回 false。
 
 ```php
-SpinLock::lock("foo");
+SpinLock::trylock("foo");
 ```
 
 ## 综合实例
