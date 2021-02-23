@@ -84,6 +84,7 @@ class DB
      * @throws DbException
      */
     public static function rawQuery(string $line, $params = [], $fetch_mode = ZM_DEFAULT_FETCH_MODE) {
+        if (!is_array($params)) $params = [$params];
         Console::debug("MySQL: " . $line . " | " . implode(", ", $params));
         try {
             $conn = SqlPoolStorage::$sql_pool->get();
