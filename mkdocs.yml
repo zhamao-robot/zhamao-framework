@@ -9,6 +9,9 @@ theme:
   logo: assets/logos.png
   favicon: assets/favicon.png
   language: zh
+  palette:
+    primary: red
+    accent: red
   features:
     - navigation.tabs
 extra_javascript:
@@ -31,7 +34,7 @@ extra:
   version:
     method: mike
 
-copyright: 'Copyright &copy; 2019 - 2020 CrazyBot Team&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tx-switch">
+copyright: 'Copyright &copy; 2019 - 2021 CrazyBot Team&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tx-switch">
                  <button data-md-color-scheme="default"><code>默认模式</code></button>
                  <button data-md-color-scheme="slate"><code>暗黑模式</code></button>
                </span>
@@ -52,27 +55,49 @@ copyright: 'Copyright &copy; 2019 - 2020 CrazyBot Team&nbsp;&nbsp;&nbsp;&nbsp;&n
 nav:
   - 指南:
       - 介绍: index.md
-      - 安装框架: guide/安装.md
-      - 快速上手（机器人篇）: guide/快速上手-机器人.md
-      - 快速上手（HTTP篇）: guide/快速上手-http.md
-      - 选择聊天机器人实例: guide/OneBot实例.md
-      - 基本配置: guide/基本配置.md
-      - 编写模块: guide/编写模块.md
-      - 注册事件响应: guide/注册事件响应.md
+      - 安装框架: guide/installation.md
+      - 快速上手（机器人篇）: guide/quickstart-robot.md
+      - 快速上手（HTTP篇）: guide/quickstart-http.md
+      - 选择聊天机器人实例: guide/onebot-choose.md
+      - 基本配置: guide/basic-config.md
+      - 编写模块: guide/write-module.md
+      - 注册事件响应: guide/register-event.md
   - 事件和注解:
       - 事件和注解: event/index.md
-      - 机器人注解事件: event/机器人注解事件.md
-      - HTTP 路由注解事件: event/路由注解事件.md
-      - 框架核心注解事件: event/框架注解事件.md
-      - 中间件注解: event/中间件.md
-      - 自定义注解: event/自定义注解.md
+      - 机器人注解事件: event/robot-annotations.md
+      - HTTP 路由注解事件: event/route-annotations.md
+      - 框架核心注解事件: event/framework-annotations.md
+      - 中间件注解: event/middleware.md
+      - 自定义注解: event/custom-annotations.md
+      - 事件分发器: event/event-dispatcher.md
   - 框架组件:
       - 框架组件: component/index.md
+      - 机器人 API: component/robot-api.md
+      - CQ 码（多媒体消息）: component/cqcode.md
+      - 上下文: component/context.md
+      - 存储:
+          - LightCache 轻量缓存: component/light-cache.md
+          - MySQL 数据库: component/mysql.md
+          - Redis 数据库: component/redis.md
+          - ZMAtomic 原子计数器: component/atomics.md
+          - SpinLock 自旋锁: component/spin-lock.md
+      - 协程池: component/coroutine-pool.md
+      - 单例类: component/singleton-trait.md
+      - ZMUtil 杂项: component/zmutil.md
+      - 全局方法: component/global-functions.md
+      - HTTP 和 WebSocket 客户端: component/zmrequest.md
+      - Console 终端: component/console.md
   - 进阶开发:
       - 进阶开发: advanced/index.md
+      - 框架剖析: advanced/framework-structure.md
+      - 框架启动模式: advanced/custom-start.md
       - 从 v1 升级: advanced/to-v2.md
-  - FAQ:
-      - FAQ: FAQ.md
+      - 内部类文件手册: advanced/inside-class.md
+      - 接入 WebSocket 客户端: advanced/connect-ws-client.md
+      - 框架多进程: advanced/multi-process.md
+      - 开发实战教程:
+          - 编写管理员才能触发的功能: advanced/example/admin.md
+  - FAQ: FAQ.md
   - 更新日志:
       - 更新日志（v2）: update/v2.md
       - 更新日志（v1）: update/v1.md

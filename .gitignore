@@ -10,3 +10,4 @@ composer.lock
 /bin/.phpunit.result.cache
 /resources/zhamao.service
 .phpunit.result.cache
+.daemon_pid

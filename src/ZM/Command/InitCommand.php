@@ -74,6 +74,7 @@ class InitCommand extends Command
                 echo("Error occurred. Please check your updates.\n");
                 return Command::FAILURE;
             }
+            $output->writeln("<info>Done!</info>");
             return Command::SUCCESS;
         } elseif (LOAD_MODE === 2) { //从phar启动的框架包，初始化的模式
             $phar_link = new Phar(__DIR__);

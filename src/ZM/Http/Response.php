@@ -4,8 +4,6 @@
 namespace ZM\Http;
 
 
-use ZM\Console\Console;
-
 class Response
 {
 
@@ -94,7 +92,8 @@ class Response
      */
     public function status($http_code, $reason = null) {
         $this->status_code = $http_code;
-        return $this->response->status($http_code, $reason);
+        if (!$this->is_end) return $this->response->status($http_code, $reason);
+        else return false;
     }
 
     public function getStatusCode() {
@@ -107,7 +106,8 @@ class Response
      * @return mixed
      */
     public function setStatusCode($http_code, $reason = null) {
-        return $this->response->setStatusCode($http_code, $reason);
+        if (!$this->is_end) return $this->response->setStatusCode($http_code, $reason);
+        else return false;
     }
 
     /**
@@ -117,7 +117,8 @@ class Response
      * @return mixed
      */
     public function header($key, $value, $ucwords = null) {
-        return $this->response->header($key, $value, $ucwords);
+        if (!$this->is_end) return $this->response->header($key, $value, $ucwords);
+        else return false;
     }
 
     /**
@@ -127,7 +128,7 @@ class Response
      * @return mixed
      */
     public function setHeader($key, $value, $ucwords = null) {
-        return $this->response->setHeader($key, $value, $ucwords);
+        return !$this->is_end ? $this->response->setHeader($key, $value, $ucwords) : false;
     }
 
     /**
@@ -159,13 +160,17 @@ class Response
      * @return mixed
      */
     public function end($content = null) {
-        $this->is_end = true;
-        return $this->response->end($content);
+        if (!$this->is_end) {
+            $this->is_end = true;
+            return $this->response->end($content);
+        } else {
+            return false;
+        }
     }
 
     public function isEnd() { return $this->is_end; }
 
-    public function endWithStatus($status_code = 200, $content = null){
+    public function endWithStatus($status_code = 200, $content = null) {
         $this->status($status_code);
         $this->end($content);
     }

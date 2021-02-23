@@ -1,4 +1,4 @@
-<?php
+<?php #plain
 
 use Swoole\Coroutine;
 use ZM\API\ZMRobot;
@@ -24,6 +24,7 @@ function phar_classloader($p) {
         return;
     }
     try {
+        /** @noinspection PhpIncludeInspection */
         require_once $filepath;
     } catch (Exception $e) {
         echo "Error when finding class: " . $p . PHP_EOL;
@@ -75,7 +76,7 @@ function unicode_decode($str) {
 /**
  * 获取模块文件夹下的每个类文件的类名称
  * @param $dir
- * @param string $indoor_name
+ * @param $indoor_name
  * @return array
  */
 function getAllClasses($dir, $indoor_name) {
@@ -88,6 +89,14 @@ function getAllClasses($dir, $indoor_name) {
         //echo "At " . $indoor_name . PHP_EOL;
         if (is_dir($dir . $v)) $classes = array_merge($classes, getAllClasses($dir . $v . "/", $indoor_name . "\\" . $v));
         elseif (mb_substr($v, -4) == ".php") {
+            if (substr(file_get_contents($dir . $v), 6, 6) == "#plain") continue;
+            $composer = json_decode(file_get_contents(DataProvider::getWorkingDir() . "/composer.json"), true);
+            foreach ($composer["autoload"]["files"] as $fi) {
+                if (realpath(DataProvider::getWorkingDir() . "/" . $fi) == realpath($dir . $v)) {
+                    continue 2;
+                }
+            }
+            if ($v == "global_function.php") continue;
             $class_name = $indoor_name . "\\" . mb_substr($v, 0, -4);
             $classes [] = $class_name;
         }
@@ -258,10 +267,14 @@ function zm_timer_after($ms, callable $callable) {
 }
 
 function zm_timer_tick($ms, callable $callable) {
-    go(function () use ($ms, $callable) {
-        Console::debug("Adding extra timer tick of " . $ms . " ms");
-        Swoole\Timer::tick($ms, $callable);
-    });
+    if (zm_cid() === -1) {
+        return go(function () use ($ms, $callable) {
+            Console::debug("Adding extra timer tick of " . $ms . " ms");
+            Swoole\Timer::tick($ms, $callable);
+        });
+    } else {
+        return Swoole\Timer::tick($ms, $callable);
+    }
 }
 
 function zm_data_hash($v) {
@@ -290,8 +303,9 @@ function bot() {
 
 /**
  * 获取同类型所有连接的文件描述符 ID
- * @author 854854321
+ * @param string $type
  * @return array
+ * @author 854854321
  */
 function getAllFdByConnectType(string $type = 'default'): array {
     $fds = [];
@@ -299,4 +313,20 @@ function getAllFdByConnectType(string $type = 'default'): array {
         $fds[] = $obj->getFd();
     }
     return $fds;
+}
+
+function zm_atomic($name) {
+    return \ZM\Store\ZMAtomic::get($name);
+}
+
+function uuidgen($uppercase = false) {
+    try {
+        $data = random_bytes(16);
+    } catch (Exception $e) {
+        return "";
+    }
+    $data[6] = chr(ord($data[6]) & 0x0f | 0x40);
+    $data[8] = chr(ord($data[8]) & 0x3f | 0x80);
+    return $uppercase ? strtoupper(vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4))) :
+        vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
 }

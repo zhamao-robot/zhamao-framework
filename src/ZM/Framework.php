@@ -55,9 +55,9 @@ class Framework
         ZMAtomic::init();
         try {
             $sw = ZMConfig::get("global");
-            if(!is_dir($sw["zm_data"])) mkdir($sw["zm_data"]);
-            if(!is_dir($sw["config_dir"])) mkdir($sw["config_dir"]);
-            if(!is_dir($sw["crash_dir"])) mkdir($sw["crash_dir"]);
+            if (!is_dir($sw["zm_data"])) mkdir($sw["zm_data"]);
+            if (!is_dir($sw["config_dir"])) mkdir($sw["config_dir"]);
+            if (!is_dir($sw["crash_dir"])) mkdir($sw["crash_dir"]);
             ManagerGM::init(ZMConfig::get("global", "swoole")["max_connection"] ?? 2048, 0.5, [
                 [
                     "key" => "connect_id",
@@ -94,6 +94,7 @@ class Framework
                 "version" => ZM_VERSION,
                 "config" => $args["env"] === null ? 'global.php' : $args["env"]
             ];
+            if (APP_VERSION !== "unknown") $out["app_version"] = APP_VERSION;
             if (isset(ZMConfig::get("global", "swoole")["task_worker_num"])) {
                 $out["task_worker_num"] = ZMConfig::get("global", "swoole")["task_worker_num"];
             }
@@ -129,6 +130,40 @@ class Framework
             LightCache::init($r);
             LightCacheInside::init();
             SpinLock::init($r["size"]);
+            set_error_handler(function ($error_no, $error_msg, $error_file, $error_line) {
+                switch ($error_no) {
+                    case E_WARNING:
+                        $level_tips = 'PHP Warning: ';
+                        break;
+                    case E_NOTICE:
+                        $level_tips = 'PHP Notice: ';
+                        break;
+                    case E_DEPRECATED:
+                        $level_tips = 'PHP Deprecated: ';
+                        break;
+                    case E_USER_ERROR:
+                        $level_tips = 'User Error: ';
+                        break;
+                    case E_USER_WARNING:
+                        $level_tips = 'User Warning: ';
+                        break;
+                    case E_USER_NOTICE:
+                        $level_tips = 'User Notice: ';
+                        break;
+                    case E_USER_DEPRECATED:
+                        $level_tips = 'User Deprecated: ';
+                        break;
+                    case E_STRICT:
+                        $level_tips = 'PHP Strict: ';
+                        break;
+                    default:
+                        $level_tips = 'Unkonw Type Error: ';
+                        break;
+                }      // do some handle
+                $error = $level_tips . $error_msg . ' in ' . $error_file . ' on ' . $error_line;
+                Console::warning($error);      // 如果 return false 则错误会继续递交给 PHP 标准错误处理     /
+                return true;
+            }, E_ALL | E_STRICT);
         } catch (Exception $e) {
             Console::error("Framework初始化出现错误，请检查！");
             Console::error($e->getMessage());
@@ -174,11 +209,9 @@ class Framework
             }
         }
         foreach ($event_list as $k => $v) {
-            self::$server->on($k, function (...$param) use ($v) {
-                $c = ZMUtil::getModInstance($v->class);
-                $m = $v->method;
-                $c->$m(...$param);
-            });
+            $c = ZMUtil::getModInstance($v->class);
+            $m = $v->method;
+            self::$server->on($k, function (...$param) use ($c, $m) { $c->$m(...$param); });
         }
     }
 
@@ -190,16 +223,7 @@ class Framework
     private function parseCliArgs($args) {
         $coroutine_mode = true;
         global $terminal_id;
-        $terminal_id = call_user_func(function () {
-            try {
-                $data = random_bytes(16);
-            } catch (Exception $e) {
-                return "";
-            }
-            $data[6] = chr(ord($data[6]) & 0x0f | 0x40);
-            $data[8] = chr(ord($data[8]) & 0x3f | 0x80);
-            return strtoupper(vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4)));
-        });
+        $terminal_id = uuidgen();
         foreach ($args as $x => $y) {
             switch ($x) {
                 case 'disable-coroutine':
@@ -217,11 +241,13 @@ class Framework
                 case 'daemon':
                     if ($y) {
                         $this->server_set["daemonize"] = 1;
+                        Console::$theme = "no-color";
                         Console::log("已启用守护进程，输出重定向到 " . $this->server_set["log_file"]);
                         $terminal_id = null;
                     }
                     break;
                 case 'disable-console-input':
+                case 'no-interaction':
                     if ($y) $terminal_id = null;
                     break;
                 case 'log-error':
@@ -234,6 +260,7 @@ class Framework
                     if ($y) Console::setLevel(2);
                     break;
                 case 'log-verbose':
+                case 'verbose':
                     if ($y) Console::setLevel(3);
                     break;
                 case 'log-debug':
@@ -243,6 +270,10 @@ class Framework
                     if ($y !== null) {
                         Console::$theme = $y;
                     }
+                    break;
+                default:
+                    //Console::info("Calculating ".$x);
+                    //dump($y);
                     break;
             }
         }

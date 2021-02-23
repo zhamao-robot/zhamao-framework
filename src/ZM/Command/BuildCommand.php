@@ -31,7 +31,7 @@ class BuildCommand extends Command
         $target_dir = $input->getOption("target") ?? (__DIR__ . '/../../../resources/');
         if (mb_strpos($target_dir, "../")) $target_dir = realpath($target_dir);
         if ($target_dir === false) {
-            $output->writeln(TermColor::color8(31) . "Error: No such file or directory (".__DIR__ . '/../../../resources/'.")" . TermColor::RESET);
+            $output->writeln(TermColor::color8(31) . "Error: No such file or directory (" . __DIR__ . '/../../../resources/' . ")" . TermColor::RESET);
             return Command::FAILURE;
         }
         $output->writeln("Target: " . $target_dir . " , Version: " . ($version = json_decode(file_get_contents(__DIR__ . "/../../../composer.json"), true)["version"]));
@@ -51,7 +51,7 @@ class BuildCommand extends Command
         return Command::SUCCESS;
     }
 
-    private function build ($target_dir, $filename) {
+    private function build($target_dir, $filename) {
         @unlink($target_dir . $filename);
         $phar = new Phar($target_dir . $filename);
         $phar->startBuffering();

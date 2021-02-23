@@ -4,7 +4,7 @@
 
 !!! error "警告"
 
-    因为炸毛框架的全局配置中含有数据库名称和密码以及 access_token 等敏感字段，在使用版本控制软件过程中请不要将将敏感信息写入配置文件并提交至开源仓库！
+    因为炸毛框架的全局配置中含有数据库名称和密码以及 access_token 等敏感字段，在使用版本控制软件过程中请不要将敏感信息写入配置文件并提交至开源仓库！
 
 ## 全局配置文件 global.php
 
@@ -20,6 +20,7 @@
 | `crash_dir`                  | 存放崩溃和运行日志的目录                         | `zm_data` 下的 `crash/`      |
 | `swoole`                     | 对应 Swoole server 中 set 的参数，参考Swoole文档 | 见子表 `swoole`              |
 | `light_cache`                | 轻量内置 key-value 缓存                          | 见字表 `light_cache`         |
+| `worker_cache`               | 跨进程变量级缓存                                 | 见子表 `worker_cache`        |
 | `sql_config`                 | MySQL 数据库连接信息                             | 见子表 `sql_config`          |
 | `redis_config`               | Redis 连接信息                                   | 见子表 `redis_config`        |
 | `access_token`               | OneBot 客户端连接约定的token，留空则无           | 空                           |
@@ -46,11 +47,17 @@
 
 | 配置名称                   | 说明                                            | 默认值                       |
 | -------------------------- | ----------------------------------------------- | ---------------------------- |
-| `size`                     | 最多可以缓存的 k-v 条目数（必须是 2 的 n 次方） | 1024                         |
-| `max_strlen`               | 作为 value 字符串的最大长度                     | 16384                        |
+| `size`                     | 最多可以缓存的 k-v 条目数（必须是 2 的 n 次方） | 512                         |
+| `max_strlen`               | 作为 value 字符串的最大长度                     | 32768                        |
 | `hash_conflict_proportion` | Hash冲突率（越大越好，但是需要的内存更多）      | 0.6                          |
 | `persistence_path`         | 持久化的键值对的存储路径                        | `zm_data` 下的 `_cache.json` |
 | `auto_save_interval`       | 持久化的键值对自动保存时间间隔（秒）            | 900                          |
+
+### 子表 worker_cache
+
+| 配置名称 | 说明                        | 默认值 |
+| -------- | --------------------------- | ------ |
+| `worker` | 跨进程缓存的存储工作进程 id | 0      |
 
 ### 子表 **sql_config**
 
@@ -84,11 +91,11 @@
 
 ## 多环境下的配置文件
 
-炸毛框架的配置文件模块支持不同环境下的配置文件，主要结构为 `global.{环境}.php`。在一般情况下，炸毛框架默认从教程引导方式根据指令 `vendor/bin/start server` 启动的框架是不带环境控制的。这章将讲述如何根据不同的环境（production / development / staging）来编写配置文件。
+炸毛框架的配置文件模块支持不同环境下的配置文件，主要结构为 `global.{环境}.php`。在一般情况下，炸毛框架默认从教程引导方式根据指令 `vendor/bin/start server` 启动的框架是不带环境控制的。这章将讲述如何根据不同的环境（development / staging / production）来编写配置文件。
 
 ### 使用环境参数
 
-在启动框架时，额外增加参数 `--env` 可以指定当前的环境，从而使用不同的配置文件。现在框架支持以下几种环境： `production`，`staging`，`development`。
+在启动框架时，额外增加参数 `--env` 可以指定当前的环境，从而使用不同的配置文件。现在框架支持以下几种环境： `development`，`staging`，`production`。
 
 ```bash
 vendor/bin/start server --env=development
@@ -96,7 +103,7 @@ vendor/bin/start server --env=development
 
 ### 不同环境配置文件
 
-由于框架默认只带有 `global.php` 文件，所以假设你现在需要区分开发环境和生产环境的配置，将 `global.php` 文件复制或改名为 `global.development.php` 或 `global.production.php` 即可。
+由于框架默认只带有 `global.php` 文件，所以假设你现在需要区分开发环境和生产环境的配置，将 `global.php` 文件复制并重命名为 `global.development.php` 或 `global.production.php` 即可。
 
 ### 优先级
 

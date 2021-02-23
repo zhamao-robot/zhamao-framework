@@ -1,4 +1,6 @@
-<?php /** @noinspection PhpComposerExtensionStubsInspection */
+<?php /** @noinspection PhpUnreachableStatementInspection */
+
+/** @noinspection PhpComposerExtensionStubsInspection */
 
 
 namespace ZM\Event;
@@ -9,13 +11,18 @@ use Error;
 use Exception;
 use PDO;
 use ReflectionException;
+use Swoole\Coroutine;
 use Swoole\Database\PDOConfig;
 use Swoole\Database\PDOPool;
 use Swoole\Event;
 use Swoole\Process;
-use Swoole\Timer;
 use ZM\Annotation\AnnotationParser;
 use ZM\Annotation\Http\RequestMapping;
+use ZM\Annotation\Swoole\OnCloseEvent;
+use ZM\Annotation\Swoole\OnMessageEvent;
+use ZM\Annotation\Swoole\OnOpenEvent;
+use ZM\Annotation\Swoole\OnPipeMessageEvent;
+use ZM\Annotation\Swoole\OnRequestEvent;
 use ZM\Annotation\Swoole\OnStart;
 use ZM\Annotation\Swoole\OnSwooleEvent;
 use ZM\Config\ZMConfig;
@@ -30,12 +37,15 @@ use ZM\Context\Context;
 use ZM\Context\ContextInterface;
 use ZM\DB\DB;
 use ZM\Exception\DbException;
+use ZM\Exception\InterruptException;
 use ZM\Framework;
 use ZM\Http\Response;
 use ZM\Module\QQBot;
+use ZM\Store\LightCache;
 use ZM\Store\LightCacheInside;
 use ZM\Store\MySQL\SqlPoolStorage;
 use ZM\Store\Redis\ZMRedisPool;
+use ZM\Store\WorkerCache;
 use ZM\Store\ZMBuf;
 use ZM\Utils\DataProvider;
 use ZM\Utils\HttpUtil;
@@ -53,7 +63,12 @@ class ServerEventHandler
         if ($terminal_id !== null) {
             ZMBuf::$terminal = $r = STDIN;
             Event::add($r, function () use ($r) {
-                $var = trim(fgets($r));
+                $fget = fgets($r);
+                if ($fget === false) {
+                    Event::del($r);
+                    return;
+                }
+                $var = trim($fget);
                 try {
                     Terminal::executeCommand($var, $r);
                 } catch (Exception $e) {
@@ -65,11 +80,18 @@ class ServerEventHandler
         }
         Process::signal(SIGINT, function () use ($r) {
             echo "\r";
-            Console::warning("Server interrupted by keyboard on Master.");
+            Console::warning("Server interrupted(SIGINT) on Master.");
             if ((Framework::$server->inotify ?? null) !== null)
                 /** @noinspection PhpUndefinedFieldInspection */ Event::del(Framework::$server->inotify);
             ZMUtil::stop();
         });
+        if (Framework::$argv["daemon"]) {
+            $daemon_data = json_encode([
+                "pid" => \server()->master_pid,
+                "stdout" => ZMConfig::get("global")["swoole"]["log_file"]
+            ], 128 | 256);
+            file_put_contents(DataProvider::getWorkingDir() . "/.daemon_pid", $daemon_data);
+        }
         if (Framework::$argv["watch"]) {
             if (extension_loaded('inotify')) {
                 Console::warning("Enabled File watcher, do not use in production.");
@@ -78,11 +100,11 @@ class ServerEventHandler
                 $this->addWatcher(DataProvider::getWorkingDir() . "/src", $fd);
                 Event::add($fd, function () use ($fd) {
                     $r = inotify_read($fd);
-                    var_dump($r);
+                    dump($r);
                     ZMUtil::reload();
                 });
             } else {
-                Console::warning("You have not loaded inotify extension.");
+                Console::warning("You have not loaded \"inotify\" extension, please install first.");
             }
         }
     }
@@ -100,6 +122,9 @@ class ServerEventHandler
      * @param $worker_id
      */
     public function onWorkerStop(Server $server, $worker_id) {
+        if ($worker_id == (ZMConfig::get("worker_cache")["worker"] ?? 0)) {
+            LightCache::savePersistence();
+        }
         Console::debug(($server->taskworker ? "Task" : "") . "Worker #$worker_id 已停止");
     }
 
@@ -114,7 +139,7 @@ class ServerEventHandler
             Console::debug("正在关闭 " . ($server->taskworker ? "Task" : "") . "Worker 进程 " . Console::setColor("#" . \server()->worker_id, "gold") . TermColor::frontColor256(59) . ", pid=" . posix_getpid());
             server()->stop($worker_id);
         });
-        unset(Context::$context[Co::getCid()]);
+        unset(Context::$context[Coroutine::getCid()]);
         if ($server->taskworker === false) {
             try {
                 register_shutdown_function(function () use ($server) {
@@ -194,7 +219,7 @@ class ServerEventHandler
 
                 // 开箱即用的Redis
                 $redis = ZMConfig::get("global", "redis_config");
-                if($redis !== null && $redis["host"] != "") {
+                if ($redis !== null && $redis["host"] != "") {
                     if (!extension_loaded("redis")) Console::error("Can not find redis extension.\n");
                     else ZMRedisPool::init($redis);
                 }
@@ -211,7 +236,8 @@ class ServerEventHandler
                     return server()->worker_id === $v->worker_id || $v->worker_id === -1;
                 });
                 $dispatcher->dispatchEvents($server, $worker_id);
-                Console::debug("@OnStart 执行完毕");
+                if ($dispatcher->status === EventDispatcher::STATUS_NORMAL) Console::debug("@OnStart 执行完毕");
+                else Console::warning("@OnStart 执行异常！");
             } catch (Exception $e) {
                 Console::error("Worker加载出错！停止服务！");
                 Console::error($e->getMessage() . "\n" . $e->getTraceAsString());
@@ -221,7 +247,7 @@ class ServerEventHandler
                 Console::error("PHP Error: " . $e->getMessage() . " in " . $e->getFile() . " on line " . $e->getLine());
                 Console::error("Maybe it caused by your own code if in your own Module directory.");
                 Console::log($e->getTraceAsString(), 'gray');
-                ZMUtil::stop();
+                posix_kill($server->master_pid, SIGINT);
             }
         } else {
             // 这里是TaskWorker初始化的内容部分
@@ -238,7 +264,7 @@ class ServerEventHandler
                 Console::error("PHP Error: " . $e->getMessage() . " in " . $e->getFile() . " on line " . $e->getLine());
                 Console::error("Maybe it caused by your own code if in your own Module directory.");
                 Console::log($e->getTraceAsString(), 'gray');
-                ZMUtil::stop();
+                posix_kill($server->master_pid, SIGINT);
             }
         }
     }
@@ -250,10 +276,17 @@ class ServerEventHandler
      */
     public function onMessage($server, Frame $frame) {
 
-        Console::debug("Calling Swoole \"message\" from fd=" . $frame->fd.": ".TermColor::ITALIC.$frame->data.TermColor::RESET);
-        unset(Context::$context[Co::getCid()]);
+        Console::debug("Calling Swoole \"message\" from fd=" . $frame->fd . ": " . TermColor::ITALIC . $frame->data . TermColor::RESET);
+        unset(Context::$context[Coroutine::getCid()]);
         $conn = ManagerGM::get($frame->fd);
         set_coroutine_params(["server" => $server, "frame" => $frame, "connection" => $conn]);
+        $dispatcher1 = new EventDispatcher(OnMessageEvent::class);
+        $dispatcher1->setRuleFunction(function ($v) {
+            /** @noinspection PhpUnreachableStatementInspection */
+            return ctx()->getConnection()->getName() == $v->connect_type && eval("return " . $v->getRule() . ";");
+        });
+
+
         $dispatcher = new EventDispatcher(OnSwooleEvent::class);
         $dispatcher->setRuleFunction(function ($v) {
             if ($v->getRule() == '') {
@@ -268,6 +301,7 @@ class ServerEventHandler
         });
         try {
             //$starttime = microtime(true);
+            $dispatcher1->dispatchEvents($conn);
             $dispatcher->dispatchEvents($conn);
             //Console::success("Used ".round((microtime(true) - $starttime) * 1000, 3)." ms!");
         } catch (Exception $e) {
@@ -287,11 +321,19 @@ class ServerEventHandler
      * @param $request
      * @param $response
      */
-    public function onRequest($request, $response) {
+    public function onRequest(?Request $request, ?\Swoole\Http\Response $response) {
         $response = new Response($response);
+        foreach (ZMConfig::get("global")["http_header"] as $k => $v) {
+            $response->setHeader($k, $v);
+        }
         unset(Context::$context[Co::getCid()]);
         Console::debug("Calling Swoole \"request\" event from fd=" . $request->fd);
         set_coroutine_params(["request" => $request, "response" => $response]);
+
+        $dis1 = new EventDispatcher(OnRequestEvent::class);
+        $dis1->setRuleFunction(function ($v) {
+            return eval("return " . $v->getRule() . ";") ? true : false;
+        });
 
         $dis = new EventDispatcher(OnSwooleEvent::class);
         $dis->setRuleFunction(function ($v) {
@@ -305,8 +347,9 @@ class ServerEventHandler
         });
 
         try {
-            $no_interrupt = $dis->dispatchEvents($request, $response);
-            if ($no_interrupt !== null) {
+            $dis1->dispatchEvents($request, $response);
+            $dis->dispatchEvents($request, $response);
+            if ($dis->status === EventDispatcher::STATUS_NORMAL && $dis1->status === EventDispatcher::STATUS_NORMAL) {
                 $result = HttpUtil::parseUri($request, $response, $request->server["request_uri"], $node, $params);
                 if ($result === true) {
                     ctx()->setCache("params", $params);
@@ -318,14 +361,16 @@ class ServerEventHandler
                     $div->request_method = $node["request_method"];
                     $div->class = $node["class"];
                     //Console::success("正在执行路由：".$node["method"]);
-                    $r = $dispatcher->dispatchEvent($div, null, $params, $request, $response);
-                    if (is_string($r) && !$response->isEnd()) $response->end($r);
+                    $dispatcher->dispatchEvent($div, null, $params, $request, $response);
+                    if (is_string($dispatcher->store) && !$response->isEnd()) $response->end($dispatcher->store);
                 }
             }
             if (!$response->isEnd()) {
                 //Console::warning('返回了404');
                 HttpUtil::responseCodePage($response, 404);
             }
+        } catch (InterruptException $e) {
+            // do nothing
         } catch (Exception $e) {
             $response->status(500);
             Console::info($request->server["remote_addr"] . ":" . $request->server["remote_port"] .
@@ -337,7 +382,7 @@ class ServerEventHandler
                 else
                     $response->end("Internal server error.");
             }
-            Console::error("Internal server exception (500), caused by " . get_class($e).": ".$e->getMessage());
+            Console::error("Internal server exception (500), caused by " . get_class($e) . ": " . $e->getMessage());
             Console::log($e->getTraceAsString(), "gray");
         } catch (Error $e) {
             $response->status(500);
@@ -351,7 +396,7 @@ class ServerEventHandler
                 else
                     $response->end("Internal server error.");
             }
-            Console::error("Internal server error (500), caused by " . get_class($e).": ".$e->getMessage());
+            Console::error("Internal server error (500), caused by " . get_class($e) . ": " . $e->getMessage());
             Console::log($e->getTraceAsString(), "gray");
         }
     }
@@ -364,12 +409,25 @@ class ServerEventHandler
     public function onOpen($server, Request $request) {
         Console::debug("Calling Swoole \"open\" event from fd=" . $request->fd);
         unset(Context::$context[Co::getCid()]);
-        $type = strtolower($request->get["type"] ?? $request->header["x-client-role"] ?? "");
+        $type = strtolower($request->header["x-client-role"] ?? $request->get["type"] ?? "");
+        $access_token = explode(" ", $request->header["authorization"] ?? $request->get["token"] ?? "")[1] ?? "";
+        if (($a = ZMConfig::get("global", "access_token")) != "") {
+            if ($access_token !== $a) {
+                $server->close($request->fd);
+                Console::warning("Unauthorized access_token: " . $access_token);
+                return;
+            }
+        }
         $type_conn = ManagerGM::getTypeClassName($type);
         ManagerGM::pushConnect($request->fd, $type_conn);
         $conn = ManagerGM::get($request->fd);
         set_coroutine_params(["server" => $server, "request" => $request, "connection" => $conn, "fd" => $request->fd]);
         $conn->setOption("connect_id", strval($request->header["x-self-id"] ?? ""));
+
+        $dispatcher1 = new EventDispatcher(OnOpenEvent::class);
+        $dispatcher1->setRuleFunction(function ($v) {
+            return ctx()->getConnection()->getName() == $v->connect_type && eval("return " . $v->getRule() . ";");
+        });
 
         $dispatcher = new EventDispatcher(OnSwooleEvent::class);
         $dispatcher->setRuleFunction(function ($v) {
@@ -387,6 +445,7 @@ class ServerEventHandler
                     LightCacheInside::set("connect", "conn_fd", $request->fd);
                 }
             }
+            $dispatcher1->dispatchEvents($conn);
             $dispatcher->dispatchEvents($conn);
         } catch (Exception $e) {
             $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
@@ -412,6 +471,10 @@ class ServerEventHandler
         Console::debug("Calling Swoole \"close\" event from fd=" . $fd);
         set_coroutine_params(["server" => $server, "connection" => $conn, "fd" => $fd]);
 
+        $dispatcher1 = new EventDispatcher(OnCloseEvent::class);
+        $dispatcher1->setRuleFunction(function ($v) {
+            return $v->connect_type == ctx()->getConnection()->getName() && eval("return " . $v->getRule() . ";");
+        });
 
         $dispatcher = new EventDispatcher(OnSwooleEvent::class);
         $dispatcher->setRuleFunction(function ($v) {
@@ -429,6 +492,7 @@ class ServerEventHandler
                     LightCacheInside::set("connect", "conn_fd", -1);
                 }
             }
+            $dispatcher1->dispatchEvents($conn);
             $dispatcher->dispatchEvents($conn);
         } catch (Exception $e) {
             $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
@@ -444,9 +508,10 @@ class ServerEventHandler
 
     /**
      * @SwooleHandler("pipeMessage")
-     * @param $server
+     * @param Server $server
      * @param $src_worker_id
      * @param $data
+     * @throws Exception
      */
     public function onPipeMessage(Server $server, $src_worker_id, $data) {
         //var_dump($data, $server->worker_id);
@@ -457,28 +522,80 @@ class ServerEventHandler
                 $obj = $data["data"];
                 Co::resume($obj["coroutine"]);
                 break;
-            case "stop":
-                Console::verbose('正在清理 #' . $server->worker_id . ' 的计时器');
-                Timer::clearAll();
+            case "getWorkerCache":
+                $r = WorkerCache::get($data["key"]);
+                $action = ["action" => "returnWorkerCache", "cid" => $data["cid"], "value" => $r];
+                $server->sendMessage(json_encode($action, 256), $src_worker_id);
                 break;
-            case "terminate":
-                $server->stop();
+            case "setWorkerCache":
+                $r = WorkerCache::set($data["key"], $data["value"]);
+                $action = ["action" => "returnWorkerCache", "cid" => $data["cid"], "value" => $r];
+                $server->sendMessage(json_encode($action, 256), $src_worker_id);
                 break;
-            case 'echo':
-                Console::success('接收到来自 #' . $src_worker_id . ' 的消息');
+            case "unsetWorkerCache":
+                $r = WorkerCache::unset($data["key"]);
+                $action = ["action" => "returnWorkerCache", "cid" => $data["cid"], "value" => $r];
+                $server->sendMessage(json_encode($action, 256), $src_worker_id);
                 break;
-            case 'send':
-                $server->sendMessage(json_encode(["action" => "echo"]), $data["target"]);
+            case "hasKeyWorkerCache":
+                $r = WorkerCache::hasKey($data["key"], $data["subkey"]);
+                $action = ["action" => "returnWorkerCache", "cid" => $data["cid"], "value" => $r];
+                $server->sendMessage(json_encode($action, 256), $src_worker_id);
+                break;
+            case "asyncAddWorkerCache":
+                WorkerCache::add($data["key"], $data["value"], true);
+                break;
+            case "asyncSubWorkerCache":
+                WorkerCache::sub($data["key"], $data["value"], true);
+                break;
+            case "asyncSetWorkerCache":
+                WorkerCache::set($data["key"], $data["value"], true);
+                break;
+            case "asyncUnsetWorkerCache":
+                WorkerCache::unset($data["key"], true);
+                break;
+            case "addWorkerCache":
+                $r = WorkerCache::add($data["key"], $data["value"]);
+                $action = ["action" => "returnWorkerCache", "cid" => $data["cid"], "value" => $r];
+                $server->sendMessage(json_encode($action, 256), $src_worker_id);
+                break;
+            case "subWorkerCache":
+                $r = WorkerCache::sub($data["key"], $data["value"]);
+                $action = ["action" => "returnWorkerCache", "cid" => $data["cid"], "value" => $r];
+                $server->sendMessage(json_encode($action, 256), $src_worker_id);
+                break;
+            case "returnWorkerCache":
+                WorkerCache::$transfer[$data["cid"]] = $data["value"];
+                zm_resume($data["cid"]);
                 break;
             default:
-                echo $data . PHP_EOL;
+                $dispatcher = new EventDispatcher(OnPipeMessageEvent::class);
+                $dispatcher->setRuleFunction(function (OnPipeMessageEvent $v) use ($data) {
+                    return $v->action == $data["action"];
+                });
+                $dispatcher->dispatchEvents($data);
+                break;
         }
     }
 
     /**
      * @SwooleHandler("task")
+     * @param Server|null $server
+     * @param Server\Task $task
+     * @return mixed
+     * @noinspection PhpUnusedParameterInspection
      */
-    public function onTask() {
+    public function onTask(?Server $server, Server\Task $task) {
+        $data = $task->data;
+        switch ($data["action"]) {
+            case "runMethod":
+                $c = $data["class"];
+                $ss = new $c();
+                $method = $data["method"];
+                $ps = $data["params"];
+                $task->finish($ss->$method(...$ps));
+        }
+        return null;
     }
 
     /**
@@ -505,7 +622,16 @@ class ServerEventHandler
         //加载各个模块的注解类，以及反射
         Console::debug("检索Module中");
         $parser = new AnnotationParser();
-        $parser->addRegisterPath(DataProvider::getWorkingDir() . "/src/Module/", "Module");
+        $path = DataProvider::getWorkingDir() . "/src/";
+        $dir = scandir($path);
+        unset($dir[0], $dir[1]);
+        $composer = json_decode(file_get_contents(DataProvider::getWorkingDir() . "/composer.json"), true);
+        foreach ($dir as $v) {
+            if (is_dir($path . "/" . $v) && isset($composer["autoload"]["psr-4"][$v . "\\"]) && !in_array($composer["autoload"]["psr-4"][$v . "\\"], $composer["extra"]["exclude_annotate"] ?? [])) {
+                Console::verbose("Add " . $v . " to register path");
+                $parser->addRegisterPath(DataProvider::getWorkingDir() . "/src/" . $v . "/", $v);
+            }
+        }
         $parser->registerMods();
         EventManager::loadEventByParser($parser); //加载事件
 
@@ -518,14 +644,14 @@ class ServerEventHandler
 
         //加载插件
         $plugins = ZMConfig::get("global", "modules") ?? [];
-        if (!isset($plugins["onebot"])) $plugins["onebot"] = ["status" => true, "single_bot_mode" => false];
+        if (!isset($plugins["onebot"])) $plugins["onebot"] = ["status" => true, "single_bot_mode" => false, "message_level" => 99999];
 
         if ($plugins["onebot"]) {
             $obj = new OnSwooleEvent();
             $obj->class = QQBot::class;
             $obj->method = 'handle';
             $obj->type = 'message';
-            $obj->level = 99999;
+            $obj->level = $plugins["onebot"]["message_level"] ?? 99999;
             $obj->rule = 'connectIsQQ()';
             EventManager::addEvent(OnSwooleEvent::class, $obj);
             if ($plugins["onebot"]["single_bot_mode"]) {
@@ -536,7 +662,6 @@ class ServerEventHandler
         }
 
         //TODO: 编写加载外部插件的方式
-        $this->loadExternalModules($plugins);
     }
 
     private function addWatcher($maindir, $fd) {
@@ -548,13 +673,6 @@ class ServerEventHandler
                 inotify_add_watch($fd, $maindir . "/" . $subdir, IN_ATTRIB | IN_ISDIR);
                 $this->addWatcher($maindir . "/" . $subdir, $fd);
             }
-        }
-    }
-
-    private function loadExternalModules($plugins) {
-        foreach ($plugins as $k => $v) {
-            if ($k == "onebot") continue;
-
         }
     }
 }

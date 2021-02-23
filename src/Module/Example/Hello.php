@@ -3,13 +3,14 @@
 namespace Module\Example;
 
 use ZM\Annotation\Http\Middleware;
-use ZM\Annotation\Swoole\OnSwooleEvent;
+use ZM\Annotation\Swoole\OnCloseEvent;
+use ZM\Annotation\Swoole\OnOpenEvent;
+use ZM\Annotation\Swoole\OnRequestEvent;
 use ZM\ConnectionManager\ConnectionObject;
 use ZM\Console\Console;
 use ZM\Annotation\CQ\CQCommand;
 use ZM\Annotation\Http\RequestMapping;
 use ZM\Event\EventDispatcher;
-use ZM\Store\Redis\ZMRedis;
 use ZM\Utils\ZMUtil;
 
 /**
@@ -19,29 +20,6 @@ use ZM\Utils\ZMUtil;
  */
 class Hello
 {
-    /**
-     * 一个简单的redis连接池使用demo，将下方user_id改为你自己的QQ号即可(为了不被不法分子利用)
-     * @CQCommand("redis_test",user_id=627577391)
-     */
-    public function testCase() {
-        $a = new ZMRedis();
-        $redis = $a->get();
-        $r1 = ctx()->getArgs(ZM_MATCH_FIRST, "请说出你想设置的操作[r/w]");
-        switch ($r1) {
-            case "r":
-                $k = ctx()->getArgs(ZM_MATCH_FIRST, "请说出你想读取的键名");
-                $result = $redis->get($k);
-                ctx()->reply("结果：" . $result);
-                break;
-            case "w":
-                $k = ctx()->getArgs(ZM_MATCH_FIRST, "请说出你想写入的键名");
-                $v = ctx()->getArgs(ZM_MATCH_FIRST, "请说出你想写入的字符串");
-                $result = $redis->set($k, $v);
-                ctx()->reply("结果：" . ($result ? "成功" : "失败"));
-                break;
-        }
-    }
-
     /**
      * 使用命令 .reload 发给机器人远程重载，注意将 user_id 换成你自己的 QQ
      * @CQCommand(".reload",user_id=627577391)
@@ -77,9 +55,9 @@ class Hello
      */
     public function randNum() {
         // 获取第一个数字类型的参数
-        $num1 = ctx()->getArgs(ZM_MATCH_NUMBER, "请输入第一个数字");
+        $num1 = ctx()->getNumArg("请输入第一个数字");
         // 获取第二个数字类型的参数
-        $num2 = ctx()->getArgs(ZM_MATCH_NUMBER, "请输入第二个数字");
+        $num2 = ctx()->getNumArg("请输入第二个数字");
         $a = min(intval($num1), intval($num2));
         $b = max(intval($num1), intval($num2));
         // 回复用户结果
@@ -111,12 +89,12 @@ class Hello
      * @return string
      */
     public function paramGet($param) {
-        return "Your name: {$param["name"]}";
+        return "Hello, ".$param["name"];
     }
 
     /**
      * 在机器人连接后向终端输出信息
-     * @OnSwooleEvent("open",rule="connectIsQQ()")
+     * @OnOpenEvent("qq")
      * @param $conn
      */
     public function onConnect(ConnectionObject $conn) {
@@ -125,7 +103,7 @@ class Hello
 
     /**
      * 在机器人断开连接后向终端输出信息
-     * @OnSwooleEvent("close",rule="connectIsQQ()")
+     * @OnCloseEvent("qq")
      * @param ConnectionObject $conn
      */
     public function onDisconnect(ConnectionObject $conn) {
@@ -134,7 +112,7 @@ class Hello
 
     /**
      * 阻止 Chrome 自动请求 /favicon.ico 导致的多条请求并发和干扰
-     * @OnSwooleEvent("request",rule="ctx()->getRequest()->server['request_uri'] == '/favicon.ico'",level=200)
+     * @OnRequestEvent(rule="ctx()->getRequest()->server['request_uri'] == '/favicon.ico'",level=200)
      */
     public function onRequest() {
         EventDispatcher::interrupt();
@@ -142,7 +120,7 @@ class Hello
 
     /**
      * 框架会默认关闭未知的WebSocket链接，因为这个绑定的事件，你可以根据你自己的需求进行修改
-     * @OnSwooleEvent(type="open",rule="connectIsDefault()")
+     * @OnOpenEvent("default")
      */
     public function closeUnknownConn() {
         Console::info("Unknown connection , I will close it.");

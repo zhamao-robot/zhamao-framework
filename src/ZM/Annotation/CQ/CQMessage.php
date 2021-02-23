@@ -3,7 +3,6 @@
 
 namespace ZM\Annotation\CQ;
 
-use Doctrine\Common\Annotations\Annotation\Required;
 use Doctrine\Common\Annotations\Annotation\Target;
 use ZM\Annotation\AnnotationBase;
 use ZM\Annotation\Interfaces\Level;

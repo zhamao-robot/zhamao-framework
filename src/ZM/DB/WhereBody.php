@@ -15,17 +15,17 @@ trait WhereBody
         return $this;
     }
 
-    protected function getWhereSQL(){
+    protected function getWhereSQL() {
         $param = [];
         $msg = '';
-        foreach($this->where_thing as $k => $v) {
-            foreach($v as $ks => $vs) {
-                if($param != []) {
-                    $msg .= ' AND '.$ks ." $k ?";
+        foreach ($this->where_thing as $k => $v) {
+            foreach ($v as $ks => $vs) {
+                if ($param != []) {
+                    $msg .= ' AND ' . $ks . " $k ?";
                 } else {
                     $msg .= "$ks $k ?";
                 }
-                $param []=$vs;
+                $param [] = $vs;
             }
         }
         if ($msg == '') $msg = 1;

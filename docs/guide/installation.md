@@ -61,12 +61,12 @@ pecl install swoole
 如果你是通过**主机安装 PHP 部署的环境**，下方是通过脚手架来构建项目的命令行。
 
 ```bash
-git clone https://github.com/zhamao-robot/zhamao-framework-starter.git
-cd zhamao-framework-starter/
-composer update
+composer create-project zhamao/framework-starter zhamao-app
+cd zhamao-app/ # 这个是你可以自己定义的名称
+vendor/bin/start server # 启动框架
 ```
 
-如果是通过 **Docker 部署的环境**，则需要在先克隆脚手架后在文件夹内使用 Docker 命令下的 `composer update`。
+如果是通过 **Docker 部署的环境**，则需要在先克隆脚手架后在文件夹内使用 Docker 命令下的 `composer update`。（如果主机环境有 composer 也可以使用 `composer create-project` 的方式拉取脚手架。）
 
 ```bash
 git clone https://github.com/zhamao-robot/zhamao-framework-starter.git
@@ -82,8 +82,19 @@ cd zhamao-framework-starter
 ./run-docker.sh # 在正式版炸毛框架 v2 发布后可用，测试版暂不放出
 ```
 
+!!! tip "提示"
+
+	如果国内 Composer 下载过慢，可以使用阿里云的 Composer 镜像加速。
+	```bash
+	# 仅对当前的项目使用阿里云加速
+	composer config repo.packagist composer https://mirrors.aliyun.com/composer/
+	# 对全局的 Composer 使用阿里云加速
+	composer config -g repo.packagist composer https://mirrors.aliyun.com/composer/
+	```
+
 
 ## 启动框架
+
 本地环境启动方式：
 ```bash
 cd zhamao-framework-starter

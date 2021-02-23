@@ -4,7 +4,6 @@
 namespace ZM\Annotation\Http;
 
 
-use Doctrine\Common\Annotations\Annotation\Required;
 use Doctrine\Common\Annotations\Annotation\Target;
 use ZM\Annotation\AnnotationBase;
 

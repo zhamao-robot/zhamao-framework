@@ -117,6 +117,8 @@ interface ContextInterface
 
     public function cloneFromParent();
 
+    public function getNumArg($prompt_msg = "");
+
     public function copy();
 
     public function getOption();

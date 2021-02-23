@@ -10,7 +10,7 @@ use ZM\Annotation\AnnotationBase;
  * Class OnWorkerStart
  * @package ZM\Annotation\Swoole
  * @Annotation
- * @Target("ALL")
+ * @Target("METHOD")
  */
 class OnStart extends AnnotationBase
 {

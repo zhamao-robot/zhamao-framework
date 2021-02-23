@@ -36,8 +36,8 @@ class PureHttpCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output) {
         $tty_width = explode(" ", trim(exec("stty size")))[1];
-        if(realpath($input->getArgument('dir') ?? '.') === false) {
-            $output->writeln("<error>Directory error(".($input->getArgument('dir') ?? '.')."): no such file or directory.</error>");
+        if (realpath($input->getArgument('dir') ?? '.') === false) {
+            $output->writeln("<error>Directory error(" . ($input->getArgument('dir') ?? '.') . "): no such file or directory.</error>");
             return self::FAILURE;
         }
         $global = ZMConfig::get("global");
@@ -60,15 +60,15 @@ class PureHttpCommand extends Command
                     "document_root" => realpath($input->getArgument('dir') ?? '.'),
                     "document_index" => $index
                 ]);
-            echo "\r".Coroutine::stats()["coroutine_peak_num"];
+            echo "\r" . Coroutine::stats()["coroutine_peak_num"];
         });
         $server->on("start", function ($server) {
             Process::signal(SIGINT, function () use ($server) {
                 Console::warning("Server interrupted by keyboard.");
                 for ($i = 0; $i < 32; ++$i) {
                     $num = ZMAtomic::$atomics["request"][$i]->get();
-                    if($num != 0)
-                    echo "[$i]: ".$num."\n";
+                    if ($num != 0)
+                        echo "[$i]: " . $num . "\n";
                 }
                 $server->shutdown();
                 $server->stop();

@@ -11,6 +11,8 @@ trait SingletonTrait
      */
     private static $instance;
 
+    protected static $cached = [];
+
     /**
      * @return self
      */

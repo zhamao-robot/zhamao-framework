@@ -35,69 +35,58 @@ class CQ
     }
 
     /**
-     * 发送emoji表情
-     * @param $id
-     * @return string
-     */
-    public static function emoji($id) {
-        if (is_numeric($id)) {
-            return "[CQ:emoji,id=" . $id . "]";
-        }
-        Console::warning("传入的emoji id($id)错误！");
-        return " ";
-    }
-
-    /**
-     * 发送原创表情，存放在酷Q目录的data/bface/下
-     * @param $id
-     * @return string
-     */
-    public static function bface($id) {
-        return "[CQ:bface,id=" . $id . "]";
-    }
-
-    /**
-     * 发送小表情
-     * @param $id
-     * @return string
-     */
-    public static function sface($id) {
-        if (is_numeric($id)) {
-            return "[CQ:sface,id=" . $id . "]";
-        }
-        Console::warning("传入的sface id($id)错误！");
-        return " ";
-    }
-
-    /**
      * 发送图片
-     * cache为<FALSE>时禁用CQ-HTTP-API插件的缓存
      * @param $file
      * @param bool $cache
+     * @param bool $flash
+     * @param bool $proxy
+     * @param int $timeout
      * @return string
      */
-    public static function image($file, $cache = true) {
-        if ($cache === false)
-            return "[CQ:image,file=" . $file . ",cache=0]";
-        else
-            return "[CQ:image,file=" . $file . "]";
+    public static function image($file, $cache = true, $flash = false, $proxy = true, $timeout = -1) {
+        return
+            "[CQ:image,file=" . self::encode($file, true) .
+            (!$cache ? ",cache=0" : "") .
+            ($flash ? ",type=flash" : "") .
+            (!$proxy ? ",proxy=false" : "") .
+            ($timeout != -1 ? (",timeout=" . intval($timeout)) : "") .
+            "]";
     }
 
     /**
      * 发送语音
-     * cache为<FALSE>时禁用CQ-HTTP-API插件的缓存
-     * magic为<TRUE>时标记为变声
      * @param $file
      * @param bool $magic
      * @param bool $cache
+     * @param bool $proxy
+     * @param int $timeout
      * @return string
      */
-    public static function record($file, $magic = false, $cache = true) {
-        if ($cache === false) $c = ",cache=0";
-        else $c = "";
-        if ($magic === true) $m = ",magic=true";
-        else $m = "";
-        return "[CQ:record,file=" . $file . $c . $m . "]";
+    public static function record($file, $magic = false, $cache = true, $proxy = true, $timeout = -1) {
+        return
+            "[CQ:record,file=" . self::encode($file, true) .
+            (!$cache ? ",cache=0" : "") .
+            ($magic ? ",magic=1" : "") .
+            (!$proxy ? ",proxy=false" : "") .
+            ($timeout != -1 ? (",timeout=" . intval($timeout)) : "") .
+            "]";
+    }
+
+    /**
+     * 发送短视频
+     * @param $file
+     * @param bool $cache
+     * @param bool $proxy
+     * @param int $timeout
+     * @return string
+     */
+    public static function video($file, $cache = true, $proxy = true, $timeout = -1) {
+        return
+            "[CQ:video,file=" . self::encode($file, true) .
+            (!$cache ? ",cache=0" : "") .
+            (!$proxy ? ",proxy=false" : "") .
+            ($timeout != -1 ? (",timeout=" . intval($timeout)) : "") .
+            "]";
     }
 
     /**
@@ -125,6 +114,69 @@ class CQ
     }
 
     /**
+     * 发送新的戳一戳
+     * @param $type
+     * @param $id
+     * @param string $name
+     * @return string
+     */
+    public static function poke($type, $id, $name = "") {
+        return "[CQ:poke,type=$type,id=$id" . ($name != "" ? (",name=".self::encode($name, true)) : "") . "]";
+    }
+
+    /**
+     * 发送匿名消息
+     * @param int $ignore
+     * @return string
+     */
+    public static function anonymous($ignore = 1) {
+        return "[CQ:anonymous" . ($ignore != 1 ? ",ignore=0" : "") . "]";
+    }
+
+    /**
+     * 发送链接分享（只能在单条回复中单独使用）
+     * @param $url
+     * @param $title
+     * @param null $content
+     * @param null $image
+     * @return string
+     */
+    public static function share($url, $title, $content = null, $image = null) {
+        if ($content === null) $c = "";
+        else $c = ",content=" . self::encode($content, true);
+        if ($image === null) $i = "";
+        else $i = ",image=" . self::encode($image, true);
+        return "[CQ:share,url=" . self::encode($url, true) . ",title=" . self::encode($title, true) . $c . $i . "]";
+    }
+
+    /**
+     * 发送好友或群推荐名片
+     * @param $type
+     * @param $id
+     * @return string
+     */
+    public static function contact($type, $id) {
+        return "[CQ:contact,type=$type,id=$id]";
+    }
+
+    /**
+     * 发送位置
+     * @param $lat
+     * @param $lon
+     * @param string $title
+     * @param string $content
+     * @return string
+     */
+    public static function location($lat, $lon, $title = "", $content = "") {
+        return "[CQ:location" .
+            ",lat=".self::encode($lat, true) .
+            ",lon=".self::encode($lon, true).
+            ($title != "" ? (",title=".self::encode($title, true)) : "") .
+            ($content != "" ? (",content=".self::encode($content, true)) : "") .
+            "]";
+    }
+
+    /**
      * 发送音乐分享（只能在单条回复中单独使用）
      * qq、163、xiami为内置分享，需要先通过搜索功能获取id后使用
      * custom为自定义分享
@@ -136,10 +188,10 @@ class CQ
      *  $image 为音乐卡片的图片链接地址（可忽略）
      * @param $type
      * @param $id_or_url
-     * @param string $audio
-     * @param string $title
-     * @param string $content
-     * @param string $image
+     * @param null $audio
+     * @param null $title
+     * @param null $content
+     * @param null $image
      * @return string
      */
     public static function music($type, $id_or_url, $audio = null, $title = null, $content = null, $image = null) {
@@ -154,42 +206,54 @@ class CQ
                     return " ";
                 }
                 if ($content === null) $c = "";
-                else $c = ",content=" . $content;
+                else $c = ",content=" . self::encode($content, true);
                 if ($image === null) $i = "";
-                else $i = ",image=" . $image;
-                return "[CQ:music,type=custom,url=" . $id_or_url . ",audio=" . $audio . ",title=" . $title . $c . $i . "]";
+                else $i = ",image=" . self::encode($image, true);
+                return "[CQ:music,type=custom,url=" .
+                    self::encode($id_or_url, true) .
+                    ",audio=" . self::encode($audio, true) . ",title=" . self::encode($title, true) . $c . $i .
+                    "]";
             default:
                 Console::warning("传入的music type($type)错误！");
                 return " ";
         }
     }
 
-    /**
-     * 发送链接分享（只能在单条回复中单独使用）
-     * @param $url
-     * @param $title
-     * @param null $content
-     * @param null $image
-     * @return string
-     */
-    public static function share($url, $title, $content = null, $image = null) {
-        if ($content === null) $c = "";
-        else $c = ",content=" . $content;
-        if ($image === null) $i = "";
-        else $i = ",image=" . $image;
-        return "[CQ:share,url=" . $url . ",title=" . $title . $c . $i . "]";
+    public static function forward($id) {
+        return "[CQ:forward,id=$id]";
+    }
+
+    public static function node($user_id, $nickname, $content) {
+        return "[CQ:node,user_id=$user_id,nickname=".self::encode($nickname, true).",content=" . self::encode($content, true) . "]";
+    }
+
+    public static function xml($data) {
+        return "[CQ:xml,data=" . self::encode($data, true) . "]";
+    }
+
+    public static function json($data, $resid = 0) {
+        return "[CQ:json,data=" . self::encode($data, true) . ",resid=" . intval($resid) . "]";
+    }
+
+    public static function _custom(string $type_name, $params) {
+        $code = "[CQ:" . $type_name;
+        foreach ($params as $k => $v) {
+            $code .= "," . $k . "=" . self::escape($v, true);
+        }
+        $code .= "]";
+        return $code;
     }
 
     /**
      * 反转义字符串中的CQ码敏感符号
-     * @param $str
+     * @param $msg
+     * @param bool $is_content
      * @return mixed
      */
-    public static function decode($str) {
-        $str = str_replace("&amp;", "&", $str);
-        $str = str_replace("&#91;", "[", $str);
-        $str = str_replace("&#93;", "]", $str);
-        return $str;
+    public static function decode($msg, $is_content = false) {
+        $msg = str_replace(["&amp;", "&#91;", "&#93;"], ["&", "[", "]"], $msg);
+        if ($is_content) $msg = str_replace("&#44;", ",", $msg);
+        return $msg;
     }
 
     public static function replace($str) {
@@ -199,42 +263,97 @@ class CQ
     }
 
     /**
-     * 转义CQ码
+     * 转义CQ码的特殊字符，同encode
      * @param $msg
+     * @param bool $is_content
      * @return mixed
      */
-    public static function escape($msg) {
-        $msg = str_replace("&", "&amp;", $msg);
-        $msg = str_replace("[", "&#91;", $msg);
-        $msg = str_replace("]", "&#93;", $msg);
+    public static function escape($msg, $is_content = false) {
+        $msg = str_replace(["&", "[", "]"], ["&amp;", "&#91;", "&#93;"], $msg);
+        if ($is_content) $msg = str_replace(",", "&#44;", $msg);
         return $msg;
     }
 
-    public static function encode($str) {
-        return self::escape($str);
+    /**
+     * 转义CQ码的特殊字符
+     * @param $msg
+     * @param false $is_content
+     * @return mixed
+     */
+    public static function encode($msg, $is_content = false) {
+        $msg = str_replace(["&", "[", "]"], ["&amp;", "&#91;", "&#93;"], $msg);
+        if ($is_content) $msg = str_replace(",", "&#44;", $msg);
+        return $msg;
     }
 
+    /**
+     * 移除消息中所有的CQ码并返回移除CQ码后的消息
+     * @param $msg
+     * @return string
+     */
     public static function removeCQ($msg) {
-        while (($cq = self::getCQ($msg)) !== null) {
-            $msg = str_replace(mb_substr($msg, $cq["start"], $cq["end"] - $cq["start"] + 1), "", $msg);
+        $final = "";
+        $last_end = 0;
+        foreach(self::getAllCQ($msg) as $k => $v) {
+            $final .= mb_substr($msg, $last_end, $v["start"] - $last_end);
+            $last_end = $v["end"] + 1;
         }
-        return $msg;
+        $final .= mb_substr($msg, $last_end);
+        return $final;
     }
 
+    /**
+     * 获取消息中第一个CQ码
+     * @param $msg
+     * @return array|null
+     */
     public static function getCQ($msg) {
-        if (($start = mb_strpos($msg, '[')) === false) return null;
-        if (($end = mb_strpos($msg, ']')) === false) return null;
-        $msg = mb_substr($msg, $start + 1, $end - $start - 1);
-        if (mb_substr($msg, 0, 3) != "CQ:") return null;
-        $msg = mb_substr($msg, 3);
-        $msg2 = explode(",", $msg);
-        $type = array_shift($msg2);
-        $array = [];
-        foreach ($msg2 as $k => $v) {
-            $ss = explode("=", $v);
-            $sk = array_shift($ss);
-            $array[$sk] = implode("=", $ss);
+        if (($head = mb_strpos($msg, "[CQ:")) !== false) {
+            $key_offset = mb_substr($msg, $head);
+            $close = mb_strpos($key_offset, "]");
+            if ($close === false) return null;
+            $content = mb_substr($msg, $head + 4, $close + $head - mb_strlen($msg));
+            $exp = explode(",", $content);
+            $cq["type"] = array_shift($exp);
+            foreach ($exp as $k => $v) {
+                $ss = explode("=", $v);
+                $sk = array_shift($ss);
+                $cq["params"][$sk] = self::decode(implode("=", $ss), true);
+            }
+            $cq["start"] = $head;
+            $cq["end"] = $close + $head;
+            return $cq;
+        } else {
+            return null;
         }
-        return ["type" => $type, "params" => $array, "start" => $start, "end" => $end];
+    }
+
+    /**
+     * 获取消息中所有的CQ码
+     * @param $msg
+     * @return array
+     */
+    public static function getAllCQ($msg) {
+        $cqs = [];
+        $offset = 0;
+        while (($head = mb_strpos(($submsg = mb_substr($msg, $offset)), "[CQ:")) !== false) {
+            $key_offset = mb_substr($submsg, $head);
+            $tmpmsg = mb_strpos($key_offset, "]");
+            if ($tmpmsg === false) break; // 没闭合，不算CQ码
+            $content = mb_substr($submsg, $head + 4, $tmpmsg + $head - mb_strlen($submsg));
+            $exp = explode(",", $content);
+            $cq = [];
+            $cq["type"] = array_shift($exp);
+            foreach ($exp as $k => $v) {
+                $ss = explode("=", $v);
+                $sk = array_shift($ss);
+                $cq["params"][$sk] = self::decode(implode("=", $ss), true);
+            }
+            $cq["start"] = $offset + $head;
+            $cq["end"] = $offset + $tmpmsg + $head;
+            $offset += $tmpmsg + 1;
+            $cqs[] = $cq;
+        }
+        return $cqs;
     }
 }

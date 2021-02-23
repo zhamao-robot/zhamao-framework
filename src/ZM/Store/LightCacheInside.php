@@ -23,9 +23,10 @@ class LightCacheInside
         $result = self::$kv_table["wait_api"]->create() && self::$kv_table["connect"]->create();
         if ($result === false) {
             self::$last_error = '系统内存不足，申请失败';
-            return $result;
+            return false;
+        } else {
+            return true;
         }
-        return $result;
     }
 
     /**

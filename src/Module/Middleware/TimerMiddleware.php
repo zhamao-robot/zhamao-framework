@@ -2,6 +2,7 @@
 
 namespace Module\Middleware;
 
+use Exception;
 use ZM\Annotation\Http\HandleAfter;
 use ZM\Annotation\Http\HandleBefore;
 use ZM\Annotation\Http\HandleException;
@@ -37,8 +38,11 @@ class TimerMiddleware implements MiddlewareInterface
 
     /**
      * @HandleException(\Exception::class)
+     * @param Exception $e
+     * @throws Exception
      */
-    public function onException() {
+    public function onException(Exception $e) {
         Console::error("Using " . round((microtime(true) - $this->starttime) * 1000, 2) . " ms but an Exception occurred.");
+        throw $e;
     }
 }

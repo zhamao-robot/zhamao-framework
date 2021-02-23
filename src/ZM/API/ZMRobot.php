@@ -59,7 +59,7 @@ class ZMRobot
     public static function getAllRobot() {
         $r = ManagerGM::getAllByName('qq');
         $obj = [];
-        foreach($r as $v) {
+        foreach ($r as $v) {
             $obj[] = new ZMRobot($v);
         }
         return $obj;
@@ -228,9 +228,9 @@ class ZMRobot
     /**
      * 群组单人禁言
      * @link https://github.com/howmanybots/onebot/blob/master/v11/specs/api/public.md#set_group_ban-%E7%BE%A4%E7%BB%84%E5%8D%95%E4%BA%BA%E7%A6%81%E8%A8%80
-     * @param int $group_id
-     * @param int $user_id
-     * @param int $duration
+     * @param $group_id
+     * @param $user_id
+     * @param $duration
      * @return array|bool|null
      */
     public function setGroupBan($group_id, $user_id, $duration = 1800) {

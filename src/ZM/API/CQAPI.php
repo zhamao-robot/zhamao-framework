@@ -3,17 +3,16 @@
 
 namespace ZM\API;
 
-use Co;
-use ZM\ConnectionManager\ConnectionObject;
 use ZM\Console\Console;
 use ZM\Store\LightCacheInside;
 use ZM\Store\Lock\SpinLock;
 use ZM\Store\ZMAtomic;
+use ZM\Utils\CoMessage;
 
 trait CQAPI
 {
     /**
-     * @param ConnectionObject $connection
+     * @param $connection
      * @param $reply
      * @param |null $function
      * @return bool|array
@@ -35,21 +34,20 @@ trait CQAPI
         $r[$api_id] = [
             "data" => $reply,
             "time" => microtime(true),
-            "self_id" => $connection->getOption("connect_id")
+            "self_id" => $connection->getOption("connect_id"),
+            "echo" => $api_id
         ];
-        if ($function === true) $r[$api_id]["coroutine"] = Co::getuid();
         LightCacheInside::set("wait_api", "wait_api", $r);
         SpinLock::unlock("wait_api");
         if (server()->push($connection->getFd(), json_encode($reply))) {
             if ($function === true) {
-                Co::suspend();
+                return CoMessage::yieldByWS($r[$api_id], ["echo"], 60);
+            } else {
                 SpinLock::lock("wait_api");
                 $r = LightCacheInside::get("wait_api", "wait_api");
-                $data = $r[$api_id];
                 unset($r[$api_id]);
                 LightCacheInside::set("wait_api", "wait_api", $r);
                 SpinLock::unlock("wait_api");
-                return isset($data['result']) ? $data['result'] : null;
             }
             return true;
         } else {
