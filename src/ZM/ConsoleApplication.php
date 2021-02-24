@@ -99,12 +99,7 @@ class ConsoleApplication extends Application
     private function selfCheck() {
         if (!extension_loaded("swoole")) die("Can not find swoole extension.\nSee: https://github.com/zhamao-robot/zhamao-framework/issues/19");
         if (version_compare(SWOOLE_VERSION, "4.4.13") == -1) die("You must install swoole version >= 4.4.13 !");
-        //if (!extension_loaded("gd")) die("Can not find gd extension.\n");
-        //if (!extension_loaded("sockets")) die("Can not find sockets extension.\n");
-        if (substr(PHP_VERSION, 0, 1) < "7") die("PHP >=7 required.\n");
-        //if (!function_exists("curl_exec")) die("Can not find curl extension.\n");
-        //if (!class_exists("ZipArchive")) die("Can not find Zip extension.\n");
-        //if (!file_exists(CRASH_DIR . "last_error.log")) die("Can not find log file.\n");
+        if (version_compare(PHP_VERSION, "7.2") == -1) die("PHP >= 7.2 required.");
         return true;
     }
 }

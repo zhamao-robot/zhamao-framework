@@ -227,5 +227,32 @@ bot()->sendPrivateMsg(123456, "你好啊！！");
 // 等同于 ZMRobot::getRandom()->sendPrivateMsg(123456, "你好啊！！");
 ```
 
+## zm_atomic()
 
+获取计时器，效果同 `\ZM\Store\ZMAtomic::get($name)`。
 
+定义：`zm_atmoic($name)`
+
+## uuidgen()
+
+> 2.2.5 版本起可用。
+
+生成一个随机的 uuid，支持大写或小写。
+
+定义：`uuidgen($uppercase = false)`
+
+当 `$uppercase` 为 `true` 时，返回的 uuid 中字母都是大写。
+
+## working_dir()
+
+> 2.2.6 版本起可用。
+
+获取框架运行的工作目录。例如你是从 `/root/framework-starter/` 目录启动的框架，`vendor/bin/start server`，那么 `working_dir()` 返回的就是 `/root/framework-starter`。（注意，返回的目录最后没有斜杠，请自行添加。）
+
+## getAllFdByConnectType()
+
+获取同类型的所有连接的描述符 ID。
+
+定义：`getAllFdByConnectType(string $type = 'default'): array`
+
+当 `$type` 为 `qq` 时，则返回所有 OneBot 机器人接入的 WebSocket 连接号。

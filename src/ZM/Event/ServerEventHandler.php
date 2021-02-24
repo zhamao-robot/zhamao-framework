@@ -6,6 +6,7 @@
 namespace ZM\Event;
 
 
+use Closure;
 use Co;
 use Error;
 use Exception;
@@ -410,9 +411,15 @@ class ServerEventHandler
         Console::debug("Calling Swoole \"open\" event from fd=" . $request->fd);
         unset(Context::$context[Co::getCid()]);
         $type = strtolower($request->header["x-client-role"] ?? $request->get["type"] ?? "");
-        $access_token = explode(" ", $request->header["authorization"] ?? $request->get["token"] ?? "")[1] ?? "";
-        if (($a = ZMConfig::get("global", "access_token")) != "") {
-            if ($access_token !== $a) {
+        $access_token = explode(" ", $request->header["authorization"] ?? "")[1] ?? $request->get["token"] ?? "";
+        $token = ZMConfig::get("global", "access_token");
+        if ($token instanceof Closure) {
+            if (!$token($access_token)) {
+                $server->close($request->fd);
+                Console::warning("Unauthorized access_token: " . $access_token);
+            }
+        } elseif (is_string($token)) {
+            if ($access_token !== $token) {
                 $server->close($request->fd);
                 Console::warning("Unauthorized access_token: " . $access_token);
                 return;

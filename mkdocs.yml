@@ -10,8 +10,8 @@ theme:
   favicon: assets/favicon.png
   language: zh
   palette:
-    primary: red
-    accent: red
+    primary: indigo
+    accent: indigo
   features:
     - navigation.tabs
 extra_javascript:
@@ -81,6 +81,7 @@ nav:
           - Redis 数据库: component/redis.md
           - ZMAtomic 原子计数器: component/atomics.md
           - SpinLock 自旋锁: component/spin-lock.md
+          - 文件管理: component/data-provider.md
       - 协程池: component/coroutine-pool.md
       - 单例类: component/singleton-trait.md
       - ZMUtil 杂项: component/zmutil.md

@@ -11,6 +11,7 @@ use ZM\Console\Console;
 use ZM\Annotation\CQ\CQCommand;
 use ZM\Annotation\Http\RequestMapping;
 use ZM\Event\EventDispatcher;
+use ZM\Requests\ZMRequest;
 use ZM\Utils\ZMUtil;
 
 /**
@@ -43,6 +44,18 @@ class Hello
      */
     public function hello() {
         return "你好啊，我是由炸毛框架构建的机器人！";
+    }
+
+    /**
+     * 一个最基本的第三方 API 接口使用示例
+     * @CQCommand("一言")
+     */
+    public function hitokoto() {
+        $api_result = ZMRequest::get("https://v1.hitokoto.cn/");
+        if ($api_result === false) return "接口请求出错，请稍后再试！";
+        $obj = json_decode($api_result, true);
+        if ($obj === null) return "接口解析出错！可能返回了非法数据！";
+        return $obj["hitokoto"] . "\n----「" . $obj["from"] . "」";
     }
 
     /**
@@ -89,7 +102,7 @@ class Hello
      * @return string
      */
     public function paramGet($param) {
-        return "Hello, ".$param["name"];
+        return "Hello, " . $param["name"];
     }
 
     /**

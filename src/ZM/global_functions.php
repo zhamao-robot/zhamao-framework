@@ -330,3 +330,10 @@ function uuidgen($uppercase = false) {
     return $uppercase ? strtoupper(vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4))) :
         vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
 }
+
+function working_dir() {
+    if (LOAD_MODE == 0) return WORKING_DIR;
+    elseif (LOAD_MODE == 1) return LOAD_MODE_COMPOSER_PATH;
+    elseif (LOAD_MODE == 2) return realpath('.');
+    return null;
+}

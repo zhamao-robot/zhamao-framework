@@ -12,6 +12,7 @@ use swoole_server;
 use ZM\ConnectionManager\ConnectionObject;
 use ZM\ConnectionManager\ManagerGM;
 use ZM\Console\Console;
+use ZM\Event\EventDispatcher;
 use ZM\Exception\InvalidArgumentException;
 use ZM\Exception\WaitTimeoutException;
 use ZM\Http\Response;
@@ -112,21 +113,20 @@ class Context implements ContextInterface
                 $this->setCache("has_reply", true);
                 $data = $this->getData();
                 $conn = $this->getConnection();
-                switch ($data["message_type"]) {
-                    case "group":
-                        return (new ZMRobot($conn))->setCallback($yield)->sendGroupMsg($data["group_id"], $msg);
-                    case "private":
-                        return (new ZMRobot($conn))->setCallback($yield)->sendPrivateMsg($data["user_id"], $msg);
-                }
-                return null;
+                return (new ZMRobot($conn))->setCallback($yield)->callExtendedAPI(".handle_quick_operation", [
+                    "context" => $data,
+                    "operation" => [
+                        "reply" => $msg
+                    ]
+                ]);
         }
         return false;
     }
 
     public function finalReply($msg, $yield = false) {
         self::$context[$this->cid]["cache"]["block_continue"] = true;
-        if ($msg == "") return true;
-        return $this->reply($msg, $yield);
+        if ($msg != "") $this->reply($msg, $yield);
+        EventDispatcher::interrupt();
     }
 
     /**
