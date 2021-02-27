@@ -97,7 +97,7 @@ class ConsoleApplication extends Application
     }
 
     private function selfCheck() {
-        if (!extension_loaded("swoole")) die("Can not find swoole extension.\nSee: https://github.com/zhamao-robot/zhamao-framework/issues/19");
+        if (!extension_loaded("swoole")) die("Can not find swoole extension.\nSee: https://github.com/zhamao-robot/zhamao-framework/issues/19\n");
         if (version_compare(SWOOLE_VERSION, "4.4.13") == -1) die("You must install swoole version >= 4.4.13 !");
         if (version_compare(PHP_VERSION, "7.2") == -1) die("PHP >= 7.2 required.");
         return true;

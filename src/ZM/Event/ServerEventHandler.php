@@ -420,7 +420,7 @@ class ServerEventHandler
                 return;
             }
         } elseif (is_string($token)) {
-            if ($access_token !== $token) {
+            if ($access_token !== $token && $token !== "") {
                 $server->close($request->fd);
                 Console::warning("Unauthorized access_token: " . $access_token);
                 return;
