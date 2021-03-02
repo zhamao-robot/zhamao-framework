@@ -9,6 +9,7 @@ use Exception;
 use ZM\Annotation\Swoole\OnSetup;
 use ZM\Config\ZMConfig;
 use ZM\ConnectionManager\ManagerGM;
+use ZM\Console\TermColor;
 use ZM\Event\ServerEventHandler;
 use ZM\Store\LightCache;
 use ZM\Store\LightCacheInside;
@@ -87,35 +88,37 @@ class Framework
 
             $this->parseCliArgs(self::$argv);
 
-            $out = [
-                "host" => ZMConfig::get("global", "host"),
-                "port" => ZMConfig::get("global", "port"),
-                "log_level" => Console::getLevel(),
-                "version" => ZM_VERSION,
-                "config" => $args["env"] === null ? 'global.php' : $args["env"]
-            ];
-            if (APP_VERSION !== "unknown") $out["app_version"] = APP_VERSION;
-            if (isset(ZMConfig::get("global", "swoole")["task_worker_num"])) {
-                $out["task_worker_num"] = ZMConfig::get("global", "swoole")["task_worker_num"];
-            }
-            if (($num = ZMConfig::get("global", "swoole")["worker_num"] ?? swoole_cpu_num()) != 1) {
-                $out["worker_num"] = $num;
-            }
-            $out["working_dir"] = DataProvider::getWorkingDir();
-            Console::printProps($out, $tty_width);
 
             self::$server->set($this->server_set);
-            if (file_exists(DataProvider::getWorkingDir() . "/config/motd.txt")) {
-                $motd = file_get_contents(DataProvider::getWorkingDir() . "/config/motd.txt");
-            } else {
-                $motd = file_get_contents(__DIR__ . "/../../config/motd.txt");
+
+            // 打印初始信息
+            $out["listen"] = ZMConfig::get("global", "host") . ":" . ZMConfig::get("global", "port");
+            if (!isset(ZMConfig::get("global", "swoole")["worker_num"])) $out["worker"] = swoole_cpu_num() . " (auto)";
+            else $out["worker"] = ZMConfig::get("global", "swoole")["worker_num"];
+            $out["env"] = $args["env"] === null ? "default" : $args["env"];
+            $out["log_level"] = Console::getLevel();
+            $out["version"] = ZM_VERSION;
+            if (APP_VERSION !== "unknown") $out["app_version"] = APP_VERSION;
+            if (isset(ZMConfig::get("global", "swoole")["task_worker_num"])) {
+                $out["task_worker"] = ZMConfig::get("global", "swoole")["task_worker_num"];
             }
-            $motd = explode("\n", $motd);
-            foreach ($motd as $k => $v) {
-                $motd[$k] = substr($v, 0, $tty_width);
+            if (ZMConfig::get("global", "sql_config")["sql_host"] !== "") {
+                $conf = ZMConfig::get("global", "sql_config");
+                $out["mysql_pool"] = $conf["database"] . "@" . $conf["sql_host"] . ":" . $conf["sql_port"];
             }
-            $motd = implode("\n", $motd);
-            echo $motd;
+            if (ZMConfig::get("global", "redis_config")["host"] !== "") {
+                $conf = ZMConfig::get("global", "redis_config");
+                $out["redis_pool"] = $conf["host"] . ":" . $conf["port"];
+            }
+            if (ZMConfig::get("global", "static_file_server")["status"] !== false) {
+                $out["static_file_server"] = "enabled";
+            }
+
+            $out["working_dir"] = DataProvider::getWorkingDir();
+            self::printProps($out, $tty_width, $args["log-theme"] === null);
+
+            self::printMotd($tty_width);
+
             global $asd;
             $asd = get_included_files();
             // 注册 Swoole Server 的事件
@@ -169,6 +172,20 @@ class Framework
             Console::error($e->getMessage());
             die;
         }
+    }
+
+    private static function printMotd($tty_width) {
+        if (file_exists(DataProvider::getWorkingDir() . "/config/motd.txt")) {
+            $motd = file_get_contents(DataProvider::getWorkingDir() . "/config/motd.txt");
+        } else {
+            $motd = file_get_contents(__DIR__ . "/../../config/motd.txt");
+        }
+        $motd = explode("\n", $motd);
+        foreach ($motd as $k => $v) {
+            $motd[$k] = substr($v, 0, $tty_width);
+        }
+        $motd = implode("\n", $motd);
+        echo $motd;
     }
 
     public function start() {
@@ -278,6 +295,95 @@ class Framework
             }
         }
         if ($coroutine_mode) Runtime::enableCoroutine(true, SWOOLE_HOOK_ALL);
+    }
+
+    private static function writeNoDouble($k, $v, &$line_data, &$line_width, &$current_line, $colorful, $max_border) {
+        $tmp_line = $k . ": " . $v;
+        //Console::info("写入[".$tmp_line."]");
+        if (strlen($tmp_line) >= $line_width[$current_line]) { //输出的内容太多了，以至于一行都放不下一个，要折行
+            $title_strlen = strlen($k . ": ");
+            $content_len = $line_width[$current_line] - $title_strlen;
+
+            $line_data[$current_line] = " " . $k . ": ";
+            if ($colorful) $line_data[$current_line] .= TermColor::color8(32);
+            $line_data[$current_line] .= substr($v, 0, $content_len);
+            if ($colorful) $line_data[$current_line] .= TermColor::RESET;
+            $rest = substr($v, $content_len);
+            ++$current_line; // 带标题的第一行满了，折到第二行
+            do {
+                if ($colorful) $line_data[$current_line] = TermColor::color8(32);
+                $line_data[$current_line] .= " " . substr($rest, 0, $max_border - 2);
+                if ($colorful) $line_data[$current_line] .= TermColor::RESET;
+                $rest = substr($rest, $max_border - 2);
+                ++$current_line;
+            } while ($rest > $max_border - 2); // 循环，直到放完
+        } else { // 不需要折行
+            //Console::info("不需要折行");
+            $line_data[$current_line] = " " . $k . ": ";
+            if ($colorful) $line_data[$current_line] .= TermColor::color8(32);
+            $line_data[$current_line] .= $v;
+            if ($colorful) $line_data[$current_line] .= TermColor::RESET;
+
+            if ($max_border >= 57) {
+                if (strlen($tmp_line) >= intval(($max_border - 2) / 2)) {  // 不需要折行，直接输出一个转下一行
+                    //Console::info("不需要折行，直接输出一个转下一行");
+                    ++$current_line;
+                } else {  // 输出很小，写到前面并分片
+                    //Console::info("输出很小，写到前面并分片");
+                    $space = intval($max_border / 2) - 2 - strlen($tmp_line);
+                    $line_data[$current_line] .= str_pad("", $space, " ");
+                    $line_data[$current_line] .= "|  "; // 添加分片
+                    $line_width[$current_line] -= (strlen($tmp_line) + 3 + $space);
+                }
+            } else {
+                ++$current_line;
+            }
+        }
+    }
+
+    public static function printProps($out, $tty_width, $colorful = true) {
+        $max_border = $tty_width < 65 ? $tty_width : 65;
+        if (LOAD_MODE == 0) echo Console::setColor("* Framework started with source mode.\n", $colorful ? "yellow" : "");
+        echo str_pad("", $max_border, "=") . PHP_EOL;
+
+        $current_line = 0;
+        $line_width = [];
+        $line_data = [];
+        foreach ($out as $k => $v) {
+            if (!isset($line_width[$current_line])) {
+                $line_width[$current_line] = $max_border - 2;
+            }
+            //Console::info("行宽[$current_line]：".$line_width[$current_line]);
+            if ($max_border >= 57) { // 很宽的时候，一行能放两个短行
+                if ($line_width[$current_line] == ($max_border - 2)) { //空行
+                    self::writeNoDouble($k, $v, $line_data, $line_width, $current_line, $colorful, $max_border);
+                } else { // 不是空行，已经有东西了
+                    $tmp_line = $k . ": " . $v;
+                    //Console::info("[$current_line]即将插入后面的东西[".$tmp_line."]");
+                    if (strlen($tmp_line) > $line_width[$current_line]) { // 地方不够，另起一行
+                        $line_data[$current_line] = str_replace("|  ", "", $line_data[$current_line]);
+                        ++$current_line;
+                        $line_data[$current_line] = " " . $k . ": ";
+                        if ($colorful) $line_data[$current_line] .= TermColor::color8(32);
+                        $line_data[$current_line] .= $v;
+                        if ($colorful) $line_data[$current_line] .= TermColor::RESET;
+                        ++$current_line;
+                    } else { // 地方够，直接写到后面并另起一行
+                        $line_data[$current_line] .= $k . ": ";
+                        if ($colorful) $line_data[$current_line] .= TermColor::color8(32);
+                        $line_data[$current_line] .= $v;
+                        if ($colorful) $line_data[$current_line] .= TermColor::RESET;
+                        ++$current_line;
+                    }
+                }
+            } else {  // 不够宽，直接写单行
+                self::writeNoDouble($k, $v, $line_data, $line_width, $current_line, $colorful, $max_border);
+            }
+        }
+        foreach ($line_data as $v) {
+            echo $v . PHP_EOL;
+        }
+        echo str_pad("", $max_border, "=") . PHP_EOL;
     }
 
     public static function getTtyWidth() {

@@ -1,14 +1,6 @@
 #!/usr/bin/env php
-<?php
+<?php /** @noinspection PhpIncludeInspection */
 
-if (!is_dir(__DIR__ . '/../vendor')) {
-    define("LOAD_MODE", 1); //composer项目模式
-    define("LOAD_MODE_COMPOSER_PATH", getcwd());
-    /** @noinspection PhpIncludeInspection */
-    require_once LOAD_MODE_COMPOSER_PATH . "/vendor/autoload.php";
-} else {
-    define("LOAD_MODE", 0); //源码模式
-    require_once __DIR__ . "/../vendor/autoload.php";
-}
+require_once ((!is_dir(__DIR__ . '/../vendor')) ? getcwd() : (__DIR__ . "/..")) . "/vendor/autoload.php";
 
 (new ZM\ConsoleApplication("zhamao-framework"))->initEnv()->run();

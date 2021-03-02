@@ -26,23 +26,21 @@ class ConsoleApplication extends Application
     public function initEnv() {
         $this->selfCheck();
 
+        if (!is_dir(__DIR__ . '/../../vendor')) {
+            define("LOAD_MODE", 1); // composer项目模式
+            define("LOAD_MODE_COMPOSER_PATH", getcwd());
+        } else  {
+            define("LOAD_MODE", 0); // 源码模式
+        }
+
         //if (LOAD_MODE === 0) $this->add(new BuildCommand()); //只有在git源码模式才能使用打包指令
         if (LOAD_MODE === 0) define("WORKING_DIR", getcwd());
         elseif (LOAD_MODE == 1) define("WORKING_DIR", realpath(__DIR__ . "/../../"));
-        elseif (LOAD_MODE == 2) echo "Phar mode: " . WORKING_DIR . PHP_EOL;
         if (file_exists(DataProvider::getWorkingDir() . "/vendor/autoload.php")) {
             /** @noinspection PhpIncludeInspection */
             require_once DataProvider::getWorkingDir() . "/vendor/autoload.php";
         }
-        if (LOAD_MODE == 2) {
-            // Phar 模式，2.0 不提供哦
-            //require_once FRAMEWORK_DIR . "/vendor/autoload.php";
-            spl_autoload_register('phar_classloader');
-        } elseif (LOAD_MODE == 0) {
-            /** @noinspection PhpIncludeInspection
-             * @noinspection RedundantSuppression
-             */
-            require_once WORKING_DIR . "/vendor/autoload.php";
+        if (LOAD_MODE == 0) {
             $composer = json_decode(file_get_contents(DataProvider::getWorkingDir() . "/composer.json"), true);
             if (!isset($composer["autoload"]["psr-4"]["Module\\"])) {
                 echo "框架源码模式需要在autoload文件中添加Module目录为自动加载，是否添加？[Y/n] ";

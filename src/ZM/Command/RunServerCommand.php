@@ -39,7 +39,6 @@ class RunServerCommand extends Command
                 return Command::FAILURE;
             }
         }
-        if (LOAD_MODE == 0) echo "* This is repository mode.\n";
         (new Framework($input->getOptions()))->start();
         return Command::SUCCESS;
     }
