@@ -13,7 +13,6 @@ jobs:
         with:
           python-version: 3.x
           key: ${{ secrets.VPS_SSH }}
-          name: id_rsa
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
       - run: pip install mkdocs-material
       - run: mkdocs build -d distribute && cd distribute/ && ssh root@139.199.77.130 rm -rf /var/www/docs_v2/\* && scp -r ./* root@139.199.77.130:/var/www/docs_v2/
