@@ -1,23 +1,15 @@
-name: Publish docs via GitHub Pages
+name: ci
 on:
   push:
     branches:
       - master
-
 jobs:
-  build:
-    name: Deploy docs
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout main
-        uses: actions/checkout@v2
-
-      - name: Deploy docs
-        uses: mhausenblas/mkdocs-deploy-gh-pages@master
-        # Or use mhausenblas/mkdocs-deploy-gh-pages@nomaterial to build without the mkdocs-material theme
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPOSITORY: zhamao-robot/docs-v2-pages
-          CUSTOM_DOMAIN: docs-v2.zhamao.me
-          CONFIG_FILE: mkdocs.yml
-          EXTRA_PACKAGES: build-base
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+      - run: pip install mkdocs-material
+      - run: mkdocs build -d distribute && git init && git add -A && git commit -m 'deploy' && git push -f https://github.com/zhamao-robot/docs-v2-pages.git master
