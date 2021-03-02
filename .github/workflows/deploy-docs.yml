@@ -9,8 +9,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
+      - uses: shimataro/ssh-key-action@v2
         with:
           python-version: 3.x
+          key: ${{ secrets.SSH_KEY }}
       - run: pip install mkdocs-material
-      - run: git config --global user.email "jesse2061@outlook.com" && git config --global user.name "crazywhalecc"
-      - run: mkdocs build -d distribute && cd distribute && git init && git add -A && git commit -m 'deploy' && git push -f https://github.com/zhamao-robot/docs-v2-pages.git master
+      - run: mkdocs build -d distribute && cd distribute/ && ssh root@139.199.77.130 rm -rf /var/www/docs_v2/\* && scp -r ./* root@139.199.77.130:/var/www/docs_v2/
