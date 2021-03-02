@@ -12,4 +12,4 @@ jobs:
         with:
           python-version: 3.x
       - run: pip install mkdocs-material
-      - run: mkdocs build -d distribute && git init && git add -A && git commit -m 'deploy' && git push -f https://github.com/zhamao-robot/docs-v2-pages.git master
+      - run: mkdocs build -d distribute && cd distribute && git init && git add -A && git commit -m 'deploy' && git push -f https://github.com/zhamao-robot/docs-v2-pages.git master
