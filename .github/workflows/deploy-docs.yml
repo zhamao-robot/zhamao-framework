@@ -12,4 +12,5 @@ jobs:
         with:
           python-version: 3.x
       - run: pip install mkdocs-material
+      - run: git config --global user.email "jesse2061@outlook.com" && git config --global user.name "crazywhalecc"
       - run: mkdocs build -d distribute && cd distribute && git init && git add -A && git commit -m 'deploy' && git push -f https://github.com/zhamao-robot/docs-v2-pages.git master
