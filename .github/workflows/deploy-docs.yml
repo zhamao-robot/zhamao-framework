@@ -1,0 +1,18 @@
+name: ci
+on:
+  push:
+    branches:
+      - master
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+      - uses: shimataro/ssh-key-action@v2
+        with:
+          python-version: 3.x
+          key: ${{ secrets.VPS_SSH }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS }}
+      - run: pip install mkdocs-material
+      - run: mkdocs build -d distribute && cd distribute/ && ssh root@139.199.77.130 rm -rf /var/www/docs_v2/\* && scp -r ./* root@139.199.77.130:/var/www/docs_v2/
