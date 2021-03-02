@@ -104,7 +104,7 @@ class Framework
             }
             if (ZMConfig::get("global", "sql_config")["sql_host"] !== "") {
                 $conf = ZMConfig::get("global", "sql_config");
-                $out["mysql_pool"] = $conf["database"] . "@" . $conf["sql_host"] . ":" . $conf["sql_port"];
+                $out["mysql_pool"] = $conf["sql_database"] . "@" . $conf["sql_host"] . ":" . $conf["sql_port"];
             }
             if (ZMConfig::get("global", "redis_config")["host"] !== "") {
                 $conf = ZMConfig::get("global", "redis_config");
