@@ -88,6 +88,7 @@ nav:
       - 全局方法: component/global-functions.md
       - HTTP 和 WebSocket 客户端: component/zmrequest.md
       - Console 终端: component/console.md
+      - Token 验证: component/access-token.md
   - 进阶开发:
       - 进阶开发: advanced/index.md
       - 框架剖析: advanced/framework-structure.md

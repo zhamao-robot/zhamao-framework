@@ -1,9 +1,9 @@
 {
     "name": "zhamao/framework",
-    "description": "High performance QQ robot and web server development framework",
+    "description": "High performance chat robot and web server development framework",
     "minimum-stability": "stable",
     "license": "Apache-2.0",
-    "version": "2.2.8",
+    "version": "2.2.9",
     "extra": {
         "exclude_annotate": [
             "src/ZM"
@@ -11,12 +11,8 @@
     },
     "authors": [
         {
-            "name": "whale",
-            "email": "crazysnowcc@gmail.com"
-        },
-        {
-            "name": "swift",
-            "email": "hugo_swift@yahoo.com"
+            "name": "jerry",
+            "email": "admin@zhamao.me"
         }
     ],
     "prefer-stable": true,
@@ -52,7 +48,6 @@
         ]
     },
     "require-dev": {
-        "swoole/ide-helper": "@dev",
-        "phpunit/phpunit": "^9.5"
+        "swoole/ide-helper": "@dev"
     }
 }

@@ -10,29 +10,29 @@
 
 框架的全局配置文件在 `config/global.php` 文件中。下面是配置文件的各个选项，请根据自己的需要自行配置。
 
-| 配置名称                     | 说明                                             | 默认值                       |
-| :--------------------------- | ------------------------------------------------ | ---------------------------- |
-| `host`                       | 框架监听的地址                                   | 0.0.0.0                      |
-| `port`                       | 框架监听的端口                                   | 20001                        |
-| `http_reverse_link`          | 框架开到公网或外部的 HTTP 反代链接               | 见配置文件                   |
-| `zm_data`                    | 框架的配置文件、日志文件等文件目录               | `./` 下的 `zm_data/`         |
-| `debug_mode`                 | 框架是否启动 debug 模式                          | false                        |
-| `crash_dir`                  | 存放崩溃和运行日志的目录                         | `zm_data` 下的 `crash/`      |
-| `swoole`                     | 对应 Swoole server 中 set 的参数，参考Swoole文档 | 见子表 `swoole`              |
-| `light_cache`                | 轻量内置 key-value 缓存                          | 见字表 `light_cache`         |
-| `worker_cache`               | 跨进程变量级缓存                                 | 见子表 `worker_cache`        |
-| `sql_config`                 | MySQL 数据库连接信息                             | 见子表 `sql_config`          |
-| `redis_config`               | Redis 连接信息                                   | 见子表 `redis_config`        |
-| `access_token`               | OneBot 客户端连接约定的token，留空则无           | 空                           |
-| `http_header`                | HTTP 请求自定义返回的header                      | 见配置文件                   |
-| `http_default_code_page`     | HTTP服务器在指定状态码下回复的默认页面           | 见配置文件                   |
-| `init_atomics`               | 框架启动时初始化的原子计数器列表                 | 见配置文件                   |
-| `info_level`                 | 终端日志显示等级（0-4）                          | 2                            |
-| `context_class`              | 上下文所定义的类，待上下文完善后见对应文档       | `\ZM\Context\Context::class` |
-| `static_file_server`         | 静态文件服务器配置项                             | 见子表 `static_file_server`  |
-| `server_event_handler_class` | 注册 Swoole Server 事件注解的类列表              | 见配置文件                   |
-| `command_register_class`     | 注册自定义命令行选项指令的类                     | 见配置文件                   |
-| `modules`                    | 服务器启用的外部第三方和内部插件                 | `['onebot' => true]`         |
+| 配置名称                     | 说明                                                         | 默认值                       |
+| :--------------------------- | ------------------------------------------------------------ | ---------------------------- |
+| `host`                       | 框架监听的地址                                               | 0.0.0.0                      |
+| `port`                       | 框架监听的端口                                               | 20001                        |
+| `http_reverse_link`          | 框架开到公网或外部的 HTTP 反代链接                           | 见配置文件                   |
+| `zm_data`                    | 框架的配置文件、日志文件等文件目录                           | `./` 下的 `zm_data/`         |
+| `debug_mode`                 | 框架是否启动 debug 模式                                      | false                        |
+| `crash_dir`                  | 存放崩溃和运行日志的目录                                     | `zm_data` 下的 `crash/`      |
+| `swoole`                     | 对应 Swoole server 中 set 的参数，参考Swoole文档             | 见子表 `swoole`              |
+| `light_cache`                | 轻量内置 key-value 缓存                                      | 见字表 `light_cache`         |
+| `worker_cache`               | 跨进程变量级缓存                                             | 见子表 `worker_cache`        |
+| `sql_config`                 | MySQL 数据库连接信息                                         | 见子表 `sql_config`          |
+| `redis_config`               | Redis 连接信息                                               | 见子表 `redis_config`        |
+| `access_token`               | OneBot 客户端连接约定的token，留空则无，相关设置见 [组件 - Access Token 验证](component/access-token) | 空                           |
+| `http_header`                | HTTP 请求自定义返回的header                                  | 见配置文件                   |
+| `http_default_code_page`     | HTTP服务器在指定状态码下回复的默认页面                       | 见配置文件                   |
+| `init_atomics`               | 框架启动时初始化的原子计数器列表                             | 见配置文件                   |
+| `info_level`                 | 终端日志显示等级（0-4）                                      | 2                            |
+| `context_class`              | 上下文所定义的类，待上下文完善后见对应文档                   | `\ZM\Context\Context::class` |
+| `static_file_server`         | 静态文件服务器配置项                                         | 见子表 `static_file_server`  |
+| `server_event_handler_class` | 注册 Swoole Server 事件注解的类列表                          | 见配置文件                   |
+| `command_register_class`     | 注册自定义命令行选项指令的类                                 | 见配置文件                   |
+| `modules`                    | 服务器启用的外部第三方和内部插件                             | `['onebot' => true]`         |
 
 ### 子表 **swoole**
 

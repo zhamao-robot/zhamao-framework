@@ -51,7 +51,7 @@ public function hello() {
      * @CQCommand("测试fd")
      */
     public function testfd() {
-        ctx()->reply("当前机器人连接的fd是：".ctx()->getFd()"，机器人QQ是：".ctx()->getRobotId());
+        ctx()->reply("当前机器人连接的fd是：".ctx()->getFd()."，机器人QQ是：".ctx()->getRobotId());
     }
     ```
 
@@ -422,3 +422,4 @@ public function argTest1() {
 ) test abc 334 argtest
 ( 参数内容：abc, 334, argtest
 </chat-box>
+

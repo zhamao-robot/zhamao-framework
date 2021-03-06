@@ -80,11 +80,16 @@ class ServerEventHandler
             });
         }
         Process::signal(SIGINT, function () use ($r) {
-            echo "\r";
-            Console::warning("Server interrupted(SIGINT) on Master.");
-            if ((Framework::$server->inotify ?? null) !== null)
-                /** @noinspection PhpUndefinedFieldInspection */ Event::del(Framework::$server->inotify);
-            ZMUtil::stop();
+            if (zm_atomic("_int_is_reload")->get() === 1) {
+                zm_atomic("_int_is_reload")->set(0);
+                ZMUtil::reload();
+            } else {
+                echo "\r";
+                Console::warning("Server interrupted(SIGINT) on Master.");
+                if ((Framework::$server->inotify ?? null) !== null)
+                    /** @noinspection PhpUndefinedFieldInspection */ Event::del(Framework::$server->inotify);
+                ZMUtil::stop();
+            }
         });
         if (Framework::$argv["daemon"]) {
             $daemon_data = json_encode([

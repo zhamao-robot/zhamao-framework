@@ -27,7 +27,7 @@ $config['crash_dir'] = $config['zm_data'] . 'crash/';
 /** 对应swoole的server->set参数 */
 $config['swoole'] = [
     'log_file' => $config['crash_dir'] . 'swoole_error.log',
-    'worker_num' => swoole_cpu_num(), //如果你只有一个 OneBot 实例连接到框架并且代码没有复杂的CPU密集计算，则可把这里改为1使用全局变量
+    //'worker_num' => swoole_cpu_num(), //如果你只有一个 OneBot 实例连接到框架并且代码没有复杂的CPU密集计算，则可把这里改为1使用全局变量
     'dispatch_mode' => 2, //包分配原则，见 https://wiki.swoole.com/#/server/setting?id=dispatch_mode
     'max_coroutine' => 300000,
     //'task_worker_num' => 4,

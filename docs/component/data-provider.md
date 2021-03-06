@@ -35,3 +35,20 @@ DataProvider 是框架内提供的一个简易的文件管理类。
 定义：`loadFromJson($filename)`
 
 文件名同上 `saveToJson()` 的定义，解析后的返回值为原先的内容或 `null`（如果文件不存在或 json 解析失败）。
+
+## 其他文件读取
+
+框架比较贴近原生的 PHP，所以推荐直接使用原生的方法来读写文件（`file_get_contents` 和 `file_put_contents`）。但有一点要注意，框架内最好使用**工作目录或者绝对路径**。
+
+```php
+// 读取框架工作目录的文件 composer.json 文件
+$r = file_get_contents(working_dir() . "/composer.json");
+
+// 写入 Linux 临时目录下的文件
+file_put_contents("/tmp/test.txt", "hello world");
+```
+
+!!! warning "注意"
+
+	在默认的情况里，框架的根目录均为可写可读的，在读写文件时务必要注意目录的位置和权限。使用 `working_dir()` 获取目录后面需要加 `/` 再追加自己的文件名或子目录名。
+

@@ -104,25 +104,31 @@ class Context implements ContextInterface
      * @param $msg
      * @param bool $yield
      * @return mixed
-     * @noinspection PhpMissingBreakStatementInspection
      */
     public function reply($msg, $yield = false) {
-        switch ($this->getData()["message_type"]) {
-            case "group":
-                $operation["at_sender"] = false;
-                // no break
-            case "private":
-            case "discuss":
-                $this->setCache("has_reply", true);
-                $data = $this->getData();
-                $conn = $this->getConnection();
-                $operation["reply"] = $msg;
-                return (new ZMRobot($conn))->setCallback($yield)->callExtendedAPI(".handle_quick_operation", [
-                    "context" => $data,
-                    "operation" => $operation
-                ]);
+        $data = $this->getData();
+        $conn = $this->getConnection();
+        if (!is_array($msg)) {
+            switch ($this->getData()["message_type"]) {
+                case "group":
+                case "private":
+                case "discuss":
+                    $this->setCache("has_reply", true);
+                    $operation["reply"] = $msg;
+                    $operation["at_sender"] = false;
+                    return (new ZMRobot($conn))->setCallback($yield)->callExtendedAPI(".handle_quick_operation", [
+                        "context" => $data,
+                        "operation" => $operation
+                    ]);
+            }
+            return false;
+        } else {
+            $operation = $msg;
+            return (new ZMRobot($conn))->setCallback(false)->callExtendedAPI(".handle_quick_operation", [
+                "context" => $data,
+                "operation" => $operation
+            ]);
         }
-        return false;
     }
 
     public function finalReply($msg, $yield = false) {

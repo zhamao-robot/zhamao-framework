@@ -74,8 +74,7 @@ class Framework
             die($e->getMessage());
         }
         try {
-            self::$server = new Server(ZMConfig::get("global", "host"), ZMConfig::get("global", "port"));
-            $this->server_set = ZMConfig::get("global", "swoole");
+
             Console::init(
                 ZMConfig::get("global", "info_level") ?? 2,
                 self::$server,
@@ -86,16 +85,14 @@ class Framework
             $timezone = ZMConfig::get("global", "timezone") ?? "Asia/Shanghai";
             date_default_timezone_set($timezone);
 
+            $this->server_set = ZMConfig::get("global", "swoole");
             $this->parseCliArgs(self::$argv);
-
-
-            self::$server->set($this->server_set);
 
             // 打印初始信息
             $out["listen"] = ZMConfig::get("global", "host") . ":" . ZMConfig::get("global", "port");
             if (!isset(ZMConfig::get("global", "swoole")["worker_num"])) $out["worker"] = swoole_cpu_num() . " (auto)";
             else $out["worker"] = ZMConfig::get("global", "swoole")["worker_num"];
-            $out["env"] = $args["env"] === null ? "default" : $args["env"];
+            $out["environment"] = $args["env"] === null ? "default" : $args["env"];
             $out["log_level"] = Console::getLevel();
             $out["version"] = ZM_VERSION;
             if (APP_VERSION !== "unknown") $out["app_version"] = APP_VERSION;
@@ -116,6 +113,10 @@ class Framework
 
             $out["working_dir"] = DataProvider::getWorkingDir();
             self::printProps($out, $tty_width, $args["log-theme"] === null);
+
+            self::$server = new Server(ZMConfig::get("global", "host"), ZMConfig::get("global", "port"));
+
+            self::$server->set($this->server_set);
 
             self::printMotd($tty_width);
 
@@ -170,6 +171,7 @@ class Framework
         } catch (Exception $e) {
             Console::error("Framework初始化出现错误，请检查！");
             Console::error($e->getMessage());
+            Console::debug($e);
             die;
         }
     }
@@ -350,6 +352,7 @@ class Framework
         $line_width = [];
         $line_data = [];
         foreach ($out as $k => $v) {
+            start:
             if (!isset($line_width[$current_line])) {
                 $line_width[$current_line] = $max_border - 2;
             }
@@ -363,11 +366,7 @@ class Framework
                     if (strlen($tmp_line) > $line_width[$current_line]) { // 地方不够，另起一行
                         $line_data[$current_line] = str_replace("|  ", "", $line_data[$current_line]);
                         ++$current_line;
-                        $line_data[$current_line] = " " . $k . ": ";
-                        if ($colorful) $line_data[$current_line] .= TermColor::color8(32);
-                        $line_data[$current_line] .= $v;
-                        if ($colorful) $line_data[$current_line] .= TermColor::RESET;
-                        ++$current_line;
+                        goto start;
                     } else { // 地方够，直接写到后面并另起一行
                         $line_data[$current_line] .= $k . ": ";
                         if ($colorful) $line_data[$current_line] .= TermColor::color8(32);
