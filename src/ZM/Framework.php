@@ -110,6 +110,9 @@ class Framework
             if (ZMConfig::get("global", "static_file_server")["status"] !== false) {
                 $out["static_file_server"] = "enabled";
             }
+            if (self::$argv["show-php-ver"] !== false) {
+                $out["php_version"] = PHP_VERSION;
+            }
 
             $out["working_dir"] = DataProvider::getWorkingDir();
             self::printProps($out, $tty_width, $args["log-theme"] === null);
@@ -290,6 +293,7 @@ class Framework
                         Console::$theme = $y;
                     }
                     break;
+                case 'show-php-ver':
                 default:
                     //Console::info("Calculating ".$x);
                     //dump($y);

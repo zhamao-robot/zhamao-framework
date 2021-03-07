@@ -26,6 +26,7 @@ class RunServerCommand extends Command
             new InputOption("disable-coroutine", null, null, "关闭协程Hook"),
             new InputOption("daemon", null, null, "以守护进程的方式运行框架"),
             new InputOption("watch", null, null, "监听 src/ 目录的文件变化并热更新"),
+            new InputOption("show-php-ver", null, null, "启动时显示PHP版本"),
             new InputOption("env", null, InputOption::VALUE_REQUIRED, "设置环境类型 (production, development, staging)"),
         ]);
         $this->setDescription("Run zhamao-framework | 启动框架");

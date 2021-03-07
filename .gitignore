@@ -11,3 +11,4 @@ composer.lock
 /resources/zhamao.service
 .phpunit.result.cache
 .daemon_pid
+/runtime/

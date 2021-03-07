@@ -20,7 +20,7 @@ class ZMUtil
     public static function stop() {
         if (SpinLock::tryLock("_stop_signal") === false) return;
         Console::warning(Console::setColor("Stopping server...", "red"));
-        Console::trace();
+        if (Console::getLevel() >= 4) Console::trace();
         LightCache::savePersistence();
         if (ZMBuf::$terminal !== null)
             Event::del(ZMBuf::$terminal);
