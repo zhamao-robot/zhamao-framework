@@ -66,6 +66,11 @@ public function index() {
 
 如果旧版框架使用过程中无问题且对新功能暂无需求，可以继续使用 v1 版本，后续也将维护安全类更新和修复致命 bug。
 
+## 下载源码
+框架源码可直接克隆本仓库进行编辑，如果你在国内，访问 GitHub 和 clone 仓库比较慢，可以将 `github.com` 替换为 `fgit.zhamao.me` 进行加速。
+
+例如：`git clone https://fgit.zhamao.me/zhamao-robot/zhamao-framework.git`。
+
 ## 贡献和捐赠
 如果你在使用过程中发现任何问题，可以提交 Issue 或自行 Fork 后修改并提交 Pull Request。
 
