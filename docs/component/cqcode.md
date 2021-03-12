@@ -174,7 +174,7 @@ CQ::getAllCQ("[CQ:at,qq=123]你好啊[CQ:at,qq=456]");
 
 定义：`CQ::face($id)`
 
-参数：`$id` 为 QQ 表情对应的 ID 号，一些常见的表情 ID 对应的表情样式见 [QQ 对应表情ID表](/assets/face_id.html)。
+参数：`$id` 为 QQ 表情对应的 ID 号，一些常见的表情 ID 对应的表情样式见 [QQ 对应表情ID表](https://static.zhamao.me/face_id.html)。
 
 ```php
 /**
