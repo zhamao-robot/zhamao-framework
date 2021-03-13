@@ -16,17 +16,10 @@ class LightCacheInside
     public static $last_error = '';
 
     public static function init() {
-        self::$kv_table["wait_api"] = new Table(3, 0);
-        self::$kv_table["wait_api"]->column("value", Table::TYPE_STRING, 65536);
-        self::$kv_table["connect"] = new Table(8, 0);
-        self::$kv_table["connect"]->column("value", Table::TYPE_STRING, 256);
-        $result = self::$kv_table["wait_api"]->create() && self::$kv_table["connect"]->create();
-        if ($result === false) {
-            self::$last_error = '系统内存不足，申请失败';
-            return false;
-        } else {
-            return true;
-        }
+        self::createTable("wait_api", 3, 65536);    //用于存协程等待的状态内容的
+        self::createTable("connect", 3, 64);        //用于存单机器人模式下的机器人fd的
+        //self::createTable("worker_start", 2, 1024);//用于存启动服务器时的状态的
+        return true;
     }
 
     /**
@@ -61,5 +54,18 @@ class LightCacheInside
 
     public static function unset(string $table, string $key) {
         return self::$kv_table[$table]->del($key);
+    }
+
+    /**
+     * @param $name
+     * @param $size
+     * @param $str_size
+     * @throws ZMException
+     */
+    private static function createTable($name, $size, $str_size) {
+        self::$kv_table[$name] = new Table($size, 0);
+        self::$kv_table[$name]->column("value", Table::TYPE_STRING, $str_size);
+        $r = self::$kv_table[$name]->create();
+        if ($r === false) throw new ZMException("内存不足，创建静态表失败！");
     }
 }

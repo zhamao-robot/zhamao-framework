@@ -94,7 +94,7 @@ class Framework
             else $out["worker"] = ZMConfig::get("global", "swoole")["worker_num"];
             $out["environment"] = $args["env"] === null ? "default" : $args["env"];
             $out["log_level"] = Console::getLevel();
-            $out["version"] = ZM_VERSION;
+            $out["version"] = ZM_VERSION . (LOAD_MODE == 0 ? (" (build " . ZM_VERSION_ID . ")") : "");
             if (APP_VERSION !== "unknown") $out["app_version"] = APP_VERSION;
             if (isset(ZMConfig::get("global", "swoole")["task_worker_num"])) {
                 $out["task_worker"] = ZMConfig::get("global", "swoole")["task_worker_num"];
@@ -112,6 +112,7 @@ class Framework
             }
             if (self::$argv["show-php-ver"] !== false) {
                 $out["php_version"] = PHP_VERSION;
+                $out["swoole_version"] = SWOOLE_VERSION;
             }
 
             $out["working_dir"] = DataProvider::getWorkingDir();
@@ -120,7 +121,7 @@ class Framework
             self::$server = new Server(ZMConfig::get("global", "host"), ZMConfig::get("global", "port"));
 
             self::$server->set($this->server_set);
-
+            Console::setServer(self::$server);
             self::printMotd($tty_width);
 
             global $asd;

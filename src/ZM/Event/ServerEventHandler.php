@@ -47,10 +47,8 @@ use ZM\Store\LightCacheInside;
 use ZM\Store\MySQL\SqlPoolStorage;
 use ZM\Store\Redis\ZMRedisPool;
 use ZM\Store\WorkerCache;
-use ZM\Store\ZMBuf;
 use ZM\Utils\DataProvider;
 use ZM\Utils\HttpUtil;
-use ZM\Utils\Terminal;
 use ZM\Utils\ZMUtil;
 
 class ServerEventHandler
@@ -59,9 +57,9 @@ class ServerEventHandler
      * @SwooleHandler("start")
      */
     public function onStart() {
-        global $terminal_id;
+        //global $terminal_id;
         $r = null;
-        if ($terminal_id !== null) {
+        /*if ($terminal_id !== null) {
             ZMBuf::$terminal = $r = STDIN;
             Event::add($r, function () use ($r) {
                 $fget = fgets($r);
@@ -78,7 +76,7 @@ class ServerEventHandler
                     Console::error("Uncaught error " . get_class($e) . ": " . $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")");
                 }
             });
-        }
+        }*/
         Process::signal(SIGINT, function () use ($r) {
             if (zm_atomic("_int_is_reload")->get() === 1) {
                 zm_atomic("_int_is_reload")->set(0);
@@ -159,7 +157,7 @@ class ServerEventHandler
                     else server()->shutdown();
                 });
 
-                Console::info("Worker #{$server->worker_id} 启动中");
+                Console::verbose("Worker #{$server->worker_id} 启动中");
                 Framework::$server = $server;
                 //ZMBuf::resetCache(); //清空变量缓存
                 //ZMBuf::set("wait_start", []); //添加队列，在workerStart运行完成前先让其他协程等待执行
@@ -233,7 +231,7 @@ class ServerEventHandler
                 $this->loadAnnotations(); //加载composer资源、phar外置包、注解解析注册等
 
                 //echo json_encode(debug_backtrace(), 128|256);
-                Console::success("Worker #" . $worker_id . " 已启动");
+
                 EventManager::registerTimerTick(); //启动计时器
                 //ZMBuf::unsetCache("wait_start");
                 set_coroutine_params(["server" => $server, "worker_id" => $worker_id]);
@@ -244,6 +242,7 @@ class ServerEventHandler
                 $dispatcher->dispatchEvents($server, $worker_id);
                 if ($dispatcher->status === EventDispatcher::STATUS_NORMAL) Console::debug("@OnStart 执行完毕");
                 else Console::warning("@OnStart 执行异常！");
+                Console::success("Worker #" . $worker_id . " 已启动");
             } catch (Exception $e) {
                 Console::error("Worker加载出错！停止服务！");
                 Console::error($e->getMessage() . "\n" . $e->getTraceAsString());
@@ -316,7 +315,7 @@ class ServerEventHandler
             Console::trace();
         } catch (Error $e) {
             $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
-            Console::error("Uncaught Error " . get_class($e) . " when calling \"message\": " . $error_msg);
+            Console::error("Uncaught " . get_class($e) . " when calling \"message\": " . $error_msg);
             Console::trace();
         }
 
@@ -466,7 +465,7 @@ class ServerEventHandler
             Console::trace();
         } catch (Error $e) {
             $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
-            Console::error("Uncaught Error " . get_class($e) . " when calling \"open\": " . $error_msg);
+            Console::error("Uncaught " . get_class($e) . " when calling \"open\": " . $error_msg);
             Console::trace();
         }
         //EventHandler::callSwooleEvent("open", $server, $request);
@@ -513,7 +512,7 @@ class ServerEventHandler
             Console::trace();
         } catch (Error $e) {
             $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
-            Console::error("Uncaught Error " . get_class($e) . " when calling \"close\": " . $error_msg);
+            Console::error("Uncaught " . get_class($e) . " when calling \"close\": " . $error_msg);
             Console::trace();
         }
         ManagerGM::popConnect($fd);
@@ -641,7 +640,8 @@ class ServerEventHandler
         $composer = json_decode(file_get_contents(DataProvider::getWorkingDir() . "/composer.json"), true);
         foreach ($dir as $v) {
             if (is_dir($path . "/" . $v) && isset($composer["autoload"]["psr-4"][$v . "\\"]) && !in_array($composer["autoload"]["psr-4"][$v . "\\"], $composer["extra"]["exclude_annotate"] ?? [])) {
-                Console::verbose("Add " . $v . " to register path");
+                if (\server()->worker_id == 0)
+                    Console::verbose("Add " . $v . " to register path");
                 $parser->addRegisterPath(DataProvider::getWorkingDir() . "/src/" . $v . "/", $v);
             }
         }

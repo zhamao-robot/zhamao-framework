@@ -261,19 +261,33 @@ function zm_yield() { Co::yield(); }
 function zm_resume(int $cid) { Co::resume($cid); }
 
 function zm_timer_after($ms, callable $callable) {
-    go(function () use ($ms, $callable) {
-        Swoole\Timer::after($ms, $callable);
+    Swoole\Timer::after($ms, function () use ($callable) {
+        call_with_catch($callable);
     });
+}
+
+function call_with_catch($callable) {
+    try {
+        $callable();
+    } catch (Exception $e) {
+        $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
+        Console::error("Uncaught exception " . get_class($e) . " when calling \"message\": " . $error_msg);
+        Console::trace();
+    } catch (Error $e) {
+        $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
+        Console::error("Uncaught " . get_class($e) . " when calling \"message\": " . $error_msg);
+        Console::trace();
+    }
 }
 
 function zm_timer_tick($ms, callable $callable) {
     if (zm_cid() === -1) {
         return go(function () use ($ms, $callable) {
             Console::debug("Adding extra timer tick of " . $ms . " ms");
-            Swoole\Timer::tick($ms, $callable);
+            Swoole\Timer::tick($ms, function () use ($callable) {call_with_catch($callable);});
         });
     } else {
-        return Swoole\Timer::tick($ms, $callable);
+        return Swoole\Timer::tick($ms, function () use ($callable) {call_with_catch($callable);});
     }
 }
 

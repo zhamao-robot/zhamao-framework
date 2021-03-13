@@ -18,9 +18,13 @@ use ZM\Utils\DataProvider;
 
 class ConsoleApplication extends Application
 {
+    const VERSION_ID = 384;
+    const VERSION = "2.2.11";
+
     public function __construct(string $name = 'UNKNOWN') {
-        $version = json_decode(file_get_contents(__DIR__ . "/../../composer.json"), true)["version"] ?? "UNKNOWN";
-        parent::__construct($name, $version);
+        define("ZM_VERSION_ID", self::VERSION_ID);
+        define("ZM_VERSION", self::VERSION);
+        parent::__construct($name, ZM_VERSION);
     }
 
     public function initEnv() {

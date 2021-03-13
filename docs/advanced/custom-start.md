@@ -85,7 +85,6 @@ bin/start server # 通过源码模式启动框架
 - `--debug-mode`：启用调试模式，调试模式的作用是关闭一键协程化和终端交互，减少 Swoole 本身对代码逻辑的干扰（比如执行 `shell_exec()` 报错的话可以开启这个进行调试）。
 - `--log-{mode}`：设置 log 等级。支持 `--log-debug`，`--log-verbose`，`--log-info`，`--log-warning`，`--log-error`。
 - `--log-theme`：设置终端信息的主题。这个选项适用于多种终端信息显示的兼容，例如白色终端和不支持颜色的终端。详见 [Console - 主题设置](/component/console/#_2)。
-- `--disable-console-input`：关闭终端交互，如果你使用的不是 tmux、screen 而是直接将进程使用 systemd 等方式运行到 init 守护进程下，则需要关闭终端交互输入，关闭后不可以使用 `stop, reload, logtest` 等交互命令。
 - `--disable-coroutine`：关闭一键协程化。
 - `--daemon`：以守护进程方式运行框架，此参数将直接在输出 motd 后将进程挂到 init 下运行，后台常驻。
 - `--watch`：监控 `src/` 目录下的文件变化，有变化则自动重新载入代码。开启监控需要安装 PHP 扩展：inotify。使用 pecl 就可以安装：`pecl install inotify`。

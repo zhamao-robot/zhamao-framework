@@ -17,7 +17,9 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use ZM\Config\ZMConfig;
 use ZM\Console\Console;
+use ZM\Framework;
 use ZM\Store\ZMAtomic;
+use ZM\Utils\DataProvider;
 use ZM\Utils\HttpUtil;
 
 class PureHttpCommand extends Command
@@ -40,17 +42,26 @@ class PureHttpCommand extends Command
             $output->writeln("<error>Directory error(" . ($input->getArgument('dir') ?? '.') . "): no such file or directory.</error>");
             return self::FAILURE;
         }
+        ZMConfig::setDirectory(DataProvider::getWorkingDir() . '/config');
         $global = ZMConfig::get("global");
         $host = $input->getOption("host") ?? $global["host"];
         $port = $input->getOption("port") ?? $global["port"];
+
+        $index = ["index.html", "index.htm"];
+        $out = [
+            "listen" => $host.":".$port,
+            "version" => ZM_VERSION,
+            "web_root" => realpath($input->getArgument('dir') ?? '.'),
+            "index" => implode(",", $index)
+        ];
+        Framework::printProps($out, $tty_width);
         $server = new Server($host, $port);
         $server->set(ZMConfig::get("global", "swoole"));
-        Console::init(0, $server);
+        Console::init(2, $server);
         ZMAtomic::$atomics["request"] = [];
         for ($i = 0; $i < 32; ++$i) {
             ZMAtomic::$atomics["request"][$i] = new Atomic(0);
         }
-        $index = ["index.html", "index.htm"];
         $server->on("request", function (Request $request, Response $response) use ($input, $index, $server) {
             ZMAtomic::$atomics["request"][$server->worker_id]->add(1);
             HttpUtil::handleStaticPage(
@@ -60,10 +71,11 @@ class PureHttpCommand extends Command
                     "document_root" => realpath($input->getArgument('dir') ?? '.'),
                     "document_index" => $index
                 ]);
-            echo "\r" . Coroutine::stats()["coroutine_peak_num"];
+            //echo "\r" . Coroutine::stats()["coroutine_peak_num"];
         });
         $server->on("start", function ($server) {
             Process::signal(SIGINT, function () use ($server) {
+                echo "\r";
                 Console::warning("Server interrupted by keyboard.");
                 for ($i = 0; $i < 32; ++$i) {
                     $num = ZMAtomic::$atomics["request"][$i]->get();
@@ -75,13 +87,6 @@ class PureHttpCommand extends Command
             });
             Console::success("Server started. Use Ctrl+C to stop.");
         });
-        $out = [
-            "host" => $host,
-            "port" => $port,
-            "document_root" => realpath($input->getArgument('dir') ?? '.'),
-            "document_index" => implode(", ", $index)
-        ];
-        Console::printProps($out, $tty_width);
         $server->start();
         // return this if there was no problem running the command
         // (it's equivalent to returning int(0))

@@ -21,9 +21,9 @@ function generate($argv) {
     $s .= "\nGroup=" . exec("groups | awk '{print $1}'");
     $s .= "\nWorkingDirectory=" . getcwd();
     if ($argv[0] == "systemd" && !file_exists(getcwd() . '/systemd'))
-        $s .= "\nExecStart=" . getcwd() . "/vendor/bin/start server --disable-console-input";
+        $s .= "\nExecStart=" . getcwd() . "/vendor/bin/start server";
     else
-        $s .= "\nExecStart=" . getcwd() . "/bin/start server --disable-console-input";
+        $s .= "\nExecStart=" . getcwd() . "/bin/start server";
     $s .= "\nRestart=always\n\n[Install]\nWantedBy=multi-user.target\n";
     @mkdir(getcwd() . "/resources/");
     file_put_contents(getcwd() . "/resources/zhamao.service", $s);

@@ -5,7 +5,6 @@ use ZM\Utils\DataProvider;
 
 define("ZM_START_TIME", microtime(true));
 define("ZM_DATA", ZMConfig::get("global", "zm_data"));
-define("ZM_VERSION", json_decode(file_get_contents(__DIR__ . "/../../composer.json"), true)["version"] ?? "unknown");
 define("APP_VERSION", LOAD_MODE == 1 ? (json_decode(file_get_contents(DataProvider::getWorkingDir() . "/composer.json"), true)["version"] ?? "unknown") : "unknown");
 define("CRASH_DIR", ZMConfig::get("global", "crash_dir"));
 @mkdir(ZM_DATA);
