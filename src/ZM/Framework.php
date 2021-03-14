@@ -196,6 +196,8 @@ class Framework
 
     public function start() {
         self::$server->start();
+        zm_atomic("server_is_stopped")->set(1);
+        Console::setLevel(0);
     }
 
     /**

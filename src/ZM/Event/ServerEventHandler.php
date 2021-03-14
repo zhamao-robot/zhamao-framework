@@ -17,6 +17,7 @@ use Swoole\Database\PDOConfig;
 use Swoole\Database\PDOPool;
 use Swoole\Event;
 use Swoole\Process;
+use Throwable;
 use ZM\Annotation\AnnotationParser;
 use ZM\Annotation\Http\RequestMapping;
 use ZM\Annotation\Swoole\OnCloseEvent;
@@ -26,6 +27,8 @@ use ZM\Annotation\Swoole\OnPipeMessageEvent;
 use ZM\Annotation\Swoole\OnRequestEvent;
 use ZM\Annotation\Swoole\OnStart;
 use ZM\Annotation\Swoole\OnSwooleEvent;
+use ZM\Annotation\Swoole\OnTask;
+use ZM\Annotation\Swoole\OnTaskEvent;
 use ZM\Config\ZMConfig;
 use ZM\ConnectionManager\ManagerGM;
 use ZM\Console\Console;
@@ -259,7 +262,7 @@ class ServerEventHandler
             try {
                 Framework::$server = $server;
                 $this->loadAnnotations();
-                Console::debug("TaskWorker #" . $server->worker_id . " 已启动");
+                Console::success("TaskWorker #" . $server->worker_id . " 已启动");
             } catch (Exception $e) {
                 Console::error("Worker加载出错！停止服务！");
                 Console::error($e->getMessage() . "\n" . $e->getTraceAsString());
@@ -594,20 +597,54 @@ class ServerEventHandler
      * @SwooleHandler("task")
      * @param Server|null $server
      * @param Server\Task $task
-     * @return mixed
      * @noinspection PhpUnusedParameterInspection
+     * @return null
      */
     public function onTask(?Server $server, Server\Task $task) {
-        $data = $task->data;
-        switch ($data["action"]) {
-            case "runMethod":
-                $c = $data["class"];
-                $ss = new $c();
-                $method = $data["method"];
-                $ps = $data["params"];
-                $task->finish($ss->$method(...$ps));
+        if (isset($task->data["task"])) {
+            $dispatcher = new EventDispatcher(OnTask::class);
+            $dispatcher->setRuleFunction(function ($v) use ($task) {
+                /** @var OnTask $v */
+                return $v->task_name == $task->data["task"];
+            });
+            $dispatcher->setReturnFunction(function ($return) {
+                EventDispatcher::interrupt($return);
+            });
+            $params = $task->data["params"];
+            try {
+                $dispatcher->dispatchEvents(...$params);
+            } catch (Throwable $e) {
+                $finish["throw"] = $e;
+            }
+            if ($dispatcher->status === EventDispatcher::STATUS_EXCEPTION) {
+                $finish["result"] = null;
+                $finish["retcode"] = -1;
+            } else {
+                $finish["result"] = $dispatcher->store;
+                $finish["retcode"] = 0;
+            }
+            if (zm_atomic("server_is_stopped")->get() === 1) {
+                return;
+            }
+            $task->finish($finish);
+        } else {
+            try {
+                $dispatcher = new EventDispatcher(OnTaskEvent::class);
+                $dispatcher->setRuleFunction(function ($v) {
+                    /** @var OnTaskEvent $v */
+                    return eval("return " . $v->getRule() . ";");
+                });
+                $dispatcher->dispatchEvents();
+            } catch (Exception $e) {
+                $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
+                Console::error("Uncaught exception " . get_class($e) . " when calling \"task\": " . $error_msg);
+                Console::trace();
+            } catch (Error $e) {
+                $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
+                Console::error("Uncaught " . get_class($e) . " when calling \"task\": " . $error_msg);
+                Console::trace();
+            }
         }
-        return null;
     }
 
     /**

@@ -31,6 +31,7 @@ class ZMAtomic
         self::$atomics["_int_is_reload"] = new Atomic(0);
         self::$atomics["wait_msg_id"] = new Atomic(0);
         self::$atomics["_event_id"] = new Atomic(0);
+        self::$atomics["server_is_stopped"] = new Atomic(0);
         for ($i = 0; $i < 10; ++$i) {
             self::$atomics["_tmp_" . $i] = new Atomic(0);
         }

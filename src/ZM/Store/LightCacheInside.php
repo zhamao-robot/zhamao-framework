@@ -18,6 +18,7 @@ class LightCacheInside
     public static function init() {
         self::createTable("wait_api", 3, 65536);    //用于存协程等待的状态内容的
         self::createTable("connect", 3, 64);        //用于存单机器人模式下的机器人fd的
+        self::createTable("static_route", 64, 256);//用于存储
         //self::createTable("worker_start", 2, 1024);//用于存启动服务器时的状态的
         return true;
     }

@@ -5,6 +5,7 @@ namespace ZM\API;
 
 
 use ZM\Console\Console;
+use ZM\Entity\CQObject;
 
 class CQ
 {
@@ -305,9 +306,10 @@ class CQ
     /**
      * 获取消息中第一个CQ码
      * @param $msg
-     * @return array|null
+     * @param bool $is_object
+     * @return array|CQObject|null
      */
-    public static function getCQ($msg) {
+    public static function getCQ($msg, $is_object = false) {
         if (($head = mb_strpos($msg, "[CQ:")) !== false) {
             $key_offset = mb_substr($msg, $head);
             $close = mb_strpos($key_offset, "]");
@@ -322,7 +324,7 @@ class CQ
             }
             $cq["start"] = $head;
             $cq["end"] = $close + $head;
-            return $cq;
+            return !$is_object ? $cq : CQObject::fromArray($cq);
         } else {
             return null;
         }
@@ -331,9 +333,10 @@ class CQ
     /**
      * 获取消息中所有的CQ码
      * @param $msg
-     * @return array
+     * @param bool $is_object
+     * @return array|CQObject[]
      */
-    public static function getAllCQ($msg) {
+    public static function getAllCQ($msg, $is_object = false) {
         $cqs = [];
         $offset = 0;
         while (($head = mb_strpos(($submsg = mb_substr($msg, $offset)), "[CQ:")) !== false) {
@@ -352,7 +355,7 @@ class CQ
             $cq["start"] = $offset + $head;
             $cq["end"] = $offset + $tmpmsg + $head;
             $offset += $tmpmsg + 1;
-            $cqs[] = $cq;
+            $cqs[] = (!$is_object ? $cq : CQObject::fromArray($cq));
         }
         return $cqs;
     }

@@ -109,15 +109,25 @@ $config['static_file_server'] = [
 
 /** 注册 Swoole Server 事件注解的类列表 */
 $config['server_event_handler_class'] = [
-    \ZM\Event\ServerEventHandler::class,
+    // 这里添加例如 \ZM\Event\ServerEventHandler::class 这样的启动注解类
 ];
 
 /** 服务器启用的外部第三方和内部插件 */
 $config['modules'] = [
-    'onebot' => [
+    'onebot' => [ // 机器人解析模块，关闭后无法使用如@CQCommand等注解
         'status' => true,
         'single_bot_mode' => false
-    ], // QQ机器人事件解析器，如果取消此项则默认为 true 开启状态，否则你手动填写 false 才会关闭
+    ],
+    'http_proxy_server' => [ // 一个内置的简单HTTP代理服务器，目前还没有认证功能，预计2.4.0版本完成
+        'status' => false,
+        'host' => '0.0.0.0',
+        'port' => 8083,
+        'swoole_set_override' => [
+            'backlog' => 128,
+            'buffer_output_size' => 1024 * 1024 * 128,
+            'socket_buffer_size' => 1024 * 1024 * 1
+        ]
+    ],
 ];
 
 return $config;

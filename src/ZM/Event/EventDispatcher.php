@@ -100,6 +100,7 @@ class EventDispatcher
                 }
             }
             if ($this->status === self::STATUS_RULE_FAILED) $this->status = self::STATUS_NORMAL;
+            //TODO:没有过滤before的false，可能会导致一些问题，先观望一下
         } catch (InterruptException $e) {
             $this->store = $e->return_var;
             $this->status = self::STATUS_INTERRUPTED;

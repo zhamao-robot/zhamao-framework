@@ -128,8 +128,9 @@ $str = CQ::removeCQ("[CQ:at,qq=all]这是带表情的全体消息[CQ:face,id=8]"
 
 解析 CQ 码。
 
-- 参数：`getCQ($msg);`：要解析出 CQ 码的消息。
-- 返回：`数组 | null`，见下表
+- 定义：`getCQ($msg, $is_object = false)`
+- 参数 `$is_object` 为 true 时，返回一个 `\ZM\Entity\CQObject` 对象，此对象的属性和下表相同。（2.3.0+ 版本可用）
+- 返回：`数组 | CQObject | null`，见下表。
 
 | 键名   | 说明                                                         |
 | ------ | ------------------------------------------------------------ |
@@ -139,6 +140,10 @@ $str = CQ::removeCQ("[CQ:at,qq=all]这是带表情的全体消息[CQ:face,id=8]"
 | end    | 此 CQ 码在字符串中的结束位置                                 |
 
 ### CQ::getAllCQ()
+
+定义：`CQ::getAllCQ($msg, $is_object = false)`
+
+参数 `$is_object` 为 true 时，返回一个 `\ZM\Entity\CQObject[]` 对象数组，此对象的属性和上面的表格内相同。（2.3.0+ 版本可用）
 
 解析 CQ 码，和 `getCQ()` 的区别是，这个会将字符串中的所有 CQ 码都解析出来，并以同样上方解析出来的数组格式返回。
 
