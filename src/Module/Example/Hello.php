@@ -6,6 +6,7 @@ use ZM\Annotation\Http\Middleware;
 use ZM\Annotation\Swoole\OnCloseEvent;
 use ZM\Annotation\Swoole\OnOpenEvent;
 use ZM\Annotation\Swoole\OnRequestEvent;
+use ZM\Annotation\Swoole\OnStart;
 use ZM\ConnectionManager\ConnectionObject;
 use ZM\Console\Console;
 use ZM\Annotation\CQ\CQCommand;
@@ -21,6 +22,14 @@ use ZM\Utils\ZMUtil;
  */
 class Hello
 {
+    /*
+     * 默认的图片监听路由对应目录，如需要使用可取消下面的注释，把上面的 /* 换成 /**
+     * @OnStart(-1)
+     */
+    //public function onStart() {
+    //    \ZM\Http\RouteManager::addStaticFileRoute("/images/", \ZM\Utils\DataProvider::getWorkingDir()."/zm_data/images/");
+    //}
+
     /**
      * 使用命令 .reload 发给机器人远程重载，注意将 user_id 换成你自己的 QQ
      * @CQCommand(".reload",user_id=627577391)

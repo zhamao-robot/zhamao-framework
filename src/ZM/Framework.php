@@ -45,14 +45,15 @@ class Framework
 
         self::$argv = $args;
 
-        //定义常量
-        include_once "global_defines.php";
-
         ZMConfig::setDirectory(DataProvider::getWorkingDir() . '/config');
         ZMConfig::setEnv($args["env"] ?? "");
         if (ZMConfig::get("global") === false) {
             die ("Global config load failed: " . ZMConfig::$last_error . "\nPlease init first!\n");
         }
+
+        //定义常量
+        include_once "global_defines.php";
+
         ZMAtomic::init();
         try {
             $sw = ZMConfig::get("global");
@@ -74,7 +75,6 @@ class Framework
             die($e->getMessage());
         }
         try {
-
             Console::init(
                 ZMConfig::get("global", "info_level") ?? 2,
                 self::$server,

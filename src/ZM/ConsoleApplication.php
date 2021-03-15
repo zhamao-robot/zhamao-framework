@@ -18,8 +18,8 @@ use ZM\Utils\DataProvider;
 
 class ConsoleApplication extends Application
 {
-    const VERSION_ID = 385;
-    const VERSION = "2.3.0";
+    const VERSION_ID = 386;
+    const VERSION = "2.3.0-beta1";
 
     public function __construct(string $name = 'UNKNOWN') {
         define("ZM_VERSION_ID", self::VERSION_ID);
@@ -54,7 +54,7 @@ class ConsoleApplication extends Application
                     $composer["autoload"]["psr-4"]["Custom\\"] = "src/Custom";
                     $r = file_put_contents(DataProvider::getWorkingDir() . "/composer.json", json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
                     if ($r !== false) {
-                        echo "成功添加！请重新进行 composer update ！\n";
+                        echo "成功添加！请运行 composer dump-autoload ！\n";
                         exit(1);
                     } else {
                         echo "添加失败！请按任意键继续！";
