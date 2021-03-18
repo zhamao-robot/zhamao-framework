@@ -1,4 +1,6 @@
-<?php /** @noinspection PhpUnused */
+<?php /** @noinspection PhpMissingReturnTypeInspection */
+
+/** @noinspection PhpUnused */
 
 
 namespace ZM\API;

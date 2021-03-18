@@ -1,6 +1,8 @@
-<?php #plain
+<?php /** @noinspection PhpUnused */ #plain
 
+use Swoole\Atomic;
 use Swoole\Coroutine;
+use Swoole\WebSocket\Server;
 use ZM\API\ZMRobot;
 use ZM\Config\ZMConfig;
 use ZM\ConnectionManager\ManagerGM;
@@ -11,6 +13,7 @@ use ZM\Exception\RobotNotFoundException;
 use ZM\Exception\ZMException;
 use ZM\Framework;
 use ZM\Store\LightCacheInside;
+use ZM\Store\ZMAtomic;
 use ZM\Store\ZMBuf;
 use ZM\Utils\DataProvider;
 use Swoole\Coroutine\System;
@@ -52,7 +55,7 @@ function getClassPath($class_name) {
  * @param bool $ban_comma
  * @return array
  */
-function explodeMsg($msg, $ban_comma = false) {
+function explodeMsg($msg, $ban_comma = false): array {
     $msg = str_replace(" ", "\n", trim($msg));
     if (!$ban_comma) {
         //$msg = str_replace("，", "\n", $msg);
@@ -79,7 +82,7 @@ function unicode_decode($str) {
  * @param $indoor_name
  * @return array
  */
-function getAllClasses($dir, $indoor_name) {
+function getAllClasses($dir, $indoor_name): array {
     if (!is_dir($dir)) return [];
     $list = scandir($dir);
     $classes = [];
@@ -104,7 +107,7 @@ function getAllClasses($dir, $indoor_name) {
     return $classes;
 }
 
-function matchPattern($pattern, $context) {
+function matchPattern($pattern, $context): bool {
     if (mb_substr($pattern, 0, 1) == "" && mb_substr($context, 0, 1) == "")
         return true;
     if ('*' == mb_substr($pattern, 0, 1) && "" != mb_substr($pattern, 1, 1) && "" == mb_substr($context, 0, 1))
@@ -116,7 +119,7 @@ function matchPattern($pattern, $context) {
     return false;
 }
 
-function split_explode($del, $str, $divide_en = false) {
+function split_explode($del, $str, $divide_en = false): array {
     $str = explode($del, $str);
     for ($i = 0; $i < mb_strlen($str[0]); $i++) {
         if (
@@ -178,19 +181,19 @@ function matchArgs($pattern, $context) {
     } else return false;
 }
 
-function connectIsQQ() {
+function connectIsQQ(): bool {
     return ctx()->getConnection()->getName() == 'qq';
 }
 
-function connectIsDefault() {
+function connectIsDefault(): bool {
     return ctx()->getConnection()->getName() == 'default';
 }
 
-function connectIs($type) {
+function connectIs($type): bool {
     return ctx()->getConnection()->getName() == $type;
 }
 
-function getAnnotations() {
+function getAnnotations(): array {
     $s = debug_backtrace()[1];
     //echo json_encode($s, 128|256);
     $list = [];
@@ -218,14 +221,14 @@ function set_coroutine_params($array) {
 /**
  * @return ContextInterface|null
  */
-function context() {
+function context(): ?ContextInterface {
     return ctx();
 }
 
 /**
  * @return ContextInterface|null
  */
-function ctx() {
+function ctx(): ?ContextInterface {
     $cid = Co::getCid();
     $c_class = ZMConfig::get("global", "context_class");
     if (isset(Context::$context[$cid])) {
@@ -242,11 +245,11 @@ function ctx() {
 
 function zm_debug($msg) { Console::debug($msg); }
 
-function onebot_target_id_name($message_type) {
+function onebot_target_id_name($message_type): string {
     return ($message_type == "group" ? "group_id" : "user_id");
 }
 
-function zm_sleep($s = 1) {
+function zm_sleep($s = 1): bool {
     if (Coroutine::getCid() != -1) System::sleep($s);
     else usleep($s * 1000 * 1000);
     return true;
@@ -291,11 +294,11 @@ function zm_timer_tick($ms, callable $callable) {
     }
 }
 
-function zm_data_hash($v) {
+function zm_data_hash($v): string {
     return md5($v["user_id"] . "^" . $v["self_id"] . "^" . $v["message_type"] . "^" . ($v[$v["message_type"] . "_id"] ?? $v["user_id"]));
 }
 
-function server() {
+function server(): ?Server {
     return Framework::$server;
 }
 
@@ -304,7 +307,7 @@ function server() {
  * @throws RobotNotFoundException
  * @throws ZMException
  */
-function bot() {
+function bot(): ZMRobot {
     if (($conn = LightCacheInside::get("connect", "conn_fd")) == -2) {
         return ZMRobot::getRandom();
     } elseif ($conn != -1) {
@@ -329,11 +332,11 @@ function getAllFdByConnectType(string $type = 'default'): array {
     return $fds;
 }
 
-function zm_atomic($name) {
-    return \ZM\Store\ZMAtomic::get($name);
+function zm_atomic($name): ?Atomic {
+    return ZMAtomic::get($name);
 }
 
-function uuidgen($uppercase = false) {
+function uuidgen($uppercase = false): string {
     try {
         $data = random_bytes(16);
     } catch (Exception $e) {

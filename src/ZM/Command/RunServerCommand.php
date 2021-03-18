@@ -33,7 +33,7 @@ class RunServerCommand extends Command
         $this->setHelp("直接运行可以启动");
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) {
+    protected function execute(InputInterface $input, OutputInterface $output): int {
         if (($opt = $input->getOption("env")) !== null) {
             if (!in_array($opt, ["production", "staging", "development", ""])) {
                 $output->writeln("<error> \"--env\" option only accept production, development, staging and [empty] ! </error>");

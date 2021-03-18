@@ -127,6 +127,7 @@ class ServerEventHandler
      * @SwooleHandler("WorkerStop")
      * @param $server
      * @param $worker_id
+     * @throws Exception
      */
     public function onWorkerStop(Server $server, $worker_id) {
         if ($worker_id == (ZMConfig::get("worker_cache")["worker"] ?? 0)) {
@@ -598,7 +599,6 @@ class ServerEventHandler
      * @param Server|null $server
      * @param Server\Task $task
      * @noinspection PhpUnusedParameterInspection
-     * @return null
      */
     public function onTask(?Server $server, Server\Task $task) {
         if (isset($task->data["task"])) {

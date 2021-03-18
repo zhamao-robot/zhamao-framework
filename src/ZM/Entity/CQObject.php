@@ -20,7 +20,7 @@ class CQObject
         }
     }
 
-    public static function fromArray($arr) {
+    public static function fromArray($arr): CQObject {
         return new CQObject($arr["type"], $arr["params"] ?? [], $arr["start"], $arr["end"]);
     }
 }

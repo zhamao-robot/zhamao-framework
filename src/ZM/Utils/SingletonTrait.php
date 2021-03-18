@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnused */
 
 
 namespace ZM\Utils;
@@ -15,6 +15,7 @@ trait SingletonTrait
 
     /**
      * @return self
+     * @noinspection PhpMissingReturnTypeInspection
      */
     public static function getInstance() {
         if (null === self::$instance) {

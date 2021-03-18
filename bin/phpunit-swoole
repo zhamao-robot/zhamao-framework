@@ -1,5 +1,5 @@
 #!/usr/bin/env php
-<?php
+/** @noinspection ALL */<?php
 /**
  * Copyright: Swlib
  * Author: Twosee <twose@qq.com>
@@ -52,6 +52,7 @@ if (!defined('PHPUNIT_COMPOSER_INSTALL')) {
         }
     }
 }
+/** @noinspection PhpIncludeInspection */
 require PHPUNIT_COMPOSER_INSTALL;
 $starttime = microtime(true);
 go(function (){

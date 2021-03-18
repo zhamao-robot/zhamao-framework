@@ -13,7 +13,7 @@ abstract class DaemonCommand extends Command
 {
     protected $daemon_file = null;
 
-    protected function execute(InputInterface $input, OutputInterface $output) {
+    protected function execute(InputInterface $input, OutputInterface $output): int {
         $pid_path = DataProvider::getWorkingDir() . "/.daemon_pid";
         if (!file_exists($pid_path)) {
             $output->writeln("<comment>没有检测到正在运行的守护进程！</comment>");

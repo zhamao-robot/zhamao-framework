@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnused */
 
 
 namespace ZM\Utils;
@@ -16,6 +16,8 @@ class Terminal
      * @param string $cmd
      * @param $resource
      * @return bool
+     * @noinspection PhpMissingReturnTypeInspection
+     * @noinspection PhpUnused
      */
     public static function executeCommand(string $cmd, $resource) {
         $it = explodeMsg($cmd);

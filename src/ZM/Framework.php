@@ -340,7 +340,7 @@ class Framework
                 } else {  // 输出很小，写到前面并分片
                     //Console::info("输出很小，写到前面并分片");
                     $space = intval($max_border / 2) - 2 - strlen($tmp_line);
-                    $line_data[$current_line] .= str_pad("", $space, " ");
+                    $line_data[$current_line] .= str_pad("", $space);
                     $line_data[$current_line] .= "|  "; // 添加分片
                     $line_width[$current_line] -= (strlen($tmp_line) + 3 + $space);
                 }
@@ -392,7 +392,7 @@ class Framework
         echo str_pad("", $max_border, "=") . PHP_EOL;
     }
 
-    public static function getTtyWidth() {
+    public static function getTtyWidth(): string {
         return explode(" ", trim(exec("stty size")))[1];
     }
 }

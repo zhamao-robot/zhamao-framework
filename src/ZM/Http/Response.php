@@ -1,4 +1,6 @@
-<?php
+<?php /** @noinspection PhpUnused */
+
+/** @noinspection PhpMissingReturnTypeInspection */
 
 
 namespace ZM\Http;

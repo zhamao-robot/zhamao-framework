@@ -75,10 +75,11 @@ trait CQAPI
      * @return bool
      * @noinspection PhpUnusedParameterInspection
      */
-    public function processHttpAPI($connection, $reply, $function = null) {
+    public function processHttpAPI($connection, $reply, $function = null): bool {
         return false;
     }
 
+    /** @noinspection PhpMissingReturnTypeInspection */
     public function __call($name, $arguments) {
         return false;
     }

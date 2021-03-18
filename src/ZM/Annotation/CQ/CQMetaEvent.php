@@ -27,7 +27,7 @@ class CQMetaEvent extends AnnotationBase implements Level
     /**
      * @return mixed
      */
-    public function getLevel() { return $this->level; }
+    public function getLevel(): int { return $this->level; }
 
     /**
      * @param int $level

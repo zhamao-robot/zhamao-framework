@@ -18,8 +18,8 @@ use ZM\Utils\DataProvider;
 
 class ConsoleApplication extends Application
 {
-    const VERSION_ID = 387;
-    const VERSION = "2.3.0";
+    const VERSION_ID = 388;
+    const VERSION = "2.3.1";
 
     public function __construct(string $name = 'UNKNOWN') {
         define("ZM_VERSION_ID", self::VERSION_ID);
@@ -27,7 +27,7 @@ class ConsoleApplication extends Application
         parent::__construct($name, ZM_VERSION);
     }
 
-    public function initEnv() {
+    public function initEnv(): ConsoleApplication {
         $this->selfCheck();
 
         if (!is_dir(__DIR__ . '/../../vendor')) {
@@ -90,7 +90,7 @@ class ConsoleApplication extends Application
      * @param OutputInterface|null $output
      * @return int
      */
-    public function run(InputInterface $input = null, OutputInterface $output = null) {
+    public function run(InputInterface $input = null, OutputInterface $output = null): int {
         try {
             return parent::run($input, $output);
         } catch (Exception $e) {
@@ -98,7 +98,7 @@ class ConsoleApplication extends Application
         }
     }
 
-    private function selfCheck() {
+    private function selfCheck(): bool {
         if (!extension_loaded("swoole")) die("Can not find swoole extension.\nSee: https://github.com/zhamao-robot/zhamao-framework/issues/19\n");
         if (version_compare(SWOOLE_VERSION, "4.4.13") == -1) die("You must install swoole version >= 4.4.13 !");
         if (version_compare(PHP_VERSION, "7.2") == -1) die("PHP >= 7.2 required.");

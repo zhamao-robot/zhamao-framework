@@ -24,7 +24,7 @@ class TimerMiddleware implements MiddlewareInterface
      * @HandleBefore()
      * @return bool
      */
-    public function onBefore() {
+    public function onBefore(): bool {
         $this->starttime = microtime(true);
         return true;
     }

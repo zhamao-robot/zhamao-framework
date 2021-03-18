@@ -13,7 +13,7 @@ class SystemdCommand extends Command
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'systemd:generate';
 
-    protected function execute(InputInterface $input, OutputInterface $output) {
+    protected function execute(InputInterface $input, OutputInterface $output): int {
         //TODO: 写一个生成systemd配置的功能，给2.0
         return Command::SUCCESS;
     }

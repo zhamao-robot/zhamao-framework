@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnused */
 
 
 namespace ZM\Event;
@@ -9,7 +9,6 @@ use Error;
 use Exception;
 use ZM\Console\Console;
 use ZM\Exception\InterruptException;
-use ZM\Exception\ZMException;
 use ZM\Store\LightCacheInside;
 use ZM\Store\Lock\SpinLock;
 use ZM\Store\ZMAtomic;
@@ -32,7 +31,7 @@ class EventDispatcher
     /** @var bool */
     private $log = false;
     /** @var int */
-    private $eid = 0;
+    private $eid;
     /** @var int */
     public $status = self::STATUS_NORMAL;
     /** @var mixed */
@@ -64,22 +63,18 @@ class EventDispatcher
 
     public function __construct(string $class = '') {
         $this->class = $class;
-        try {
-            $this->eid = ZMAtomic::get("_event_id")->add(1);
-            $list = LightCacheInside::get("wait_api", "event_trace");
-        } catch (ZMException $e) {
-            $list = [];
-        }
+        $this->eid = ZMAtomic::get("_event_id")->add(1);
+        $list = LightCacheInside::get("wait_api", "event_trace");
         if (isset($list[$class])) $this->log = true;
         if ($this->log) Console::verbose("[事件分发{$this->eid}] 开始分发事件: " . $class);
     }
 
-    public function setRuleFunction(callable $rule = null) {
+    public function setRuleFunction(callable $rule = null): EventDispatcher {
         $this->rule = $rule;
         return $this;
     }
 
-    public function setReturnFunction(callable $return_func) {
+    public function setReturnFunction(callable $return_func): EventDispatcher {
         $this->return_func = $return_func;
         return $this;
     }
@@ -117,6 +112,7 @@ class EventDispatcher
      * @return bool
      * @throws InterruptException
      * @throws AnnotationException
+     * @noinspection PhpMissingReturnTypeInspection
      */
     public function dispatchEvent($v, $rule_func = null, ...$params) {
         $q_c = $v->class;

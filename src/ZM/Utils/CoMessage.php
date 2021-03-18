@@ -5,7 +5,6 @@ namespace ZM\Utils;
 
 
 use Co;
-use Exception;
 use ZM\Store\LightCacheInside;
 use ZM\Store\Lock\SpinLock;
 use ZM\Store\ZMAtomic;
@@ -17,7 +16,7 @@ class CoMessage
      * @param array $compare
      * @param int $timeout
      * @return mixed
-     * @throws Exception
+     * @noinspection PhpMissingReturnTypeInspection
      */
     public static function yieldByWS(array $hang, array $compare, $timeout = 600) {
         $cid = Co::getuid();
@@ -40,7 +39,7 @@ class CoMessage
         Co::suspend();
         SpinLock::lock("wait_api");
         $sess = LightCacheInside::get("wait_api", "wait_api");
-        $result = $sess[$api_id]["result"];
+        $result = $sess[$api_id]["result"] ?? null;
         unset($sess[$api_id]);
         LightCacheInside::set("wait_api", "wait_api", $sess);
         SpinLock::unlock("wait_api");
@@ -49,7 +48,7 @@ class CoMessage
         return $result;
     }
 
-    public static function resumeByWS() {
+    public static function resumeByWS(): bool {
         $dat = ctx()->getData();
         $last = null;
         SpinLock::lock("wait_api");

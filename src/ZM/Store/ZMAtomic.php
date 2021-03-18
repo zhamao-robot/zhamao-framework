@@ -16,7 +16,7 @@ class ZMAtomic
      * @param $name
      * @return Atomic|null
      */
-    public static function get($name) {
+    public static function get($name): ?Atomic {
         return self::$atomics[$name] ?? null;
     }
 

@@ -5,7 +5,6 @@ namespace ZM\Command;
 
 
 use Swoole\Atomic;
-use Swoole\Coroutine;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 use Swoole\Http\Server;
@@ -36,7 +35,7 @@ class PureHttpCommand extends Command
         // ...
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) {
+    protected function execute(InputInterface $input, OutputInterface $output): int {
         $tty_width = explode(" ", trim(exec("stty size")))[1];
         if (realpath($input->getArgument('dir') ?? '.') === false) {
             $output->writeln("<error>Directory error(" . ($input->getArgument('dir') ?? '.') . "): no such file or directory.</error>");

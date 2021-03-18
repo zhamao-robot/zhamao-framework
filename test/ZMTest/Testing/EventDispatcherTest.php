@@ -40,10 +40,7 @@ class EventDispatcherTest extends TestCase
         $dispatcher->setRuleFunction(function ($v) { return $v->match == "你好"; });
         //$dispatcher->setRuleFunction(fn ($v) => $v->match == "qwe");
         ob_start();
-        try {
-            $dispatcher->dispatchEvents();
-        } catch (AnnotationException $e) {
-        }
+        $dispatcher->dispatchEvents();
         $r = ob_get_clean();
         echo $r;
         $this->assertStringContainsString("你好啊", $r);

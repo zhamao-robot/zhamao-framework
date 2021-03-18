@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnused */
 
 
 namespace ZM\Utils;
@@ -7,7 +7,6 @@ namespace ZM\Utils;
 use ZM\API\CQ;
 use ZM\Config\ZMConfig;
 use ZM\Console\Console;
-use ZM\Framework;
 use ZM\Requests\ZMRequest;
 
 class MessageUtil
@@ -46,7 +45,7 @@ class MessageUtil
      * @param $msg
      * @return bool
      */
-    public static function containsImage($msg) {
+    public static function containsImage($msg): bool {
         $cq = CQ::getAllCQ($msg, true);
         foreach ($cq as $v) {
             if ($v->type == "image") {
@@ -65,7 +64,7 @@ class MessageUtil
      * @param int $type
      * @return string
      */
-    public static function getImageCQFromLocal($file, $type = 0) {
+    public static function getImageCQFromLocal($file, $type = 0): string {
         switch ($type) {
             case 0:
                 return CQ::image("base64://" . base64_encode(file_get_contents($file)));

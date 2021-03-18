@@ -125,10 +125,7 @@ class AnnotationParser
         Console::debug("解析注解完毕！");
     }
 
-    /**
-     * @return array
-     */
-    public function generateAnnotationEvents() {
+    public function generateAnnotationEvents(): array {
         $o = [];
         foreach ($this->annotation_map as $module => $obj) {
             foreach (($obj["class_annotations"] ?? []) as $class_annotation) {
@@ -151,17 +148,17 @@ class AnnotationParser
     /**
      * @return array
      */
-    public function getMiddlewares() { return $this->middlewares; }
+    public function getMiddlewares(): array { return $this->middlewares; }
 
     /**
      * @return array
      */
-    public function getMiddlewareMap() { return $this->middleware_map; }
+    public function getMiddlewareMap(): array { return $this->middleware_map; }
 
     /**
      * @return array
      */
-    public function getReqMapping() { return $this->req_mapping; }
+    public function getReqMapping(): array { return $this->req_mapping; }
 
     /**
      * @param $path
@@ -171,7 +168,7 @@ class AnnotationParser
 
     //private function below
 
-    private function registerMiddleware(MiddlewareClass $vs, ReflectionClass $reflection_class) {
+    private function registerMiddleware(MiddlewareClass $vs, ReflectionClass $reflection_class): array {
         $result = [
             "class" => "\\" . $reflection_class->getName(),
             "name" => $vs->name

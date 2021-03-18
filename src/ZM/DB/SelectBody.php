@@ -32,7 +32,7 @@ class SelectBody
     /**
      * @throws DbException
      */
-    public function count() {
+    public function count(): int {
         $this->select_thing = ["count(*)"];
         $str = $this->queryPrepare();
         $this->result = DB::rawQuery($str[0], $str[1]);
@@ -81,7 +81,7 @@ class SelectBody
 
     public function getResult() { return $this->result; }
 
-    public function equals(SelectBody $body) {
+    public function equals(SelectBody $body): bool {
         if ($this->select_thing != $body->getSelectThing()) return false;
         elseif ($this->where_thing == $body->getWhereThing()) return false;
         else return true;
@@ -95,9 +95,9 @@ class SelectBody
     /**
      * @return array
      */
-    public function getWhereThing() { return $this->where_thing; }
+    public function getWhereThing(): array { return $this->where_thing; }
 
-    private function queryPrepare() {
+    private function queryPrepare(): array {
         $msg = "SELECT " . implode(", ", $this->select_thing) . " FROM " . $this->table->getTableName();
         $sql = $this->table->paintWhereSQL($this->where_thing['='] ?? [], '=');
         if ($sql[0] != '') {

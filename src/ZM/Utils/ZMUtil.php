@@ -17,6 +17,9 @@ use ZM\Store\ZMBuf;
 
 class ZMUtil
 {
+    /**
+     * @throws Exception
+     */
     public static function stop() {
         if (SpinLock::tryLock("_stop_signal") === false) return;
         Console::warning(Console::setColor("Stopping server...", "red"));
@@ -33,6 +36,10 @@ class ZMUtil
         server()->stop();
     }
 
+    /**
+     * @param int $delay
+     * @throws Exception
+     */
     public static function reload($delay = 800) {
         if (server()->worker_id !== -1) {
             Console::info(server()->worker_id);

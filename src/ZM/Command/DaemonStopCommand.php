@@ -16,7 +16,7 @@ class DaemonStopCommand extends DaemonCommand
         $this->setDescription("停止守护进程下运行的框架（仅限--daemon模式可用）");
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) {
+    protected function execute(InputInterface $input, OutputInterface $output): int {
         parent::execute($input, $output);
         system("kill -TERM " . intval($this->daemon_file["pid"]));
         unlink(DataProvider::getWorkingDir() . "/.daemon_pid");

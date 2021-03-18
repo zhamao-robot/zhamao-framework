@@ -15,7 +15,7 @@ class DaemonReloadCommand extends DaemonCommand
         $this->setDescription("重载守护进程下的用户代码（仅限--daemon模式可用）");
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) {
+    protected function execute(InputInterface $input, OutputInterface $output): int {
         parent::execute($input, $output);
         system("kill -USR1 " . intval($this->daemon_file["pid"]));
         $output->writeln("<info>成功重载！</info>");

@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpMissingReturnTypeInspection */
 
 
 namespace ZM\Utils;
@@ -17,6 +17,7 @@ use ZM\Http\RouteManager;
 
 class HttpUtil
 {
+    /** @noinspection PhpMissingReturnTypeInspection */
     public static function parseUri($request, $response, $uri, &$node, &$params) {
         $context = new RequestContext();
         $context->setMethod($request->server['request_method']);

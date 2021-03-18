@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnused */
 
 
 namespace ZM\Store\Lock;
@@ -29,7 +29,7 @@ class SpinLock
         }
     }
 
-    public static function tryLock(string $key) {
+    public static function tryLock(string $key): bool {
         if (($r = self::$kv_lock->incr($key, 'lock_num')) > 1) {
             return false;
         }

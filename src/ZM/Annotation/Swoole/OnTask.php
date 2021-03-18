@@ -30,7 +30,7 @@ class OnTask extends AnnotationBase implements Rule
     /**
      * @return mixed
      */
-    public function getRule() {
+    public function getRule(): string {
         return $this->rule;
     }
 }

@@ -28,7 +28,7 @@ class CQBefore extends AnnotationBase implements Level
     /**
      * @return mixed
      */
-    public function getLevel() {
+    public function getLevel(): int {
         return $this->level;
     }
 

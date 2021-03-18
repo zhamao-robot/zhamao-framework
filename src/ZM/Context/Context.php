@@ -8,11 +8,12 @@ use Co;
 use Exception;
 use Swoole\Http\Request;
 use Swoole\WebSocket\Frame;
-use swoole_server;
+use Swoole\WebSocket\Server;
 use ZM\ConnectionManager\ConnectionObject;
 use ZM\ConnectionManager\ManagerGM;
 use ZM\Console\Console;
 use ZM\Event\EventDispatcher;
+use ZM\Exception\InterruptException;
 use ZM\Exception\InvalidArgumentException;
 use ZM\Exception\WaitTimeoutException;
 use ZM\Http\Response;
@@ -27,19 +28,19 @@ class Context implements ContextInterface
     public function __construct($cid) { $this->cid = $cid; }
 
     /**
-     * @return swoole_server|null
+     * @return Server
      */
-    public function getServer() { return self::$context[$this->cid]["server"] ?? server(); }
+    public function getServer(): ?Server { return self::$context[$this->cid]["server"] ?? server(); }
 
     /**
      * @return Frame|null
      */
-    public function getFrame() { return self::$context[$this->cid]["frame"] ?? null; }
+    public function getFrame(): ?Frame { return self::$context[$this->cid]["frame"] ?? null; }
 
-    public function getFd() { return self::$context[$this->cid]["fd"] ?? $this->getFrame()->fd ?? null; }
+    public function getFd(): ?int { return self::$context[$this->cid]["fd"] ?? $this->getFrame()->fd ?? null; }
 
     /**
-     * @return array|null
+     * @return mixed
      */
     public function getData() { return self::$context[$this->cid]["data"] ?? null; }
 
@@ -48,25 +49,25 @@ class Context implements ContextInterface
     /**
      * @return Request|null
      */
-    public function getRequest() { return self::$context[$this->cid]["request"] ?? null; }
+    public function getRequest(): ?Request { return self::$context[$this->cid]["request"] ?? null; }
 
     /**
      * @return Response|null
      */
-    public function getResponse() { return self::$context[$this->cid]["response"] ?? null; }
+    public function getResponse(): ?Response { return self::$context[$this->cid]["response"] ?? null; }
 
-    /** @return ConnectionObject|null */
+    /** @return ConnectionObject|null|Response */
     public function getConnection() { return ManagerGM::get($this->getFd()); }
 
     /**
      * @return int|null
      */
-    public function getCid() { return $this->cid; }
+    public function getCid(): ?int { return $this->cid; }
 
     /**
      * @return ZMRobot|null
      */
-    public function getRobot() {
+    public function getRobot(): ?ZMRobot {
         $conn = ManagerGM::get($this->getFrame()->fd);
         return $conn instanceof ConnectionObject ? new ZMRobot($conn) : null;
     }
@@ -87,7 +88,7 @@ class Context implements ContextInterface
 
     public function setDiscussId($id) { self::$context[$this->cid]["data"]["discuss_id"] = $id; }
 
-    public function getMessageType() { return $this->getData()["message_type"] ?? null; }
+    public function getMessageType(): ?string { return $this->getData()["message_type"] ?? null; }
 
     public function setMessageType($type) { self::$context[$this->cid]["data"]["message_type"] = $type; }
 
@@ -104,6 +105,7 @@ class Context implements ContextInterface
      * @param $msg
      * @param bool $yield
      * @return mixed
+     * @noinspection PhpMissingReturnTypeInspection
      */
     public function reply($msg, $yield = false) {
         $data = $this->getData();
@@ -131,6 +133,12 @@ class Context implements ContextInterface
         }
     }
 
+    /**
+     * @param $msg
+     * @param false $yield
+     * @return mixed|void
+     * @throws InterruptException
+     */
     public function finalReply($msg, $yield = false) {
         self::$context[$this->cid]["cache"]["block_continue"] = true;
         if ($msg != "") $this->reply($msg, $yield);
@@ -144,6 +152,7 @@ class Context implements ContextInterface
      * @return string
      * @throws InvalidArgumentException
      * @throws WaitTimeoutException
+     * @noinspection PhpMissingReturnTypeInspection
      */
     public function waitMessage($prompt = "", $timeout = 600, $timeout_prompt = "") {
         if (!isset($this->getData()["user_id"], $this->getData()["message"], $this->getData()["self_id"]))
@@ -258,6 +267,7 @@ class Context implements ContextInterface
      */
     public function getNumArg($prompt_msg = "") { return $this->getArgs(ZM_MATCH_NUMBER, $prompt_msg); }
 
+    /** @noinspection PhpMissingReturnTypeInspection */
     public function cloneFromParent() {
         set_coroutine_params(self::$context[Co::getPcid()] ?? self::$context[$this->cid]);
         return context();

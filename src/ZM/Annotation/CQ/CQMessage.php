@@ -32,7 +32,7 @@ class CQMessage extends AnnotationBase implements Level
     /** @var int */
     public $level = 20;
 
-    public function getLevel() { return $this->level; }
+    public function getLevel(): int { return $this->level; }
 
     public function setLevel(int $level) {
         $this->level = $level;

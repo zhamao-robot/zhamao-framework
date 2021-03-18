@@ -1,4 +1,6 @@
-<?php /** @noinspection PhpComposerExtensionStubsInspection */
+<?php /** @noinspection PhpUnused */
+
+/** @noinspection PhpComposerExtensionStubsInspection */
 
 
 namespace ZM\Store\Redis;
@@ -36,7 +38,7 @@ class ZMRedis
     /**
      * @return Redis
      */
-    public function get() {
+    public function get(): Redis {
         return $this->conn;
     }
 

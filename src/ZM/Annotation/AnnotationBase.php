@@ -12,7 +12,7 @@ abstract class AnnotationBase
 
     public $class;
 
-    public function __toString() {
+    public function __toString(): string {
         $str = __CLASS__ . ": ";
         foreach ($this as $k => $v) {
             $str .= "\n\t" . $k . " => ";

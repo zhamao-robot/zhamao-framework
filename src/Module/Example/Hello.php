@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpMissingReturnTypeInspection */
 
 namespace Module\Example;
 
@@ -6,12 +6,12 @@ use ZM\Annotation\Http\Middleware;
 use ZM\Annotation\Swoole\OnCloseEvent;
 use ZM\Annotation\Swoole\OnOpenEvent;
 use ZM\Annotation\Swoole\OnRequestEvent;
-use ZM\Annotation\Swoole\OnStart;
 use ZM\ConnectionManager\ConnectionObject;
 use ZM\Console\Console;
 use ZM\Annotation\CQ\CQCommand;
 use ZM\Annotation\Http\RequestMapping;
 use ZM\Event\EventDispatcher;
+use ZM\Exception\InterruptException;
 use ZM\Requests\ZMRequest;
 use ZM\Utils\ZMUtil;
 
@@ -135,6 +135,7 @@ class Hello
     /**
      * 阻止 Chrome 自动请求 /favicon.ico 导致的多条请求并发和干扰
      * @OnRequestEvent(rule="ctx()->getRequest()->server['request_uri'] == '/favicon.ico'",level=200)
+     * @throws InterruptException
      */
     public function onRequest() {
         EventDispatcher::interrupt();

@@ -30,7 +30,7 @@ class InitCommand extends Command
         // ...
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) {
+    protected function execute(InputInterface $input, OutputInterface $output): int {
         if (LOAD_MODE === 1) { // 从composer依赖而来的项目模式，最基本的需要初始化的模式
             $output->writeln("<comment>Initializing files</comment>");
             $base_path = LOAD_MODE_COMPOSER_PATH;
@@ -96,7 +96,7 @@ class InitCommand extends Command
         return Command::FAILURE;
     }
 
-    private function getExtractFiles() {
+    private function getExtractFiles(): array {
         return $this->extract_files;
     }
 }

@@ -15,7 +15,7 @@ class DaemonStatusCommand extends DaemonCommand
         $this->setDescription("查看守护进程框架的运行状态（仅限--daemon模式可用）");
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) {
+    protected function execute(InputInterface $input, OutputInterface $output): int {
         parent::execute($input, $output);
         $output->writeln("<info>框架运行中，pid：" . $this->daemon_file["pid"] . "</info>");
         $output->writeln("<comment>----- 以下是stdout内容 -----</comment>");

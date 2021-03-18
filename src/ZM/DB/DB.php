@@ -1,4 +1,6 @@
-<?php /** @noinspection PhpComposerExtensionStubsInspection */
+<?php /** @noinspection PhpUnused */
+
+/** @noinspection PhpComposerExtensionStubsInspection */
 
 
 namespace ZM\DB;
@@ -34,7 +36,7 @@ class DB
      * @return Table
      * @throws DbException
      */
-    public static function table($table_name) {
+    public static function table($table_name): Table {
         if (Table::getTableInstance($table_name) === null) {
             if (in_array($table_name, self::$table_list))
                 return new Table($table_name);
@@ -60,7 +62,7 @@ class DB
      * @return bool
      * @throws DbException
      */
-    public static function unprepared($line) {
+    public static function unprepared($line): bool {
         try {
             $conn = SqlPoolStorage::$sql_pool->get();
             if ($conn === false) {
@@ -134,7 +136,7 @@ class DB
         }
     }
 
-    public static function isTableExists($table) {
+    public static function isTableExists($table): bool {
         return in_array($table, self::$table_list);
     }
 }

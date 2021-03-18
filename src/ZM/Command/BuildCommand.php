@@ -26,7 +26,7 @@ class BuildCommand extends Command
         // ...
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) {
+    protected function execute(InputInterface $input, OutputInterface $output): int {
         $this->output = $output;
         $target_dir = $input->getOption("target") ?? (__DIR__ . '/../../../resources/');
         if (mb_strpos($target_dir, "../")) $target_dir = realpath($target_dir);

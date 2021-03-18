@@ -27,6 +27,7 @@ class LightCache
      * @param $config
      * @return bool|mixed
      * @throws Exception
+     * @noinspection PhpMissingReturnTypeInspection
      */
     public static function init($config) {
         self::$config = $config;
@@ -87,6 +88,7 @@ class LightCache
      * @param int $expire
      * @return mixed
      * @throws ZMException
+     * @noinspection PhpMissingReturnTypeInspection
      */
     public static function set(string $key, $value, int $expire = -1) {
         if (self::$kv_table === null) throw new ZMException("not initialized LightCache");
@@ -120,6 +122,7 @@ class LightCache
      * @param $value
      * @return bool|mixed
      * @throws ZMException
+     * @noinspection PhpMissingReturnTypeInspection
      */
     public static function update(string $key, $value) {
         if (self::$kv_table === null) throw new ZMException("not initialized LightCache.");
@@ -154,7 +157,7 @@ class LightCache
      * @return bool
      * @throws Exception
      */
-    public static function isset(string $key) {
+    public static function isset(string $key): bool {
         return self::get($key) !== null;
     }
 
@@ -162,7 +165,7 @@ class LightCache
         return self::$kv_table->del($key);
     }
 
-    public static function getAll() {
+    public static function getAll(): array {
         $r = [];
         $del = [];
         foreach (self::$kv_table as $k => $v) {
@@ -178,8 +181,11 @@ class LightCache
         return $r;
     }
 
+    /**
+     * @param false $only_worker
+     * @throws Exception
+     */
     public static function savePersistence($only_worker = false) {
-
         // 下面将OnSave激活一下
         if (server()->worker_id == (ZMConfig::get("global", "worker_cache")["worker"] ?? 0)) {
             $dispatcher = new EventDispatcher(OnSave::class);

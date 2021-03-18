@@ -9,7 +9,6 @@ use Exception;
 use Swoole\Timer;
 use ZM\Annotation\AnnotationBase;
 use ZM\Annotation\AnnotationParser;
-use ZM\Annotation\Swoole\OnSave;
 use ZM\Annotation\Swoole\OnTick;
 use ZM\Config\ZMConfig;
 use ZM\Console\Console;
@@ -37,6 +36,7 @@ class EventManager
 
     /**
      * 注册所有计时器给每个进程
+     * @throws Exception
      */
     public static function registerTimerTick() {
         $dispatcher = new EventDispatcher(OnTick::class);

@@ -55,7 +55,7 @@ class QQBot
      * @return EventDispatcher
      * @throws Exception
      */
-    public function dispatchBeforeEvents($data) {
+    public function dispatchBeforeEvents($data): EventDispatcher {
         $before = new EventDispatcher(CQBefore::class);
         $before->setRuleFunction(function ($v) use ($data) {
             return $v->cq_event == $data["post_type"];
@@ -70,6 +70,7 @@ class QQBot
     /**
      * @param $data
      * @throws InterruptException
+     * @throws Exception
      */
     private function dispatchEvents($data) {
         //Console::warning("最xia数据包：".json_encode($data));

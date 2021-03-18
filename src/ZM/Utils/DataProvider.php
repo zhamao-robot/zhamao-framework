@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnused */
 
 
 namespace ZM\Utils;
@@ -11,7 +11,7 @@ class DataProvider
 {
     public static $buffer_list = [];
 
-    public static function getResourceFolder() {
+    public static function getResourceFolder(): string {
         return self::getWorkingDir() . '/resources/';
     }
 
