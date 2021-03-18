@@ -304,6 +304,7 @@ class Framework
             }
         }
         if ($coroutine_mode) Runtime::enableCoroutine(true, SWOOLE_HOOK_ALL);
+        else Runtime::enableCoroutine(false, SWOOLE_HOOK_ALL);
     }
 
     private static function writeNoDouble($k, $v, &$line_data, &$line_width, &$current_line, $colorful, $max_border) {
