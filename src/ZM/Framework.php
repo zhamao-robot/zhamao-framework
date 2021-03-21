@@ -5,7 +5,9 @@ namespace ZM;
 
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Error;
 use Exception;
+use Swoole\Server\Port;
 use ZM\Annotation\Swoole\OnSetup;
 use ZM\Config\ZMConfig;
 use ZM\ConnectionManager\ManagerGM;
@@ -23,6 +25,7 @@ use Swoole\Runtime;
 use Swoole\WebSocket\Server;
 use ZM\Annotation\Swoole\SwooleHandler;
 use ZM\Console\Console;
+use ZM\Utils\Terminal;
 use ZM\Utils\ZMUtil;
 
 class Framework
@@ -36,10 +39,15 @@ class Framework
      */
     public static $server;
     /**
+     * @var string[]
+     */
+    public static $loaded_files = [];
+    /**
      * @var array|bool|mixed|null
      */
     private $server_set;
 
+    /** @noinspection PhpUnusedParameterInspection */
     public function __construct($args = []) {
         $tty_width = $this->getTtyWidth();
 
@@ -54,7 +62,6 @@ class Framework
         //定义常量
         include_once "global_defines.php";
 
-        ZMAtomic::init();
         try {
             $sw = ZMConfig::get("global");
             if (!is_dir($sw["zm_data"])) mkdir($sw["zm_data"]);
@@ -82,11 +89,17 @@ class Framework
                 ($o = ZMConfig::get("console_color")) === false ? [] : $o
             );
 
+            $worker = ZMConfig::get("global", "swoole")["worker_num"] ?? swoole_cpu_num();
+            define("ZM_WORKER_NUM", $worker);
+            ZMAtomic::init();
             $timezone = ZMConfig::get("global", "timezone") ?? "Asia/Shanghai";
             date_default_timezone_set($timezone);
 
             $this->server_set = ZMConfig::get("global", "swoole");
-            $this->parseCliArgs(self::$argv);
+            $this->server_set["log_level"] = SWOOLE_LOG_DEBUG;
+            $add_port = ZMConfig::get("global", "modules")["remote_terminal"]["status"] ?? false;
+
+            $this->parseCliArgs(self::$argv, $add_port);
 
             // 打印初始信息
             $out["listen"] = ZMConfig::get("global", "host") . ":" . ZMConfig::get("global", "port");
@@ -114,11 +127,81 @@ class Framework
                 $out["php_version"] = PHP_VERSION;
                 $out["swoole_version"] = SWOOLE_VERSION;
             }
+            if ($add_port) {
+                $conf = ZMConfig::get("global", "modules")["remote_terminal"];
+                $out["terminal"] = $conf["host"] . ":" . $conf["port"];
+            }
 
             $out["working_dir"] = DataProvider::getWorkingDir();
             self::printProps($out, $tty_width, $args["log-theme"] === null);
 
             self::$server = new Server(ZMConfig::get("global", "host"), ZMConfig::get("global", "port"));
+
+            if ($add_port) {
+                $welcome_msg = Console::setColor("Welcome! You can use `help` for usage.", "green");
+                /** @var Port $port */
+                $port = self::$server->listen("127.0.0.1", 20002, SWOOLE_SOCK_TCP);
+                $port->set([
+                    'open_http_protocol' => false
+                ]);
+                $port->on('connect', function (?\Swoole\Server $serv, $fd) use ($port, $welcome_msg) {
+                    ManagerGM::pushConnect($fd, "terminal");
+                    $serv->send($fd, file_get_contents(working_dir() . "/config/motd.txt"));
+                    if (!empty(ZMConfig::get("global", "modules")["remote_terminal"]["token"] ?? '')) {
+                        $serv->send($fd, "Please input token: ");
+                    } else {
+                        $serv->send($fd, $welcome_msg . "\n>>> ");
+                    }
+                });
+
+                $port->on('receive', function ($serv, $fd, $reactor_id, $data) use ($welcome_msg) {
+                    ob_start();
+                    try {
+                        $arr = LightCacheInside::get("light_array", "input_token") ?? [];
+                        if (empty($arr[$fd] ?? '')) {
+                            if (ZMConfig::get("global", "modules")["remote_terminal"]["token"] != '') {
+                                $token = trim($data);
+                                if ($token === ZMConfig::get("global", "modules")["remote_terminal"]["token"]) {
+                                    SpinLock::transaction("input_token", function () use ($fd, $token) {
+                                        $arr = LightCacheInside::get("light_array", "input_token");
+                                        $arr[$fd] = $token;
+                                        LightCacheInside::set("light_array", "input_token", $arr);
+                                    });
+                                    $serv->send($fd, Console::setColor("Auth success!!\n", "green"));
+                                    $serv->send($fd, $welcome_msg . "\n>>> ");
+                                } else {
+                                    $serv->send($fd, Console::setColor("Auth failed!!\n", "red"));
+                                    $serv->close($fd);
+                                }
+                                return;
+                            }
+                        }
+                        if (trim($data) == "exit" || trim($data) == "q") {
+                            $serv->send($fd, Console::setColor("Bye!\n", "blue"));
+                            $serv->close($fd);
+                            return;
+                        }
+                        Terminal::executeCommand(trim($data));
+                    } catch (Exception $e) {
+                        $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
+                        Console::error("Uncaught exception " . get_class($e) . " when calling \"open\": " . $error_msg);
+                        Console::trace();
+                    } catch (Error $e) {
+                        $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
+                        Console::error("Uncaught " . get_class($e) . " when calling \"open\": " . $error_msg);
+                        Console::trace();
+                    }
+
+                    $r = ob_get_clean();
+                    if (!empty($r)) $serv->send($fd, $r);
+                    if (!in_array(trim($data), ['r', 'reload', 'stop'])) $serv->send($fd, ">>> ");
+                });
+
+                $port->on('close', function ($serv, $fd) {
+                    ManagerGM::popConnect($fd);
+                    //echo "Client: Close.\n";
+                });
+            }
 
             self::$server->set($this->server_set);
             Console::setServer(self::$server);
@@ -195,9 +278,9 @@ class Framework
     }
 
     public function start() {
+        self::$loaded_files = get_included_files();
         self::$server->start();
         zm_atomic("server_is_stopped")->set(1);
-        Console::setLevel(0);
     }
 
     /**
@@ -243,9 +326,9 @@ class Framework
     /**
      * 解析命令行的 $argv 参数们
      * @param $args
-     * @throws Exception
+     * @param $add_port
      */
-    private function parseCliArgs($args) {
+    private function parseCliArgs($args, &$add_port) {
         $coroutine_mode = true;
         global $terminal_id;
         $terminal_id = uuidgen();
@@ -295,6 +378,9 @@ class Framework
                     if ($y !== null) {
                         Console::$theme = $y;
                     }
+                    break;
+                case 'remote-terminal':
+                    $add_port = true;
                     break;
                 case 'show-php-ver':
                 default:

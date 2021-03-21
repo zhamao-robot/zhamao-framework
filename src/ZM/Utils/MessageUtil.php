@@ -4,9 +4,13 @@
 namespace ZM\Utils;
 
 
+use ZM\Annotation\CQ\CQCommand;
 use ZM\API\CQ;
 use ZM\Config\ZMConfig;
 use ZM\Console\Console;
+use ZM\Entity\MatchResult;
+use ZM\Event\EventDispatcher;
+use ZM\Event\EventManager;
 use ZM\Requests\ZMRequest;
 
 class MessageUtil
@@ -55,6 +59,10 @@ class MessageUtil
         return false;
     }
 
+    public static function isAtMe($msg, $me_id) {
+        return strpos($msg, CQ::at($me_id)) !== false;
+    }
+
     /**
      * 通过本地地址返回图片的 CQ 码
      * type == 0 : 返回图片的 base64 CQ 码
@@ -75,5 +83,81 @@ class MessageUtil
                 return CQ::image(ZMConfig::get("global", "http_reverse_link") . "/images/" . $info["basename"]);
         }
         return "";
+    }
+
+    /**
+     * 分割字符，将用户消息通过空格或换行分割为数组
+     * @param $msg
+     * @return array|string[]
+     */
+    public static function splitCommand($msg) {
+        $word = explodeMsg(str_replace("\r", "", $msg));
+        if (empty($word)) $word = [""];
+        if (count(explode("\n", $word[0])) >= 2) {
+            $enter = explode("\n", $msg);
+            $first = split_explode(" ", array_shift($enter));
+            $word = array_merge($first, $enter);
+            foreach ($word as $k => $v) {
+                $word[$k] = trim($word[$k]);
+            }
+        }
+        return $word;
+    }
+
+    /**
+     * @param $msg
+     * @param $obj
+     * @return MatchResult
+     */
+    public static function matchCommand($msg, $obj) {
+        $ls = EventManager::$events[CQCommand::class];
+        $word = self::splitCommand($msg);
+        $matched = new MatchResult();
+        foreach ($ls as $k => $v) {
+            if (array_diff([$v->match, $v->pattern, $v->regex, $v->keyword, $v->end_with, $v->start_with], [""]) == []) continue;
+            elseif (($v->user_id == 0 || ($v->user_id != 0 && $v->user_id == $obj["user_id"])) &&
+                ($v->group_id == 0 || ($v->group_id != 0 && $v->group_id == ($obj["group_id"] ?? 0))) &&
+                ($v->message_type == '' || ($v->message_type != '' && $v->message_type == $obj["message_type"]))
+            ) {
+                if (($word[0] != "" && $v->match == $word[0]) || in_array($word[0], $v->alias)) {
+                    array_shift($word);
+                    $matched->match = $word;
+                    $matched->object = $v;
+                    $matched->status = true;
+                    break;
+                } elseif ($v->start_with != "" && mb_strpos($msg, $v->start_with) === 0) {
+                    $matched->match = [mb_substr($msg, mb_strlen($v->start_with))];
+                    $matched->object = $v;
+                    $matched->status = true;
+                    break;
+                } elseif ($v->end_with != "" && strlen($msg) == (strripos($msg, $v->end_with) + strlen($v->end_with))) {
+                    $matched->match = [substr($msg, 0, strripos($msg, $v->end_with))];
+                    $matched->object = $v;
+                    $matched->status = true;
+                    break;
+                } elseif ($v->keyword != "" && mb_strpos($msg, $v->keyword) !== false) {
+                    $matched->match = explode($v->keyword, $msg);
+                    $matched->object = $v;
+                    $matched->status = true;
+                    break;
+                } elseif ($v->pattern != "") {
+                    $match = matchArgs($v->pattern, $msg);
+                    if ($match !== false) {
+                        $matched->match = $match;
+                        $matched->object = $v;
+                        $matched->status = true;
+                        break;
+                    }
+                } elseif ($v->regex != "") {
+                    if (preg_match("/" . $v->regex . "/u", $msg, $word2) != 0) {
+                        $matched->match = $word2;
+                        $matched->object = $v;
+                        $matched->status = true;
+                        break;
+                    }
+                }
+            }
+        }
+        return $matched;
     }
 }
