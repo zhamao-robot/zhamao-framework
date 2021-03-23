@@ -40,9 +40,7 @@
     },
     "autoload": {
         "psr-4": {
-            "ZM\\": "src/ZM",
-            "Module\\": "src/Module",
-            "Custom\\": "src/Custom"
+            "ZM\\": "src/ZM"
         },
         "files": [
             "src/ZM/global_functions.php"
