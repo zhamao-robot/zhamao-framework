@@ -4,10 +4,13 @@
 namespace ZM\Utils;
 
 
+use Co;
 use Exception;
-use Swoole\Process;
+use Swoole\Event;
+use Swoole\Timer;
 use ZM\Console\Console;
-use ZM\Framework;
+use ZM\Store\LightCache;
+use ZM\Store\LightCacheInside;
 use ZM\Store\Lock\SpinLock;
 use ZM\Store\ZMAtomic;
 use ZM\Store\ZMBuf;
@@ -21,20 +24,39 @@ class ZMUtil
         if (SpinLock::tryLock("_stop_signal") === false) return;
         Console::warning(Console::setColor("Stopping server...", "red"));
         if (Console::getLevel() >= 4) Console::trace();
+        LightCache::savePersistence();
+        if (ZMBuf::$terminal !== null)
+            Event::del(ZMBuf::$terminal);
         ZMAtomic::get("stop_signal")->set(1);
-        for($i = 0; $i < ZM_WORKER_NUM; ++$i) {
-            Process::kill(zm_atomic("_#worker_".$i)->get(), SIGUSR1);
+        try {
+            LightCache::set('stop', 'OK');
+        } catch (Exception $e) {
         }
         server()->shutdown();
         server()->stop();
     }
 
     /**
+     * @param int $delay
      * @throws Exception
      */
-    public static function reload() {
-        zm_atomic("_int_is_reload")->set(1);
-        system("kill -INT " . intval(server()->master_pid));
+    public static function reload($delay = 800) {
+        if (server()->worker_id !== -1) {
+            Console::info(server()->worker_id);
+            zm_atomic("_int_is_reload")->set(1);
+            system("kill -INT " . intval(server()->master_pid));
+            return;
+        }
+        Console::info(Console::setColor("Reloading server...", "gold"));
+        usleep($delay * 1000);
+        foreach ((LightCacheInside::get("wait_api", "wait_api") ?? []) as $k => $v) {
+            if (($v["result"] ?? false) === null && isset($v["coroutine"])) Co::resume($v["coroutine"]);
+        }
+        LightCacheInside::unset("wait_api", "wait_api");
+        LightCache::savePersistence();
+        //DataProvider::saveBuffer();
+        Timer::clearAll();
+        server()->reload();
     }
 
     public static function getModInstance($class) {
@@ -47,22 +69,6 @@ class ZMUtil
     }
 
     public static function sendActionToWorker($target_id, $action, $data) {
-        Console::verbose($action . ": " . $data);
         server()->sendMessage(json_encode(["action" => $action, "data" => $data]), $target_id);
-    }
-
-    /**
-     * 在工作进程中返回可以通过reload重新加载的php文件列表
-     * @return string[]|string[][]
-     */
-    public static function getReloadableFiles() {
-        return array_map(
-            function ($x) {
-                return str_replace(DataProvider::getWorkingDir() . "/", "", $x);
-            }, array_diff(
-                get_included_files(),
-                Framework::$loaded_files
-            )
-        );
     }
 }

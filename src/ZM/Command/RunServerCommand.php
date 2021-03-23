@@ -23,7 +23,6 @@ class RunServerCommand extends Command
             new InputOption("log-error", null, null, "调整消息等级到error (log-level=0)"),
             new InputOption("log-theme", null, InputOption::VALUE_REQUIRED, "改变终端的主题配色"),
             new InputOption("disable-console-input", null, null, "禁止终端输入内容 (废弃)"),
-            new InputOption("remote-terminal", null, null, "启用远程终端，配置使用global.php中的"),
             new InputOption("disable-coroutine", null, null, "关闭协程Hook"),
             new InputOption("daemon", null, null, "以守护进程的方式运行框架"),
             new InputOption("watch", null, null, "监听 src/ 目录的文件变化并热更新"),

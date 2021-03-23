@@ -2,16 +2,10 @@
 
 namespace Module\Example;
 
-use ZM\Annotation\Command\TerminalCommand;
-use ZM\Annotation\CQ\CQBefore;
-use ZM\Annotation\CQ\CQMessage;
 use ZM\Annotation\Http\Middleware;
 use ZM\Annotation\Swoole\OnCloseEvent;
 use ZM\Annotation\Swoole\OnOpenEvent;
 use ZM\Annotation\Swoole\OnRequestEvent;
-use ZM\Annotation\Swoole\OnStart;
-use ZM\API\CQ;
-use ZM\API\TuringAPI;
 use ZM\ConnectionManager\ConnectionObject;
 use ZM\Console\Console;
 use ZM\Annotation\CQ\CQCommand;
@@ -19,7 +13,6 @@ use ZM\Annotation\Http\RequestMapping;
 use ZM\Event\EventDispatcher;
 use ZM\Exception\InterruptException;
 use ZM\Requests\ZMRequest;
-use ZM\Utils\MessageUtil;
 use ZM\Utils\ZMUtil;
 
 /**
@@ -29,12 +22,6 @@ use ZM\Utils\ZMUtil;
  */
 class Hello
 {
-    /**
-     * @OnStart()
-     */
-    public function onStart() {
-    }
-
     /*
      * 默认的图片监听路由对应目录，如需要使用可取消下面的注释，把上面的 /* 换成 /**
      * @OnStart(-1)
@@ -78,34 +65,6 @@ class Hello
         $obj = json_decode($api_result, true);
         if ($obj === null) return "接口解析出错！可能返回了非法数据！";
         return $obj["hitokoto"] . "\n----「" . $obj["from"] . "」";
-    }
-
-    /**
-     * @CQCommand(start_with="机器人",end_with="机器人",message_type="group")
-     * @CQMessage(message_type="private",level=1)
-     */
-    public function turingAPI() {
-        $user_id = ctx()->getUserId();
-        $api = "83513e3d316f44de9c952cda4c9aed30"; // 请在这里填入你的图灵机器人的apikey
-        if ($api === "") return false; //如果没有填入apikey则此功能关闭
-        if (($this->_running_annotation ?? null) instanceof CQCommand) {
-            $msg = ctx()->getFullArg("我在！有什么事吗？");
-        } else {
-            $msg = ctx()->getMessage();
-        }
-        zm_dump($msg);
-        return TuringAPI::getTuringMsg($msg, $user_id, $api);
-    }
-
-    /**
-     * @CQBefore("message")
-     */
-    public function changeAt() {
-        if (MessageUtil::isAtMe(ctx()->getMessage(), ctx()->getRobotId())) {
-            $msg = str_replace(CQ::at(ctx()->getRobotId()), "", ctx()->getMessage());
-            ctx()->setMessage("机器人 ".$msg);
-        }
-        return true;
     }
 
     /**

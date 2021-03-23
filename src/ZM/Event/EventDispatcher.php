@@ -152,7 +152,6 @@ class EventDispatcher
             if ($before_result) {
                 try {
                     $q_o = ZMUtil::getModInstance($q_c);
-                    $q_o->_running_annotation = $v;
                     if ($this->log) Console::verbose("[事件分发{$this->eid}] 正在执行方法 " . $q_c . "::" . $q_f . " ...");
                     $this->store = $q_o->$q_f(...$params);
                 } catch (Exception $e) {
@@ -189,7 +188,6 @@ class EventDispatcher
             return false;
         } else {
             $q_o = ZMUtil::getModInstance($q_c);
-            $q_o->_running_annotation = $v;
             if ($this->log) Console::verbose("[事件分发{$this->eid}] 正在执行方法 " . $q_c . "::" . $q_f . " ...");
             $this->store = $q_o->$q_f(...$params);
             $this->status = self::STATUS_NORMAL;

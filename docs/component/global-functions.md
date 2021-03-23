@@ -134,6 +134,10 @@ set_coroutine_params(["data" => [
 
 别名：`context()`，获取当前协程的上下文，见 [上下文](/component/context/)。
 
+## zm_debug()
+
+同 `Console::debug($msg)`。
+
 ## zm_sleep()
 
 协程版 `sleep()` 函数。
@@ -252,57 +256,3 @@ bot()->sendPrivateMsg(123456, "你好啊！！");
 定义：`getAllFdByConnectType(string $type = 'default'): array`
 
 当 `$type` 为 `qq` 时，则返回所有 OneBot 机器人接入的 WebSocket 连接号。
-
-## zm_dump()
-
-更漂亮地输出变量值，可替代 `var_dump()`。
-
-```php
-class Pass {
-    public $foo = 123;
-    public $bar = ["a", "b"];
-}
-$pass = new Pass();
-$pass->obj = true;
-zm_dump($pass);
-```
-
-<img src="../assets/img/image-20210321193956832.png" alt="image-20210321193956832" style="zoom:50%;" />
-
-## zm_config()
-
-同 `ZMConfig::get()`。
-
-定义：`zm_config($name, $key = null)`。
-
-有关 ZMConfig 模块的说明，见 [指南 - 基本配置](/guide/basic-config/)。
-
-```php
-zm_config("global"); //等同于 ZMConfig::get("global");
-zm_config("global", "swoole"); //等同于 ZMConfig::get("global", "swoole");
-```
-
-## zm_info()
-
-同 `Console::info($msg)`。
-
-## zm_debug()
-
-同 `Console::debug($msg)`。
-
-## zm_warning()
-
-同 `Console::warning($msg)`。
-
-## zm_success()
-
-同 `Console::success($msg)`。
-
-## zm_error()
-
-同 `Console::error($msg)`。
-
-## zm_verbose()
-
-同 `Console::verbose($msg)`。
-

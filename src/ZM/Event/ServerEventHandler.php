@@ -17,13 +17,13 @@ use Swoole\Database\PDOConfig;
 use Swoole\Database\PDOPool;
 use Swoole\Event;
 use Swoole\Process;
-use Swoole\Timer;
 use Throwable;
 use ZM\Annotation\AnnotationParser;
 use ZM\Annotation\Http\RequestMapping;
 use ZM\Annotation\Swoole\OnCloseEvent;
 use ZM\Annotation\Swoole\OnMessageEvent;
 use ZM\Annotation\Swoole\OnOpenEvent;
+use ZM\Annotation\Swoole\OnPipeMessageEvent;
 use ZM\Annotation\Swoole\OnRequestEvent;
 use ZM\Annotation\Swoole\OnStart;
 use ZM\Annotation\Swoole\OnSwooleEvent;
@@ -49,9 +49,9 @@ use ZM\Store\LightCache;
 use ZM\Store\LightCacheInside;
 use ZM\Store\MySQL\SqlPoolStorage;
 use ZM\Store\Redis\ZMRedisPool;
+use ZM\Store\WorkerCache;
 use ZM\Utils\DataProvider;
 use ZM\Utils\HttpUtil;
-use ZM\Utils\ProcessManager;
 use ZM\Utils\ZMUtil;
 
 class ServerEventHandler
@@ -83,7 +83,7 @@ class ServerEventHandler
         Process::signal(SIGINT, function () use ($r) {
             if (zm_atomic("_int_is_reload")->get() === 1) {
                 zm_atomic("_int_is_reload")->set(0);
-                \server()->reload();
+                ZMUtil::reload();
             } else {
                 echo "\r";
                 Console::warning("Server interrupted(SIGINT) on Master.");
@@ -133,25 +133,17 @@ class ServerEventHandler
         if ($worker_id == (ZMConfig::get("worker_cache")["worker"] ?? 0)) {
             LightCache::savePersistence();
         }
-        Console::verbose(($server->taskworker ? "Task" : "") . "Worker #$worker_id 已停止");
+        Console::debug(($server->taskworker ? "Task" : "") . "Worker #$worker_id 已停止");
     }
 
     /**
      * @SwooleHandler("WorkerStart")
      * @param Server $server
      * @param $worker_id
-     * @throws Exception
      */
     public function onWorkerStart(Server $server, $worker_id) {
-        zm_atomic("_#worker_".$worker_id)->set($server->worker_pid);
         //if (ZMBuf::atomic("stop_signal")->get() != 0) return;
-        Process::signal(SIGUSR1, function() use ($worker_id){
-            Timer::clearAll();
-            ProcessManager::resumeAllWorkerCoroutines();
-        });
         Process::signal(SIGINT, function () use ($worker_id, $server) {
-            Timer::clearAll();
-            ProcessManager::resumeAllWorkerCoroutines();
             Console::debug("正在关闭 " . ($server->taskworker ? "Task" : "") . "Worker 进程 " . Console::setColor("#" . \server()->worker_id, "gold") . TermColor::frontColor256(59) . ", pid=" . posix_getpid());
             server()->stop($worker_id);
         });
@@ -480,6 +472,7 @@ class ServerEventHandler
             Console::error("Uncaught " . get_class($e) . " when calling \"open\": " . $error_msg);
             Console::trace();
         }
+        //EventHandler::callSwooleEvent("open", $server, $request);
     }
 
     /**
@@ -535,27 +528,70 @@ class ServerEventHandler
      * @param $src_worker_id
      * @param $data
      * @throws Exception
-     * @noinspection PhpUnusedParameterInspection
      */
     public function onPipeMessage(Server $server, $src_worker_id, $data) {
         //var_dump($data, $server->worker_id);
         //unset(Context::$context[Co::getCid()]);
         $data = json_decode($data, true);
-        ProcessManager::workerAction($src_worker_id, $data);
-    }
-
-    /**
-     * @SwooleHandler("beforeReload")
-     */
-    public function onBeforeReload() {
-        for($i = 0; $i < ZM_WORKER_NUM; ++$i) {
-            $pid = zm_atomic("_#worker_".$i)->get();
-            Process::kill($pid, SIGUSR1);
+        switch ($data["action"] ?? '') {
+            case "resume_ws_message":
+                $obj = $data["data"];
+                Co::resume($obj["coroutine"]);
+                break;
+            case "getWorkerCache":
+                $r = WorkerCache::get($data["key"]);
+                $action = ["action" => "returnWorkerCache", "cid" => $data["cid"], "value" => $r];
+                $server->sendMessage(json_encode($action, 256), $src_worker_id);
+                break;
+            case "setWorkerCache":
+                $r = WorkerCache::set($data["key"], $data["value"]);
+                $action = ["action" => "returnWorkerCache", "cid" => $data["cid"], "value" => $r];
+                $server->sendMessage(json_encode($action, 256), $src_worker_id);
+                break;
+            case "unsetWorkerCache":
+                $r = WorkerCache::unset($data["key"]);
+                $action = ["action" => "returnWorkerCache", "cid" => $data["cid"], "value" => $r];
+                $server->sendMessage(json_encode($action, 256), $src_worker_id);
+                break;
+            case "hasKeyWorkerCache":
+                $r = WorkerCache::hasKey($data["key"], $data["subkey"]);
+                $action = ["action" => "returnWorkerCache", "cid" => $data["cid"], "value" => $r];
+                $server->sendMessage(json_encode($action, 256), $src_worker_id);
+                break;
+            case "asyncAddWorkerCache":
+                WorkerCache::add($data["key"], $data["value"], true);
+                break;
+            case "asyncSubWorkerCache":
+                WorkerCache::sub($data["key"], $data["value"], true);
+                break;
+            case "asyncSetWorkerCache":
+                WorkerCache::set($data["key"], $data["value"], true);
+                break;
+            case "asyncUnsetWorkerCache":
+                WorkerCache::unset($data["key"], true);
+                break;
+            case "addWorkerCache":
+                $r = WorkerCache::add($data["key"], $data["value"]);
+                $action = ["action" => "returnWorkerCache", "cid" => $data["cid"], "value" => $r];
+                $server->sendMessage(json_encode($action, 256), $src_worker_id);
+                break;
+            case "subWorkerCache":
+                $r = WorkerCache::sub($data["key"], $data["value"]);
+                $action = ["action" => "returnWorkerCache", "cid" => $data["cid"], "value" => $r];
+                $server->sendMessage(json_encode($action, 256), $src_worker_id);
+                break;
+            case "returnWorkerCache":
+                WorkerCache::$transfer[$data["cid"]] = $data["value"];
+                zm_resume($data["cid"]);
+                break;
+            default:
+                $dispatcher = new EventDispatcher(OnPipeMessageEvent::class);
+                $dispatcher->setRuleFunction(function (OnPipeMessageEvent $v) use ($data) {
+                    return $v->action == $data["action"];
+                });
+                $dispatcher->dispatchEvents($data);
+                break;
         }
-
-        Console::info(Console::setColor("Reloading server...", "gold"));
-        usleep(800 * 1000);
-        LightCacheInside::unset("wait_api", "wait_api");
     }
 
     /**

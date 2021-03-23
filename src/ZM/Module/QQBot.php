@@ -15,7 +15,6 @@ use ZM\Event\EventDispatcher;
 use ZM\Exception\InterruptException;
 use ZM\Exception\WaitTimeoutException;
 use ZM\Utils\CoMessage;
-use ZM\Utils\MessageUtil;
 
 /**
  * Class QQBot
@@ -77,19 +76,58 @@ class QQBot
         //Console::warning("最xia数据包：".json_encode($data));
         switch ($data["post_type"]) {
             case "message":
+                $word = explodeMsg(str_replace("\r", "", context()->getMessage()));
+                if (empty($word)) $word = [""];
+                if (count(explode("\n", $word[0])) >= 2) {
+                    $enter = explode("\n", context()->getMessage());
+                    $first = split_explode(" ", array_shift($enter));
+                    $word = array_merge($first, $enter);
+                    foreach ($word as $k => $v) {
+                        $word[$k] = trim($word[$k]);
+                    }
+                }
                 //分发CQCommand事件
                 $dispatcher = new EventDispatcher(CQCommand::class);
+                $dispatcher->setRuleFunction(function (CQCommand $v) use ($word) {
+                    if (array_diff([$v->match, $v->pattern, $v->regex, $v->keyword, $v->end_with, $v->start_with], [""]) == []) return false;
+                    elseif (($v->user_id == 0 || ($v->user_id != 0 && $v->user_id == ctx()->getUserId())) &&
+                        ($v->group_id == 0 || ($v->group_id != 0 && $v->group_id == (ctx()->getGroupId() ?? 0))) &&
+                        ($v->message_type == '' || ($v->message_type != '' && $v->message_type == ctx()->getMessageType()))
+                    ) {
+                        if (($word[0] != "" && $v->match == $word[0]) || in_array($word[0], $v->alias)) {
+                            array_shift($word);
+                            ctx()->setCache("match", $word);
+                            return true;
+                        } elseif ($v->start_with != "" && mb_strpos(ctx()->getMessage(), $v->start_with) === 0) {
+                            ctx()->setCache("match", [mb_substr(ctx()->getMessage(), mb_strlen($v->start_with))]);
+                            return true;
+                        } elseif ($v->end_with != "" && strlen(ctx()->getMessage()) == (strripos(ctx()->getMessage(), $v->end_with) + strlen($v->end_with))) {
+                            ctx()->setCache("match", [substr(ctx()->getMessage(), 0, strripos(ctx()->getMessage(), $v->end_with))]);
+                            return true;
+                        } elseif ($v->keyword != "" && mb_strpos(ctx()->getMessage(), $v->keyword) !== false) {
+                            ctx()->setCache("match", explode($v->keyword, ctx()->getMessage()));
+                            return true;
+                        } elseif ($v->pattern != "") {
+                            $match = matchArgs($v->pattern, ctx()->getMessage());
+                            if ($match !== false) {
+                                ctx()->setCache("match", $match);
+                                return true;
+                            }
+                        } elseif ($v->regex != "") {
+                            if (preg_match("/" . $v->regex . "/u", ctx()->getMessage(), $word2) != 0) {
+                                ctx()->setCache("match", $word2);
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
+                });
                 $dispatcher->setReturnFunction(function ($result) {
                     if (is_string($result)) ctx()->reply($result);
                     if (ctx()->getCache("has_reply") === true) EventDispatcher::interrupt();
                 });
-                $s = MessageUtil::matchCommand(ctx()->getMessage(), ctx()->getData());
-                if ($s->status !== false) {
-                    if (!empty($s->match)) ctx()->setCache("match", $s->match);
-                    $dispatcher->dispatchEvent($s->object, null);
-                    if (is_string($dispatcher->store)) ctx()->reply($dispatcher->store);
-                    if (ctx()->getCache("has_reply") === true) EventDispatcher::interrupt();
-                }
+                $dispatcher->dispatchEvents();
+                if ($dispatcher->status == EventDispatcher::STATUS_INTERRUPTED) EventDispatcher::interrupt();
 
                 //分发CQMessage事件
                 $msg_dispatcher = new EventDispatcher(CQMessage::class);
