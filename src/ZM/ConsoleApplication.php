@@ -18,7 +18,7 @@ use ZM\Utils\DataProvider;
 
 class ConsoleApplication extends Application
 {
-    const VERSION_ID = 395;
+    const VERSION_ID = 396;
     const VERSION = "2.3.2";
 
     public function __construct(string $name = 'UNKNOWN') {
