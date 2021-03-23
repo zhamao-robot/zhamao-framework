@@ -29,25 +29,15 @@ trait CQAPI
     public function processWebsocketAPI($connection, $reply, $function = false) {
         $api_id = ZMAtomic::get("wait_msg_id")->add(1);
         $reply["echo"] = $api_id;
-        SpinLock::lock("wait_api");
-        $r = LightCacheInside::get("wait_api", "wait_api");
-        $r[$api_id] = [
-            "data" => $reply,
-            "time" => microtime(true),
-            "self_id" => $connection->getOption("connect_id"),
-            "echo" => $api_id
-        ];
-        LightCacheInside::set("wait_api", "wait_api", $r);
-        SpinLock::unlock("wait_api");
         if (server()->push($connection->getFd(), json_encode($reply))) {
             if ($function === true) {
-                return CoMessage::yieldByWS($r[$api_id], ["echo"], 60);
-            } else {
-                SpinLock::lock("wait_api");
-                $r = LightCacheInside::get("wait_api", "wait_api");
-                unset($r[$api_id]);
-                LightCacheInside::set("wait_api", "wait_api", $r);
-                SpinLock::unlock("wait_api");
+                $obj = [
+                    "data" => $reply,
+                    "time" => microtime(true),
+                    "self_id" => $connection->getOption("connect_id"),
+                    "echo" => $api_id
+                ];
+                return CoMessage::yieldByWS($obj, ["echo"], 60);
             }
             return true;
         } else {
