@@ -61,7 +61,7 @@ class Table
             if ($msg == "") {
                 $msg .= $k . " $operator ? ";
             } else {
-                $msg .= "AND " . $k . " $operator ?";
+                $msg .= " AND " . $k . " $operator ?";
             }
             $param[] = $v;
         }
