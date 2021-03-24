@@ -18,7 +18,7 @@ class DaemonStopCommand extends DaemonCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int {
         parent::execute($input, $output);
-        system("kill -TERM " . intval($this->daemon_file["pid"]));
+        system("kill -INT " . intval($this->daemon_file["pid"]));
         unlink(DataProvider::getWorkingDir() . "/.daemon_pid");
         $output->writeln("<info>成功停止！</info>");
         return Command::SUCCESS;

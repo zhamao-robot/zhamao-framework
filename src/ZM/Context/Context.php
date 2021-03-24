@@ -216,7 +216,7 @@ class Context implements ContextInterface
      * @throws WaitTimeoutException
      */
     public function getArgs($mode, $prompt_msg) {
-        $arg = ctx()->getCache("match");
+        $arg = ctx()->getCache("match") ?? [];
         switch ($mode) {
             case ZM_MATCH_ALL:
                 $p = $arg;

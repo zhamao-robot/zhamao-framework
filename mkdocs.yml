@@ -72,9 +72,12 @@ nav:
       - 事件分发器: event/event-dispatcher.md
   - 框架组件:
       - 框架组件: component/index.md
-      - 机器人 API: component/robot-api.md
-      - CQ 码（多媒体消息）: component/cqcode.md
       - 上下文: component/context.md
+      - 聊天机器人组件:
+          - 机器人 API: component/robot-api.md
+          - CQ 码（多媒体消息）: component/cqcode.md
+          - 机器人消息处理: component/message-util.md
+          - Token 验证: component/access-token.md
       - 存储:
           - LightCache 轻量缓存: component/light-cache.md
           - MySQL 数据库: component/mysql.md
@@ -82,13 +85,15 @@ nav:
           - ZMAtomic 原子计数器: component/atomics.md
           - SpinLock 自旋锁: component/spin-lock.md
           - 文件管理: component/data-provider.md
+      - HTTP 服务器工具类:
+          - HTTP 和 WebSocket 客户端: component/zmrequest.md
+          - HTTP 路由管理: component/route-manager.md
       - 协程池: component/coroutine-pool.md
       - 单例类: component/singleton-trait.md
       - ZMUtil 杂项: component/zmutil.md
       - 全局方法: component/global-functions.md
-      - HTTP 和 WebSocket 客户端: component/zmrequest.md
       - Console 终端: component/console.md
-      - Token 验证: component/access-token.md
+      - TaskWorker 管理: component/task-worker.md
   - 进阶开发:
       - 进阶开发: advanced/index.md
       - 框架剖析: advanced/framework-structure.md
@@ -97,6 +102,7 @@ nav:
       - 内部类文件手册: advanced/inside-class.md
       - 接入 WebSocket 客户端: advanced/connect-ws-client.md
       - 框架多进程: advanced/multi-process.md
+      - TaskWorker 提高并发: advanced/task-worker.md
       - 开发实战教程:
           - 编写管理员才能触发的功能: advanced/example/admin.md
   - FAQ: FAQ.md

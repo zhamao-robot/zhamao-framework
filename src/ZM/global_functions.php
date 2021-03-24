@@ -3,6 +3,7 @@
 use Swoole\Atomic;
 use Swoole\Coroutine;
 use Swoole\WebSocket\Server;
+use Symfony\Component\VarDumper\VarDumper;
 use ZM\API\ZMRobot;
 use ZM\Config\ZMConfig;
 use ZM\ConnectionManager\ManagerGM;
@@ -243,8 +244,6 @@ function ctx(): ?ContextInterface {
     }
 }
 
-function zm_debug($msg) { Console::debug($msg); }
-
 function onebot_target_id_name($message_type): string {
     return ($message_type == "group" ? "group_id" : "user_id");
 }
@@ -255,13 +254,21 @@ function zm_sleep($s = 1): bool {
     return true;
 }
 
-function zm_exec($cmd): array { return System::exec($cmd); }
+function zm_exec($cmd): array {
+    return System::exec($cmd);
+}
 
-function zm_cid() { return Co::getCid(); }
+function zm_cid() {
+    return Co::getCid();
+}
 
-function zm_yield() { Co::yield(); }
+function zm_yield() {
+    Co::yield();
+}
 
-function zm_resume(int $cid) { Co::resume($cid); }
+function zm_resume(int $cid) {
+    Co::resume($cid);
+}
 
 function zm_timer_after($ms, callable $callable) {
     Swoole\Timer::after($ms, function () use ($callable) {
@@ -287,10 +294,14 @@ function zm_timer_tick($ms, callable $callable) {
     if (zm_cid() === -1) {
         return go(function () use ($ms, $callable) {
             Console::debug("Adding extra timer tick of " . $ms . " ms");
-            Swoole\Timer::tick($ms, function () use ($callable) {call_with_catch($callable);});
+            Swoole\Timer::tick($ms, function () use ($callable) {
+                call_with_catch($callable);
+            });
         });
     } else {
-        return Swoole\Timer::tick($ms, function () use ($callable) {call_with_catch($callable);});
+        return Swoole\Timer::tick($ms, function () use ($callable) {
+            call_with_catch($callable);
+        });
     }
 }
 
@@ -354,3 +365,32 @@ function working_dir() {
     elseif (LOAD_MODE == 2) return realpath('.');
     return null;
 }
+
+/** @noinspection PhpMissingReturnTypeInspection */
+function zm_dump($var, ...$moreVars) {
+    VarDumper::dump($var);
+
+    foreach ($moreVars as $v) {
+        VarDumper::dump($v);
+    }
+
+    if (1 < func_num_args()) {
+        return func_get_args();
+    }
+
+    return $var;
+}
+
+function zm_info($obj) { Console::info($obj); }
+
+function zm_warning($obj) { Console::warning($obj); }
+
+function zm_success($obj) { Console::success($obj); }
+
+function zm_debug($obj) { Console::debug($obj); }
+
+function zm_verbose($obj) { Console::verbose($obj); }
+
+function zm_error($obj) { Console::error($obj); }
+
+function zm_config($name, $key = null) { return ZMConfig::get($name, $key); }

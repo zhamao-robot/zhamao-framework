@@ -5,6 +5,7 @@ namespace ZM;
 
 
 use Exception;
+use ZM\Command\CheckConfigCommand;
 use ZM\Command\DaemonReloadCommand;
 use ZM\Command\DaemonStatusCommand;
 use ZM\Command\DaemonStopCommand;
@@ -18,8 +19,8 @@ use ZM\Utils\DataProvider;
 
 class ConsoleApplication extends Application
 {
-    const VERSION_ID = 398;
-    const VERSION = "2.3.5";
+    const VERSION_ID = 399;
+    const VERSION = "2.4.0";
 
     public function __construct(string $name = 'UNKNOWN') {
         define("ZM_VERSION_ID", self::VERSION_ID);
@@ -75,6 +76,9 @@ class ConsoleApplication extends Application
             new InitCommand(), //初始化用的，用于项目初始化和phar初始化
             new PureHttpCommand() //纯HTTP服务器指令
         ]);
+        if (LOAD_MODE === 1) {
+            $this->add(new CheckConfigCommand());
+        }
         /*
         $command_register = ZMConfig::get("global", "command_register_class") ?? [];
         foreach ($command_register as $v) {
@@ -100,7 +104,7 @@ class ConsoleApplication extends Application
 
     private function selfCheck(): bool {
         if (!extension_loaded("swoole")) die("Can not find swoole extension.\nSee: https://github.com/zhamao-robot/zhamao-framework/issues/19\n");
-        if (version_compare(SWOOLE_VERSION, "4.4.13") == -1) die("You must install swoole version >= 4.4.13 !");
+        if (version_compare(SWOOLE_VERSION, "4.5.0") == -1) die("You must install swoole version >= 4.5.0 !");
         if (version_compare(PHP_VERSION, "7.2") == -1) die("PHP >= 7.2 required.");
         return true;
     }

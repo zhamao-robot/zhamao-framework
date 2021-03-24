@@ -39,7 +39,7 @@ $config['light_cache'] = [
     'size' => 512,                     //最多允许储存的条数（需要2的倍数）
     'max_strlen' => 32768,               //单行字符串最大长度（需要2的倍数）
     'hash_conflict_proportion' => 0.6,   //Hash冲突率（越大越好，但是需要的内存更多）
-    'persistence_path' => $config['zm_data'].'_cache.json',
+    'persistence_path' => $config['zm_data'] . '_cache.json',
     'auto_save_interval' => 900
 ];
 
@@ -112,22 +112,19 @@ $config['server_event_handler_class'] = [
     // 这里添加例如 \ZM\Event\ServerEventHandler::class 这样的启动注解类
 ];
 
-/** 服务器启用的外部第三方和内部插件 */
-$config['modules'] = [
-    'onebot' => [ // 机器人解析模块，关闭后无法使用如@CQCommand等注解
-        'status' => true,
-        'single_bot_mode' => false
-    ],
-    'http_proxy_server' => [ // 一个内置的简单HTTP代理服务器，目前还没有认证功能，预计2.4.0版本完成
-        'status' => false,
-        'host' => '0.0.0.0',
-        'port' => 8083,
-        'swoole_set_override' => [
-            'backlog' => 128,
-            'buffer_output_size' => 1024 * 1024 * 128,
-            'socket_buffer_size' => 1024 * 1024 * 1
-        ]
-    ],
+/** 机器人解析模块，关闭后无法使用如CQCommand等注解(上面的modules即将废弃) */
+$config['onebot'] = [
+    'status' => true,
+    'single_bot_mode' => false,
+    'message_level' => 99999
+];
+
+/** 一个远程简易终端，使用nc直接连接即可，但是不建议开放host为0.0.0.0(远程连接) */
+$config['remote_terminal'] = [
+    'status' => false,
+    'host' => '127.0.0.1',
+    'port' => 20002,
+    'token' => ''
 ];
 
 return $config;

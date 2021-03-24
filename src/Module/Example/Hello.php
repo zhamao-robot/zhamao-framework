@@ -2,17 +2,23 @@
 
 namespace Module\Example;
 
+use ZM\Annotation\CQ\CQBefore;
+use ZM\Annotation\CQ\CQMessage;
 use ZM\Annotation\Http\Middleware;
 use ZM\Annotation\Swoole\OnCloseEvent;
 use ZM\Annotation\Swoole\OnOpenEvent;
 use ZM\Annotation\Swoole\OnRequestEvent;
+use ZM\API\CQ;
+use ZM\API\TuringAPI;
 use ZM\ConnectionManager\ConnectionObject;
 use ZM\Console\Console;
 use ZM\Annotation\CQ\CQCommand;
 use ZM\Annotation\Http\RequestMapping;
 use ZM\Event\EventDispatcher;
 use ZM\Exception\InterruptException;
+use ZM\Module\QQBot;
 use ZM\Requests\ZMRequest;
+use ZM\Utils\MessageUtil;
 use ZM\Utils\ZMUtil;
 
 /**
@@ -65,6 +71,42 @@ class Hello
         $obj = json_decode($api_result, true);
         if ($obj === null) return "接口解析出错！可能返回了非法数据！";
         return $obj["hitokoto"] . "\n----「" . $obj["from"] . "」";
+    }
+
+    /**
+     * 图灵机器人的内置实现，在tuling123.com申请一个apikey填入下方变量即可。
+     * @CQCommand(start_with="机器人",end_with="机器人",message_type="group")
+     * @CQMessage(message_type="private",level=1)
+     */
+    public function turingAPI() {
+        $user_id = ctx()->getUserId();
+        $api = ""; // 请在这里填入你的图灵机器人的apikey
+        if ($api === "") return false; //如果没有填入apikey则此功能关闭
+        if (($this->_running_annotation ?? null) instanceof CQCommand) {
+            $msg = ctx()->getFullArg("我在！有什么事吗？");
+        } else {
+            $msg = ctx()->getMessage();
+        }
+        ctx()->setMessage($msg);
+        if (MessageUtil::matchCommand($msg, ctx()->getData())->status === false) {
+            return TuringAPI::getTuringMsg($msg, $user_id, $api);
+        } else {
+            QQBot::getInstance()->handle(ctx()->getData(), ctx()->getCache("level") + 1);
+            return true;
+        }
+    }
+
+    /**
+     * 响应at机器人的消息
+     * @CQBefore("message")
+     */
+    public function changeAt() {
+        if (MessageUtil::isAtMe(ctx()->getMessage(), ctx()->getRobotId())) {
+            $msg = str_replace(CQ::at(ctx()->getRobotId()), "", ctx()->getMessage());
+            ctx()->setMessage("机器人" . $msg);
+            Console::info(ctx()->getMessage());
+        }
+        return true;
     }
 
     /**
