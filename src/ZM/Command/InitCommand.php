@@ -38,7 +38,7 @@ class InitCommand extends Command
         if (LOAD_MODE === 1) { // 从composer依赖而来的项目模式，最基本的需要初始化的模式
             $output->writeln("<comment>Initializing files</comment>");
             $base_path = LOAD_MODE_COMPOSER_PATH;
-            $args = $input->getArgument("force");
+            $args = $input->getOption("force");
             foreach ($this->extract_files as $file) {
                 if (!file_exists($base_path . $file) || $args) {
                     $info = pathinfo($file);
