@@ -35,7 +35,6 @@ class ZMAtomic
         for($i = 0; $i < ZM_WORKER_NUM; ++$i) {
             self::$atomics["_#worker_".$i] = new Atomic(0);
         }
-       echo ("初始化工作进程数量：".ZM_WORKER_NUM.PHP_EOL);
         for ($i = 0; $i < 10; ++$i) {
             self::$atomics["_tmp_" . $i] = new Atomic(0);
         }

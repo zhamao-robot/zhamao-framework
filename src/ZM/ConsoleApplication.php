@@ -20,8 +20,8 @@ use ZM\Utils\DataProvider;
 
 class ConsoleApplication extends Application
 {
-    const VERSION_ID = 400;
-    const VERSION = "2.4.0";
+    const VERSION_ID = 401;
+    const VERSION = "2.4.1";
 
     public function __construct(string $name = 'UNKNOWN') {
         define("ZM_VERSION_ID", self::VERSION_ID);

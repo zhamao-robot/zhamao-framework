@@ -340,18 +340,22 @@ class Framework
         foreach ($args as $x => $y) {
             switch ($x) {
                 case 'worker-num':
-                    if (intval($y) >= 1 && intval($y) <= 1024) {
-                        $this->server_set["worker_num"] = intval($y);
-                    } else {
-                        Console::warning("Invalid worker num! Turn to default value (".($this->server_set["worker_num"] ?? swoole_cpu_num()).")");
+                    if ($y) {
+                        if (intval($y) >= 1 && intval($y) <= 1024) {
+                            $this->server_set["worker_num"] = intval($y);
+                        } else {
+                            Console::warning("Invalid worker num! Turn to default value (".($this->server_set["worker_num"] ?? swoole_cpu_num()).")");
+                        }
                     }
                     break;
                 case 'task-worker-num':
-                    if (intval($y) >= 1 && intval($y) <= 1024) {
-                        $this->server_set["task_worker_num"] = intval($y);
-                        $this->server_set["task_enable_coroutine"] = true;
-                    } else {
-                        Console::warning("Invalid worker num! Turn to default value (0)");
+                    if ($y) {
+                        if (intval($y) >= 1 && intval($y) <= 1024) {
+                            $this->server_set["task_worker_num"] = intval($y);
+                            $this->server_set["task_enable_coroutine"] = true;
+                        } else {
+                            Console::warning("Invalid worker num! Turn to default value (0)");
+                        }
                     }
                     break;
                 case 'disable-coroutine':
