@@ -1,7 +1,6 @@
 <?php
 /** @noinspection PhpFullyQualifiedNameUsageInspection */
 /** @noinspection PhpComposerExtensionStubsInspection */
-global $config;
 
 /** bind host */
 $config['host'] = '0.0.0.0';
