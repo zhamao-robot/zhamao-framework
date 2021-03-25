@@ -15,11 +15,12 @@ use ZM\Command\RunServerCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use ZM\Command\SystemdCommand;
 use ZM\Utils\DataProvider;
 
 class ConsoleApplication extends Application
 {
-    const VERSION_ID = 399;
+    const VERSION_ID = 400;
     const VERSION = "2.4.0";
 
     public function __construct(string $name = 'UNKNOWN') {
@@ -74,7 +75,8 @@ class ConsoleApplication extends Application
             new DaemonStopCommand(),
             new RunServerCommand(), //运行主服务的指令控制器
             new InitCommand(), //初始化用的，用于项目初始化和phar初始化
-            new PureHttpCommand() //纯HTTP服务器指令
+            new PureHttpCommand(), //纯HTTP服务器指令
+            new SystemdCommand()
         ]);
         if (LOAD_MODE === 1) {
             $this->add(new CheckConfigCommand());

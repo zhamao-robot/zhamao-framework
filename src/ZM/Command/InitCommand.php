@@ -26,6 +26,7 @@ class InitCommand extends Command
 
     protected function configure() {
         $this->setDescription("Initialize framework starter | 初始化框架运行的基础文件");
+        $this->addOption("force", 'F', null, "强制重制，覆盖现有文件");
         $this->setHelp("此命令将会解压以下文件到项目的根目录：\n" . implode("\n", $this->getExtractFiles()));
         // ...
     }
@@ -34,8 +35,9 @@ class InitCommand extends Command
         if (LOAD_MODE === 1) { // 从composer依赖而来的项目模式，最基本的需要初始化的模式
             $output->writeln("<comment>Initializing files</comment>");
             $base_path = LOAD_MODE_COMPOSER_PATH;
+            $args = $input->getArgument("force");
             foreach ($this->extract_files as $file) {
-                if (!file_exists($base_path . $file)) {
+                if (!file_exists($base_path . $file) || $args) {
                     $info = pathinfo($file);
                     @mkdir($base_path . $info["dirname"], 0777, true);
                     echo "Copying " . $file . PHP_EOL;
@@ -67,8 +69,8 @@ class InitCommand extends Command
                     }
                 }
                 file_put_contents($base_path . "/composer.json", json_encode($composer, 64 | 128 | 256));
-                $output->writeln("<info>Executing composer update command</info>");
-                exec("composer update");
+                $output->writeln("<info>Executing composer command: `composer dump-autoload`</info>");
+                exec("composer dump-autoload");
                 echo PHP_EOL;
             } else {
                 echo("Error occurred. Please check your updates.\n");

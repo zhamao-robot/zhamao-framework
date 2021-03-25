@@ -29,10 +29,10 @@
         "symfony/polyfill-mbstring": "^1.20",
         "symfony/console": "^5.1",
         "symfony/routing": "^5.1",
-        "zhamao/connection-manager": "*@dev",
-        "zhamao/console": "^1.0",
+        "zhamao/console": "^1.0.10",
         "zhamao/config": "^1.0",
-        "zhamao/request": "*@dev"
+        "zhamao/request": "^1.1",
+        "zhamao/connection-manager": "^1.0"
     },
     "suggest": {
         "ext-ctype": "*",

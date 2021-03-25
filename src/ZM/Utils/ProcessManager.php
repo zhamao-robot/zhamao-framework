@@ -5,9 +5,11 @@ namespace ZM\Utils;
 
 
 use Co;
+use ZM\Annotation\CQ\CQCommand;
 use ZM\Annotation\Swoole\OnPipeMessageEvent;
 use ZM\Console\Console;
 use ZM\Event\EventDispatcher;
+use ZM\Event\EventManager;
 use ZM\Store\LightCache;
 use ZM\Store\LightCacheInside;
 use ZM\Store\WorkerCache;
@@ -17,6 +19,14 @@ class ProcessManager
     public static function workerAction($src_worker_id, $data) {
         $server = server();
         switch ($data["action"] ?? '') {
+            case 'add_short_command':
+                Console::verbose("Adding short command ".$data["data"][0]);
+                $obj = new CQCommand();
+                $obj->method = quick_reply_closure($data["data"][1]);
+                $obj->match = $data["data"][0];
+                $obj->class = "";
+                EventManager::addEvent(CQCommand::class, $obj);
+                break;
             case "eval":
                 eval($data["data"]);
                 break;

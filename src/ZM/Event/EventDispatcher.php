@@ -117,6 +117,17 @@ class EventDispatcher
     public function dispatchEvent($v, $rule_func = null, ...$params) {
         $q_c = $v->class;
         $q_f = $v->method;
+        if ($q_c === "" && ($q_f instanceof \Closure)) {
+            if ($this->log) Console::verbose("[事件分发{$this->eid}] 闭包函数的事件触发过程！");
+            if ($rule_func !== null && !$rule_func($v)) {
+                if ($this->log) Console::verbose("[事件分发{$this->eid}] 闭包函数下的 ruleFunc 判断为 false, 拒绝执行此方法。");
+                $this->status = self::STATUS_RULE_FAILED;
+                return false;
+            }
+            $this->store = $q_f(...$params);
+            $this->status = self::STATUS_NORMAL;
+            return true;
+        }
         if ($this->log) Console::verbose("[事件分发{$this->eid}] 正在判断 " . $q_c . "::" . $q_f . " 方法下的 ruleFunc ...");
         if ($rule_func !== null && !$rule_func($v)) {
             if ($this->log) Console::verbose("[事件分发{$this->eid}] " . $q_c . "::" . $q_f . " 方法下的 ruleFunc 判断为 false, 拒绝执行此方法。");

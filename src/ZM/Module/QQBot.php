@@ -103,7 +103,6 @@ class QQBot
                     if (is_string($result)) ctx()->reply($result);
                     if (ctx()->getCache("has_reply") === true) EventDispatcher::interrupt();
                 });
-                zm_dump(ctx()->getData());
                 $s = MessageUtil::matchCommand(ctx()->getMessage(), ctx()->getData());
                 if ($s->status !== false) {
                     if (!empty($s->match)) ctx()->setCache("match", $s->match);

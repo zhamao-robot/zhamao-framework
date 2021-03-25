@@ -159,4 +159,10 @@ class MessageUtil
         }
         return $matched;
     }
+
+    public static function addShortCommand($command, string $reply) {
+        for ($i = 0; $i < ZM_WORKER_NUM; ++$i) {
+            ProcessManager::sendActionToWorker($i, "add_short_command", [$command, $reply]);
+        }
+    }
 }

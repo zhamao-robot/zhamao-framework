@@ -394,3 +394,9 @@ function zm_verbose($obj) { Console::verbose($obj); }
 function zm_error($obj) { Console::error($obj); }
 
 function zm_config($name, $key = null) { return ZMConfig::get($name, $key); }
+
+function quick_reply_closure($reply) {
+    return function() use ($reply){
+        return $reply;
+    };
+}
