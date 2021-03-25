@@ -267,7 +267,7 @@ $pass->obj = true;
 zm_dump($pass);
 ```
 
-<img src="../assets/img/CB86FE26-7EC7-4480-83FF-DE29285D1C7B.png" alt="CB86FE26-7EC7-4480-83FF-DE29285D1C7B" style="zoom:50%;" />
+![](../assets/img/CB86FE26-7EC7-4480-83FF-DE29285D1C7B.png)
 
 ## zm_config()
 
