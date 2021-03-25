@@ -6,6 +6,7 @@ namespace ZM\Command;
 use Phar;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class InitCommand extends Command
@@ -26,7 +27,9 @@ class InitCommand extends Command
 
     protected function configure() {
         $this->setDescription("Initialize framework starter | 初始化框架运行的基础文件");
-        $this->addOption("force", 'F', null, "强制重制，覆盖现有文件");
+        $this->setDefinition([
+            new InputOption("force", "F", null, "强制重制，覆盖现有文件")
+        ]);
         $this->setHelp("此命令将会解压以下文件到项目的根目录：\n" . implode("\n", $this->getExtractFiles()));
         // ...
     }
