@@ -94,6 +94,7 @@ nav:
       - 全局方法: component/global-functions.md
       - Console 终端: component/console.md
       - TaskWorker 管理: component/task-worker.md
+      - 远程终端: component/remote-terminal.md
   - 进阶开发:
       - 进阶开发: advanced/index.md
       - 框架剖析: advanced/framework-structure.md
