@@ -2,5 +2,5 @@
 
 ## 框架运行总结构图
 
-![](../assets/img/framework-structure.png)
+![](https://static.zhamao.me/images/docs/a23d8a952cf9c88d395888d220605a4f.png)
 

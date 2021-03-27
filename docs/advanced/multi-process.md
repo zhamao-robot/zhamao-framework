@@ -16,13 +16,13 @@ PHP 也是如此，框架的多进程又是怎么一回事呢？为什么要采�
 
 **但是**，CPU 密集型的应用怎么办呢？假设我的 Web 应用有大量的排序、md5 运算怎么办呢？这样的阻塞，假设是一个超级大的 for 循环或者是要执行很长时间的 while 循环，CPU 一直在被占用。多进程就是针对 CPU 密集型的应用说 yes 的一个方案。
 
-![Untitled Diagram (1)](../assets/img/single-process.png)
+![diagram](https://static.zhamao.me/images/docs/06c17ab473f17ab10523a938cdbd8760.png)
 
 我们假设现在有 3 个请求同时访问，也就是说上面的流程需要执行 3 遍。而如果我们只有一个进程的话，最后一个请求需要等待的时间为 `2*3+5*3=21` 秒，非常耗时。
 
 而如果有两个进程处理 3 个请求，则最后一个完成的请求就缩短了，`2+5+2+5=14` 秒。
 
-![Untitled Diagram (2)](../assets/img/Untitled Diagram (2).png)
+![diagram](https://static.zhamao.me/images/docs/dbb4e32e1c77f96162d10e41f25befa4.png)
 
 所以如果要充分利用你的服务器或者个人电脑的多核 CPU 资源，就要设置多个进程来处理。一个进程只能在一个 CPU 上运行，而设置了多进程后，就可以让多核 CPU 充分运行多个进程，所以我们给框架设置多进程的推荐数值为等同于 CPU 的核心数。
 
@@ -32,7 +32,7 @@ PHP 也是如此，框架的多进程又是怎么一回事呢？为什么要采�
 
 ## 框架进程模型
 
-![Untitled Diagram (3)](../assets/img/Untitled Diagram (3).png)
+![diagram](https://static.zhamao.me/images/docs/46a34feb0195d6ea12da7b80750c9e71.png)
 
 上图中，横向的时间片可以理解为并行执行，这些操作在多个 CPU 内可能同时在执行。
 
@@ -40,7 +40,7 @@ PHP 也是如此，框架的多进程又是怎么一回事呢？为什么要采�
 
 众所周知，进程是程序在操作系统中的一个边界，和自己有关的一切变量、内容和代码都在自己的进程内，不同进程之间如果不使用管道等方式，是不可以互相访问的。而加上开始描述的，创建子进程是一个复制自身的过程，所以也就会有如下图的情况：
 
-![Untitled Diagram (4)](../assets/img/Untitled Diagram (4).png)
+![diagram](https://static.zhamao.me/images/docs/8b43e2179a63c8d91a508d7cefcd3226.png)
 
 我们以静态类为例，设置一个进程中的全局变量。这里就会出现，同一个静态变量在多个进程中完全不同的值的结果。此后，我们将会在 Worker 进程中执行用户的代码，如果设置 Worker 数量仅为 1 的话，那么就简单许多了，你还是可以使用全局变量或静态类来存储你想要的内容而不用担心这种多个进程变量隔离的情况（因为用户的 Web 请求处理的代码只会在一个 Worker 进程中执行）。如果像上图一样设置了多个 Worker，则用户过来的比如 HTTP 请求就有可能出现在不同的 Worker 进程中，给全局变量设值就一定会造成不同步的问题。这时我们就不可以使用全局变量做数据同步（注意，我说的是数据同步）。
 

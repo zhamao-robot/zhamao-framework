@@ -102,15 +102,15 @@ class Test {
 
 在炸毛框架内部，一个完整的事件流程和中间件的关系如下图：
 
-![Untitled Diagram](../assets/img/diagram3.dbb4e32e.png)
+![Untitled Diagram](https://static.zhamao.me/images/docs/dbb4e32e1c77f96162d10e41f25befa4.png)
 
 对于同一事件的优先级和响应顺序，优先级的关系如下图：
 
-![Untitled Diagram](../assets/img/Untitled Diagram.png)
+![diagram](https://static.zhamao.me/images/docs/fa52005b7ca891053617a77541c7e785.png)
 
 对于事件内单个事件被调用的单个函数下如果存在多个中间件，中间件模型和事件的关系如下图：
 
-![Untitled Diagram-2](../assets/img/diagram4.16ce39ca.png)
+![Untitled Diagram-2](https://static.zhamao.me/images/docs/16ce39caad472d03d7786e6ffb0c55bf.png)
 
 ## 实战例子
 

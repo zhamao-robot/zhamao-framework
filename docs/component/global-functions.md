@@ -267,7 +267,7 @@ $pass->obj = true;
 zm_dump($pass);
 ```
 
-![](../assets/img/CB86FE26-7EC7-4480-83FF-DE29285D1C7B.png)
+![](https://static.zhamao.me/images/docs/ba026ca11332b1a4ad68a549165230e6.png)
 
 ## zm_config()
 

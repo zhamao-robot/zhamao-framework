@@ -86,15 +86,19 @@ bin/start server # 通过源码模式启动框架
 - `--log-{mode}`：设置 log 等级。支持 `--log-debug`，`--log-verbose`，`--log-info`，`--log-warning`，`--log-error`。
 - `--log-theme`：设置终端信息的主题。这个选项适用于多种终端信息显示的兼容，例如白色终端和不支持颜色的终端。详见 [Console - 主题设置](/component/console/#_2)。
 - `--disable-coroutine`：关闭一键协程化。
+- `--remote-terminal`：开启 nc 远程终端，配置文件使用全局中的 `remote_terminal` 项。也可以在全局配置中常开启（status 设置为 true）。
 - `--daemon`：以守护进程方式运行框架，此参数将直接在输出 motd 后将进程挂到 init 下运行，后台常驻。
-- `--watch`：监控 `src/` 目录下的文件变化，有变化则自动重新载入代码。开启监控需要安装 PHP 扩展：inotify。使用 pecl 就可以安装：`pecl install inotify`。
+- `--watch`：监控 `src/` 目录下的文件变化，有变化则自动重新载入代码。开启监控需要安装 PHP 扩展：inotify。使用 pecl 就可以安装：`pecl install inotify`。（注：不支持 WSL 和 macOS）
 - `--env`：设置运行环境，设置运行环境后将优先加载指定环境的配置文件，支持 `--env=production`，`--env=staging`，`--env=development`，见 [基本配置](/guide/basic-config/#_2)。
+- `--worker-num`：指定运行的工作进程数量（并不是越多越好，框架默认为 CPU 核心数），例如 `--worker-num=8`。
+- `--task-worker-num`：启用 TaskWorker 进程并指定数量。
+- `--show-php-ver`：在启动时显示 Swoole 和 PHP 的版本。
 
 ## 守护进程操作命令
 
 守护进程在 2.2.0 版本开始，可以使用命令行快速操作，如重启、停止、查看状态等。
 
-注意，这里的守护进程操作命令是指 **使用 `--daemon` 方式启动的框架**，如使用 Docker、screen、tmux 等方式挂后台跑则此命令不可用！
+注意，这里的守护进程操作命令是指 **使用 `--daemon` 方式启动的框架**，如使用 Docker、screen、tmux、systemd 等方式挂后台跑则此命令不可用！
 
 ```bash
 vendor/bin/start daemon:status # 查看守护进程的状态
@@ -116,3 +120,15 @@ vendor/bin/start simple-http-server your-web-dir/ --host=0.0.0.0 --port=8080
 
 -  `your-web-dir` 是必填的参数。
 - `--host` 和 `--port` 是可选参数，如果不填，则默认使用 `global.php` 配置文件中的配置。
+
+### 检查配置是否更新
+
+默认情况下（非源码模式），你可以使用命令 `vendor/bin/start check:config` 来检查你的配置文件是否需要更新部分段落。
+
+### systemd 配置文件生成器
+
+框架支持生成 systemd 配置文件 `zhamao.service`，生成后将文件放入 `/etc/systemd/system` 后输入 `systemctl enable zhamao.service` 即可。
+
+命令：`vendor/bin/start systemd:generate`
+
+注意，systemd 启动的守护进程模式和使用参数 `--daemon` 不一样，请勿同时混用，直接使用上述命令生成的配置文件即可正常使用！

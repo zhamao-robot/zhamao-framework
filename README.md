@@ -69,7 +69,7 @@ public function index() {
 ## 下载源码
 框架源码可直接克隆本仓库进行编辑，如果你在国内，访问 GitHub 和 clone 仓库比较慢，可以将 `github.com` 替换为 `fgit.zhamao.me` 进行加速。
 
-例如：`git clone https://fgit.zhamao.me/zhamao-robot/zhamao-framework.git`。
+例如：`git clone https://fgit.zhamao.me/zhamao-robot/zhamao-framework.git --depth 1`。
 
 ## 贡献和捐赠
 如果你在使用过程中发现任何问题，可以提交 Issue 或自行 Fork 后修改并提交 Pull Request。

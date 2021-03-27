@@ -18,6 +18,7 @@
 | `zm_data`                    | 框架的配置文件、日志文件等文件目录                           | `./` 下的 `zm_data/`         |
 | `debug_mode`                 | 框架是否启动 debug 模式                                      | false                        |
 | `crash_dir`                  | 存放崩溃和运行日志的目录                                     | `zm_data` 下的 `crash/`      |
+| `config_dir`                 | 存放 saveToJson() 方法保存的数据的目录                       | `zm_data` 下的 `config/`     |
 | `swoole`                     | 对应 Swoole server 中 set 的参数，参考Swoole文档             | 见子表 `swoole`              |
 | `light_cache`                | 轻量内置 key-value 缓存                                      | 见字表 `light_cache`         |
 | `worker_cache`               | 跨进程变量级缓存                                             | 见子表 `worker_cache`        |
@@ -28,11 +29,11 @@
 | `http_default_code_page`     | HTTP服务器在指定状态码下回复的默认页面                       | 见配置文件                   |
 | `init_atomics`               | 框架启动时初始化的原子计数器列表                             | 见配置文件                   |
 | `info_level`                 | 终端日志显示等级（0-4）                                      | 2                            |
-| `context_class`              | 上下文所定义的类，待上下文完善后见对应文档                   | `\ZM\Context\Context::class` |
+| `context_class`              | 上下文所定义的类，见对应上下文说明文档                       | `\ZM\Context\Context::class` |
 | `static_file_server`         | 静态文件服务器配置项                                         | 见子表 `static_file_server`  |
-| `server_event_handler_class` | 注册 Swoole Server 事件注解的类列表                          | 见配置文件                   |
-| `command_register_class`     | 注册自定义命令行选项指令的类                                 | 见配置文件                   |
-| `modules`                    | 服务器启用的外部第三方和内部插件                             | `['onebot' => true]`         |
+| `server_event_handler_class` | 注册 Swoole Server 事件注解的类列表，在 Swoole 服务器启动前就被加载 | 空                           |
+| `onebot`                     | OneBot 协议相关配置                                          | 见子表 `onebot`              |
+| `remote_terminal`            | 远程终端相关配置                                             | 见子表 `remote_terminal`     |
 
 ### 子表 **swoole**
 
@@ -90,6 +91,23 @@
 | `status`         | 是否开启静态文件服务器 | false                          |
 | `document_root`  | 静态文件的根目录       | `{WORKING_DIR}/resources/html` |
 | `document_index` | 默认索引的文件名列表   | `["index.html"]`               |
+
+### 子表 onebot
+
+| 配置名称          | 说明                                                         | 默认值 |
+| ----------------- | ------------------------------------------------------------ | ------ |
+| `status`          | 是否开启 OneBot 标准机器人解析功能                           | true   |
+| `single_bot_mode` | 是否开启单机器人模式                                         | false  |
+| `message_level`   | 机器人的 WebSocket 事件在 Swoole 原生事件 `@OnMessageEvent` 中的等级（越高说明越被优先处理） | 99999  |
+
+### 子表 remote_terminal
+
+| 配置名称 | 说明                                                         | 默认值      |
+| -------- | ------------------------------------------------------------ | ----------- |
+| `status` | 是否开启远程终端功能，见 [组件 - 远程终端](/component/remote-terminal) | false       |
+| `host`   | 远程终端监听地址，为安全起见，默认值只允许本地回环地址（127.0.0.1） | `127.0.0.1` |
+| `port`   | 远程终端监听的 TCP 端口                                      | 20002       |
+| `token`  | 远程终端连接的令牌（如果为空（""）则不验证）                 | ""          |
 
 ## 多环境下的配置文件
 
