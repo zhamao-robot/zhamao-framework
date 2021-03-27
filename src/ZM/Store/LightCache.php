@@ -15,8 +15,6 @@ class LightCache
 {
     /** @var Table|null */
     private static $kv_table = null;
-    /** @var Table|null */
-    private static $kv_lock = null;
 
     private static $config = [];
 
@@ -35,14 +33,13 @@ class LightCache
         self::$kv_table->column("expire", Table::TYPE_INT);
         self::$kv_table->column("data_type", Table::TYPE_STRING, 8);
         $result = self::$kv_table->create();
-        self::$kv_lock = new Table($config["size"], $config["hash_conflict_proportion"]);
-        $result = $result && self::$kv_lock->create();
+        // 加载内容
         if ($result === true && isset($config["persistence_path"])) {
             if (file_exists($config["persistence_path"])) {
                 $r = json_decode(file_get_contents($config["persistence_path"]), true);
                 if ($r === null) $r = [];
                 foreach ($r as $k => $v) {
-                    $write = self::set($k, $v, -2);
+                    $write = self::set($k, $v);
                     Console::verbose("Writing LightCache: " . $k);
                     if ($write === false) {
                         self::$last_error = '可能是由于 Hash 冲突过多导致动态空间无法分配内存';
@@ -180,6 +177,30 @@ class LightCache
         return $r;
     }
 
+    public static function addPersistence($key) {
+        if (file_exists(self::$config["persistence_path"])) {
+            $r = json_decode(file_get_contents(self::$config["persistence_path"]), true);
+            if ($r === null) $r = [];
+            if (!isset($r[$key])) $r[$key] = null;
+            file_put_contents(self::$config["persistence_path"], json_encode($r, 64 | 128 | 256));
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static function removePersistence($key) {
+        if (file_exists(self::$config["persistence_path"])) {
+            $r = json_decode(file_get_contents(self::$config["persistence_path"]), true);
+            if ($r === null) $r = [];
+            if (isset($r[$key])) unset($r[$key]);
+            file_put_contents(self::$config["persistence_path"], json_encode($r, 64 | 128 | 256));
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     /**
      * 这个只能在唯一一个工作进程中执行
      * @throws Exception
@@ -189,17 +210,15 @@ class LightCache
         $dispatcher->dispatchEvents();
 
         if (self::$kv_table === null) return;
-        $r = [];
-        foreach (self::$kv_table as $k => $v) {
-            if ($v["expire"] === -2) {
+
+        if (!empty(self::$config["persistence_path"])) {
+            $r = json_decode(file_get_contents(self::$config["persistence_path"]), true);
+            if ($r === null) $r = [];
+            foreach ($r as $k => $v) {
                 Console::verbose("Saving " . $k);
-                $r[$k] = self::parseGet($v);
+                $r[$k] = self::get($k);
             }
-        }
-        if (self::$config["persistence_path"] == "") return;
-        if (file_exists(self::$config["persistence_path"])) {
-            $r = file_put_contents(self::$config["persistence_path"], json_encode($r, 128 | 256));
-            if ($r === false) Console::error("Not saved, please check your \"persistence_path\"!");
+            file_put_contents(self::$config["persistence_path"], json_encode($r, 64 | 128 | 256));
         }
         Console::verbose("Saved.");
     }

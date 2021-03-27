@@ -16,10 +16,7 @@ class DataProvider
     }
 
     public static function getWorkingDir() {
-        if (LOAD_MODE == 0) return WORKING_DIR;
-        elseif (LOAD_MODE == 1) return LOAD_MODE_COMPOSER_PATH;
-        elseif (LOAD_MODE == 2) return realpath('.');
-        return null;
+        return WORKING_DIR;
     }
 
     public static function getFrameworkLink() {

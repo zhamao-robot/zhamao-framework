@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpUnused */ #plain
+<?php #plain
 
 use Swoole\Atomic;
 use Swoole\Coroutine;
@@ -21,33 +21,13 @@ use Swoole\Coroutine\System;
 use ZM\Context\ContextInterface;
 
 
-function phar_classloader($p) {
-    $filepath = getClassPath($p);
-    if ($filepath === null) {
-        Console::debug("F:Warning: get class path wrongs.$p");
-        return;
-    }
-    try {
-        /** @noinspection PhpIncludeInspection */
-        require_once $filepath;
-    } catch (Exception $e) {
-        echo "Error when finding class: " . $p . PHP_EOL;
-        die;
-    }
-}
-
 function getClassPath($class_name) {
     $dir = str_replace("\\", "/", $class_name);
     $dir2 = WORKING_DIR . "/src/" . $dir . ".php";
     //echo "@@@".$dir2.PHP_EOL;
     $dir2 = str_replace("\\", "/", $dir2);
     if (file_exists($dir2)) return $dir2;
-    else {
-        $dir = DataProvider::getWorkingDir() . "/src/" . $dir . ".php";
-        //echo "###".$dir.PHP_EOL;
-        if (file_exists($dir)) return $dir;
-        else return null;
-    }
+    else return null;
 }
 
 /**
@@ -360,13 +340,9 @@ function uuidgen($uppercase = false): string {
 }
 
 function working_dir() {
-    if (LOAD_MODE == 0) return WORKING_DIR;
-    elseif (LOAD_MODE == 1) return LOAD_MODE_COMPOSER_PATH;
-    elseif (LOAD_MODE == 2) return realpath('.');
-    return null;
+    return WORKING_DIR;
 }
 
-/** @noinspection PhpMissingReturnTypeInspection */
 function zm_dump($var, ...$moreVars) {
     VarDumper::dump($var);
 

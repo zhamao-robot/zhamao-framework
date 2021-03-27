@@ -37,7 +37,7 @@ class InitCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int {
         if (LOAD_MODE === 1) { // 从composer依赖而来的项目模式，最基本的需要初始化的模式
             $output->writeln("<comment>Initializing files</comment>");
-            $base_path = LOAD_MODE_COMPOSER_PATH;
+            $base_path = WORKING_DIR;
             $args = $input->getOption("force");
             foreach ($this->extract_files as $file) {
                 if (!file_exists($base_path . $file) || $args) {
@@ -50,6 +50,12 @@ class InitCommand extends Command
                     echo "Skipping " . $file . " , file exists." . PHP_EOL;
                 }
             }
+            echo "Copying ./zhamao\n";
+            file_put_contents(
+                $base_path."/zhamao",
+                "#!/usr/bin/env php\n<?php require_once \"vendor/autoload.php\";(new ZM\ConsoleApplication(\"zhamao-framework\"))->initEnv()->run();"
+            );
+            chmod($base_path."/zhamao", 0755);
             $autoload = [
                 "psr-4" => [
                     "Module\\" => "src/Module",

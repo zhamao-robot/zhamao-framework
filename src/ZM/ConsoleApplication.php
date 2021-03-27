@@ -16,12 +16,11 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use ZM\Command\SystemdCommand;
-use ZM\Utils\DataProvider;
 
 class ConsoleApplication extends Application
 {
-    const VERSION_ID = 401;
-    const VERSION = "2.4.1";
+    const VERSION_ID = 402;
+    const VERSION = "2.4.2";
 
     public function __construct(string $name = 'UNKNOWN') {
         define("ZM_VERSION_ID", self::VERSION_ID);
@@ -29,35 +28,24 @@ class ConsoleApplication extends Application
         parent::__construct($name, ZM_VERSION);
     }
 
-    public function initEnv(): ConsoleApplication {
+    public function initEnv($with_default_cmd = ""): ConsoleApplication {
         $this->selfCheck();
 
-        if (!is_dir(__DIR__ . '/../../vendor')) {
-            define("LOAD_MODE", 1); // composer项目模式
-            define("LOAD_MODE_COMPOSER_PATH", getcwd());
-        } else  {
-            define("LOAD_MODE", 0); // 源码模式
-        }
-
-        //if (LOAD_MODE === 0) $this->add(new BuildCommand()); //只有在git源码模式才能使用打包指令
-        if (LOAD_MODE === 0) define("WORKING_DIR", getcwd());
-        elseif (LOAD_MODE == 1) define("WORKING_DIR", realpath(__DIR__ . "/../../"));
-        if (file_exists(DataProvider::getWorkingDir() . "/vendor/autoload.php")) {
-            /** @noinspection PhpIncludeInspection */
-            require_once DataProvider::getWorkingDir() . "/vendor/autoload.php";
-        }
+        define("WORKING_DIR", getcwd());
+        define("LOAD_MODE", is_dir(WORKING_DIR . "/src/ZM") ? 0 : 1);
+        define("FRAMEWORK_ROOT_DIR", realpath(__DIR__ . "/../../"));
         if (LOAD_MODE == 0) {
-            $composer = json_decode(file_get_contents(DataProvider::getWorkingDir() . "/composer.json"), true);
+            $composer = json_decode(file_get_contents(WORKING_DIR . "/composer.json"), true);
             if (!isset($composer["autoload"]["psr-4"]["Module\\"])) {
                 echo "框架源码模式需要在autoload文件中添加Module目录为自动加载，是否添加？[Y/n] ";
                 $r = strtolower(trim(fgets(STDIN)));
                 if ($r === "" || $r === "y") {
                     $composer["autoload"]["psr-4"]["Module\\"] = "src/Module";
                     $composer["autoload"]["psr-4"]["Custom\\"] = "src/Custom";
-                    $r = file_put_contents(DataProvider::getWorkingDir() . "/composer.json", json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+                    $r = file_put_contents(WORKING_DIR . "/composer.json", json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
                     if ($r !== false) {
                         echo "成功添加！请运行 composer dump-autoload ！\n";
-                        exit(1);
+                        exit(0);
                     } else {
                         echo "添加失败！请按任意键继续！";
                         fgets(STDIN);
@@ -80,6 +68,9 @@ class ConsoleApplication extends Application
         ]);
         if (LOAD_MODE === 1) {
             $this->add(new CheckConfigCommand());
+        }
+        if (!empty($with_default_cmd)) {
+            $this->setDefaultCommand($with_default_cmd);
         }
         /*
         $command_register = ZMConfig::get("global", "command_register_class") ?? [];

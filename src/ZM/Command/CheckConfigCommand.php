@@ -19,11 +19,11 @@ class CheckConfigCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int {
         if (LOAD_MODE !== 1) {
-            $output->writeln("<error>仅限在Composer依赖模式中使用此命令！");
+            $output->writeln("<error>仅限在Composer依赖模式中使用此命令！</error>");
             return Command::FAILURE;
         }
         $current_cfg = getcwd() . "/config/";
-        $remote_cfg = include_once WORKING_DIR . "/config/global.php";
+        $remote_cfg = include_once FRAMEWORK_ROOT_DIR . "/config/global.php";
         if (file_exists($current_cfg . "global.php")) {
             $this->check($remote_cfg, "global.php", $output);
         }
@@ -37,7 +37,7 @@ class CheckConfigCommand extends Command
             $this->check($remote_cfg, "global.production.php", $output);
         }
         if ($this->need_update === true) {
-            $output->writeln("<comment>有配置文件需要更新，详情见文档 https://framework.zhamao.xin/update/config.md</comment>");
+            $output->writeln("<comment>有配置文件需要更新，详情见文档 `https://framework.zhamao.xin/update/config.md`</comment>");
         } else {
             $output->writeln("<info>配置文件暂无更新！</info>");
         }
@@ -51,9 +51,8 @@ class CheckConfigCommand extends Command
     private function check($remote, $local, OutputInterface $out) {
         $local_file = include_once getcwd() . "/config/".$local;
         foreach($remote as $k => $v) {
-            $out->writeln("<comment>正在检查".$k."</comment>");
             if (!isset($local_file[$k])) {
-                $out->writeln("<error>配置文件 ".$local . " 需要更新！(缺少 `$k` 字段配置)</error>");
+                $out->writeln("<comment>配置文件 ".$local . " 需要更新！(当前配置文件缺少 `$k` 字段配置)</comment>");
                 $this->need_update = true;
             }
         }

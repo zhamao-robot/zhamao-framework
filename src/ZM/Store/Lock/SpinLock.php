@@ -7,6 +7,7 @@ namespace ZM\Store\Lock;
 use Swoole\Coroutine;
 use Swoole\Coroutine\System;
 use Swoole\Table;
+use ZM\Console\Console;
 
 class SpinLock
 {

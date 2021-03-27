@@ -404,7 +404,9 @@ class Framework
                     }
                     break;
                 case 'remote-terminal':
-                    $add_port = true;
+                    if ($y) {
+                        $add_port = true;
+                    }
                     break;
                 case 'show-php-ver':
                 default:
