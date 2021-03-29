@@ -19,8 +19,8 @@ use ZM\Command\SystemdCommand;
 
 class ConsoleApplication extends Application
 {
-    const VERSION_ID = 403;
-    const VERSION = "2.4.3";
+    const VERSION_ID = 404;
+    const VERSION = "2.4.4";
 
     public function __construct(string $name = 'UNKNOWN') {
         define("ZM_VERSION_ID", self::VERSION_ID);

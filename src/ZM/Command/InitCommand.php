@@ -53,7 +53,7 @@ class InitCommand extends Command
             echo "Copying ./zhamao\n";
             file_put_contents(
                 $base_path."/zhamao",
-                "#!/usr/bin/env php\n<?php require_once \"vendor/autoload.php\";(new ZM\ConsoleApplication(\"zhamao-framework\"))->initEnv()->run();"
+                "#!/usr/bin/env php\n<?php require_once \"vendor/autoload.php\";(new ZM\ConsoleApplication(\"zhamao-framework\"))->initEnv(\"server\")->run();"
             );
             chmod($base_path."/zhamao", 0755);
             $autoload = [

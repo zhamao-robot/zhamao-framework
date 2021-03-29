@@ -256,7 +256,11 @@ class LightCache
         if (self::$kv_table === null) return;
 
         if (!empty(self::$config["persistence_path"])) {
-            $r = json_decode(file_get_contents(self::$config["persistence_path"]), true);
+            if (file_exists(self::$config["persistence_path"])) {
+                $r = json_decode(file_get_contents(self::$config["persistence_path"]), true);
+            } else {
+                $r = [];
+            }
             if ($r === null) $r = [];
             foreach ($r as $k => $v) {
                 Console::verbose("Saving " . $k);
