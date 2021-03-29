@@ -57,7 +57,9 @@ $config['light_cache'] = [
 
 `$value` 可存入 `bool`、`string`、`int`、`array` 等可被 `json_encode()` 的变量，闭包函数和对象不可存入。
 
-`$expire` 是 `int`，超时时间（秒）。如果设定了大于 0 的值，则表明是在 `$expire` 秒后自动删除。如果为 -1 则什么都不做，如果框架使用了 `stop` 或 Ctrl+C 或意外退出时数据会丢失。如果为 -2，则会将此数据持久化保存，保存在上方配置文件指定的 json 文件中，待关闭后再次启动框架会自动加载回来，不会丢失。
+`$expire` 是 `int`，超时时间（秒）。如果设定了大于 0 的值，则表明是在 `$expire` 秒后自动删除（框架中途停止不受影响）。如果为 -1 则什么都不做。框架停止后自动被清除。
+
+**注意：如果前面使用了 set() ，后面再次使用 set() 会重置 expire 过期时间为 -1（-1 是框架运行时不过期，关闭框架删除的状态），如果只需要更新值，请使用 update()。**
 
 ```php
 // use ZM\Store\LightCache;
@@ -88,6 +90,14 @@ public function storeAfterRemove() {
 ( 内容不存在！
 </chat-box>
 
+### LightCache::update()
+
+更新值而不更新状态。如果键值对不存在，则返回 false。
+
+定义：`LightCache::update(string $key, $value)`
+
+参数同 `set()`，可参考。
+
 ### LightCache::get()
 
 获取内容。
@@ -104,6 +114,20 @@ public function storeAfterRemove() {
 $s = LightCache::set("test", "hello", 20);
 zm_sleep(10);
 dump(LightCache::getExpire("test")); // 返回 10
+```
+
+### LightCache::getExpireTS()
+
+获取存储项要过期的时间戳。
+
+定义：`LightCache::getExpireTS(string $key)`
+
+```php
+$s = LightCache::set("test", "hello", 20); //假设这条代码执行时时间戳是 1616838482
+zm_sleep(10);
+dump(LightCache::getExpire("test")); // 返回 1616838502
+zm_sleep(10);
+dump(LightCache::getExpire("test")); // 返回 null
 ```
 
 ### LightCache::getMemoryUsage()
@@ -157,25 +181,34 @@ dump(LightCache::getAll());
 */
 ```
 
-### LightCache::savePersistence()
+### LightCache::addPersistence()
 
-立刻保存所有被标记为持久化的缓存项到磁盘。
+添加持久化存储的键。
 
-!!! note "提示"
+用法：`LightCache::addPersistence($key)`。
 
-	在一般情况下，框架定时执行此方法来保存，在停止框架、reload 框架和 Ctrl+C 停止框架的时候，均会执行保存。
+注：只需调用一次即可，无需多次重复调用，也不需要设置 expire 为 -2 了。（2.4.2 起可用此方法）。
+
+详见下方 **持久化**。
+
+### LightCache::removePersistence()
+
+删除持久化的键。
+
+用法：`LightCache::removePersistence($key)`。
+
+注：只需调用一次即可，无需多次重复调用，也不需要设置 expire 为非 -2 了。（2.4.2 起可用此方法）。
 
 ### 持久化
 
-将 `set()` 的 expire 设置为 -2 即可。
+使用 `LightCache::addPersistence($key)` 添加对应需要持久化的键名即可。
 
 ```php
 /**
- * @CQCommand("store")
+ * @OnStart()
  */
-public function store() {
-    LightCache::set("msg_time", time(), -2);
-    return "OK!";
+public function onStart() {
+    LightCache::addPersistence("msg_time");
 }
 /**
  * @CQCommand("getStore")
@@ -187,11 +220,11 @@ public function getStore() {
 
 <chat-box>
 ^ 我在 2021-01-05 15:21:00 发送这条消息
-) store
-( OK!
+) getStore
+( 2021-01-05 15:20:00
 ^ 这时我用 Ctrl+C 停止框架，过一会儿再启动
 ) getStore
-( 存储时间：2021-01-05 15:21:00
+( 存储时间：2021-01-05 15:20:00
 </chat-box>
 
 ### 数据加锁

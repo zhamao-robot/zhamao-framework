@@ -10,6 +10,8 @@ use ZM\Annotation\Swoole\OnSave;
 use ZM\Console\Console;
 use ZM\Event\EventDispatcher;
 use ZM\Exception\ZMException;
+use ZM\Framework;
+use ZM\Utils\ProcessManager;
 
 class LightCache
 {
@@ -50,6 +52,31 @@ class LightCache
         }
         if ($result === false) {
             self::$last_error = '系统内存不足，申请失败';
+        } else {
+            $obj = Framework::loadFrameworkState();
+            foreach(($obj["expiring_light_cache"] ?? []) as $k => $v) {
+                $value = $v["value"];
+                if (is_array($value)) {
+                    $value = json_encode($value, JSON_UNESCAPED_UNICODE);
+                    if (strlen($value) >= self::$config["max_strlen"]) return false;
+                    $data_type = "json";
+                } elseif (is_string($value)) {
+                    $data_type = "";
+                } elseif (is_int($value)) {
+                    $data_type = "int";
+                } elseif (is_bool($value)) {
+                    $data_type = "bool";
+                    $value = json_encode($value);
+                } else {
+                    return false;
+                }
+                $result = self::$kv_table->set($k, [
+                    "value" => $value,
+                    "expire" => $v["expire"],
+                    "data_type" => $data_type
+                ]);
+                if ($result === false) return false;
+            }
         }
         return $result;
     }
@@ -76,6 +103,19 @@ class LightCache
         self::checkExpire($key);
         $r = self::$kv_table->get($key, "expire");
         return $r === false ? null : $r - time();
+    }
+
+    /**
+     * @param string $key
+     * @return mixed|null
+     * @throws ZMException
+     * @since 2.4.3
+     */
+    public static function getExpireTS(string $key) {
+        if (self::$kv_table === null) throw new ZMException("not initialized LightCache");
+        self::checkExpire($key);
+        $r = self::$kv_table->get($key, "expire");
+        return $r === false ? null : $r;
     }
 
     /**
@@ -206,6 +246,10 @@ class LightCache
      * @throws Exception
      */
     public static function savePersistence() {
+        if (server()->worker_id !== MAIN_WORKER) {
+            ProcessManager::sendActionToWorker(MAIN_WORKER, "save_persistence", []);
+            return;
+        }
         $dispatcher = new EventDispatcher(OnSave::class);
         $dispatcher->dispatchEvents();
 
@@ -220,6 +264,25 @@ class LightCache
             }
             file_put_contents(self::$config["persistence_path"], json_encode($r, 64 | 128 | 256));
         }
+
+        $obj = Framework::loadFrameworkState();
+        $obj["expiring_light_cache"] = [];
+        $del = [];
+        foreach (self::$kv_table as $k => $v) {
+            if ($v["expire"] <= time() && $v["expire"] >= 0) {
+                $del[] = $k;
+                continue;
+            } elseif ($v["expire"] > time()) {
+                $obj["expiring_light_cache"][$k] = [
+                    "expire" => $v["expire"],
+                    "value" => self::parseGet($v)
+                ];
+            }
+        }
+        foreach ($del as $v) {
+            self::unset($v);
+        }
+        Framework::saveFrameworkState($obj);
         Console::verbose("Saved.");
     }
 

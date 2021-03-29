@@ -43,6 +43,7 @@
 | `worker_num`            | Worker 工作进程数                                            | 运行框架的主机 CPU 核心数           |
 | `dispatch_mode`         | 数据包分发策略，见 [文档](https://wiki.swoole.com/#/server/setting?id=dispatch_mode) | 2                                   |
 | `max_coroutine`         | 最大协程并发数                                               | 300000                              |
+| `max_wait_time`         | 退出进程时等待协程恢复的最长时间（秒）                       | 5（2.4.3 版本后默认值）             |
 | `task_worker_num`       | TaskWorker 工作进程数                                        | 默认不开启（此参数被注释）          |
 | `task_enable_coroutine` | TaskWorker 工作进程启用协程                                  | 默认不开启（此参数被注释）或 `bool` |
 

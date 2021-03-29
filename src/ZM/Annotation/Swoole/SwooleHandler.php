@@ -12,7 +12,7 @@ use ZM\Annotation\AnnotationBase;
  * Class SwooleHandler
  * @package ZM\Annotation\Swoole
  * @Annotation
- * @Target("METHOD")
+ * @Target("ALL")
  */
 class SwooleHandler extends AnnotationBase
 {

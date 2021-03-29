@@ -35,8 +35,9 @@
         "zhamao/connection-manager": "^1.0"
     },
     "suggest": {
-        "ext-ctype": "*",
-        "ext-mbstring": "*"
+        "ext-ctype": "Use C/C++ extension instead of polyfill will be more efficient",
+        "ext-mbstring": "Use C/C++ extension instead of polyfill will be more efficient",
+        "league/climate": "Display columns and status in terminal"
     },
     "autoload": {
         "psr-4": {

@@ -19,8 +19,8 @@ use ZM\Command\SystemdCommand;
 
 class ConsoleApplication extends Application
 {
-    const VERSION_ID = 402;
-    const VERSION = "2.4.2";
+    const VERSION_ID = 403;
+    const VERSION = "2.4.3";
 
     public function __construct(string $name = 'UNKNOWN') {
         define("ZM_VERSION_ID", self::VERSION_ID);
@@ -72,13 +72,6 @@ class ConsoleApplication extends Application
         if (!empty($with_default_cmd)) {
             $this->setDefaultCommand($with_default_cmd);
         }
-        /*
-        $command_register = ZMConfig::get("global", "command_register_class") ?? [];
-        foreach ($command_register as $v) {
-            $obj = new $v();
-            if (!($obj instanceof Command)) throw new TypeError("Command register class must be extended by Symfony\\Component\\Console\\Command\\Command");
-            $this->add($obj);
-        }*/
         return $this;
     }
 

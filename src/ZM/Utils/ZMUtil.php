@@ -27,15 +27,13 @@ class ZMUtil
                 Process::kill(zm_atomic("_#worker_" . $i)->get(), SIGUSR1);
         }
         server()->shutdown();
-        server()->stop();
     }
 
     /**
      * @throws Exception
      */
     public static function reload() {
-        zm_atomic("_int_is_reload")->set(1);
-        system("kill -INT " . intval(server()->master_pid));
+        Process::kill(server()->master_pid, SIGUSR1);
     }
 
     public static function getModInstance($class) {
@@ -45,11 +43,6 @@ class ZMUtil
         } else {
             return ZMBuf::$instance[$class];
         }
-    }
-
-    public static function sendActionToWorker($target_id, $action, $data) {
-        Console::verbose($action . ": " . $data);
-        server()->sendMessage(json_encode(["action" => $action, "data" => $data]), $target_id);
     }
 
     /**

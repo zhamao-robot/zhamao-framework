@@ -12,7 +12,6 @@ use ZM\Annotation\Swoole\OnSetup;
 use ZM\Config\ZMConfig;
 use ZM\ConnectionManager\ManagerGM;
 use ZM\Console\TermColor;
-use ZM\Event\ServerEventHandler;
 use ZM\Store\LightCache;
 use ZM\Store\LightCacheInside;
 use ZM\Store\Lock\SpinLock;
@@ -97,6 +96,9 @@ class Framework
             $add_port = ZMConfig::get("global", "remote_terminal")["status"] ?? false;
 
             $this->parseCliArgs(self::$argv, $add_port);
+            if (!isset($this->server_set["max_wait_time"])) {
+                $this->server_set["max_wait_time"] = 5;
+            }
             $worker = $this->server_set["worker_num"] ?? swoole_cpu_num();
             define("ZM_WORKER_NUM", $worker);
             ZMAtomic::init();
@@ -286,6 +288,7 @@ class Framework
         self::$loaded_files = get_included_files();
         self::$server->start();
         zm_atomic("server_is_stopped")->set(1);
+        Console::log("zhamao-framework is stopped.");
     }
 
     /**
@@ -294,13 +297,23 @@ class Framework
      * @throws ReflectionException
      */
     private function registerServerEvents() {
-        $all_event_class = ZMConfig::get("global", "server_event_handler_class") ?? [];
-        if (!in_array(ServerEventHandler::class, $all_event_class)) {
-            $all_event_class[] = ServerEventHandler::class;
-        }
         $event_list = [];
+        $reader = new AnnotationReader();
+
+        $all = getAllClasses(FRAMEWORK_ROOT_DIR . "/src/ZM/Event/SwooleEvent/", "ZM\\Event\\SwooleEvent");
+        foreach ($all as $v) {
+            $class = new $v();
+            $reflection_class = new ReflectionClass($class);
+            $anno_class = $reader->getClassAnnotation($reflection_class, SwooleHandler::class);
+            if ($anno_class !== null) { // 类名形式的注解
+                $anno_class->class = $v;
+                $anno_class->method = "onCall";
+                $event_list[strtolower($anno_class->event)] = $anno_class;
+            }
+        }
+
+        $all_event_class = ZMConfig::get("global", "server_event_handler_class") ?? [];
         foreach ($all_event_class as $v) {
-            $reader = new AnnotationReader();
             $reflection_class = new ReflectionClass($v);
             $methods = $reflection_class->getMethods(ReflectionMethod::IS_PUBLIC);
             foreach ($methods as $vs) {
@@ -338,81 +351,69 @@ class Framework
         global $terminal_id;
         $terminal_id = uuidgen();
         foreach ($args as $x => $y) {
-            switch ($x) {
-                case 'worker-num':
-                    if ($y) {
+            if ($y) {
+                switch ($x) {
+                    case 'worker-num':
                         if (intval($y) >= 1 && intval($y) <= 1024) {
                             $this->server_set["worker_num"] = intval($y);
                         } else {
-                            Console::warning("Invalid worker num! Turn to default value (".($this->server_set["worker_num"] ?? swoole_cpu_num()).")");
+                            Console::warning("Invalid worker num! Turn to default value (" . ($this->server_set["worker_num"] ?? swoole_cpu_num()) . ")");
                         }
-                    }
-                    break;
-                case 'task-worker-num':
-                    if ($y) {
+                        break;
+                    case 'task-worker-num':
                         if (intval($y) >= 1 && intval($y) <= 1024) {
                             $this->server_set["task_worker_num"] = intval($y);
                             $this->server_set["task_enable_coroutine"] = true;
                         } else {
                             Console::warning("Invalid worker num! Turn to default value (0)");
                         }
-                    }
-                    break;
-                case 'disable-coroutine':
-                    if ($y) {
+                        break;
+                    case 'disable-coroutine':
                         $coroutine_mode = false;
-                    }
-                    break;
-                case 'debug-mode':
-                    if ($y || ZMConfig::get("global", "debug_mode")) {
+                        break;
+                    case 'debug-mode':
                         $coroutine_mode = false;
                         $terminal_id = null;
                         Console::warning("You are in debug mode, do not use in production!");
-                    }
-                    break;
-                case 'daemon':
-                    if ($y) {
+                        break;
+                    case 'daemon':
                         $this->server_set["daemonize"] = 1;
                         Console::$theme = "no-color";
                         Console::log("已启用守护进程，输出重定向到 " . $this->server_set["log_file"]);
                         $terminal_id = null;
-                    }
-                    break;
-                case 'disable-console-input':
-                case 'no-interaction':
-                    if ($y) $terminal_id = null;
-                    break;
-                case 'log-error':
-                    if ($y) Console::setLevel(0);
-                    break;
-                case 'log-warning':
-                    if ($y) Console::setLevel(1);
-                    break;
-                case 'log-info':
-                    if ($y) Console::setLevel(2);
-                    break;
-                case 'log-verbose':
-                case 'verbose':
-                    if ($y) Console::setLevel(3);
-                    break;
-                case 'log-debug':
-                    if ($y) Console::setLevel(4);
-                    break;
-                case 'log-theme':
-                    if ($y !== null) {
+                        break;
+                    case 'disable-console-input':
+                    case 'no-interaction':
+                        $terminal_id = null;
+                        break;
+                    case 'log-error':
+                        Console::setLevel(0);
+                        break;
+                    case 'log-warning':
+                        Console::setLevel(1);
+                        break;
+                    case 'log-info':
+                        Console::setLevel(2);
+                        break;
+                    case 'log-verbose':
+                    case 'verbose':
+                        Console::setLevel(3);
+                        break;
+                    case 'log-debug':
+                        Console::setLevel(4);
+                        break;
+                    case 'log-theme':
                         Console::$theme = $y;
-                    }
-                    break;
-                case 'remote-terminal':
-                    if ($y) {
+                        break;
+                    case 'remote-terminal':
                         $add_port = true;
-                    }
-                    break;
-                case 'show-php-ver':
-                default:
-                    //Console::info("Calculating ".$x);
-                    //dump($y);
-                    break;
+                        break;
+                    case 'show-php-ver':
+                    default:
+                        //Console::info("Calculating ".$x);
+                        //dump($y);
+                        break;
+                }
             }
         }
         if ($coroutine_mode) Runtime::enableCoroutine(true, SWOOLE_HOOK_ALL);
@@ -507,5 +508,16 @@ class Framework
 
     public static function getTtyWidth(): string {
         return explode(" ", trim(exec("stty size")))[1];
+    }
+
+    public static function loadFrameworkState() {
+        if (!file_exists(DataProvider::getDataFolder() . ".state.json")) return [];
+        $r = json_decode(file_get_contents(DataProvider::getDataFolder() . ".state.json"), true);
+        if ($r === null) $r = [];
+        return $r;
+    }
+
+    public static function saveFrameworkState($data) {
+        return file_put_contents(DataProvider::getDataFolder() . ".state.json", json_encode($data, 64 | 128 | 256));
     }
 }

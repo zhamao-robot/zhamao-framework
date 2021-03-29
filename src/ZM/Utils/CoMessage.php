@@ -68,7 +68,7 @@ class CoMessage
             LightCacheInside::set("wait_api", "wait_api", $all);
             SpinLock::unlock("wait_api");
             if ($all[$last]["worker_id"] != server()->worker_id) {
-                ZMUtil::sendActionToWorker($all[$last]["worker_id"], "resume_ws_message", $all[$last]);
+                ProcessManager::sendActionToWorker($all[$last]["worker_id"], "resume_ws_message", $all[$last]);
             } else {
                 Co::resume($all[$last]["coroutine"]);
             }

@@ -20,7 +20,7 @@ class ProcessManager
         $server = server();
         switch ($data["action"] ?? '') {
             case 'add_short_command':
-                Console::verbose("Adding short command ".$data["data"][0]);
+                Console::verbose("Adding short command " . $data["data"][0]);
                 $obj = new CQCommand();
                 $obj->method = quick_reply_closure($data["data"][1]);
                 $obj->match = $data["data"][0];
@@ -111,11 +111,11 @@ class ProcessManager
 
     public static function resumeAllWorkerCoroutines() {
         if (server()->worker_id === -1) {
-            Console::warning("Cannot call '".__FUNCTION__."' in non-worker process!");
+            Console::warning("Cannot call '" . __FUNCTION__ . "' in non-worker process!");
             return;
         }
         foreach ((LightCacheInside::get("wait_api", "wait_api") ?? []) as $k => $v) {
-            if (($v["result"] ?? false) === null && isset($v["coroutine"], $v["worker_id"])) {
+            if (isset($v["coroutine"], $v["worker_id"])) {
                 if (server()->worker_id == $v["worker_id"]) Co::resume($v["coroutine"]);
             }
         }

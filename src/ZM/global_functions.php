@@ -285,6 +285,10 @@ function zm_timer_tick($ms, callable $callable) {
     }
 }
 
+function zm_go(callable $callable) {
+    call_with_catch($callable);
+}
+
 function zm_data_hash($v): string {
     return md5($v["user_id"] . "^" . $v["self_id"] . "^" . $v["message_type"] . "^" . ($v[$v["message_type"] . "_id"] ?? $v["user_id"]));
 }
