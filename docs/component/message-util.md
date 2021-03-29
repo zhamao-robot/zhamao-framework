@@ -87,3 +87,29 @@ MessageUtil::splitCommand("我有   三个空格"); // ["我有","三个空格"]
 
 返回：`\ZM\Entity\MatchObject` 对象，含有匹配成功与否，匹配到的注解对象，匹配到的分割词等，见 []
 
+### addShortCommand()
+
+快速添加一条静态消息回复命令。
+
+定义：`addShortCommand($command, string $reply)`
+
+参数 `$command` 为问的内容，如 `炸毛不聪明`。
+
+参数 `$reply` 为回复的内容，如 `其实还是很聪明的！`。
+
+这个命令推荐在 `@OnStart` 注解下使用，可以用这个来做一个动态的词库，从文件加载后使用。
+
+```php
+/**
+ * @OnStart()
+ */
+public function onStart() {
+    MessageUtil::addShortCommand("炸毛不聪明", "其实还是很聪明的！");
+}
+```
+
+<chat-box>
+) 炸毛不聪明
+( 其实还是很聪明的！
+</chat-box>
+

@@ -23,6 +23,7 @@
         "php": ">=7.2",
         "ext-json": "*",
         "ext-posix": "*",
+        "ext-pcntl": "*",
         "doctrine/annotations": "~1.10",
         "psy/psysh": "@stable",
         "symfony/polyfill-ctype": "^1.20",

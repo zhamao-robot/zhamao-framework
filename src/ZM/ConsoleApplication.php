@@ -19,7 +19,7 @@ use ZM\Command\SystemdCommand;
 
 class ConsoleApplication extends Application
 {
-    const VERSION_ID = 404;
+    const VERSION_ID = 405;
     const VERSION = "2.4.4";
 
     public function __construct(string $name = 'UNKNOWN') {

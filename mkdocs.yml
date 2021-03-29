@@ -78,6 +78,7 @@ nav:
           - CQ 码（多媒体消息）: component/cqcode.md
           - 机器人消息处理: component/message-util.md
           - Token 验证: component/access-token.md
+          - 图灵机器人 API: component/turing-api.md
       - 存储:
           - LightCache 轻量缓存: component/light-cache.md
           - MySQL 数据库: component/mysql.md
@@ -106,7 +107,12 @@ nav:
       - TaskWorker 提高并发: advanced/task-worker.md
       - 开发实战教程:
           - 编写管理员才能触发的功能: advanced/example/admin.md
-  - FAQ: FAQ.md
+  - FAQ:
+      - FAQ: faq/FAQ.md
+      - 启动时报错 Address already in use: faq/address-already-in-use.md
+      - 出现 deadlock 字样: faq/display-deadlock.md
+      - 使用 LightCache 关闭时无法正常保存持久化: faq/light-cache-wrong.md
+      - CQBefore 过滤不了 waitMessage: faq/wait-message-cqbefore.md
   - 更新日志:
       - 更新日志（v2）: update/v2.md
       - 更新日志（v1）: update/v1.md

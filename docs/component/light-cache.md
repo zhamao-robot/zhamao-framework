@@ -118,7 +118,7 @@ dump(LightCache::getExpire("test")); // 返回 10
 
 ### LightCache::getExpireTS()
 
-获取存储项要过期的时间戳。
+获取存储项要过期的时间戳。（2.4.3 起可用）
 
 定义：`LightCache::getExpireTS(string $key)`
 
@@ -135,7 +135,7 @@ dump(LightCache::getExpire("test")); // 返回 null
 获取轻量缓存使用的总空间大小（字节）
 
 ```php
-LightCache::getMemoryUsage());
+LightCache::getMemoryUsage();
 ```
 
 轻量缓存的内存手工计算方式：(Table 结构体长度` + `KEY 长度 64 字节 + `$size`) * (1 + `$conflict_proportion`) * 列尺寸。

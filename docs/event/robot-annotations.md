@@ -333,6 +333,8 @@ TODO：先放着，有时间再更。
 	在设置了 `level` 参数后，如果设置了多个 `@CQBefore` 监听事件函数，更高 `level` 的事件函数返回了 `false`，则低 `level` 的绑定函数不会执行，所有 `@CQMessage` 绑定的事件也不会执行。
 	
 	你也可以使用 `@CQBefore` 做一些消息的转发和过滤。比如你想去除用户发来的文字中的 emoji、图片等 CQ 码，只保留文本。
+	
+	使用 `ctx()->waitMessage()` 时等待用户输入下一条消息功能和 CQBefore 配合过滤消息时需注意，见 [FAQ - CQBefore 过滤不了 waitMessage](/FAQ/wait-message-cqbefore/)
 
 ## CQAfter()
 
