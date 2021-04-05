@@ -25,6 +25,6 @@ class DaemonStatusCommand extends DaemonCommand
             if (isset($stdout[count($stdout) - $i]))
                 echo $stdout[count($stdout) - $i] . PHP_EOL;
         }
-        return Command::SUCCESS;
+        return 0;
     }
 }

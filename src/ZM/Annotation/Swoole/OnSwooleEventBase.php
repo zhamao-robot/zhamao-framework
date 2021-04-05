@@ -43,7 +43,7 @@ abstract class OnSwooleEventBase extends AnnotationBase implements Level, Rule
     /**
      * @param int $level
      */
-    public function setLevel(int $level) {
+    public function setLevel($level) {
         $this->level = $level;
     }
 }

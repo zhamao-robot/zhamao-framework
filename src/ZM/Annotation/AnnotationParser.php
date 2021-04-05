@@ -9,7 +9,12 @@ use ZM\Console\Console;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
-use ZM\Annotation\Http\{HandleAfter, HandleBefore, HandleException, Middleware, MiddlewareClass, RequestMapping};
+use ZM\Annotation\Http\HandleAfter;
+use ZM\Annotation\Http\HandleBefore;
+use ZM\Annotation\Http\HandleException;
+use ZM\Annotation\Http\Middleware;
+use ZM\Annotation\Http\MiddlewareClass;
+use ZM\Annotation\Http\RequestMapping;
 use ZM\Annotation\Interfaces\Level;
 use ZM\Annotation\Module\Closed;
 use ZM\Http\RouteManager;
@@ -125,7 +130,7 @@ class AnnotationParser
         Console::debug("解析注解完毕！");
     }
 
-    public function generateAnnotationEvents(): array {
+    public function generateAnnotationEvents() {
         $o = [];
         foreach ($this->annotation_map as $module => $obj) {
             foreach (($obj["class_annotations"] ?? []) as $class_annotation) {

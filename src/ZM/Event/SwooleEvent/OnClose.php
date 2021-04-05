@@ -28,9 +28,9 @@ class OnClose implements SwooleEvent
     /** @noinspection PhpUnreachableStatementInspection */
     public function onCall($server, $fd) {
         unset(Context::$context[Co::getCid()]);
+        Console::debug("Calling Swoole \"close\" event from fd=" . $fd);
         $conn = ManagerGM::get($fd);
         if ($conn === null) return;
-        Console::debug("Calling Swoole \"close\" event from fd=" . $fd);
         set_coroutine_params(["server" => $server, "connection" => $conn, "fd" => $fd]);
 
         $dispatcher1 = new EventDispatcher(OnCloseEvent::class);

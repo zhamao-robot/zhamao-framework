@@ -20,7 +20,7 @@ class CheckConfigCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int {
         if (LOAD_MODE !== 1) {
             $output->writeln("<error>仅限在Composer依赖模式中使用此命令！</error>");
-            return Command::FAILURE;
+            return 1;
         }
         $current_cfg = getcwd() . "/config/";
         $remote_cfg = include_once FRAMEWORK_ROOT_DIR . "/config/global.php";
@@ -42,7 +42,7 @@ class CheckConfigCommand extends Command
             $output->writeln("<info>配置文件暂无更新！</info>");
         }
 
-        return Command::SUCCESS;
+        return 0;
     }
 
     /**

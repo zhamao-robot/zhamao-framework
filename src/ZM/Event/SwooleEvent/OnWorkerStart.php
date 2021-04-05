@@ -59,7 +59,7 @@ class OnWorkerStart implements SwooleEvent
             try {
                 register_shutdown_function(function () use ($server) {
                     $error = error_get_last();
-                    if ($error["type"] != 0) {
+                    if (($error["type"] ?? -1) != 0) {
                         Console::error("Internal fatal error: " . $error["message"] . " at " . $error["file"] . "({$error["line"]})");
                     }
                     //DataProvider::saveBuffer();

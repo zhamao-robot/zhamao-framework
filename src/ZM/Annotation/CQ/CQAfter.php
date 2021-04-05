@@ -26,7 +26,7 @@ class CQAfter extends AnnotationBase implements Level
     /**
      * @return mixed
      */
-    public function getLevel(): int {
+    public function getLevel() {
         return $this->level;
     }
 

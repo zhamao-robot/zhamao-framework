@@ -21,6 +21,6 @@ class DaemonStopCommand extends DaemonCommand
         system("kill -INT " . intval($this->daemon_file["pid"]));
         unlink(DataProvider::getWorkingDir() . "/.daemon_pid");
         $output->writeln("<info>成功停止！</info>");
-        return Command::SUCCESS;
+        return 0;
     }
 }

@@ -24,25 +24,30 @@
         "ext-json": "*",
         "ext-posix": "*",
         "ext-pcntl": "*",
-        "doctrine/annotations": "~1.10",
+        "doctrine/annotations": "~1.12 || ~1.4.0",
         "psy/psysh": "@stable",
-        "symfony/polyfill-ctype": "^1.20",
-        "symfony/polyfill-mbstring": "^1.20",
-        "symfony/console": "^5.1",
-        "symfony/routing": "^5.1",
+        "symfony/polyfill-ctype": "^1.19",
+        "symfony/polyfill-mbstring": "^1.19",
+        "symfony/console": "~5.0 || ~4.0 || ~3.0",
+        "symfony/routing": "~5.0 || ~4.0 || ~3.0",
         "zhamao/console": "^1.0.10",
         "zhamao/config": "^1.0",
         "zhamao/request": "^1.1",
-        "zhamao/connection-manager": "^1.0"
+        "zhamao/connection-manager": "^1.0",
+        "league/climate": "^3.7"
     },
     "suggest": {
         "ext-ctype": "Use C/C++ extension instead of polyfill will be more efficient",
         "ext-mbstring": "Use C/C++ extension instead of polyfill will be more efficient",
+        "ext-pdo_mysql": "If you use mysql in framework, you will need this extension",
+        "ext-redis": "If you use Redis in framework, you will need this extension",
         "league/climate": "Display columns and status in terminal"
     },
     "autoload": {
         "psr-4": {
-            "ZM\\": "src/ZM"
+            "ZM\\": "src/ZM",
+            "Module\\": "src/Module",
+            "Custom\\": "src/Custom"
         },
         "files": [
             "src/ZM/global_functions.php"

@@ -13,3 +13,9 @@ composer.lock
 .daemon_pid
 /runtime/
 /tmp/
+/ext/go-cqhttp/data/
+/ext/go-cqhttp/logs/
+/ext/go-cqhttp/config.hjson
+/ext/go-cqhttp/device.json
+/ext/go-cqhttp/go-cqhttp
+/ext/go-cqhttp/session.token

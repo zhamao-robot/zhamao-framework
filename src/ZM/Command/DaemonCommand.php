@@ -26,6 +26,6 @@ abstract class DaemonCommand extends Command
             die();
         }
         $this->daemon_file = $file;
-        return Command::SUCCESS;
+        return 0;
     }
 }

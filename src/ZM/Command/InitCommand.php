@@ -83,10 +83,10 @@ class InitCommand extends Command
                 echo PHP_EOL;
             } else {
                 echo("Error occurred. Please check your updates.\n");
-                return Command::FAILURE;
+                return 1;
             }
             $output->writeln("<info>Done!</info>");
-            return Command::SUCCESS;
+            return 0;
         } elseif (LOAD_MODE === 2) { //从phar启动的框架包，初始化的模式
             $phar_link = new Phar(__DIR__);
             $current_dir = pathinfo($phar_link->getPath())["dirname"];
@@ -104,7 +104,7 @@ class InitCommand extends Command
             }
         }
         $output->writeln("initialization must be started with composer-project mode!");
-        return Command::FAILURE;
+        return 1;
     }
 
     private function getExtractFiles(): array {

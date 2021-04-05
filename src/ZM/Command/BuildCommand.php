@@ -32,23 +32,23 @@ class BuildCommand extends Command
         if (mb_strpos($target_dir, "../")) $target_dir = realpath($target_dir);
         if ($target_dir === false) {
             $output->writeln(TermColor::color8(31) . "Error: No such file or directory (" . __DIR__ . '/../../../resources/' . ")" . TermColor::RESET);
-            return Command::FAILURE;
+            return 1;
         }
         $output->writeln("Target: " . $target_dir . " , Version: " . ($version = json_decode(file_get_contents(__DIR__ . "/../../../composer.json"), true)["version"]));
         if (mb_substr($target_dir, -1, 1) !== '/') $target_dir .= "/";
         if (ini_get('phar.readonly') == 1) {
             $output->writeln(TermColor::color8(31) . "You need to set \"phar.readonly\" to \"Off\"!");
             $output->writeln(TermColor::color8(31) . "See: https://stackoverflow.com/questions/34667606/cant-enable-phar-writing");
-            return Command::FAILURE;
+            return 1;
         }
         if (!is_dir($target_dir)) {
             $output->writeln(TermColor::color8(31) . "Error: No such file or directory ($target_dir)" . TermColor::RESET);
-            return Command::FAILURE;
+            return 1;
         }
         $filename = "server.phar";
         $this->build($target_dir, $filename);
 
-        return Command::SUCCESS;
+        return 0;
     }
 
     private function build($target_dir, $filename) {

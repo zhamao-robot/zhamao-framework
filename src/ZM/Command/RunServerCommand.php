@@ -40,10 +40,10 @@ class RunServerCommand extends Command
         if (($opt = $input->getOption("env")) !== null) {
             if (!in_array($opt, ["production", "staging", "development", ""])) {
                 $output->writeln("<error> \"--env\" option only accept production, development, staging and [empty] ! </error>");
-                return Command::FAILURE;
+                return 1;
             }
         }
         (new Framework($input->getOptions()))->start();
-        return Command::SUCCESS;
+        return 0;
     }
 }

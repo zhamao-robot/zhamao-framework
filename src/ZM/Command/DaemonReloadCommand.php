@@ -19,6 +19,6 @@ class DaemonReloadCommand extends DaemonCommand
         parent::execute($input, $output);
         system("kill -USR1 " . intval($this->daemon_file["pid"]));
         $output->writeln("<info>成功重载！</info>");
-        return Command::SUCCESS;
+        return 0;
     }
 }
