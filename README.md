@@ -43,7 +43,16 @@ public function index() {
 ```
 
 ## 开始
-框架首先需要部署环境，可以参考下方文档中部署环境和框架的方法进行。
+如果你是初学者，可以直接使用以下脚本部署 PHP 环境和安装框架的脚手架：
+```bash
+# 新建一个自己喜欢名字的文件夹，运行一键安装脚本
+mkdir zhamao-app/
+cd zhamao-app/
+bash -c "$(curl -fsSL https://api.zhamao.xin/go.sh)"
+
+# 启动
+runtime/php vendor/bin/start server
+```
 
 ## 文档（v2 版本）
 查看文档（国内自建）：<https://docs-v2.zhamao.xin/>
@@ -62,6 +71,7 @@ public function index() {
 - 自带 MySQL、Redis 等数据库连接池等数据库连接方案
 - 本身为 HTTP 服务器、WebSocket 服务器，可以构建属于自己的 HTTP API 接口
 - 静态文件服务器，可将前端合并到一起
+- 自带 PHP + Swoole 环境，无需手动编译安装，by [crazywhalecc/static-php-cli](https://github.com/crazywhalecc/static-php-cli)
 
 ## 从 v1 升级
 炸毛框架 v2 相对 v1 版本改动了不少内容，其中包括框架底层机制、注解事件分发、调试、命名空间等变化，详情可查看上方文档。
