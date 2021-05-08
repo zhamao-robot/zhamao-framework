@@ -7,6 +7,8 @@ namespace ZM;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Error;
 use Exception;
+use Swoole\Event;
+use Swoole\Process;
 use Swoole\Server\Port;
 use ZM\Annotation\Swoole\OnSetup;
 use ZM\Config\ZMConfig;
@@ -109,6 +111,7 @@ class Framework
             $out["environment"] = $args["env"] === null ? "default" : $args["env"];
             $out["log_level"] = Console::getLevel();
             $out["version"] = ZM_VERSION . (LOAD_MODE == 0 ? (" (build " . ZM_VERSION_ID . ")") : "");
+            $out["master_pid"] = posix_getpid();
             if (APP_VERSION !== "unknown") $out["app_version"] = APP_VERSION;
             if (isset($this->server_set["task_worker_num"])) {
                 $out["task_worker"] = $this->server_set["task_worker_num"];
@@ -135,7 +138,9 @@ class Framework
 
             $out["working_dir"] = DataProvider::getWorkingDir();
             self::printProps($out, $tty_width, $args["log-theme"] === null);
-
+            if ($args["preview"]) {
+                exit();
+            }
             self::$server = new Server(ZMConfig::get("global", "host"), ZMConfig::get("global", "port"));
 
             if ($add_port) {
@@ -297,47 +302,88 @@ class Framework
      * @throws ReflectionException
      */
     private function registerServerEvents() {
-        $event_list = [];
         $reader = new AnnotationReader();
-
+        global $master_events;
+        $master_events = [
+            "setup" => [],
+            "event" => []
+        ];
         $all = getAllClasses(FRAMEWORK_ROOT_DIR . "/src/ZM/Event/SwooleEvent/", "ZM\\Event\\SwooleEvent");
         foreach ($all as $v) {
             $class = new $v();
             $reflection_class = new ReflectionClass($class);
             $anno_class = $reader->getClassAnnotation($reflection_class, SwooleHandler::class);
             if ($anno_class !== null) { // 类名形式的注解
-                $anno_class->class = $v;
-                $anno_class->method = "onCall";
-                $event_list[strtolower($anno_class->event)] = $anno_class;
+                $master_events["event"][]=[
+                    "class" => $v,
+                    "method" => "onCall",
+                    "event" => $anno_class->event
+                ];
             }
         }
 
-        $all_event_class = ZMConfig::get("global", "server_event_handler_class") ?? [];
-        foreach ($all_event_class as $v) {
-            $reflection_class = new ReflectionClass($v);
-            $methods = $reflection_class->getMethods(ReflectionMethod::IS_PUBLIC);
-            foreach ($methods as $vs) {
-                $method_annotations = $reader->getMethodAnnotations($vs);
-                if ($method_annotations != []) {
-                    $annotation = $method_annotations[0];
-                    if ($annotation instanceof SwooleHandler) {
-                        $annotation->class = $v;
-                        $annotation->method = $vs->getName();
-                        $event_list[strtolower($annotation->event)] = $annotation;
-                    } elseif ($annotation instanceof OnSetup) {
-                        $annotation->class = $v;
-                        $annotation->method = $vs->getName();
-                        $c = new $v();
-                        $m = $annotation->method;
-                        $c->$m();
+        $base_path = DataProvider::getWorkingDir();
+        $scan_paths = [];
+        $composer = json_decode(file_get_contents(DataProvider::getWorkingDir() . "/composer.json"), true);
+        foreach (($composer["autoload"]["psr-4"] ?? []) as $k => $v) {
+            if (is_dir($base_path."/".$v) && !in_array($v, $composer["extra"]["exclude_annotate"] ?? [])) {
+                $scan_paths[trim($k, "\\")]=realpath($base_path."/".$v);
+            }
+        }
+        $all_event_class = [];
+        foreach($scan_paths as $namespace => $autoload_path) {
+            $all_event_class = array_merge($all_event_class, getAllClasses($autoload_path."/", $namespace));
+        }
+        $process = new Process(function(Process $process) use ($all_event_class) {
+            $reader = new AnnotationReader();
+            $event_list = [];
+            $setup_list = [];
+            foreach ($all_event_class as $v) {
+                $reflection_class = new ReflectionClass($v);
+                $methods = $reflection_class->getMethods(ReflectionMethod::IS_PUBLIC);
+                foreach ($methods as $vs) {
+                    $method_annotations = $reader->getMethodAnnotations($vs);
+                    if ($method_annotations != []) {
+                        $annotation = $method_annotations[0];
+                        if ($annotation instanceof SwooleHandler) {
+                            $event_list[]=[
+                                "class" => $v,
+                                "method" => $vs->getName(),
+                                "event" => $annotation->event
+                            ];
+                        } elseif ($annotation instanceof OnSetup) {
+                            $setup_list[]=[
+                                "class" => $v,
+                                "method" => $vs->getName()
+                            ];
+                        }
                     }
                 }
             }
+            $sock = $process->exportSocket();
+            $sock->send(json_encode(["setup" => $setup_list, "event" => $event_list]));
+        });
+        $process->start();
+        go(function() use ($process) {
+            $socket = $process->exportSocket();
+            global $master_events;
+            $obj = json_decode($socket->recv(), true);
+            if ($obj["setup"] != []) $master_events["setup"] = array_merge($master_events["setup"], $obj["setup"]);
+            if ($obj["event"] != []) $master_events["event"] = array_merge($master_events["event"], $obj["event"]);
+        });
+        Process::wait(true);
+        Event::wait();
+
+        foreach($master_events["setup"] as $k => $v) {
+            $c = ZMUtil::getModInstance($v["class"]);
+            $method = $v["method"];
+            $c->$method();
         }
-        foreach ($event_list as $k => $v) {
-            $c = ZMUtil::getModInstance($v->class);
-            $m = $v->method;
-            self::$server->on($k, function (...$param) use ($c, $m) { $c->$m(...$param); });
+
+        foreach ($master_events["event"] as $k => $v) {
+            self::$server->on($v["event"], function (...$param) use ($k, $v) {
+                ZMUtil::getModInstance($v["class"])->{$v["method"]}(...$param);
+            });
         }
     }
 
@@ -374,7 +420,8 @@ class Framework
                     case 'debug-mode':
                         $coroutine_mode = false;
                         $terminal_id = null;
-                        Console::warning("You are in debug mode, do not use in production!");
+                        self::$argv["watch"] = true;
+                        echo ("* You are in debug mode, do not use in production!\n");
                         break;
                     case 'daemon':
                         $this->server_set["daemonize"] = 1;

@@ -31,6 +31,8 @@ class RunServerCommand extends Command
             new InputOption("watch", null, null, "监听 src/ 目录的文件变化并热更新"),
             new InputOption("show-php-ver", null, null, "启动时显示PHP和Swoole版本"),
             new InputOption("env", null, InputOption::VALUE_REQUIRED, "设置环境类型 (production, development, staging)"),
+            new InputOption("disable-safe-exit", null, null, "关闭安全退出（关闭后按CtrlC时直接杀死进程）"),
+            new InputOption("preview", null, null, "只显示参数，不启动服务器")
         ]);
         $this->setDescription("Run zhamao-framework | 启动框架");
         $this->setHelp("直接运行可以启动");

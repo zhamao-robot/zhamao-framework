@@ -33,8 +33,7 @@
         "zhamao/console": "^1.0.10",
         "zhamao/config": "^1.0",
         "zhamao/request": "^1.1",
-        "zhamao/connection-manager": "^1.0",
-        "league/climate": "^3.7"
+        "zhamao/connection-manager": "^1.0"
     },
     "suggest": {
         "ext-ctype": "Use C/C++ extension instead of polyfill will be more efficient",
@@ -45,9 +44,7 @@
     },
     "autoload": {
         "psr-4": {
-            "ZM\\": "src/ZM",
-            "Module\\": "src/Module",
-            "Custom\\": "src/Custom"
+            "ZM\\": "src/ZM"
         },
         "files": [
             "src/ZM/global_functions.php"

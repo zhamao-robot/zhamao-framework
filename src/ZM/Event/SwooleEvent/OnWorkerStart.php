@@ -33,7 +33,6 @@ use ZM\Store\MySQL\SqlPoolStorage;
 use ZM\Store\Redis\ZMRedisPool;
 use ZM\Utils\DataProvider;
 use ZM\Utils\ProcessManager;
-use ZM\Utils\ZMUtil;
 
 /**
  * Class OnWorkerStart
@@ -43,15 +42,19 @@ use ZM\Utils\ZMUtil;
 class OnWorkerStart implements SwooleEvent
 {
     public function onCall(Server $server, $worker_id) {
-        Process::signal(SIGINT, function () use ($worker_id, $server) {
+        if (!Framework::$argv["disable-safe-exit"]) {
+            Process::signal(SIGINT, function () use ($worker_id, $server) {
 
-        });
+            });
+        }
         unset(Context::$context[Coroutine::getCid()]);
         if ($server->taskworker === false) {
-            Process::signal(SIGUSR1, function () use ($worker_id) {
-                Timer::clearAll();
-                ProcessManager::resumeAllWorkerCoroutines();
-            });
+            if (!Framework::$argv["disable-safe-exit"]) {
+                Process::signal(SIGUSR1, function () use ($worker_id) {
+                    Timer::clearAll();
+                    ProcessManager::resumeAllWorkerCoroutines();
+                });
+            }
             zm_atomic("_#worker_" . $worker_id)->set($server->worker_pid);
             if (LightCacheInside::get("wait_api", "wait_api") !== null) {
                 LightCacheInside::unset("wait_api", "wait_api");
@@ -84,7 +87,7 @@ class OnWorkerStart implements SwooleEvent
                     }
                     Console::info("新建SQL连接池中");
                     ob_start();
-                    phpinfo();
+                    phpinfo(); //这个phpinfo是有用的，不能删除
                     $str = ob_get_clean();
                     $str = explode("\n", $str);
                     foreach ($str as $k => $v) {
@@ -130,7 +133,7 @@ class OnWorkerStart implements SwooleEvent
                 $dispatcher->dispatchEvents($server, $worker_id);
                 if ($dispatcher->status === EventDispatcher::STATUS_NORMAL) Console::debug("@OnStart 执行完毕");
                 else Console::warning("@OnStart 执行异常！");
-                Console::success("Worker #" . $worker_id . " 已启动");
+                Console::success("Worker #" . $worker_id . " started");
             } catch (Exception $e) {
                 Console::error("Worker加载出错！停止服务！");
                 Console::error($e->getMessage() . "\n" . $e->getTraceAsString());
@@ -147,7 +150,7 @@ class OnWorkerStart implements SwooleEvent
             try {
                 Framework::$server = $server;
                 $this->loadAnnotations();
-                Console::success("TaskWorker #" . $server->worker_id . " 已启动");
+                Console::success("TaskWorker #" . $server->worker_id . " started");
             } catch (Exception $e) {
                 Console::error("Worker加载出错！停止服务！");
                 Console::error($e->getMessage() . "\n" . $e->getTraceAsString());

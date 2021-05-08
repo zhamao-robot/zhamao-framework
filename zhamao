@@ -1,4 +1,22 @@
-#!/usr/bin/env php
-<?php
-require_once "vendor/autoload.php";
-(new ZM\ConsoleApplication("zhamao-framework"))->initEnv("server")->run();
+#!/bin/sh
+
+if [ -f "$(pwd)/runtime/php" ]; then
+    executable="$(pwd)/runtime/php"
+else
+  which php >/dev/null 2>&1
+	if [ $? -eq 0 ]; then
+	  executable=$(which php)
+	else
+	  echo 'Cannot find any PHP runtime, please use command `./install-runtime.sh` or install PHP manually!'
+	  exit 1
+	fi
+fi
+
+if [ -f "$(pwd)/src/entry.php" ]; then
+  $executable "$(pwd)/src/entry.php" $@
+elif [ -f "$(pwd)/vendor/zhamao/framework/src/entry.php" ]; then
+  $executable "$(pwd)/vendor/zhamao/framework/src/entry.php" $@
+else
+  echo "Cannot find zhamao-framework entry file!"
+  exit 1
+fi

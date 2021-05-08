@@ -6,6 +6,11 @@ if [ "$(uname -m)" = "x86_64" ]; then
     arch_type="amd64"
 elif [ "$(uname -m)" = "i386" ]; then
     arch_type="386"
+elif [ "$(uname -m)" = "aarch64" ]; then
+    arch_type="arm64"
+else
+    echo "Not supported architecture: $(uname -m)"
+    exit 1
 fi
 
 aas=$(uname -s | tr 'A-Z' 'a-z')

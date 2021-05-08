@@ -12,6 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class InitCommand extends Command
 {
     private $extract_files = [
+        "/zhamao",
         "/config/global.php",
         "/.gitignore",
         "/config/file_header.json",
@@ -50,11 +51,6 @@ class InitCommand extends Command
                     echo "Skipping " . $file . " , file exists." . PHP_EOL;
                 }
             }
-            echo "Copying ./zhamao\n";
-            file_put_contents(
-                $base_path."/zhamao",
-                "#!/usr/bin/env php\n<?php require_once \"vendor/autoload.php\";(new ZM\ConsoleApplication(\"zhamao-framework\"))->initEnv(\"server\")->run();"
-            );
             chmod($base_path."/zhamao", 0755);
             $autoload = [
                 "psr-4" => [

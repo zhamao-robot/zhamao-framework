@@ -11,11 +11,11 @@ $config['port'] = 20001;
 /** 框架开到公网或外部的HTTP访问链接，通过 DataProvider::getFrameworkLink() 获取 */
 $config['http_reverse_link'] = "http://127.0.0.1:" . $config['port'];
 
-/** 框架是否启动debug模式 */
+/** 框架是否启动debug模式，当debug模式为true时，启用热更新（需要安装inotify扩展） */
 $config['debug_mode'] = false;
 
 /** 存放框架内文件数据的目录 */
-$config['zm_data'] = realpath(__DIR__ . "/../") . '/zm_data/';
+$config['zm_data'] = realpath(WORKING_DIR) . '/zm_data/';
 
 /** 存放各个模块配置文件的目录 */
 $config['config_dir'] = $config['zm_data'] . 'config/';
@@ -105,11 +105,6 @@ $config['static_file_server'] = [
     'document_index' => [
         'index.html'
     ]
-];
-
-/** 注册 Swoole Server 事件注解的类列表 */
-$config['server_event_handler_class'] = [
-    // 这里添加例如 \ZM\Event\ServerEventHandler::class 这样的启动注解类
 ];
 
 /** 机器人解析模块，关闭后无法使用如CQCommand等注解(上面的modules即将废弃) */

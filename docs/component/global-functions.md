@@ -4,6 +4,8 @@
 
 ## getClassPath()
 
+[源码](https://github.com/zhamao-robot/zhamao-framework/blob/master/src/ZM/global_functions.php#L24)
+
 根据加载的用户编写的代码类名来获取类所在的文件路径。
 
 === "src/Module/Example/Hello.php"
@@ -38,6 +40,8 @@
 
 ## explodeMsg()
 
+[源码](https://github.com/zhamao-robot/zhamao-framework/blob/master/src/ZM/global_functions.php#L39)
+
 切割字符串的函数，支持多空格，换行，tab。
 
 定义：`explodeMsg($msg, $ban_comma = false)`
@@ -49,6 +53,8 @@ echo json_encode($s, 128|256); // ["你好啊","你好你好","我还有多个�
 
 ## unicode_decode()
 
+[源码](https://github.com/zhamao-robot/zhamao-framework/blob/master/src/ZM/global_functions.php#L54)
+
 Unicode 解码，一般用于被转义的 Unicode 转回来。
 
 ```php
@@ -56,6 +62,8 @@ echo unicode_decode("\u4f60\u597d"); // 你好
 ```
 
 ## matchPattern()
+
+[源码](https://github.com/zhamao-robot/zhamao-framework/blob/master/src/ZM/global_functions.php#L91)
 
 根据星号匹配字符串（非正则表达式）。
 
@@ -81,6 +89,8 @@ matchPattern("*把*翻译成*", "请把你好翻译成阿拉伯语"); // true
 
 ## split_explode()
 
+[源码](https://github.com/zhamao-robot/zhamao-framework/blob/master/src/ZM/global_functions.php#L103)
+
 和 `explodeMsg()` 类似，用作分割字符串，不过此函数加入了对 `中文|数字` 两者的分割，也就是说中文和数字之间也会被分割。
 
 定义：`split_explode($del, $str, $divide_en = false)`
@@ -96,6 +106,8 @@ split_explode(" ", "前进20 急啊急啊"); // ["前进","20","急啊急啊"]
 `$divide_en` 表示是否分割中文和英文，如果为是，则中文和英文之间也会被分割开。
 
 ## matchArgs()
+
+[源码](https://github.com/zhamao-robot/zhamao-framework/blob/master/src/ZM/global_functions.php#L135)
 
 `matchPattern()` 的扩展，如果 `matchPattern()` 格式的字符串和模式匹配成功，则通过星号位置来提取星号匹配到的内容，参数同 `matchPattern()`。
 

@@ -24,18 +24,20 @@ class OnStart implements SwooleEvent
 {
     public function onCall(Server $server) {
         $r = null;
-        Process::signal(SIGINT, function () use ($r, $server) {
-            if (zm_atomic("_int_is_reload")->get() === 1) {
-                zm_atomic("_int_is_reload")->set(0);
-                $server->reload();
-            } else {
-                echo "\r";
-                Console::warning("Server interrupted(SIGINT) on Master.");
-                if ((Framework::$server->inotify ?? null) !== null)
-                    /** @noinspection PhpUndefinedFieldInspection */ Event::del(Framework::$server->inotify);
-                Process::kill($server->master_pid, SIGTERM);
-            }
-        });
+        if (!Framework::$argv["disable-safe-exit"]) {
+            Process::signal(SIGINT, function () use ($r, $server) {
+                if (zm_atomic("_int_is_reload")->get() === 1) {
+                    zm_atomic("_int_is_reload")->set(0);
+                    $server->reload();
+                } else {
+                    echo "\r";
+                    Console::warning("Server interrupted(SIGINT) on Master.");
+                    if ((Framework::$server->inotify ?? null) !== null)
+                        /** @noinspection PhpUndefinedFieldInspection */ Event::del(Framework::$server->inotify);
+                    Process::kill($server->master_pid, SIGTERM);
+                }
+            });
+        }
         if (Framework::$argv["daemon"]) {
             $daemon_data = json_encode([
                 "pid" => $server->master_pid,
@@ -45,13 +47,13 @@ class OnStart implements SwooleEvent
         }
         if (Framework::$argv["watch"]) {
             if (extension_loaded('inotify')) {
-                Console::warning("Enabled File watcher, do not use in production.");
+                Console::info("Enabled File watcher, framework will reload automatically.");
                 /** @noinspection PhpUndefinedFieldInspection */
                 Framework::$server->inotify = $fd = inotify_init();
                 $this->addWatcher(DataProvider::getWorkingDir() . "/src", $fd);
                 Event::add($fd, function () use ($fd) {
                     $r = inotify_read($fd);
-                    dump($r);
+                    Console::verbose("File updated: ".$r[0]["name"]);
                     ZMUtil::reload();
                 });
             } else {
