@@ -9,7 +9,7 @@ $config['host'] = '0.0.0.0';
 $config['port'] = 20001;
 
 /** 框架开到公网或外部的HTTP访问链接，通过 DataProvider::getFrameworkLink() 获取 */
-$config['http_reverse_link'] = "http://127.0.0.1:" . $config['port'];
+$config['http_reverse_link'] = 'http://127.0.0.1:' . $config['port'];
 
 /** 框架是否启动debug模式，当debug模式为true时，启用热更新（需要安装inotify扩展） */
 $config['debug_mode'] = false;
@@ -36,7 +36,7 @@ $config['swoole'] = [
 
 /** 轻量字符串缓存，默认开启 */
 $config['light_cache'] = [
-    'size' => 512,                     //最多允许储存的条数（需要2的倍数）
+    'size' => 512,                       //最多允许储存的条数（需要2的倍数）
     'max_strlen' => 32768,               //单行字符串最大长度（需要2的倍数）
     'hash_conflict_proportion' => 0.6,   //Hash冲突率（越大越好，但是需要的内存更多）
     'persistence_path' => $config['zm_data'] . '_cache.json',
@@ -44,9 +44,9 @@ $config['light_cache'] = [
 ];
 
 /** 大容量跨进程变量存储（2.2.0可用） */
-$config["worker_cache"] = [
-    "worker" => 0,
-    "transaction_timeout" => 30000
+$config['worker_cache'] = [
+    'worker' => 0,
+    'transaction_timeout' => 30000
 ];
 
 /** MySQL数据库连接信息，host留空则启动时不创建sql连接池 */
@@ -61,7 +61,7 @@ $config['sql_config'] = [
         PDO::ATTR_EMULATE_PREPARES => false
     ],
     'sql_no_exception' => false,
-    'sql_default_fetch_mode' => PDO::FETCH_ASSOC         // added in 1.5.6
+    'sql_default_fetch_mode' => PDO::FETCH_ASSOC //added in 1.5.6
 ];
 
 /** Redis连接信息，host留空则启动时不创建Redis连接池 */
@@ -74,7 +74,7 @@ $config['redis_config'] = [
 ];
 
 /** onebot连接约定的token */
-$config["access_token"] = '';
+$config['access_token'] = '';
 
 /** HTTP服务器固定请求头的返回 */
 $config['http_header'] = [
@@ -89,11 +89,11 @@ $config['http_default_code_page'] = [
 
 /** zhamao-framework在框架启动时初始化的atomic们 */
 $config['init_atomics'] = [
-    //'custom_atomic_name' => 0,  //自定义添加的Atomic
+    //'custom_atomic_name' => 0, //自定义添加的Atomic
 ];
 
 /** 终端日志显示等级（0-4） */
-$config["info_level"] = 2;
+$config['info_level'] = 2;
 
 /** 上下文接口类 implemented from ContextInterface */
 $config['context_class'] = \ZM\Context\Context::class;
@@ -101,7 +101,7 @@ $config['context_class'] = \ZM\Context\Context::class;
 /** 静态文件访问 */
 $config['static_file_server'] = [
     'status' => false,
-    'document_root' => realpath(__DIR__ . "/../") . '/resources/html',
+    'document_root' => realpath(__DIR__ . '/../') . '/resources/html',
     'document_index' => [
         'index.html'
     ]
