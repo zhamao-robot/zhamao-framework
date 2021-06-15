@@ -29,11 +29,8 @@ class SystemdCommand extends Command
         $s .= "\nUser=" . exec("whoami");
         $s .= "\nGroup=" . exec("groups | awk '{print $1}'");
         $s .= "\nWorkingDirectory=" . getcwd();
-        if (LOAD_MODE == 1) {
-            $s .= "\nExecStart=" . getcwd() . "/vendor/bin/start server";
-        } else {
-            $s .= "\nExecStart=" . getcwd() . "/bin/start server";
-        }
+        global $argv;
+        $s .= "\nExecStart=".PHP_BINARY." {$argv[0]} server";
         $s .= "\nRestart=always\n\n[Install]\nWantedBy=multi-user.target\n";
         @mkdir(getcwd() . "/resources/");
         file_put_contents(getcwd() . "/resources/zhamao.service", $s);

@@ -4,8 +4,8 @@
 namespace ZM\Context;
 
 
-use Co;
 use Exception;
+use Swoole\Coroutine;
 use Swoole\Http\Request;
 use Swoole\WebSocket\Frame;
 use Swoole\WebSocket\Server;
@@ -104,8 +104,7 @@ class Context implements ContextInterface
      * only can used by cq->message event function
      * @param $msg
      * @param bool $yield
-     * @return mixed
-     * @noinspection PhpMissingReturnTypeInspection
+     * @return array|bool
      */
     public function reply($msg, $yield = false) {
         $data = $this->getData();
@@ -136,7 +135,7 @@ class Context implements ContextInterface
     /**
      * @param $msg
      * @param false $yield
-     * @return mixed|void
+     * @return void
      * @throws InterruptException
      */
     public function finalReply($msg, $yield = false) {
@@ -170,42 +169,6 @@ class Context implements ContextInterface
             throw new WaitTimeoutException($this, $timeout_prompt);
         }
         return $r["message"];
-        /*
-        $cid = Co::getuid();
-        $api_id = ZMAtomic::get("wait_msg_id")->add(1);
-        $hang = [
-            "coroutine" => $cid,
-            "user_id" => $this->getData()["user_id"],
-            "message" => $this->getData()["message"],
-            "self_id" => $this->getData()["self_id"],
-            "message_type" => $this->getData()["message_type"],
-            "result" => null
-        ];
-        if ($hang["message_type"] == "group" || $hang["message_type"] == "discuss") {
-            $hang[$hang["message_type"] . "_id"] = $this->getData()[$this->getData()["message_type"] . "_id"];
-        }
-        SpinLock::lock("wait_api");
-        $hw = LightCacheInside::get("wait_api", "wait_api") ?? [];
-        $hw[$api_id] = $hang;
-        LightCacheInside::set("wait_api", "wait_api", $hw);
-        SpinLock::unlock("wait_api");
-        $id = swoole_timer_after($timeout * 1000, function () use ($api_id, $timeout_prompt) {
-            $r = LightCacheInside::get("wait_api", "wait_api")[$api_id] ?? null;
-            if (is_array($r)) {
-                Co::resume($r["coroutine"]);
-            }
-        });
-
-        Co::suspend();
-        SpinLock::lock("wait_api");
-        $hw = LightCacheInside::get("wait_api", "wait_api") ?? [];
-        $sess = $hw[$api_id];
-        unset($hw[$api_id]);
-        LightCacheInside::set("wait_api", "wait_api", $hw);
-        $result = $sess["result"];
-        if (isset($id)) swoole_timer_clear($id);
-        if ($result === null) throw new WaitTimeoutException($this, $timeout_prompt);
-        return $result;*/
     }
 
     /**
@@ -269,7 +232,7 @@ class Context implements ContextInterface
 
     /** @noinspection PhpMissingReturnTypeInspection */
     public function cloneFromParent() {
-        set_coroutine_params(self::$context[Co::getPcid()] ?? self::$context[$this->cid]);
+        set_coroutine_params(self::$context[Coroutine::getPcid()] ?? self::$context[$this->cid]);
         return context();
     }
 

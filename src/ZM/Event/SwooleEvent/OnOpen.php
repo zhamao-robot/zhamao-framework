@@ -5,9 +5,9 @@ namespace ZM\Event\SwooleEvent;
 
 
 use Closure;
-use Co;
 use Error;
 use Exception;
+use Swoole\Coroutine;
 use Swoole\Http\Request;
 use ZM\Annotation\Swoole\OnOpenEvent;
 use ZM\Annotation\Swoole\OnSwooleEvent;
@@ -30,20 +30,20 @@ class OnOpen implements SwooleEvent
     /** @noinspection PhpUnreachableStatementInspection */
     public function onCall($server, Request $request) {
         Console::debug("Calling Swoole \"open\" event from fd=" . $request->fd);
-        unset(Context::$context[Co::getCid()]);
+        unset(Context::$context[Coroutine::getCid()]);
         $type = strtolower($request->header["x-client-role"] ?? $request->get["type"] ?? "");
         $access_token = explode(" ", $request->header["authorization"] ?? "")[1] ?? $request->get["token"] ?? "";
         $token = ZMConfig::get("global", "access_token");
         if ($token instanceof Closure) {
             if (!$token($access_token)) {
                 $server->close($request->fd);
-                Console::warning("Unauthorized access_token: " . $access_token);
+                Console::warning(zm_internal_errcode("E00018") . "Unauthorized access_token: " . $access_token);
                 return;
             }
         } elseif (is_string($token)) {
             if ($access_token !== $token && $token !== "") {
                 $server->close($request->fd);
-                Console::warning("Unauthorized access_token: " . $access_token);
+                Console::warning(zm_internal_errcode("E00019") . "Unauthorized access_token: " . $access_token);
                 return;
             }
         }
@@ -81,11 +81,11 @@ class OnOpen implements SwooleEvent
             $dispatcher->dispatchEvents($conn);
         } catch (Exception $e) {
             $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
-            Console::error("Uncaught exception " . get_class($e) . " when calling \"open\": " . $error_msg);
+            Console::error(zm_internal_errcode("E00020") . "Uncaught exception " . get_class($e) . " when calling \"open\": " . $error_msg);
             Console::trace();
         } catch (Error $e) {
             $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
-            Console::error("Uncaught " . get_class($e) . " when calling \"open\": " . $error_msg);
+            Console::error(zm_internal_errcode("E00020") . "Uncaught " . get_class($e) . " when calling \"open\": " . $error_msg);
             Console::trace();
         }
     }

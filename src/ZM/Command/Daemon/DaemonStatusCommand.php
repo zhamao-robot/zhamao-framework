@@ -1,7 +1,7 @@
 <?php
 
 
-namespace ZM\Command;
+namespace ZM\Command\Daemon;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

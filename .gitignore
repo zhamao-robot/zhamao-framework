@@ -2,7 +2,6 @@
 /src/test/
 /src/webconsole/config/
 /vendor/
-zm.json
 /zm_data/
 composer.lock
 /resources/server.phar

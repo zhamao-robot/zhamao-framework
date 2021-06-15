@@ -1,10 +1,10 @@
 <?php #plain
-
+use Swoole\Coroutine as Co;
 use Swoole\Atomic;
 use Swoole\Coroutine;
 use Swoole\WebSocket\Server;
 use Symfony\Component\VarDumper\VarDumper;
-use ZM\API\ZMRobot;
+use ZM\API\OneBotV11;
 use ZM\Config\ZMConfig;
 use ZM\ConnectionManager\ManagerGM;
 use ZM\Console\Console;
@@ -23,7 +23,7 @@ use ZM\Context\ContextInterface;
 
 function getClassPath($class_name) {
     $dir = str_replace("\\", "/", $class_name);
-    $dir2 = WORKING_DIR . "/src/" . $dir . ".php";
+    $dir2 = DataProvider::getSourceRootDir() . "/src/" . $dir . ".php";
     //echo "@@@".$dir2.PHP_EOL;
     $dir2 = str_replace("\\", "/", $dir2);
     if (file_exists($dir2)) return $dir2;
@@ -44,48 +44,18 @@ function explodeMsg($msg, $ban_comma = false): array {
     }
     $msgs = explode("\n", $msg);
     $ls = [];
-    foreach ($msgs as $k => $v) {
+    foreach ($msgs as $v) {
         if (trim($v) == "") continue;
         $ls[] = trim($v);
     }
     return $ls;
 }
 
+/** @noinspection PhpUnused */
 function unicode_decode($str) {
     return preg_replace_callback('/\\\\u([0-9a-f]{4})/i', function ($matches) {
         return mb_convert_encoding(pack("H*", $matches[1]), "UTF-8", "UCS-2BE");
     }, $str);
-}
-
-/**
- * 获取模块文件夹下的每个类文件的类名称
- * @param $dir
- * @param $indoor_name
- * @return array
- */
-function getAllClasses($dir, $indoor_name): array {
-    if (!is_dir($dir)) return [];
-    $list = scandir($dir);
-    $classes = [];
-    if ($list[0] == '.') unset($list[0], $list[1]);
-    foreach ($list as $v) {
-        //echo "Finding " . $dir . $v . PHP_EOL;
-        //echo "At " . $indoor_name . PHP_EOL;
-        if (is_dir($dir . $v)) $classes = array_merge($classes, getAllClasses($dir . $v . "/", $indoor_name . "\\" . $v));
-        elseif (mb_substr($v, -4) == ".php") {
-            if (substr(file_get_contents($dir . $v), 6, 6) == "#plain") continue;
-            $composer = json_decode(file_get_contents(DataProvider::getWorkingDir() . "/composer.json"), true);
-            foreach ($composer["autoload"]["files"] as $fi) {
-                if (realpath(DataProvider::getWorkingDir() . "/" . $fi) == realpath($dir . $v)) {
-                    continue 2;
-                }
-            }
-            if ($v == "global_function.php") continue;
-            $class_name = $indoor_name . "\\" . mb_substr($v, 0, -4);
-            $classes [] = $class_name;
-        }
-    }
-    return $classes;
 }
 
 function matchPattern($pattern, $context): bool {
@@ -124,7 +94,7 @@ function split_explode($del, $str, $divide_en = false): array {
     $str = implode($del, $str);
     //echo $str."\n";
     $ls = [];
-    foreach (explode($del, $str) as $k => $v) {
+    foreach (explode($del, $str) as $v) {
         if (trim($v) == "") continue;
         $ls[] = $v;
     }
@@ -178,8 +148,8 @@ function getAnnotations(): array {
     $s = debug_backtrace()[1];
     //echo json_encode($s, 128|256);
     $list = [];
-    foreach (EventManager::$events as $event => $v) {
-        foreach ($v as $ks => $vs) {
+    foreach (EventManager::$events as $v) {
+        foreach ($v as $vs) {
             //echo get_class($vs).": ".$vs->class." => ".$vs->method.PHP_EOL;
             if ($vs->class == $s["class"] && $vs->method == $s["function"]) {
                 $list[get_class($vs)][] = $vs;
@@ -191,7 +161,7 @@ function getAnnotations(): array {
 
 function set_coroutine_params($array) {
     $cid = Co::getCid();
-    if ($cid == -1) die("Cannot set coroutine params at none coroutine mode.");
+    if ($cid == -1) die(zm_internal_errcode("E00061")."Cannot set coroutine params at none coroutine mode.");
     if (isset(Context::$context[$cid])) Context::$context[$cid] = array_merge(Context::$context[$cid], $array);
     else Context::$context[$cid] = $array;
     foreach (Context::$context as $c => $v) {
@@ -261,11 +231,11 @@ function call_with_catch($callable) {
         $callable();
     } catch (Exception $e) {
         $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
-        Console::error("Uncaught exception " . get_class($e) . " when calling \"message\": " . $error_msg);
+        Console::error(zm_internal_errcode("E00033") . "Uncaught exception " . get_class($e) . ": " . $error_msg);
         Console::trace();
     } catch (Error $e) {
         $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
-        Console::error("Uncaught " . get_class($e) . " when calling \"message\": " . $error_msg);
+        Console::error(zm_internal_errcode("E00033") . "Uncaught " . get_class($e) . ": " . $error_msg);
         Console::trace();
     }
 }
@@ -298,15 +268,15 @@ function server(): ?Server {
 }
 
 /**
- * @return ZMRobot
+ * @return OneBotV11
  * @throws RobotNotFoundException
  * @throws ZMException
  */
-function bot(): ZMRobot {
+function bot() {
     if (($conn = LightCacheInside::get("connect", "conn_fd")) == -2) {
-        return ZMRobot::getRandom();
+        return OneBotV11::getRandom();
     } elseif ($conn != -1) {
-        if (($obj = ManagerGM::get($conn)) !== null) return new ZMRobot($obj);
+        if (($obj = ManagerGM::get($conn)) !== null) return new OneBotV11($obj);
         else throw new RobotNotFoundException("单机器人连接模式可能连接了多个机器人！");
     } else {
         throw new RobotNotFoundException("没有任何机器人连接到框架！");
@@ -376,7 +346,11 @@ function zm_error($obj) { Console::error($obj); }
 function zm_config($name, $key = null) { return ZMConfig::get($name, $key); }
 
 function quick_reply_closure($reply) {
-    return function() use ($reply){
+    return function () use ($reply) {
         return $reply;
     };
+}
+
+function zm_internal_errcode($code): string {
+    return "[ErrCode:$code] ";
 }

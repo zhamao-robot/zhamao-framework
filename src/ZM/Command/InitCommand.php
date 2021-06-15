@@ -45,13 +45,13 @@ class InitCommand extends Command
                     $info = pathinfo($file);
                     @mkdir($base_path . $info["dirname"], 0777, true);
                     echo "Copying " . $file . PHP_EOL;
-                    $package_name = ($version = json_decode(file_get_contents(__DIR__ . "/../../../composer.json"), true)["name"]);
+                    $package_name = (json_decode(file_get_contents(__DIR__ . "/../../../composer.json"), true)["name"]);
                     copy($base_path . "/vendor/" . $package_name . $file, $base_path . $file);
                 } else {
                     echo "Skipping " . $file . " , file exists." . PHP_EOL;
                 }
             }
-            chmod($base_path."/zhamao", 0755);
+            chmod($base_path . "/zhamao", 0755);
             $autoload = [
                 "psr-4" => [
                     "Module\\" => "src/Module",
@@ -69,7 +69,7 @@ class InitCommand extends Command
                     foreach ($autoload["psr-4"] as $k => $v) {
                         if (!isset($composer["autoload"]["psr-4"][$k])) $composer["autoload"]["psr-4"][$k] = $v;
                     }
-                    foreach ($autoload["files"] as $k => $v) {
+                    foreach ($autoload["files"] as $v) {
                         if (!in_array($v, $composer["autoload"]["files"])) $composer["autoload"]["files"][] = $v;
                     }
                 }
@@ -78,7 +78,7 @@ class InitCommand extends Command
                 exec("composer dump-autoload");
                 echo PHP_EOL;
             } else {
-                echo("Error occurred. Please check your updates.\n");
+                echo(zm_internal_errcode("E00041") . "Error occurred. Please check your updates.\n");
                 return 1;
             }
             $output->writeln("<info>Done!</info>");
@@ -99,7 +99,7 @@ class InitCommand extends Command
                 }
             }
         }
-        $output->writeln("initialization must be started with composer-project mode!");
+        $output->writeln(zm_internal_errcode("E00042") . "initialization must be started with composer-project mode!");
         return 1;
     }
 

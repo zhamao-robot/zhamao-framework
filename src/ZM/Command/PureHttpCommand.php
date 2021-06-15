@@ -41,7 +41,7 @@ class PureHttpCommand extends Command
             $output->writeln("<error>Directory error(" . ($input->getArgument('dir') ?? '.') . "): no such file or directory.</error>");
             return self::FAILURE;
         }
-        ZMConfig::setDirectory(DataProvider::getWorkingDir() . '/config');
+        ZMConfig::setDirectory(DataProvider::getSourceRootDir() . '/config');
         $global = ZMConfig::get("global");
         $host = $input->getOption("host") ?? $global["host"];
         $port = $input->getOption("port") ?? $global["port"];

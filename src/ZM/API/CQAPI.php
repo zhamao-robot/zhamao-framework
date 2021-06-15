@@ -22,8 +22,6 @@ trait CQAPI
             return $this->processWebsocketAPI($connection, $reply, $function);
         else
             return $this->processHttpAPI($connection, $reply, $function);
-
-
     }
 
     public function processWebsocketAPI($connection, $reply, $function = false) {
@@ -41,7 +39,7 @@ trait CQAPI
             }
             return true;
         } else {
-            Console::warning("CQAPI send failed, websocket push error.");
+            Console::warning(zm_internal_errcode("E00036") . "CQAPI send failed, websocket push error.");
             $response = [
                 "status" => "failed",
                 "retcode" => -1000,
@@ -69,7 +67,6 @@ trait CQAPI
         return false;
     }
 
-    /** @noinspection PhpMissingReturnTypeInspection */
     public function __call($name, $arguments) {
         return false;
     }

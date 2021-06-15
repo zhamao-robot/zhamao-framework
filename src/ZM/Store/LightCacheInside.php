@@ -67,6 +67,6 @@ class LightCacheInside
         self::$kv_table[$name] = new Table($size, $conflict_proportion);
         self::$kv_table[$name]->column("value", Table::TYPE_STRING, $str_size);
         $r = self::$kv_table[$name]->create();
-        if ($r === false) throw new ZMException("内存不足，创建静态表失败！");
+        if ($r === false) throw new ZMException(zm_internal_errcode("E00050") . "内存不足，创建静态表失败！");
     }
 }

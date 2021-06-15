@@ -4,7 +4,11 @@
 namespace ZM\Exception;
 
 
-class NotInitializedException extends ZMException
-{
+use Throwable;
 
+class NotInitializedException extends RedisException
+{
+    public function __construct($message = "", $code = 0, Throwable $previous = null) {
+        parent::__construct(zm_internal_errcode("E00046") . $message, $code, $previous);
+    }
 }

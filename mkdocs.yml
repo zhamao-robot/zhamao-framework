@@ -1,4 +1,4 @@
-site_name: 炸毛框架 v2
+site_name: 炸毛框架文档
 
 repo_name: '炸毛框架'
 repo_url: 'https://github.com/zhamao-robot/zhamao-framework'
@@ -32,7 +32,7 @@ markdown_extensions:
       linenums_style: pymdownx.inline
 extra:
   version:
-    method: mike
+    provider: mike
 
 copyright: 'Copyright &copy; 2019 - 2021 CrazyBot Team&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tx-switch">
                  <button data-md-color-scheme="default"><code>默认模式</code></button>
@@ -50,7 +50,7 @@ copyright: 'Copyright &copy; 2019 - 2021 CrazyBot Team&nbsp;&nbsp;&nbsp;&nbsp;&n
                      name.textContent = attr;
                    })
                  })
-               </script><br><a href="http://beian.miit.gov.cn">蒙ICP备18000198号-1</a>'
+               </script><br><a href="http://beian.miit.gov.cn">沪ICP备2021010446号-1</a>'
 
 nav:
   - 指南:
@@ -74,18 +74,18 @@ nav:
       - 框架组件: component/index.md
       - 上下文: component/context.md
       - 聊天机器人组件:
-          - 机器人 API: component/robot-api.md
-          - CQ 码（多媒体消息）: component/cqcode.md
-          - 机器人消息处理: component/message-util.md
-          - Token 验证: component/access-token.md
-          - 图灵机器人 API: component/turing-api.md
+          - 机器人 API: component/bot/robot-api.md
+          - CQ 码（多媒体消息）: component/bot/cqcode.md
+          - 机器人消息处理: component/bot/message-util.md
+          - Token 验证: component/bot/access-token.md
+          - 图灵机器人 API: component/bot/turing-api.md
       - 存储:
-          - LightCache 轻量缓存: component/light-cache.md
-          - MySQL 数据库: component/mysql.md
-          - Redis 数据库: component/redis.md
-          - ZMAtomic 原子计数器: component/atomics.md
-          - SpinLock 自旋锁: component/spin-lock.md
-          - 文件管理: component/data-provider.md
+          - LightCache 轻量缓存: component/store/light-cache.md
+          - MySQL 数据库: component/store/mysql.md
+          - Redis 数据库: component/store/redis.md
+          - ZMAtomic 原子计数器: component/store/atomics.md
+          - SpinLock 自旋锁: component/store/spin-lock.md
+          - 文件管理: component/store/data-provider.md
       - HTTP 服务器工具类:
           - HTTP 和 WebSocket 客户端: component/zmrequest.md
           - HTTP 路由管理: component/route-manager.md
@@ -100,6 +100,7 @@ nav:
       - 进阶开发: advanced/index.md
       - 框架剖析: advanced/framework-structure.md
       - 框架启动模式: advanced/custom-start.md
+      - 手动安装环境: advanced/manually-install.md
       - 从 v1 升级: advanced/to-v2.md
       - 内部类文件手册: advanced/inside-class.md
       - 接入 WebSocket 客户端: advanced/connect-ws-client.md

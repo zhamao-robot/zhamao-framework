@@ -1,10 +1,10 @@
 <?php /** @noinspection PhpUnused */
 
 
-namespace ZM\Utils;
+namespace ZM\Utils\Manager;
 
 
-use Co;
+use Swoole\Coroutine;
 use ZM\Annotation\CQ\CQCommand;
 use ZM\Annotation\Swoole\OnPipeMessageEvent;
 use ZM\Console\Console;
@@ -38,7 +38,7 @@ class ProcessManager
                 break;
             case "resume_ws_message":
                 $obj = $data["data"];
-                Co::resume($obj["coroutine"]);
+                Coroutine::resume($obj["coroutine"]);
                 break;
             case "getWorkerCache":
                 $r = WorkerCache::get($data["key"]);
@@ -99,7 +99,7 @@ class ProcessManager
     public static function sendActionToWorker($worker_id, $action, $data) {
         $obj = ["action" => $action, "data" => $data];
         if (server()->worker_id === -1 && server()->getManagerPid() != posix_getpid()) {
-            Console::warning("Cannot send worker action from master or manager process!");
+            Console::warning(zm_internal_errcode("E00022") . "Cannot send worker action from master or manager process!");
             return;
         }
         if (server()->worker_id == $worker_id) {
@@ -114,9 +114,9 @@ class ProcessManager
             Console::warning("Cannot call '" . __FUNCTION__ . "' in non-worker process!");
             return;
         }
-        foreach ((LightCacheInside::get("wait_api", "wait_api") ?? []) as $k => $v) {
+        foreach ((LightCacheInside::get("wait_api", "wait_api") ?? []) as $v) {
             if (isset($v["coroutine"], $v["worker_id"])) {
-                if (server()->worker_id == $v["worker_id"]) Co::resume($v["coroutine"]);
+                if (server()->worker_id == $v["worker_id"]) Coroutine::resume($v["coroutine"]);
             }
         }
     }

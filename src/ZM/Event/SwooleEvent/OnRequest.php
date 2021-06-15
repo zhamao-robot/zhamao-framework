@@ -4,9 +4,9 @@
 namespace ZM\Event\SwooleEvent;
 
 
-use Co;
 use Error;
 use Exception;
+use Swoole\Coroutine;
 use Swoole\Http\Request;
 use ZM\Annotation\Http\RequestMapping;
 use ZM\Annotation\Swoole\OnRequestEvent;
@@ -33,7 +33,7 @@ class OnRequest implements SwooleEvent
         foreach (ZMConfig::get("global")["http_header"] as $k => $v) {
             $response->setHeader($k, $v);
         }
-        unset(Context::$context[Co::getCid()]);
+        unset(Context::$context[Coroutine::getCid()]);
         Console::debug("Calling Swoole \"request\" event from fd=" . $request->fd);
         set_coroutine_params(["request" => $request, "response" => $response]);
 
@@ -86,11 +86,11 @@ class OnRequest implements SwooleEvent
             );
             if (!$response->isEnd()) {
                 if (ZMConfig::get("global", "debug_mode"))
-                    $response->end("Internal server exception: " . $e->getMessage());
+                    $response->end(zm_internal_errcode("E00023") . "Internal server exception: " . $e->getMessage());
                 else
-                    $response->end("Internal server error.");
+                    $response->end(zm_internal_errcode("E00023") . "Internal server error.");
             }
-            Console::error("Internal server exception (500), caused by " . get_class($e) . ": " . $e->getMessage());
+            Console::error(zm_internal_errcode("E00023") . "Internal server exception (500), caused by " . get_class($e) . ": " . $e->getMessage());
             Console::log($e->getTraceAsString(), "gray");
         } catch (Error $e) {
             $response->status(500);
@@ -100,11 +100,11 @@ class OnRequest implements SwooleEvent
             if (!$response->isEnd()) {
                 $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
                 if (ZMConfig::get("global", "debug_mode"))
-                    $response->end("Internal server error: " . $error_msg);
+                    $response->end(zm_internal_errcode("E00023") . "Internal server error: " . $error_msg);
                 else
-                    $response->end("Internal server error.");
+                    $response->end(zm_internal_errcode("E00023") . "Internal server error.");
             }
-            Console::error("Internal server error (500), caused by " . get_class($e) . ": " . $e->getMessage());
+            Console::error(zm_internal_errcode("E00023") . "Internal server error (500), caused by " . get_class($e) . ": " . $e->getMessage());
             Console::log($e->getTraceAsString(), "gray");
         }
     }

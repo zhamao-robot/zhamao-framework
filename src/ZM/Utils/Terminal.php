@@ -33,13 +33,13 @@ class Terminal
         $dispatcher = new EventDispatcher(TerminalCommand::class);
         $dispatcher->setRuleFunction(function ($v) use ($it) {
             /** @var TerminalCommand $v */
-            return $v->command == $it[0] || $v->alias == $it[0];
+            return !empty($it) && ($v->command == $it[0] || $v->alias == $it[0]);
         });
         $dispatcher->setReturnFunction(function () {
             EventDispatcher::interrupt('none');
         });
         $dispatcher->dispatchEvents($it);
-        if ($dispatcher->store !== 'none') {
+        if ($dispatcher->store !== 'none' && $cmd !== "") {
             Console::info("Command not found: " . $cmd);
             return true;
         }
@@ -55,7 +55,7 @@ class Terminal
         Console::$type($log_msg);
         $r = ob_get_clean();
         $all = ManagerGM::getAllByName("terminal");
-        foreach ($all as $k => $v) {
+        foreach ($all as $v) {
             server()->send($v->getFd(), "\r" . $r);
             server()->send($v->getFd(), ">>> ");
         }
@@ -72,7 +72,7 @@ class Terminal
         $class = new Terminal();
         $reader = new AnnotationReader();
         $reflection = new ReflectionClass($class);
-        foreach ($reflection->getMethods() as $k => $v) {
+        foreach ($reflection->getMethods() as $v) {
             $r = $reader->getMethodAnnotation($v, TerminalCommand::class);
             if ($r !== null) {
                 Console::debug("adding command " . $r->command);
@@ -176,7 +176,7 @@ class Terminal
      * @TerminalCommand(command="stop",description="停止框架")
      */
     public function stop() {
-        Process::kill(server()->master_pid, SIGTERM);
+        posix_kill(server()->master_pid, SIGTERM);
     }
 
     /**

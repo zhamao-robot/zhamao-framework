@@ -56,11 +56,11 @@ class OnMessage implements SwooleEvent
             //Console::success("Used ".round((microtime(true) - $starttime) * 1000, 3)." ms!");
         } catch (Exception $e) {
             $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
-            Console::error("Uncaught exception " . get_class($e) . " when calling \"message\": " . $error_msg);
+            Console::error(zm_internal_errcode("E00017") . "Uncaught exception " . get_class($e) . " when calling \"message\": " . $error_msg);
             Console::trace();
         } catch (Error $e) {
             $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
-            Console::error("Uncaught " . get_class($e) . " when calling \"message\": " . $error_msg);
+            Console::error(zm_internal_errcode("E00017") . "Uncaught " . get_class($e) . " when calling \"message\": " . $error_msg);
             Console::trace();
         }
 

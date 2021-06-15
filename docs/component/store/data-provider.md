@@ -16,6 +16,16 @@ DataProvider 是框架内提供的一个简易的文件管理类。
 
 获取配置项 `zm_data` 指定的目录。
 
+如果指定参数 `$second`，则返回二级目录地址，如果二级目录不存在则自动创建。
+
+```php
+DataProvider::getDataFolder("TestModule"); // 例如返回 /root/zhamao-framework/zm_data/TestModule/
+```
+
+## DataProvider::getFrameworkRootDir()
+
+返回框架本体的根目录。
+
 ## DataProvider::saveToJson()
 
 将变量内容保存为 json 格式的文件，存储在 `zm_data/config/` 目录下或子目录下。

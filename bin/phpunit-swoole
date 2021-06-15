@@ -1,18 +1,20 @@
 #!/usr/bin/env php
-/** @noinspection ALL */<?php
+<?php
 /**
  * Copyright: Swlib
  * Author: Twosee <twose@qq.com>
  * Date: 2018/4/14 下午10:58
  */
 
-Co::set([
-    'log_level'   => SWOOLE_LOG_INFO,
+use Swoole\Coroutine;
+
+Coroutine::set([
+    'log_level' => SWOOLE_LOG_INFO,
     'trace_flags' => 0
 ]);
 
 if (!ini_get('date.timezone')) {
-    ini_set('date.timezone', 'UTC');
+    ini_set('date.timezone', 'Asia/Shanghai');
 }
 
 foreach ([
@@ -55,12 +57,12 @@ if (!defined('PHPUNIT_COMPOSER_INSTALL')) {
 /** @noinspection PhpIncludeInspection */
 require PHPUNIT_COMPOSER_INSTALL;
 $starttime = microtime(true);
-go(function (){
-    try{
+go(function () {
+    try {
         PHPUnit\TextUI\Command::main(false);
-    } catch(Exception $e) {
-        echo $e->getMessage().PHP_EOL;
+    } catch (Exception $e) {
+        echo $e->getMessage() . PHP_EOL;
     }
 });
 Swoole\Event::wait();
-echo "Took ".round(microtime(true) - $starttime, 4). "s\n";
+echo "Took " . round(microtime(true) - $starttime, 4) . "s\n";

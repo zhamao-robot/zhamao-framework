@@ -124,7 +124,7 @@ public function ping() {
 
 ## getRobot() - 获取机器人 API 对象
 
-返回当前上下文关联的机器人 API 调用对象 [ZMRobot](robot-api.md)。
+返回当前上下文关联的机器人 API 调用对象 [ZMRobot](bot/robot-api.md)。
 
 可以使用的事件：所有 HTTP API 发来的事件：`@CQCommand()`，`@CQMessage()` 等。
 

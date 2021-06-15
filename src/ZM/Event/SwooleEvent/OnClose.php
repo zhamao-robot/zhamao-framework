@@ -4,9 +4,9 @@
 namespace ZM\Event\SwooleEvent;
 
 
-use Co;
 use Error;
 use Exception;
+use Swoole\Coroutine;
 use ZM\Annotation\Swoole\OnCloseEvent;
 use ZM\Annotation\Swoole\OnSwooleEvent;
 use ZM\Annotation\Swoole\SwooleHandler;
@@ -27,7 +27,7 @@ class OnClose implements SwooleEvent
 {
     /** @noinspection PhpUnreachableStatementInspection */
     public function onCall($server, $fd) {
-        unset(Context::$context[Co::getCid()]);
+        unset(Context::$context[Coroutine::getCid()]);
         Console::debug("Calling Swoole \"close\" event from fd=" . $fd);
         $conn = ManagerGM::get($fd);
         if ($conn === null) return;
@@ -61,11 +61,11 @@ class OnClose implements SwooleEvent
             $dispatcher->dispatchEvents($conn);
         } catch (Exception $e) {
             $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
-            Console::error("Uncaught exception " . get_class($e) . " when calling \"close\": " . $error_msg);
+            Console::error(zm_internal_errcode("E00016") . "Uncaught exception " . get_class($e) . " when calling \"close\": " . $error_msg);
             Console::trace();
         } catch (Error $e) {
             $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
-            Console::error("Uncaught " . get_class($e) . " when calling \"close\": " . $error_msg);
+            Console::error(zm_internal_errcode("E00016") . "Uncaught " . get_class($e) . " when calling \"close\": " . $error_msg);
             Console::trace();
         }
         ManagerGM::popConnect($fd);

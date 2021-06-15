@@ -23,6 +23,7 @@ class RunServerCommand extends Command
             new InputOption("log-error", null, null, "调整消息等级到error (log-level=0)"),
             new InputOption("log-theme", null, InputOption::VALUE_REQUIRED, "改变终端的主题配色"),
             new InputOption("disable-console-input", null, null, "禁止终端输入内容 (废弃)"),
+            new InputOption("interact", null, null, "打开终端输入"),
             new InputOption("remote-terminal", null, null, "启用远程终端，配置使用global.php中的"),
             new InputOption("disable-coroutine", null, null, "关闭协程Hook"),
             new InputOption("daemon", null, null, "以守护进程的方式运行框架"),
@@ -32,7 +33,8 @@ class RunServerCommand extends Command
             new InputOption("show-php-ver", null, null, "启动时显示PHP和Swoole版本"),
             new InputOption("env", null, InputOption::VALUE_REQUIRED, "设置环境类型 (production, development, staging)"),
             new InputOption("disable-safe-exit", null, null, "关闭安全退出（关闭后按CtrlC时直接杀死进程）"),
-            new InputOption("preview", null, null, "只显示参数，不启动服务器")
+            new InputOption("preview", null, null, "只显示参数，不启动服务器"),
+            new InputOption("force-load-module", null, InputOption::VALUE_OPTIONAL, "强制打包状态下加载模块（使用英文逗号分割多个）")
         ]);
         $this->setDescription("Run zhamao-framework | 启动框架");
         $this->setHelp("直接运行可以启动");

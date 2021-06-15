@@ -34,6 +34,11 @@ $config['swoole'] = [
     //'task_enable_coroutine' => true
 ];
 
+/** 一些框架与Swoole运行时设置的调整 */
+$config['runtime'] = [
+    'swoole_coroutine_hook_flags' => SWOOLE_HOOK_ALL & (~SWOOLE_HOOK_CURL)
+];
+
 /** 轻量字符串缓存，默认开启 */
 $config['light_cache'] = [
     'size' => 512,                       //最多允许储存的条数（需要2的倍数）
@@ -120,6 +125,12 @@ $config['remote_terminal'] = [
     'host' => '127.0.0.1',
     'port' => 20002,
     'token' => ''
+];
+
+/** 模块(插件)加载器的相关设置 */
+$config['module_loader'] = [
+    'enable_hotload' => true,
+    'load_path' => $config['zm_data'] . 'modules'
 ];
 
 return $config;

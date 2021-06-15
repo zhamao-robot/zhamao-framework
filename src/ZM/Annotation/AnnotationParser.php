@@ -17,7 +17,8 @@ use ZM\Annotation\Http\MiddlewareClass;
 use ZM\Annotation\Http\RequestMapping;
 use ZM\Annotation\Interfaces\Level;
 use ZM\Annotation\Module\Closed;
-use ZM\Http\RouteManager;
+use ZM\Utils\Manager\RouteManager;
+use ZM\Utils\ZMUtil;
 
 class AnnotationParser
 {
@@ -53,7 +54,7 @@ class AnnotationParser
     public function registerMods() {
         foreach ($this->path_list as $path) {
             Console::debug("parsing annotation in " . $path[0]);
-            $all_class = getAllClasses($path[0], $path[1]);
+            $all_class = ZMUtil::getClassesPsr4($path[0], $path[1]);
             $this->reader = new AnnotationReader();
             foreach ($all_class as $v) {
                 Console::debug("正在检索 " . $v);
@@ -88,7 +89,7 @@ class AnnotationParser
                 }
 
 
-                foreach ($this->annotation_map[$v]["class_annotations"] as $ks => $vs) {
+                foreach ($this->annotation_map[$v]["class_annotations"] as $vs) {
                     $vs->class = $v;
 
                     //预处理1：将适用于每一个函数的注解到类注解重新注解到每个函数下面
@@ -132,12 +133,12 @@ class AnnotationParser
 
     public function generateAnnotationEvents() {
         $o = [];
-        foreach ($this->annotation_map as $module => $obj) {
+        foreach ($this->annotation_map as $obj) {
             foreach (($obj["class_annotations"] ?? []) as $class_annotation) {
                 if ($class_annotation instanceof ErgodicAnnotation) continue;
                 else $o[get_class($class_annotation)][] = $class_annotation;
             }
-            foreach (($obj["methods_annotations"] ?? []) as $method_name => $methods_annotations) {
+            foreach (($obj["methods_annotations"] ?? []) as $methods_annotations) {
                 foreach ($methods_annotations as $annotation) {
                     $o[get_class($annotation)][] = $annotation;
                 }

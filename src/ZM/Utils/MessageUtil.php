@@ -11,6 +11,7 @@ use ZM\Console\Console;
 use ZM\Entity\MatchResult;
 use ZM\Event\EventManager;
 use ZM\Requests\ZMRequest;
+use ZM\Utils\Manager\ProcessManager;
 
 class MessageUtil
 {
@@ -25,7 +26,7 @@ class MessageUtil
         if (!is_dir($path)) mkdir($path);
         $path = realpath($path);
         if ($path === false) {
-            Console::warning("指定的路径错误不存在！");
+            Console::warning(zm_internal_errcode("E00059") . "指定的路径错误不存在！");
             return false;
         }
         $files = [];
@@ -34,7 +35,7 @@ class MessageUtil
             if ($v->type == "image") {
                 $result = ZMRequest::downloadFile($v->params["url"], $path . "/" . $v->params["file"]);
                 if ($result === false) {
-                    Console::warning("图片 " . $v->params["url"] . " 下载失败！");
+                    Console::warning(zm_internal_errcode("E00060") . "图片 " . $v->params["url"] . " 下载失败！");
                     return false;
                 }
                 $files[] = $path . "/" . $v->params["file"];
@@ -112,7 +113,7 @@ class MessageUtil
         $ls = EventManager::$events[CQCommand::class] ?? [];
         $word = self::splitCommand($msg);
         $matched = new MatchResult();
-        foreach ($ls as $k => $v) {
+        foreach ($ls as $v) {
             if (array_diff([$v->match, $v->pattern, $v->regex, $v->keyword, $v->end_with, $v->start_with], [""]) == []) continue;
             elseif (($v->user_id == 0 || ($v->user_id != 0 && $v->user_id == $obj["user_id"])) &&
                 ($v->group_id == 0 || ($v->group_id != 0 && $v->group_id == ($obj["group_id"] ?? 0))) &&

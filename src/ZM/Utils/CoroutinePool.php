@@ -38,6 +38,10 @@ class CoroutinePool
         self::$sizes[$name] = $size;
     }
 
+    public static function getRunningCoroutineCount($name = "default") {
+        return count(self::$cids[$name]);
+    }
+
     private static function checkCids($name) {
         if (in_array(Coroutine::getCid(), self::$cids[$name])) {
             $a = array_search(Coroutine::getCid(), self::$cids[$name]);

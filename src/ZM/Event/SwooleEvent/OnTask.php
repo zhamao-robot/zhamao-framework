@@ -65,11 +65,11 @@ class OnTask implements SwooleEvent
                 $dispatcher->dispatchEvents();
             } catch (Exception $e) {
                 $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
-                Console::error("Uncaught exception " . get_class($e) . " when calling \"task\": " . $error_msg);
+                Console::error(zm_internal_errcode("E00026") . "Uncaught exception " . get_class($e) . " when calling \"task\": " . $error_msg);
                 Console::trace();
             } catch (Error $e) {
                 $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
-                Console::error("Uncaught " . get_class($e) . " when calling \"task\": " . $error_msg);
+                Console::error(zm_internal_errcode("E00026") . "Uncaught " . get_class($e) . " when calling \"task\": " . $error_msg);
                 Console::trace();
             }
         }

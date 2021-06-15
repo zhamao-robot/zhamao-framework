@@ -29,6 +29,6 @@ if [ "$ver" != "" ]; then
         tar -zxvf temp.tar.gz go-cqhttp
         rm temp.tar.gz
         echo "下载完成，启动命令：./go-cqhttp"
-        echo "首次启动后先编辑config.hjson文件！"
+        echo "首次启动后先编辑config文件！"
     fi
 fi

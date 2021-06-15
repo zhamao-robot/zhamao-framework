@@ -54,14 +54,14 @@ class TuringAPI
             if ($api_return["intent"]["code"] == 4003) {
                 return "哎呀，我刚才有点走神了，可能忘记你说什么了，可以重说一遍吗";
             }
-            Console::error("图灵机器人发送错误！\n错误原始内容：" . $origin . "\n来自：" . $user_id . "\n错误信息：" . $status);
+            Console::error(zm_internal_errcode("E00038") . "图灵机器人发送错误！\n错误原始内容：" . $origin . "\n来自：" . $user_id . "\n错误信息：" . $status);
             //echo json_encode($r, 128|256);
             return "哎呀，我刚才有点走神了，要不一会儿换一种问题试试？";
         }
         $result = $api_return["results"];
         //Console::info(Console::setColor(json_encode($result, 128 | 256), "green"));
         $final = "";
-        foreach ($result as $k => $v) {
+        foreach ($result as $v) {
             switch ($v["resultType"]) {
                 case "url":
                     $final .= "\n" . $v["values"]["url"];

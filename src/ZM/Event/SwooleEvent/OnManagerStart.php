@@ -11,6 +11,7 @@ use ZM\Annotation\Swoole\SwooleHandler;
 use ZM\Console\Console;
 use ZM\Event\SwooleEvent;
 use ZM\Framework;
+use ZM\Utils\SignalListener;
 
 /**
  * Class OnManagerStart
@@ -21,9 +22,7 @@ class OnManagerStart implements SwooleEvent
 {
     public function onCall(Server $server) {
         if (!Framework::$argv["disable-safe-exit"]) {
-            pcntl_signal(SIGINT, function () {
-                Console::verbose("Interrupted in manager!");
-            });
+            SignalListener::signalManager();
         }
         Console::verbose("进程 Manager 已启动");
     }

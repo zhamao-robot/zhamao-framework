@@ -38,6 +38,7 @@ class ZMAtomic
         for ($i = 0; $i < 10; ++$i) {
             self::$atomics["_tmp_" . $i] = new Atomic(0);
         }
+        self::$atomics["ss"] = new Atomic(1);
     }
 
 

@@ -20,7 +20,7 @@ class CQ
         if (is_numeric($qq) || $qq === "all") {
             return "[CQ:at,qq=" . $qq . "]";
         }
-        Console::warning("传入的QQ号码($qq)错误！");
+        Console::warning(zm_internal_errcode("E00035") . "传入的QQ号码($qq)错误！");
         return " ";
     }
 
@@ -33,7 +33,7 @@ class CQ
         if (is_numeric($id)) {
             return "[CQ:face,id=" . $id . "]";
         }
-        Console::warning("传入的face id($id)错误！");
+        Console::warning(zm_internal_errcode("E00035") . "传入的face id($id)错误！");
         return " ";
     }
 
@@ -46,13 +46,13 @@ class CQ
      * @param int $timeout
      * @return string
      */
-    public static function image($file, $cache = true, $flash = false, $proxy = true, $timeout = -1) {
+    public static function image($file, bool $cache = true, bool $flash = false, bool $proxy = true, int $timeout = -1) {
         return
             "[CQ:image,file=" . self::encode($file, true) .
             (!$cache ? ",cache=0" : "") .
             ($flash ? ",type=flash" : "") .
             (!$proxy ? ",proxy=false" : "") .
-            ($timeout != -1 ? (",timeout=" . intval($timeout)) : "") .
+            ($timeout != -1 ? (",timeout=" . $timeout) : "") .
             "]";
     }
 
@@ -65,13 +65,13 @@ class CQ
      * @param int $timeout
      * @return string
      */
-    public static function record($file, $magic = false, $cache = true, $proxy = true, $timeout = -1) {
+    public static function record($file, bool $magic = false, bool $cache = true, bool $proxy = true, int $timeout = -1) {
         return
             "[CQ:record,file=" . self::encode($file, true) .
             (!$cache ? ",cache=0" : "") .
             ($magic ? ",magic=1" : "") .
             (!$proxy ? ",proxy=false" : "") .
-            ($timeout != -1 ? (",timeout=" . intval($timeout)) : "") .
+            ($timeout != -1 ? (",timeout=" . $timeout) : "") .
             "]";
     }
 
@@ -83,7 +83,7 @@ class CQ
      * @param int $timeout
      * @return string
      */
-    public static function video($file, $cache = true, $proxy = true, $timeout = -1) {
+    public static function video($file, bool $cache = true, bool $proxy = true, int $timeout = -1) {
         return
             "[CQ:video,file=" . self::encode($file, true) .
             (!$cache ? ",cache=0" : "") .
@@ -123,8 +123,8 @@ class CQ
      * @param string $name
      * @return string
      */
-    public static function poke($type, $id, $name = "") {
-        return "[CQ:poke,type=$type,id=$id" . ($name != "" ? (",name=".self::encode($name, true)) : "") . "]";
+    public static function poke($type, $id, string $name = "") {
+        return "[CQ:poke,type=$type,id=$id" . ($name != "" ? (",name=" . self::encode($name, true)) : "") . "]";
     }
 
     /**
@@ -132,7 +132,7 @@ class CQ
      * @param int $ignore
      * @return string
      */
-    public static function anonymous($ignore = 1) {
+    public static function anonymous(int $ignore = 1) {
         return "[CQ:anonymous" . ($ignore != 1 ? ",ignore=0" : "") . "]";
     }
 
@@ -170,12 +170,12 @@ class CQ
      * @param string $content
      * @return string
      */
-    public static function location($lat, $lon, $title = "", $content = "") {
+    public static function location($lat, $lon, string $title = "", string $content = "") {
         return "[CQ:location" .
-            ",lat=".self::encode($lat, true) .
-            ",lon=".self::encode($lon, true).
-            ($title != "" ? (",title=".self::encode($title, true)) : "") .
-            ($content != "" ? (",content=".self::encode($content, true)) : "") .
+            ",lat=" . self::encode($lat, true) .
+            ",lon=" . self::encode($lon, true) .
+            ($title != "" ? (",title=" . self::encode($title, true)) : "") .
+            ($content != "" ? (",content=" . self::encode($content, true)) : "") .
             "]";
     }
 
@@ -205,7 +205,7 @@ class CQ
                 return "[CQ:music,type=$type,id=$id_or_url]";
             case "custom":
                 if ($title === null || $audio === null) {
-                    Console::warning("传入CQ码实例的标题和音频链接不能为空！");
+                    Console::warning(zm_internal_errcode("E00035") . "传入CQ码实例的标题和音频链接不能为空！");
                     return " ";
                 }
                 if ($content === null) $c = "";
@@ -217,17 +217,17 @@ class CQ
                     ",audio=" . self::encode($audio, true) . ",title=" . self::encode($title, true) . $c . $i .
                     "]";
             default:
-                Console::warning("传入的music type($type)错误！");
+                Console::warning(zm_internal_errcode("E00035") . "传入的music type($type)错误！");
                 return " ";
         }
     }
 
     public static function forward($id) {
-        return "[CQ:forward,id=$id]";
+        return "[CQ:forward,id=".self::encode($id)."]";
     }
 
     public static function node($user_id, $nickname, $content) {
-        return "[CQ:node,user_id=$user_id,nickname=".self::encode($nickname, true).",content=" . self::encode($content, true) . "]";
+        return "[CQ:node,user_id=$user_id,nickname=" . self::encode($nickname, true) . ",content=" . self::encode($content, true) . "]";
     }
 
     public static function xml($data) {
@@ -297,7 +297,7 @@ class CQ
     public static function removeCQ($msg) {
         $final = "";
         $last_end = 0;
-        foreach(self::getAllCQ($msg) as $k => $v) {
+        foreach (self::getAllCQ($msg) as $v) {
             $final .= mb_substr($msg, $last_end, $v["start"] - $last_end);
             $last_end = $v["end"] + 1;
         }
@@ -319,7 +319,7 @@ class CQ
             $content = mb_substr($msg, $head + 4, $close + $head - mb_strlen($msg));
             $exp = explode(",", $content);
             $cq["type"] = array_shift($exp);
-            foreach ($exp as $k => $v) {
+            foreach ($exp as $v) {
                 $ss = explode("=", $v);
                 $sk = array_shift($ss);
                 $cq["params"][$sk] = self::decode(implode("=", $ss), true);
@@ -349,7 +349,7 @@ class CQ
             $exp = explode(",", $content);
             $cq = [];
             $cq["type"] = array_shift($exp);
-            foreach ($exp as $k => $v) {
+            foreach ($exp as $v) {
                 $ss = explode("=", $v);
                 $sk = array_shift($ss);
                 $cq["params"][$sk] = self::decode(implode("=", $ss), true);

@@ -23,17 +23,18 @@
         "php": ">=7.2",
         "ext-json": "*",
         "ext-posix": "*",
-        "ext-pcntl": "*",
         "doctrine/annotations": "~1.12 || ~1.4.0",
-        "psy/psysh": "@stable",
         "symfony/polyfill-ctype": "^1.19",
         "symfony/polyfill-mbstring": "^1.19",
         "symfony/console": "~5.0 || ~4.0 || ~3.0",
         "symfony/routing": "~5.0 || ~4.0 || ~3.0",
-        "zhamao/console": "^1.0.10",
+        "zhamao/console": "^1.0",
         "zhamao/config": "^1.0",
         "zhamao/request": "^1.1",
-        "zhamao/connection-manager": "^1.0"
+        "zhamao/connection-manager": "^1.0",
+        "jelix/version": "^2.0",
+        "league/climate": "^3.7",
+        "psy/psysh": "^0.10.8"
     },
     "suggest": {
         "ext-ctype": "Use C/C++ extension instead of polyfill will be more efficient",
@@ -51,6 +52,7 @@
         ]
     },
     "require-dev": {
-        "swoole/ide-helper": "@dev"
+        "swoole/ide-helper": "@dev",
+        "phpunit/phpunit": "^8.5 || ^9.0"
     }
 }

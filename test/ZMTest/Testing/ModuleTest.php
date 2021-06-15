@@ -7,6 +7,7 @@ namespace ZMTest\Testing;
 use Module\Example\Hello;
 use PHPUnit\Framework\TestCase;
 use ZM\Config\ZMConfig;
+use ZM\ConsoleApplication;
 use ZM\Utils\ZMUtil;
 
 class ModuleTest extends TestCase
@@ -14,6 +15,7 @@ class ModuleTest extends TestCase
     protected function setUp(): void {
         ZMConfig::setDirectory(realpath(__DIR__."/../Mock"));
         set_coroutine_params([]);
+        (new ConsoleApplication('zhamao-test'))->initEnv();
         require_once __DIR__ . '/../../../src/ZM/global_defines.php';
     }
 

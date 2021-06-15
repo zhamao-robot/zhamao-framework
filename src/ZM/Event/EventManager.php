@@ -54,9 +54,9 @@ class EventManager
                 try {
                     $dispatcher->dispatchEvent($vss, null);
                 } catch (Exception $e) {
-                    Console::error("Uncaught error from TimerTick: " . $e->getMessage() . " at " . $e->getFile() . "({$e->getLine()})");
+                    Console::error(zm_internal_errcode("E00034") . "Uncaught error from TimerTick: " . $e->getMessage() . " at " . $e->getFile() . "({$e->getLine()})");
                 } catch (Error $e) {
-                    Console::error("Uncaught fatal error from TimerTick: " . $e->getMessage());
+                    Console::error(zm_internal_errcode("E00034") . "Uncaught fatal error from TimerTick: " . $e->getMessage());
                     echo Console::setColor($e->getTraceAsString(), "gray");
                     Console::error("Please check your code!");
                 }

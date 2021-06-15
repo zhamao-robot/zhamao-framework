@@ -3,14 +3,11 @@
 
 namespace ZM;
 
-
 use Doctrine\Common\Annotations\AnnotationReader;
 use Error;
 use Exception;
-use Swoole\Event;
-use Swoole\Process;
 use Swoole\Server\Port;
-use ZM\Annotation\Swoole\OnSetup;
+use Throwable;
 use ZM\Config\ZMConfig;
 use ZM\ConnectionManager\ManagerGM;
 use ZM\Console\TermColor;
@@ -21,7 +18,6 @@ use ZM\Store\ZMAtomic;
 use ZM\Utils\DataProvider;
 use ReflectionClass;
 use ReflectionException;
-use ReflectionMethod;
 use Swoole\Runtime;
 use Swoole\WebSocket\Server;
 use ZM\Annotation\Swoole\SwooleHandler;
@@ -47,17 +43,19 @@ class Framework
      * @var array|bool|mixed|null
      */
     private $server_set;
+    /**
+     * @var array
+     */
+    private $setup_events = [];
 
-    /** @noinspection PhpUnusedParameterInspection */
     public function __construct($args = []) {
         $tty_width = $this->getTtyWidth();
 
         self::$argv = $args;
-
-        ZMConfig::setDirectory(DataProvider::getWorkingDir() . '/config');
+        ZMConfig::setDirectory(DataProvider::getSourceRootDir() . '/config');
         ZMConfig::setEnv($args["env"] ?? "");
         if (ZMConfig::get("global") === false) {
-            die ("Global config load failed: " . ZMConfig::$last_error . "\nPlease init first!\n");
+            die (zm_internal_errcode("E00007") . "Global config load failed: " . ZMConfig::$last_error . "\nPlease init first!\nSee: https://github.com/zhamao-robot/zhamao-framework/issues/37\n");
         }
 
         //定义常量
@@ -80,9 +78,10 @@ class Framework
                 ]
             ]);
         } catch (ConnectionManager\TableException $e) {
-            die($e->getMessage());
+            die(zm_internal_errcode("E00008") . $e->getMessage());
         }
         try {
+
             Console::init(
                 ZMConfig::get("global", "info_level") ?? 2,
                 self::$server,
@@ -97,13 +96,18 @@ class Framework
             $this->server_set["log_level"] = SWOOLE_LOG_DEBUG;
             $add_port = ZMConfig::get("global", "remote_terminal")["status"] ?? false;
 
+            $this->loadServerEvents();
+
             $this->parseCliArgs(self::$argv, $add_port);
+
             if (!isset($this->server_set["max_wait_time"])) {
                 $this->server_set["max_wait_time"] = 5;
             }
             $worker = $this->server_set["worker_num"] ?? swoole_cpu_num();
             define("ZM_WORKER_NUM", $worker);
+
             ZMAtomic::init();
+
             // 打印初始信息
             $out["listen"] = ZMConfig::get("global", "host") . ":" . ZMConfig::get("global", "port");
             if (!isset($this->server_set["worker_num"])) $out["worker"] = swoole_cpu_num() . " (auto)";
@@ -115,6 +119,9 @@ class Framework
             if (APP_VERSION !== "unknown") $out["app_version"] = APP_VERSION;
             if (isset($this->server_set["task_worker_num"])) {
                 $out["task_worker"] = $this->server_set["task_worker_num"];
+            }
+            if (!isset($this->server_set["pid_file"])) {
+                $this->server_set["pid_file"] = ZMConfig::get("crash_dir") . ".zm.pid";
             }
             if (ZMConfig::get("global", "sql_config")["sql_host"] !== "") {
                 $conf = ZMConfig::get("global", "sql_config");
@@ -141,6 +148,8 @@ class Framework
             if ($args["preview"]) {
                 exit();
             }
+
+
             self::$server = new Server(ZMConfig::get("global", "host"), ZMConfig::get("global", "port"));
 
             if ($add_port) {
@@ -196,11 +205,11 @@ class Framework
                         Terminal::executeCommand(trim($data));
                     } catch (Exception $e) {
                         $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
-                        Console::error("Uncaught exception " . get_class($e) . " when calling \"open\": " . $error_msg);
+                        Console::error(zm_internal_errcode("E00009") . "Uncaught exception " . get_class($e) . " when calling \"open\": " . $error_msg);
                         Console::trace();
                     } catch (Error $e) {
                         $error_msg = $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")";
-                        Console::error("Uncaught " . get_class($e) . " when calling \"open\": " . $error_msg);
+                        Console::error(zm_internal_errcode("E00009") . "Uncaught " . get_class($e) . " when calling \"open\": " . $error_msg);
                         Console::trace();
                     }
 
@@ -224,11 +233,11 @@ class Framework
             // 注册 Swoole Server 的事件
             $this->registerServerEvents();
             $r = ZMConfig::get("global", "light_cache") ?? [
-                    "size" => 1024,
-                    "max_strlen" => 8192,
-                    "hash_conflict_proportion" => 0.6,
-                    "persistence_path" => realpath(DataProvider::getDataFolder() . "_cache.json"),
-                    "auto_save_interval" => 900
+                    'size' => 512,                     //最多允许储存的条数（需要2的倍数）
+                    'max_strlen' => 32768,               //单行字符串最大长度（需要2的倍数）
+                    'hash_conflict_proportion' => 0.6,   //Hash冲突率（越大越好，但是需要的内存更多）
+                    'persistence_path' => DataProvider::getDataFolder() . '_cache.json',
+                    'auto_save_interval' => 900
                 ];
             LightCache::init($r);
             LightCacheInside::init();
@@ -269,15 +278,15 @@ class Framework
             }, E_ALL | E_STRICT);
         } catch (Exception $e) {
             Console::error("Framework初始化出现错误，请检查！");
-            Console::error($e->getMessage());
+            Console::error(zm_internal_errcode("E00010") . $e->getMessage());
             Console::debug($e);
             die;
         }
     }
 
     private static function printMotd($tty_width) {
-        if (file_exists(DataProvider::getWorkingDir() . "/config/motd.txt")) {
-            $motd = file_get_contents(DataProvider::getWorkingDir() . "/config/motd.txt");
+        if (file_exists(DataProvider::getSourceRootDir() . "/config/motd.txt")) {
+            $motd = file_get_contents(DataProvider::getSourceRootDir() . "/config/motd.txt");
         } else {
             $motd = file_get_contents(__DIR__ . "/../../config/motd.txt");
         }
@@ -290,10 +299,27 @@ class Framework
     }
 
     public function start() {
-        self::$loaded_files = get_included_files();
-        self::$server->start();
-        zm_atomic("server_is_stopped")->set(1);
-        Console::log("zhamao-framework is stopped.");
+        try {
+            self::$loaded_files = get_included_files();
+            self::$server->start();
+            zm_atomic("server_is_stopped")->set(1);
+            Console::log("zhamao-framework is stopped.");
+        } catch (Throwable $e) {
+            die(zm_internal_errcode("E00011") . "Framework has an uncaught " . get_class($e) . ": " . $e->getMessage() . PHP_EOL);
+        }
+    }
+
+    private function loadServerEvents() {
+        $r = exec(PHP_BINARY . " " . DataProvider::getFrameworkRootDir() . "/src/ZM/script_setup_loader.php", $output, $result_code);
+        if ($result_code !== 0) {
+            Console::error("Parsing code error!");
+            exit(1);
+        }
+        $json = json_decode($r, true);
+        if (!is_array($json)) {
+            Console::warning(zm_internal_errcode("E00012") . "Parsing @SwooleHandler and @OnSetup error!");
+        }
+        $this->setup_events = $json;
     }
 
     /**
@@ -303,18 +329,13 @@ class Framework
      */
     private function registerServerEvents() {
         $reader = new AnnotationReader();
-        global $master_events;
-        $master_events = [
-            "setup" => [],
-            "event" => []
-        ];
-        $all = getAllClasses(FRAMEWORK_ROOT_DIR . "/src/ZM/Event/SwooleEvent/", "ZM\\Event\\SwooleEvent");
+        $all = ZMUtil::getClassesPsr4(FRAMEWORK_ROOT_DIR . "/src/ZM/Event/SwooleEvent/", "ZM\\Event\\SwooleEvent");
         foreach ($all as $v) {
             $class = new $v();
             $reflection_class = new ReflectionClass($class);
             $anno_class = $reader->getClassAnnotation($reflection_class, SwooleHandler::class);
             if ($anno_class !== null) { // 类名形式的注解
-                $master_events["event"][]=[
+                $this->setup_events["event"][] = [
                     "class" => $v,
                     "method" => "onCall",
                     "event" => $anno_class->event
@@ -322,66 +343,14 @@ class Framework
             }
         }
 
-        $base_path = DataProvider::getWorkingDir();
-        $scan_paths = [];
-        $composer = json_decode(file_get_contents(DataProvider::getWorkingDir() . "/composer.json"), true);
-        foreach (($composer["autoload"]["psr-4"] ?? []) as $k => $v) {
-            if (is_dir($base_path."/".$v) && !in_array($v, $composer["extra"]["exclude_annotate"] ?? [])) {
-                $scan_paths[trim($k, "\\")]=realpath($base_path."/".$v);
-            }
-        }
-        $all_event_class = [];
-        foreach($scan_paths as $namespace => $autoload_path) {
-            $all_event_class = array_merge($all_event_class, getAllClasses($autoload_path."/", $namespace));
-        }
-        $process = new Process(function(Process $process) use ($all_event_class) {
-            $reader = new AnnotationReader();
-            $event_list = [];
-            $setup_list = [];
-            foreach ($all_event_class as $v) {
-                $reflection_class = new ReflectionClass($v);
-                $methods = $reflection_class->getMethods(ReflectionMethod::IS_PUBLIC);
-                foreach ($methods as $vs) {
-                    $method_annotations = $reader->getMethodAnnotations($vs);
-                    if ($method_annotations != []) {
-                        $annotation = $method_annotations[0];
-                        if ($annotation instanceof SwooleHandler) {
-                            $event_list[]=[
-                                "class" => $v,
-                                "method" => $vs->getName(),
-                                "event" => $annotation->event
-                            ];
-                        } elseif ($annotation instanceof OnSetup) {
-                            $setup_list[]=[
-                                "class" => $v,
-                                "method" => $vs->getName()
-                            ];
-                        }
-                    }
-                }
-            }
-            $sock = $process->exportSocket();
-            $sock->send(json_encode(["setup" => $setup_list, "event" => $event_list]));
-        });
-        $process->start();
-        go(function() use ($process) {
-            $socket = $process->exportSocket();
-            global $master_events;
-            $obj = json_decode($socket->recv(), true);
-            if ($obj["setup"] != []) $master_events["setup"] = array_merge($master_events["setup"], $obj["setup"]);
-            if ($obj["event"] != []) $master_events["event"] = array_merge($master_events["event"], $obj["event"]);
-        });
-        Process::wait(true);
-        Event::wait();
-
-        foreach($master_events["setup"] as $k => $v) {
+        foreach (($this->setup_events["setup"] ?? []) as $v) {
             $c = ZMUtil::getModInstance($v["class"]);
             $method = $v["method"];
             $c->$method();
         }
 
-        foreach ($master_events["event"] as $k => $v) {
-            self::$server->on($v["event"], function (...$param) use ($k, $v) {
+        foreach ($this->setup_events["event"] as $v) {
+            self::$server->on($v["event"], function (...$param) use ($v) {
                 ZMUtil::getModInstance($v["class"])->{$v["method"]}(...$param);
             });
         }
@@ -403,7 +372,7 @@ class Framework
                         if (intval($y) >= 1 && intval($y) <= 1024) {
                             $this->server_set["worker_num"] = intval($y);
                         } else {
-                            Console::warning("Invalid worker num! Turn to default value (" . ($this->server_set["worker_num"] ?? swoole_cpu_num()) . ")");
+                            Console::warning(zm_internal_errcode("E00013") . "Invalid worker num! Turn to default value (" . ($this->server_set["worker_num"] ?? swoole_cpu_num()) . ")");
                         }
                         break;
                     case 'task-worker-num':
@@ -411,7 +380,7 @@ class Framework
                             $this->server_set["task_worker_num"] = intval($y);
                             $this->server_set["task_enable_coroutine"] = true;
                         } else {
-                            Console::warning("Invalid worker num! Turn to default value (0)");
+                            Console::warning(zm_internal_errcode("E00013") . "Invalid worker num! Turn to default value (0)");
                         }
                         break;
                     case 'disable-coroutine':
@@ -421,7 +390,7 @@ class Framework
                         $coroutine_mode = false;
                         $terminal_id = null;
                         self::$argv["watch"] = true;
-                        echo ("* You are in debug mode, do not use in production!\n");
+                        echo("* You are in debug mode, do not use in production!\n");
                         break;
                     case 'daemon':
                         $this->server_set["daemonize"] = 1;
@@ -463,7 +432,8 @@ class Framework
                 }
             }
         }
-        if ($coroutine_mode) Runtime::enableCoroutine(true, SWOOLE_HOOK_ALL);
+        $global_hook = ZMConfig::get("global", 'runtime')['swoole_coroutine_hook_flags'] ?? SWOOLE_HOOK_ALL & (~SWOOLE_HOOK_CURL);
+        if ($coroutine_mode && $global_hook === false) Runtime::enableCoroutine(true, $global_hook);
         else Runtime::enableCoroutine(false, SWOOLE_HOOK_ALL);
     }
 
@@ -554,7 +524,9 @@ class Framework
     }
 
     public static function getTtyWidth(): string {
-        return explode(" ", trim(exec("stty size")))[1];
+        $size = exec("stty size");
+        if (empty($size)) return 65;
+        return explode(" ", trim($size))[1];
     }
 
     public static function loadFrameworkState() {

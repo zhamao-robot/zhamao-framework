@@ -11,7 +11,7 @@ use ZM\Console\Console;
 use ZM\Event\EventDispatcher;
 use ZM\Exception\ZMException;
 use ZM\Framework;
-use ZM\Utils\ProcessManager;
+use ZM\Utils\Manager\ProcessManager;
 
 class LightCache
 {
@@ -26,7 +26,6 @@ class LightCache
      * @param $config
      * @return bool|mixed
      * @throws Exception
-     * @noinspection PhpMissingReturnTypeInspection
      */
     public static function init($config) {
         self::$config = $config;
@@ -44,17 +43,17 @@ class LightCache
                     $write = self::set($k, $v);
                     Console::verbose("Writing LightCache: " . $k);
                     if ($write === false) {
-                        self::$last_error = '可能是由于 Hash 冲突过多导致动态空间无法分配内存';
+                        self::$last_error = zm_internal_errcode("E00051") . '可能是由于 Hash 冲突过多导致动态空间无法分配内存';
                         return false;
                     }
                 }
             }
         }
         if ($result === false) {
-            self::$last_error = '系统内存不足，申请失败';
+            self::$last_error = zm_internal_errcode("E00050") . '系统内存不足，申请失败';
         } else {
             $obj = Framework::loadFrameworkState();
-            foreach(($obj["expiring_light_cache"] ?? []) as $k => $v) {
+            foreach (($obj["expiring_light_cache"] ?? []) as $k => $v) {
                 $value = $v["value"];
                 if (is_array($value)) {
                     $value = json_encode($value, JSON_UNESCAPED_UNICODE);
@@ -87,7 +86,7 @@ class LightCache
      * @throws ZMException
      */
     public static function get(string $key) {
-        if (self::$kv_table === null) throw new ZMException("not initialized LightCache");
+        if (self::$kv_table === null) throw new ZMException(zm_internal_errcode("E00048") . "not initialized LightCache");
         self::checkExpire($key);
         $r = self::$kv_table->get($key);
         return $r === false ? null : self::parseGet($r);
@@ -99,7 +98,7 @@ class LightCache
      * @throws ZMException
      */
     public static function getExpire(string $key) {
-        if (self::$kv_table === null) throw new ZMException("not initialized LightCache");
+        if (self::$kv_table === null) throw new ZMException(zm_internal_errcode("E00048") . "not initialized LightCache");
         self::checkExpire($key);
         $r = self::$kv_table->get($key, "expire");
         return $r === false ? null : $r - time();
@@ -112,7 +111,7 @@ class LightCache
      * @since 2.4.3
      */
     public static function getExpireTS(string $key) {
-        if (self::$kv_table === null) throw new ZMException("not initialized LightCache");
+        if (self::$kv_table === null) throw new ZMException(zm_internal_errcode("E00048") . "not initialized LightCache");
         self::checkExpire($key);
         $r = self::$kv_table->get($key, "expire");
         return $r === false ? null : $r;
@@ -124,10 +123,9 @@ class LightCache
      * @param int $expire
      * @return mixed
      * @throws ZMException
-     * @noinspection PhpMissingReturnTypeInspection
      */
     public static function set(string $key, $value, int $expire = -1) {
-        if (self::$kv_table === null) throw new ZMException("not initialized LightCache");
+        if (self::$kv_table === null) throw new ZMException(zm_internal_errcode("E00048") . "not initialized LightCache");
         if (is_array($value)) {
             $value = json_encode($value, JSON_UNESCAPED_UNICODE);
             if (strlen($value) >= self::$config["max_strlen"]) return false;
@@ -140,7 +138,7 @@ class LightCache
             $data_type = "bool";
             $value = json_encode($value);
         } else {
-            throw new ZMException("Only can set string, array and int");
+            throw new ZMException(zm_internal_errcode("E00049") . "Only can set string, array and int");
         }
         try {
             return self::$kv_table->set($key, [
@@ -158,10 +156,9 @@ class LightCache
      * @param $value
      * @return bool|mixed
      * @throws ZMException
-     * @noinspection PhpMissingReturnTypeInspection
      */
     public static function update(string $key, $value) {
-        if (self::$kv_table === null) throw new ZMException("not initialized LightCache.");
+        if (self::$kv_table === null) throw new ZMException(zm_internal_errcode("E00048") . "not initialized LightCache.");
         if (is_array($value)) {
             $value = json_encode($value, JSON_UNESCAPED_UNICODE);
             if (strlen($value) >= self::$config["max_strlen"]) return false;
@@ -171,7 +168,7 @@ class LightCache
         } elseif (is_int($value)) {
             $data_type = "int";
         } else {
-            throw new ZMException("Only can set string, array and int");
+            throw new ZMException(zm_internal_errcode("E00048") . "Only can set string, array and int");
         }
         try {
             if (self::$kv_table->get($key) === false) return false;

@@ -4,10 +4,11 @@
 namespace ZM\Utils;
 
 
-use Co;
+use Swoole\Coroutine;
 use ZM\Store\LightCacheInside;
 use ZM\Store\Lock\SpinLock;
 use ZM\Store\ZMAtomic;
+use ZM\Utils\Manager\ProcessManager;
 
 class CoMessage
 {
@@ -16,10 +17,9 @@ class CoMessage
      * @param array $compare
      * @param int $timeout
      * @return mixed
-     * @noinspection PhpMissingReturnTypeInspection
      */
     public static function yieldByWS(array $hang, array $compare, $timeout = 600) {
-        $cid = Co::getuid();
+        $cid = Coroutine::getuid();
         $api_id = ZMAtomic::get("wait_msg_id")->add(1);
         $hang["compare"] = $compare;
         $hang["coroutine"] = $cid;
@@ -33,10 +33,10 @@ class CoMessage
         $id = swoole_timer_after($timeout * 1000, function () use ($api_id) {
             $r = LightCacheInside::get("wait_api", "wait_api")[$api_id] ?? null;
             if (is_array($r)) {
-                Co::resume($r["coroutine"]);
+                Coroutine::resume($r["coroutine"]);
             }
         });
-        Co::suspend();
+        Coroutine::suspend();
         SpinLock::lock("wait_api");
         $sess = LightCacheInside::get("wait_api", "wait_api");
         $result = $sess[$api_id]["result"] ?? null;
@@ -70,7 +70,7 @@ class CoMessage
             if ($all[$last]["worker_id"] != server()->worker_id) {
                 ProcessManager::sendActionToWorker($all[$last]["worker_id"], "resume_ws_message", $all[$last]);
             } else {
-                Co::resume($all[$last]["coroutine"]);
+                Coroutine::resume($all[$last]["coroutine"]);
             }
             return true;
         } else {

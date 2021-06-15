@@ -14,6 +14,6 @@ use Throwable;
 class RobotNotFoundException extends ZMException
 {
     public function __construct($message = "", $code = 0, Throwable $previous = null) {
-        parent::__construct($message, $code, $previous);
+        parent::__construct(zm_internal_errcode("E00037") . $message, $code, $previous);
     }
 }

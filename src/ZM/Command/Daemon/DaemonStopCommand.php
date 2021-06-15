@@ -1,7 +1,7 @@
 <?php
 
 
-namespace ZM\Command;
+namespace ZM\Command\Daemon;
 
 use Swoole\Process;
 use Symfony\Component\Console\Input\InputInterface;

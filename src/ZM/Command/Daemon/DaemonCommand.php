@@ -1,7 +1,7 @@
 <?php
 
 
-namespace ZM\Command;
+namespace ZM\Command\Daemon;
 
 
 use Symfony\Component\Console\Command\Command;
@@ -16,12 +16,12 @@ abstract class DaemonCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int {
         $pid_path = DataProvider::getWorkingDir() . "/.daemon_pid";
         if (!file_exists($pid_path)) {
-            $output->writeln("<comment>没有检测到正在运行的守护进程！</comment>");
+            $output->writeln("<comment>没有检测到正在运行的守护进程或框架进程！</comment>");
             die();
         }
         $file = json_decode(file_get_contents($pid_path), true);
         if ($file === null || posix_getsid(intval($file["pid"])) === false) {
-            $output->writeln("<comment>未检测到正在运行的守护进程！</comment>");
+            $output->writeln("<comment>未检测到正在运行的守护进程或框架进程！</comment>");
             unlink($pid_path);
             die();
         }

@@ -4,7 +4,7 @@
 namespace ZM\Utils;
 
 
-use Co;
+use Swoole\Coroutine;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
@@ -13,7 +13,7 @@ use Symfony\Component\Routing\RouteCollection;
 use ZM\Config\ZMConfig;
 use ZM\Console\Console;
 use ZM\Http\Response;
-use ZM\Http\RouteManager;
+use ZM\Utils\Manager\RouteManager;
 
 class HttpUtil
 {
@@ -51,7 +51,7 @@ class HttpUtil
 
     public static function getHttpCodePage(int $http_code) {
         if (isset(ZMConfig::get("global", "http_default_code_page")[$http_code])) {
-            return Co::readFile(DataProvider::getResourceFolder() . "html/" . ZMConfig::get("global", "http_default_code_page")[$http_code]);
+            return Coroutine::readFile(DataProvider::getResourceFolder() . "html/" . ZMConfig::get("global", "http_default_code_page")[$http_code]);
         } else return null;
     }
 

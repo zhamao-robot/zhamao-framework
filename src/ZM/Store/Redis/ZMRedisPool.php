@@ -30,7 +30,7 @@ class ZMRedisPool
                 var_dump($r);
             }
         } catch (RedisException $e) {
-            Console::error("Redis init failed! " . $e->getMessage());
+            Console::error(zm_internal_errcode("E00047") . "Redis init failed! " . $e->getMessage());
             self::$pool = null;
         }
     }

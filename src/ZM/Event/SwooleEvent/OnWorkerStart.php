@@ -12,7 +12,6 @@ use Swoole\Database\PDOConfig;
 use Swoole\Database\PDOPool;
 use Swoole\Process;
 use Swoole\Server;
-use Swoole\Timer;
 use ZM\Annotation\AnnotationParser;
 use ZM\Annotation\Swoole\OnStart;
 use ZM\Annotation\Swoole\OnSwooleEvent;
@@ -26,13 +25,14 @@ use ZM\Event\EventDispatcher;
 use ZM\Event\EventManager;
 use ZM\Event\SwooleEvent;
 use ZM\Exception\DbException;
+use ZM\Exception\ZMException;
 use ZM\Framework;
 use ZM\Module\QQBot;
 use ZM\Store\LightCacheInside;
 use ZM\Store\MySQL\SqlPoolStorage;
 use ZM\Store\Redis\ZMRedisPool;
 use ZM\Utils\DataProvider;
-use ZM\Utils\ProcessManager;
+use ZM\Utils\SignalListener;
 
 /**
  * Class OnWorkerStart
@@ -43,18 +43,10 @@ class OnWorkerStart implements SwooleEvent
 {
     public function onCall(Server $server, $worker_id) {
         if (!Framework::$argv["disable-safe-exit"]) {
-            Process::signal(SIGINT, function () use ($worker_id, $server) {
-
-            });
+            SignalListener::signalWorker($server, $worker_id);
         }
         unset(Context::$context[Coroutine::getCid()]);
         if ($server->taskworker === false) {
-            if (!Framework::$argv["disable-safe-exit"]) {
-                Process::signal(SIGUSR1, function () use ($worker_id) {
-                    Timer::clearAll();
-                    ProcessManager::resumeAllWorkerCoroutines();
-                });
-            }
             zm_atomic("_#worker_" . $worker_id)->set($server->worker_pid);
             if (LightCacheInside::get("wait_api", "wait_api") !== null) {
                 LightCacheInside::unset("wait_api", "wait_api");
@@ -63,7 +55,8 @@ class OnWorkerStart implements SwooleEvent
                 register_shutdown_function(function () use ($server) {
                     $error = error_get_last();
                     if (($error["type"] ?? -1) != 0) {
-                        Console::error("Internal fatal error: " . $error["message"] . " at " . $error["file"] . "({$error["line"]})");
+                        Console::error(zm_internal_errcode("E00027") . "Internal fatal error: " . $error["message"] . " at " . $error["file"] . "({$error["line"]})");
+                        zm_dump($error);
                     }
                     //DataProvider::saveBuffer();
                     /** @var Server $server */
@@ -71,7 +64,7 @@ class OnWorkerStart implements SwooleEvent
                     else server()->shutdown();
                 });
 
-                Console::verbose("Worker #{$server->worker_id} 启动中");
+                Console::verbose("Worker #{$server->worker_id} starting");
                 Framework::$server = $server;
                 //ZMBuf::resetCache(); //清空变量缓存
                 //ZMBuf::set("wait_start", []); //添加队列，在workerStart运行完成前先让其他协程等待执行
@@ -90,12 +83,12 @@ class OnWorkerStart implements SwooleEvent
                     phpinfo(); //这个phpinfo是有用的，不能删除
                     $str = ob_get_clean();
                     $str = explode("\n", $str);
-                    foreach ($str as $k => $v) {
+                    foreach ($str as $v) {
                         $v = trim($v);
                         if ($v == "") continue;
                         if (mb_strpos($v, "API Extensions") === false) continue;
                         if (mb_strpos($v, "pdo_mysql") === false) {
-                            throw new DbException("未安装 mysqlnd php-mysql扩展。");
+                            throw new DbException(zm_internal_errcode("E00028") . "未安装 mysqlnd php-mysql扩展。");
                         }
                     }
                     $sql = ZMConfig::get("global", "sql_config");
@@ -115,7 +108,7 @@ class OnWorkerStart implements SwooleEvent
                 // 开箱即用的Redis
                 $redis = ZMConfig::get("global", "redis_config");
                 if ($redis !== null && $redis["host"] != "") {
-                    if (!extension_loaded("redis")) Console::error("Can not find redis extension.\n");
+                    if (!extension_loaded("redis")) Console::error(zm_internal_errcode("E00029") . "Can not find redis extension.\n");
                     else ZMRedisPool::init($redis);
                 }
 
@@ -136,11 +129,11 @@ class OnWorkerStart implements SwooleEvent
                 Console::success("Worker #" . $worker_id . " started");
             } catch (Exception $e) {
                 Console::error("Worker加载出错！停止服务！");
-                Console::error($e->getMessage() . "\n" . $e->getTraceAsString());
+                Console::error(zm_internal_errcode("E00030") . $e->getMessage() . "\n" . $e->getTraceAsString());
                 Process::kill($server->master_pid, SIGTERM);
                 return;
             } catch (Error $e) {
-                Console::error("PHP Error: " . $e->getMessage() . " in " . $e->getFile() . " on line " . $e->getLine());
+                Console::error(zm_internal_errcode("E00030") . "PHP Error: " . $e->getMessage() . " in " . $e->getFile() . " on line " . $e->getLine());
                 Console::error("Maybe it caused by your own code if in your own Module directory.");
                 Console::log($e->getTraceAsString(), 'gray');
                 Process::kill($server->master_pid, SIGTERM);
@@ -153,11 +146,11 @@ class OnWorkerStart implements SwooleEvent
                 Console::success("TaskWorker #" . $server->worker_id . " started");
             } catch (Exception $e) {
                 Console::error("Worker加载出错！停止服务！");
-                Console::error($e->getMessage() . "\n" . $e->getTraceAsString());
+                Console::error(zm_internal_errcode("E00030") . $e->getMessage() . "\n" . $e->getTraceAsString());
                 Process::kill($server->master_pid, SIGTERM);
                 return;
             } catch (Error $e) {
-                Console::error("PHP Error: " . $e->getMessage() . " in " . $e->getFile() . " on line " . $e->getLine());
+                Console::error(zm_internal_errcode("E00030") . "PHP Error: " . $e->getMessage() . " in " . $e->getFile() . " on line " . $e->getLine());
                 Console::error("Maybe it caused by your own code if in your own Module directory.");
                 Console::log($e->getTraceAsString(), 'gray');
                 Process::kill($server->master_pid, SIGTERM);
@@ -189,15 +182,13 @@ class OnWorkerStart implements SwooleEvent
         //加载各个模块的注解类，以及反射
         Console::debug("检索Module中");
         $parser = new AnnotationParser();
-        $path = DataProvider::getWorkingDir() . "/src/";
-        $dir = scandir($path);
-        unset($dir[0], $dir[1]);
-        $composer = json_decode(file_get_contents(DataProvider::getWorkingDir() . "/composer.json"), true);
-        foreach ($dir as $v) {
-            if (is_dir($path . "/" . $v) && isset($composer["autoload"]["psr-4"][$v . "\\"]) && !in_array($composer["autoload"]["psr-4"][$v . "\\"], $composer["extra"]["exclude_annotate"] ?? [])) {
-                if (\server()->worker_id == 0)
-                    Console::verbose("Add " . $v . " to register path");
-                $parser->addRegisterPath(DataProvider::getWorkingDir() . "/src/" . $v . "/", $v);
+        $composer = json_decode(file_get_contents(DataProvider::getSourceRootDir() . "/composer.json"), true);
+        foreach ($composer["autoload"]["psr-4"] as $k => $v) {
+            if (is_dir(DataProvider::getSourceRootDir() . "/" . $v)) {
+                if (in_array(trim($k, "\\") . "\\", $composer["extra"]["exclude_annotate"] ?? [])) continue;
+                if (trim($k, "\\") == "ZM") continue;
+                if (\server()->worker_id == 0) Console::verbose("Add " . $v . ":$k to register path");
+                $parser->addRegisterPath(DataProvider::getSourceRootDir() . "/" . $v . "/", trim($k, "\\"));
             }
         }
         $parser->registerMods();
@@ -207,7 +198,7 @@ class OnWorkerStart implements SwooleEvent
         Console::debug("加载自定义上下文中...");
         $context_class = ZMConfig::get("global", "context_class");
         if (!is_a($context_class, ContextInterface::class, true)) {
-            throw new Exception("Context class must implemented from ContextInterface!");
+            throw new ZMException(zm_internal_errcode("E00032") ."Context class must implemented from ContextInterface!");
         }
 
         //加载插件

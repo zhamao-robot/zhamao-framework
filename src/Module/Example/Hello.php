@@ -92,6 +92,7 @@ class Hello
             return TuringAPI::getTuringMsg($msg, $user_id, $api);
         } else {
             QQBot::getInstance()->handle(ctx()->getData(), ctx()->getCache("level") + 1);
+            //执行嵌套消息，递归层级+1
             return true;
         }
     }
