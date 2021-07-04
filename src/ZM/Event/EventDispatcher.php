@@ -137,17 +137,18 @@ class EventDispatcher
         if ($this->log) Console::verbose("[事件分发{$this->eid}] " . $q_c . "::" . $q_f . " 方法下的 ruleFunc 为真，继续执行方法本身 ...");
         if (isset(EventManager::$middleware_map[$q_c][$q_f])) {
             $middlewares = EventManager::$middleware_map[$q_c][$q_f];
-            if ($this->log) Console::verbose("[事件分发{$this->eid}] " . $q_c . "::" . $q_f . " 方法还绑定了 Middleware：" . implode(", ", $middlewares));
+            if ($this->log) Console::verbose("[事件分发{$this->eid}] " . $q_c . "::" . $q_f . " 方法还绑定了 Middleware：" . implode(", ", array_map(function($x){ return $x->middleware; }, $middlewares)));
             $before_result = true;
             $r = [];
             foreach ($middlewares as $k => $middleware) {
-                if (!isset(EventManager::$middlewares[$middleware])) throw new AnnotationException("Annotation parse error: Unknown MiddlewareClass named \"{$middleware}\"!");
-                $middleware_obj = EventManager::$middlewares[$middleware];
+                if (!isset(EventManager::$middlewares[$middleware->middleware])) throw new AnnotationException("Annotation parse error: Unknown MiddlewareClass named \"{$middleware->middleware}\"!");
+                $middleware_obj = EventManager::$middlewares[$middleware->middleware];
                 $before = $middleware_obj["class"];
                 //var_dump($middleware_obj);
                 $r[$k] = new $before();
                 $r[$k]->class = $q_c;
                 $r[$k]->method = $q_f;
+                $r[$k]->middleware = $middleware;
                 if (isset($middleware_obj["before"])) {
                     if ($this->log) Console::verbose("[事件分发{$this->eid}] Middleware 存在前置事件，执行中 ...");
                     $rs = $middleware_obj["before"];
@@ -173,7 +174,7 @@ class EventDispatcher
                     }
                     if ($this->log) Console::verbose("[事件分发{$this->eid}] 方法 " . $q_c . "::" . $q_f . " 执行过程中抛出了异常，正在倒序查找 Middleware 中的捕获方法 ...");
                     for ($i = count($middlewares) - 1; $i >= 0; --$i) {
-                        $middleware_obj = EventManager::$middlewares[$middlewares[$i]];
+                        $middleware_obj = EventManager::$middlewares[$middlewares[$i]->middleware];
                         if (!isset($middleware_obj["exceptions"])) continue;
                         foreach ($middleware_obj["exceptions"] as $name => $method) {
                             if ($e instanceof $name) {
@@ -186,7 +187,7 @@ class EventDispatcher
                     throw $e;
                 }
                 for ($i = count($middlewares) - 1; $i >= 0; --$i) {
-                    $middleware_obj = EventManager::$middlewares[$middlewares[$i]];
+                    $middleware_obj = EventManager::$middlewares[$middlewares[$i]->middleware];
                     if (isset($middleware_obj["after"], $r[$i])) {
                         if ($this->log) Console::verbose("[事件分发{$this->eid}] Middleware 存在后置事件，执行中 ...");
                         $r[$i]->{$middleware_obj["after"]}(...$params);
@@ -206,5 +207,19 @@ class EventDispatcher
             $this->status = self::STATUS_NORMAL;
             return true;
         }
+    }
+
+    /**
+     * @return int
+     */
+    public function getEid(): int {
+        return $this->eid;
+    }
+
+    /**
+     * @return string
+     */
+    public function getClass(): string {
+        return $this->class;
     }
 }

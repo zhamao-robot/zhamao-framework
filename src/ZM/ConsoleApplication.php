@@ -11,6 +11,7 @@ use ZM\Command\CheckConfigCommand;
 use ZM\Command\Daemon\DaemonReloadCommand;
 use ZM\Command\Daemon\DaemonStatusCommand;
 use ZM\Command\Daemon\DaemonStopCommand;
+use ZM\Command\Generate\SystemdGenerateCommand;
 use ZM\Command\InitCommand;
 use ZM\Command\Module\ModuleListCommand;
 use ZM\Command\Module\ModulePackCommand;
@@ -20,21 +21,32 @@ use ZM\Command\RunServerCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use ZM\Command\SystemdCommand;
 use ZM\Console\Console;
+use ZM\Exception\InitException;
 
 class ConsoleApplication extends Application
 {
-    const VERSION_ID = 408;
-    const VERSION = "2.5.0-b1";
+    private static $obj = null;
 
+    const VERSION_ID = 409;
+    const VERSION = "2.5.0-b2";
+
+    /**
+     * @throws InitException
+     */
     public function __construct(string $name = 'UNKNOWN') {
+        if (self::$obj !== null) throw new InitException(zm_internal_errcode("E00069") . "Initializing another Application is not allowed!");
         define("ZM_VERSION_ID", self::VERSION_ID);
         define("ZM_VERSION", self::VERSION);
+        self::$obj = $this;
         parent::__construct($name, ZM_VERSION);
     }
 
+    /**
+     * @throws InitException
+     */
     public function initEnv($with_default_cmd = ""): ConsoleApplication {
+        if (defined("WORKDING_DIR")) throw new InitException();
         $this->selfCheck();
 
         define("WORKING_DIR", getcwd());
@@ -77,7 +89,7 @@ class ConsoleApplication extends Application
             new DaemonStopCommand(),
             new RunServerCommand(), //运行主服务的指令控制器
             new PureHttpCommand(), //纯HTTP服务器指令
-            new SystemdCommand()
+            new SystemdGenerateCommand()
         ]);
         if (LOAD_MODE === 1) {
             $this->add(new CheckConfigCommand());

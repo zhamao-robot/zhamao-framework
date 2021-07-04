@@ -129,7 +129,7 @@ $config['remote_terminal'] = [
 
 /** 模块(插件)加载器的相关设置 */
 $config['module_loader'] = [
-    'enable_hotload' => true,
+    'enable_hotload' => false,
     'load_path' => $config['zm_data'] . 'modules'
 ];
 

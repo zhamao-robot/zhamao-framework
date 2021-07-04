@@ -50,9 +50,6 @@ class OneBotV11
         return new ZMRobot($r[array_rand($r)]);
     }
 
-    public static function getFirst() {
-    }
-
     /**
      * @return ZMRobot[]
      */

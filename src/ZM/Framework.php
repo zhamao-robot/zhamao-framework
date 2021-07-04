@@ -55,7 +55,7 @@ class Framework
         ZMConfig::setDirectory(DataProvider::getSourceRootDir() . '/config');
         ZMConfig::setEnv($args["env"] ?? "");
         if (ZMConfig::get("global") === false) {
-            die (zm_internal_errcode("E00007") . "Global config load failed: " . ZMConfig::$last_error . "\nPlease init first!\nSee: https://github.com/zhamao-robot/zhamao-framework/issues/37\n");
+            die (zm_internal_errcode("E00007") . "Global config load failed: " . ZMConfig::$last_error . "\nError path: " . DataProvider::getSourceRootDir() . "\nPlease init first!\nSee: https://github.com/zhamao-robot/zhamao-framework/issues/37\n");
         }
 
         //定义常量
@@ -107,6 +107,7 @@ class Framework
             define("ZM_WORKER_NUM", $worker);
 
             ZMAtomic::init();
+            $out["working_dir"] = DataProvider::getWorkingDir();
 
             // 打印初始信息
             $out["listen"] = ZMConfig::get("global", "host") . ":" . ZMConfig::get("global", "port");
@@ -138,12 +139,12 @@ class Framework
                 $out["php_version"] = PHP_VERSION;
                 $out["swoole_version"] = SWOOLE_VERSION;
             }
+
             if ($add_port) {
                 $conf = ZMConfig::get("global", "remote_terminal");
                 $out["terminal"] = $conf["host"] . ":" . $conf["port"];
             }
 
-            $out["working_dir"] = DataProvider::getWorkingDir();
             self::printProps($out, $tty_width, $args["log-theme"] === null);
             if ($args["preview"]) {
                 exit();
@@ -215,7 +216,7 @@ class Framework
 
                     $r = ob_get_clean();
                     if (!empty($r)) $serv->send($fd, $r);
-                    if (!in_array(trim($data), ['r', 'reload', 'stop'])) $serv->send($fd, ">>> ");
+                    if (!in_array(trim($data), ['r', 'reload'])) $serv->send($fd, ">>> ");
                 });
 
                 $port->on('close', function ($serv, $fd) {
@@ -310,7 +311,14 @@ class Framework
     }
 
     private function loadServerEvents() {
-        $r = exec(PHP_BINARY . " " . DataProvider::getFrameworkRootDir() . "/src/ZM/script_setup_loader.php", $output, $result_code);
+        if (\Phar::running() !== "") {
+            ob_start();
+            $r = include_once DataProvider::getFrameworkRootDir() . "/src/ZM/script_setup_loader.php";
+            $r = ob_get_clean();
+            $result_code = 0;
+        } else {
+            $r = exec(PHP_BINARY . " " . DataProvider::getFrameworkRootDir() . "/src/ZM/script_setup_loader.php", $output, $result_code);
+        }
         if ($result_code !== 0) {
             Console::error("Parsing code error!");
             exit(1);
@@ -440,7 +448,7 @@ class Framework
     private static function writeNoDouble($k, $v, &$line_data, &$line_width, &$current_line, $colorful, $max_border) {
         $tmp_line = $k . ": " . $v;
         //Console::info("写入[".$tmp_line."]");
-        if (strlen($tmp_line) >= $line_width[$current_line]) { //输出的内容太多了，以至于一行都放不下一个，要折行
+        if (strlen($tmp_line) > $line_width[$current_line]) { //输出的内容太多了，以至于一行都放不下一个，要折行
             $title_strlen = strlen($k . ": ");
             $content_len = $line_width[$current_line] - $title_strlen;
 

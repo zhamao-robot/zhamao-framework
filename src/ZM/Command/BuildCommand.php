@@ -3,6 +3,7 @@
 
 namespace ZM\Command;
 
+use League\CLImate\CLImate;
 use Phar;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -56,22 +57,22 @@ class BuildCommand extends Command
         @unlink($target_dir . $filename);
         $phar = new Phar($target_dir . $filename);
         $phar->startBuffering();
+        $climate = new CLImate();
 
-        $allow_dir = ["bin", "config", "resources", "src", "vendor", "composer.json", "README.md", "zhamao"];
+        $all = DataProvider::scanDirFiles(DataProvider::getSourceRootDir(), true, true);
+
+        $all = array_filter($all, function ($x) {
+            $dirs = preg_match("/(^(bin|config|resources|src|vendor)\/|^(composer\.json|README\.md)$)/", $x);
+            return !($dirs !== 1);
+        });
+
+        sort($all);
+        $progress = $climate->progress()->total(count($all));
 
         $archive_dir = DataProvider::getSourceRootDir();
-        $scan = scandir($archive_dir);
-        if ($scan[0] == ".") {
-            unset($scan[0], $scan[1]);
-        }
-        foreach ($scan as $v) {
-            if (in_array($v, $allow_dir)) {
-                if (is_dir($archive_dir . "/" . $v)) {
-                    $this->addDirectory($phar, $archive_dir . "/" . $v, $v);
-                } elseif (is_file($archive_dir . "/" . $v)) {
-                    $phar->addFile($archive_dir . "/" . $v, $v);
-                }
-            }
+        foreach ($all as $k => $v) {
+            $phar->addFile($archive_dir . "/" . $v, $v);
+            $progress->current($k + 1, "Adding " . $v);
         }
 
         $phar->setStub(
@@ -80,19 +81,5 @@ class BuildCommand extends Command
         );
         $phar->stopBuffering();
         $this->output->writeln("Successfully built. Location: " . $target_dir . "$filename");
-    }
-
-    private function addDirectory(Phar $phar, $dir, $local_dir) {
-        $o = scandir($dir);
-        if ($o[0] == ".") {
-            unset($o[0], $o[1]);
-        }
-        foreach ($o as $v) {
-            if (is_dir($dir . "/" . $v)) {
-                $this->addDirectory($phar, $dir . "/" . $v, $local_dir . "/" . $v);
-            } elseif (is_file($dir . "/" . $v)) {
-                $phar->addFile($dir . "/" . $v, $local_dir . "/" . $v);
-            }
-        }
     }
 }

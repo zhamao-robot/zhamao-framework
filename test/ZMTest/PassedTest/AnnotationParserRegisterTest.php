@@ -11,6 +11,7 @@ use ReflectionException;
 use ZM\Annotation\AnnotationParser;
 use ZM\Annotation\Swoole\OnStart;
 use ZM\Console\Console;
+use ZM\Event\EventTracer;
 
 class AnnotationParserRegisterTest extends TestCase
 {
@@ -21,7 +22,7 @@ class AnnotationParserRegisterTest extends TestCase
             define("WORKING_DIR", realpath(__DIR__ . "/../../../"));
         if (!defined("LOAD_MODE"))
             define("LOAD_MODE", 0);
-        Console::init(2);
+        Console::init(4);
         $this->parser = new AnnotationParser();
         $this->parser->addRegisterPath(WORKING_DIR . "/src/Module/", "Module");
         try {
@@ -69,5 +70,9 @@ class AnnotationParserRegisterTest extends TestCase
     public function testReqMapping() {
         $mapping = $this->parser->getReqMapping();
         $this->assertEquals("index", $mapping["method"]);
+    }
+
+    public function testTracer() {
+
     }
 }

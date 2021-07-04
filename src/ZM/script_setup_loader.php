@@ -4,14 +4,18 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use ZM\Annotation\Swoole\OnSetup;
 use ZM\Annotation\Swoole\SwooleHandler;
 use ZM\ConsoleApplication;
+use ZM\Exception\InitException;
 use ZM\Utils\DataProvider;
 use ZM\Utils\ZMUtil;
 
 require_once ((!is_dir(__DIR__ . '/../../vendor')) ? getcwd() : (__DIR__ . "/../..")) . "/vendor/autoload.php";
 
 try {
-    (new ConsoleApplication('zhamao'))->initEnv();
+    try {
+        (new ConsoleApplication('zhamao'))->initEnv();
+    } catch (InitException $e) {
 
+    }
     $base_path = DataProvider::getSourceRootDir();
     $scan_paths = [];
     $composer = json_decode(file_get_contents($base_path . "/composer.json"), true);

@@ -20,6 +20,9 @@ extra_javascript:
 extra_css:
   - assets/css/extra.css
   - https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/default.min.css
+plugins:
+  - search:
+      lang: ja
 markdown_extensions:
   - admonition
   - pymdownx.tabbed
@@ -62,6 +65,7 @@ nav:
       - 基本配置: guide/basic-config.md
       - 编写模块: guide/write-module.md
       - 注册事件响应: guide/register-event.md
+      - 错误码对照表: guide/errcode.md
   - 事件和注解:
       - 事件和注解: event/index.md
       - 机器人注解事件: event/robot-annotations.md

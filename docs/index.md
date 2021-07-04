@@ -39,17 +39,17 @@ public function index() {
 
 1. Linux 命令行（会跑 Linux 程序）
 2. php 7.2+ 开发环境（项目会持续支持最新的 PHP 版本）
-3. HTTP/WebSocket 协议
 4. OneBot 机器人聊天接口标准
 
 需要值得注意的是，本教程中所涉及的内容均为尽可能翻译为白话的方式进行描述，但对于框架的组件或事件等需要单独拆分说明文档的部分则需要足够详细，所以本教程提供一个快速上手的教程，并且会将最典型的安装方式写到快速教程篇。
 
 !!! bug "文档提示"
 
-    此文档采用 MkDocs 驱动，但因为本文档的搜索组件原生不支持中文搜索，所以搜索体验会大打折扣，敬请谅解！搜不到不是没这个东西哦！
+    此文档采用 MkDocs 驱动，文档的搜索组件原生不支持中文搜索，且分词很难控制，所以搜索体验会大打折扣，敬请谅解！搜不到不是没这个东西，建议这种情况可以自行翻阅目录查看！
 
 
 ## 框架特色
+
 - 支持MySQL数据库（连接池），自带查询缓存提高多查询时的效率
 - Websocket 服务器、HTTP 服务器兼容运行，一个框架多个用处
 - 支持命令、自然语言处理等多种插件形式
@@ -61,6 +61,7 @@ public function index() {
 ## 文档主题
 
 ### 主题
+
 <div class="tx-switch">
   <button data-md-color-scheme="default"><code>默认模式</code></button>
   <button data-md-color-scheme="slate"><code>暗黑模式</code></button>
@@ -80,6 +81,7 @@ public function index() {
 </script>
 
 ### 主色调
+
 <div class="tx-switch">
   <button data-md-color-primary="red"><code>red</code></button>
   <button data-md-color-primary="pink"><code>pink</code></button>
@@ -105,6 +107,7 @@ public function index() {
 </div>
 
 ### 辅色调
+
 <div class="tx-switch"> <button data-md-color-accent="red"><code>red</code></button> <button data-md-color-accent="pink"><code>pink</code></button> <button data-md-color-accent="purple"><code>purple</code></button> <button data-md-color-accent="deep-purple"><code>deep purple</code></button> <button data-md-color-accent="indigo"><code>indigo</code></button> <button data-md-color-accent="blue"><code>blue</code></button> <button data-md-color-accent="light-blue"><code>light blue</code></button> <button data-md-color-accent="cyan"><code>cyan</code></button> <button data-md-color-accent="teal"><code>teal</code></button> <button data-md-color-accent="green"><code>green</code></button> <button data-md-color-accent="light-green"><code>light green</code></button> <button data-md-color-accent="lime"><code>lime</code></button> <button data-md-color-accent="yellow"><code>yellow</code></button> <button data-md-color-accent="amber"><code>amber</code></button> <button data-md-color-accent="orange"><code>orange</code></button> <button data-md-color-accent="deep-orange"><code>deep orange</code></button> </div>
 
 <script>

@@ -24,7 +24,7 @@ class ZMAtomic
      * 初始化atomic计数器
      */
     public static function init() {
-        foreach (ZMConfig::get("global", "init_atomics") as $k => $v) {
+        foreach ((ZMConfig::get("global", "init_atomics") ?? []) as $k => $v) {
             self::$atomics[$k] = new Atomic($v);
         }
         self::$atomics["stop_signal"] = new Atomic(0);

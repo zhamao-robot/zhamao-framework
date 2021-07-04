@@ -99,15 +99,16 @@ class ModuleManager
     }
 
     /**
-     * 解包模块 TODO
+     * 解包模块
      * @param $module
+     * @param array $options
      * @return array|false
      */
-    public static function unpackModule($module) {
+    public static function unpackModule($module, array $options = []) {
         try {
             $packer = new ModuleUnpacker($module);
-            return $packer->unpack();
-        } catch (ModulePackException $e) {
+            return $packer->unpack((bool)$options["override-light-cache"], (bool)$options["override-zm-data"], (bool)$options["override-source"]);
+        } catch (ZMException $e) {
             Console::error($e->getMessage());
             return false;
         }

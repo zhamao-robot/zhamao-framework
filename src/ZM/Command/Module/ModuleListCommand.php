@@ -23,7 +23,7 @@ class ModuleListCommand extends Command
         ZMConfig::setDirectory(DataProvider::getSourceRootDir() . '/config');
         ZMConfig::setEnv($args["env"] ?? "");
         if (ZMConfig::get("global") === false) {
-            die ("Global config load failed: " . ZMConfig::$last_error . "\nPlease init first!\n");
+            die (zm_internal_errcode("E00007") . "Global config load failed: " . ZMConfig::$last_error . "\nPlease init first!\nSee: https://github.com/zhamao-robot/zhamao-framework/issues/37\n");
         }
 
         //定义常量
@@ -52,6 +52,9 @@ class ModuleListCommand extends Command
             $out_list["目录"] = str_replace(DataProvider::getSourceRootDir() . "/", "", $v["module-path"]);
             $this->printList($out_list);
         }
+        if ($list === []) {
+            echo Console::setColor("没有发现已编写打包配置文件（zm.json）的模块！", "yellow") . PHP_EOL;
+        }
         $list = ModuleManager::getPackedModules();
         foreach ($list as $v) {
             echo "[" . Console::setColor($v["name"], "gold") . "]" . PHP_EOL;
@@ -62,7 +65,7 @@ class ModuleListCommand extends Command
             $this->printList($out_list);
         }
         if ($list === []) {
-            echo Console::setColor("没有发现已编写打包配置文件（zm.json）的模块和已打包且装载的模块！", "yellow") . PHP_EOL;
+            echo Console::setColor("没有发现已打包且装载的模块！", "yellow") . PHP_EOL;
         }
         return 0;
     }

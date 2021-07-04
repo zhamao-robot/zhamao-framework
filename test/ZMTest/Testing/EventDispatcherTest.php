@@ -8,11 +8,14 @@ use Doctrine\Common\Annotations\AnnotationException;
 use Module\Example\Hello;
 use PHPUnit\Framework\TestCase;
 use ReflectionException;
+use Swoole\Atomic;
 use ZM\Annotation\AnnotationParser;
 use ZM\Annotation\CQ\CQCommand;
 use ZM\Console\Console;
 use ZM\Event\EventDispatcher;
 use ZM\Event\EventManager;
+use ZM\Store\LightCacheInside;
+use ZM\Store\ZMAtomic;
 
 class EventDispatcherTest extends TestCase
 {
@@ -23,7 +26,9 @@ class EventDispatcherTest extends TestCase
             define("WORKING_DIR", realpath(__DIR__ . "/../../../"));
         if (!defined("LOAD_MODE"))
             define("LOAD_MODE", 0);
-        Console::init(2);
+        Console::init(4);
+        ZMAtomic::$atomics["_event_id"] = new Atomic(0);
+        LightCacheInside::init();
         $parser = new AnnotationParser();
         $parser->addRegisterPath(WORKING_DIR . "/src/Module/", "Module");
         try {
@@ -44,5 +49,13 @@ class EventDispatcherTest extends TestCase
         $r = ob_get_clean();
         echo $r;
         $this->assertStringContainsString("你好啊", $r);
+        $dispatcher = new EventDispatcher(CQCommand::class);
+        $dispatcher->setReturnFunction(function ($result) {
+            //echo $result . PHP_EOL;
+        });
+        //$dispatcher->setRuleFunction(function ($v) { return $v->match == "qwe"; });
+        $dispatcher->setRuleFunction(function ($v) { return $v->match == "qwe"; });
+        //$dispatcher->setRuleFunction(fn ($v) => $v->match == "qwe");
+        $dispatcher->dispatchEvents();
     }
 }

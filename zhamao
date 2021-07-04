@@ -1,22 +1,35 @@
 #!/bin/sh
 
+# shellcheck disable=SC2068
+# shellcheck disable=SC2181
+# author: crazywhalecc
+# since: 2.5.0
+
+
 if [ -f "$(pwd)/runtime/php" ]; then
     executable="$(pwd)/runtime/php"
+    echo "* Framework started with built-in php."
 else
-  which php >/dev/null 2>&1
+    which php >/dev/null 2>&1
 	if [ $? -eq 0 ]; then
-	  executable=$(which php)
+	    executable=$(which php)
 	else
-	  echo 'Cannot find any PHP runtime, please use command `./install-runtime.sh` or install PHP manually!'
-	  exit 1
+	    echo '[ErrCode:E00014] Cannot find any PHP runtime, please use command "./install-runtime.sh" or install PHP manually!'
+	    exit 1
 	fi
 fi
 
+result=$(echo "$1" | grep -E "module|build")
+
+if [ "$result" != "" ]; then
+    executable="$executable -d phar.readonly=off"
+fi
+
 if [ -f "$(pwd)/src/entry.php" ]; then
-  $executable "$(pwd)/src/entry.php" $@
+    $executable "$(pwd)/src/entry.php" $@
 elif [ -f "$(pwd)/vendor/zhamao/framework/src/entry.php" ]; then
-  $executable "$(pwd)/vendor/zhamao/framework/src/entry.php" $@
+    $executable "$(pwd)/vendor/zhamao/framework/src/entry.php" $@
 else
-  echo "Cannot find zhamao-framework entry file!"
-  exit 1
+    echo "[ErrCode:E00015] Cannot find zhamao-framework entry file!"
+    exit 1
 fi

@@ -104,6 +104,7 @@ class ModulePacker
         $this->addFiles();                  //添加文件
         $this->addLightCacheStore();        //保存light-cache-store指定的项
         $this->addModuleConfig();           //生成module-config.json
+        $this->addZMDataFiles();            //添加需要保存的zm_data下的目录或文件
         $this->addEntry();                  //生成模块的入口文件module_entry.php
 
         $this->phar->stopBuffering();
@@ -159,7 +160,7 @@ class ModulePacker
             foreach ($this->module['light-cache-store'] as $v) {
                 $r = LightCache::get($v);
                 if ($r === null) {
-                    Console::warning(zm_internal_errcode("E00045") . 'LightCache 项：`$v` 不存在或值为null，无法为其保存。');
+                    Console::warning(zm_internal_errcode("E00045") . 'LightCache 项：' . $v . ' 不存在或值为null，无法为其保存。');
                 } else {
                     $store[$v] = $r;
                     Console::info('打包LightCache持久化项：' . $v);
@@ -179,9 +180,10 @@ class ModulePacker
             'autoload-psr-4' => $this->generatePharAutoload(),
             'unpack' => [
                 'composer-autoload-items' => $this->getComposerAutoloadItems(),
-                'global-config-override' => !empty($this->module['global-config-override'] ?? []) ? $this->module['global-config-override'] : false
+                'global-config-override' => $this->module['global-config-override'] ?? false
             ],
-            'allow-hotload' => empty($this->module['global-config-override'] ?? []) && !isset($this->module['depends'])
+            'allow-hotload' => $this->module["allow-hotload"] ?? false,
+            'pack-time' => time()
         ];
         $this->phar->addFromString('zmplugin.json', json_encode($stub_values, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
         $this->module_config = $stub_values;
@@ -202,5 +204,29 @@ class ModulePacker
         $this->phar->addFromString('module_entry.php', $stub_template);
 
         $this->phar->setStub($this->phar->createDefaultStub('module_entry.php'));
+    }
+
+    /**
+     * @throws ModulePackException
+     */
+    private function addZMDataFiles() {
+        $base_dir = realpath(DataProvider::getDataFolder());
+        if (is_array($this->module["zm-data-store"] ?? null)) {
+            foreach ($this->module["zm-data-store"] as $v) {
+                if (is_dir($base_dir . '/' . $v)) {
+                    $v = rtrim($v, '/');
+                    Console::info("Adding external zm_data dir: " . $v);
+                    $files = DataProvider::scanDirFiles($base_dir . '/' . $v, true, true);
+                    foreach ($files as $single) {
+                        $this->phar->addFile($base_dir . '/' . $v . '/' . $single, 'zm_data/' . $v . '/' . $single);
+                    }
+                } elseif (is_file($base_dir . '/' . $v)) {
+                    Console::info("Add external zm_data file: " . $v);
+                    $this->phar->addFile($base_dir . '/' . $v, 'zm_data/' . $v);
+                } else {
+                    throw new ModulePackException(zm_internal_errcode("E00066")."`zmdata-store` 指定的文件或目录不存在");
+                }
+            }
+        }
     }
 }

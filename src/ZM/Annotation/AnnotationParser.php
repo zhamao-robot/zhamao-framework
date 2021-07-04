@@ -122,7 +122,7 @@ class AnnotationParser
                         if ($method_anno instanceof RequestMapping) {
                             RouteManager::importRouteByAnnotation($method_anno, $method_name, $v, $methods_annotations);
                         } elseif ($method_anno instanceof Middleware) {
-                            $this->middleware_map[$method_anno->class][$method_anno->method][] = $method_anno->middleware;
+                            $this->middleware_map[$method_anno->class][$method_anno->method][] = $method_anno;
                         }
                     }
                 }

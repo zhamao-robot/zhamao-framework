@@ -17,7 +17,7 @@ class ModuleManagerTest extends TestCase
         ZMConfig::setDirectory(DataProvider::getSourceRootDir() . '/config');
         ZMConfig::setEnv($args["env"] ?? "");
         if (ZMConfig::get("global") === false) {
-            die ("Global config load failed: " . ZMConfig::$last_error . "\nPlease init first!\n");
+            die (zm_internal_errcode("E00007") . "Global config load failed: " . ZMConfig::$last_error . "\nPlease init first!\nSee: https://github.com/zhamao-robot/zhamao-framework/issues/37\n");
         }
 
         //定义常量

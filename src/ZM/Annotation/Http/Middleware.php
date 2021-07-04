@@ -22,4 +22,9 @@ class Middleware extends AnnotationBase implements ErgodicAnnotation
      * @Required()
      */
     public $middleware;
+
+    /**
+     * @var string[]
+     */
+    public $params = [];
 }
