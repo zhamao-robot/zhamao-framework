@@ -113,7 +113,7 @@ class Framework
             // 打印初始信息
             $out["listen"] = ZMConfig::get("global", "host") . ":" . ZMConfig::get("global", "port");
             if (!isset($this->server_set["worker_num"])) {
-                if ((ZMConfig::get("global", "runtime")["swoole_server_mode"]) == SWOOLE_PROCESS) {
+                if ((ZMConfig::get("global", "runtime")["swoole_server_mode"] ?? SWOOLE_PROCESS) == SWOOLE_PROCESS) {
                     $out["worker"] = swoole_cpu_num() . " (auto)";
                 } else {
                     $out["single_proc_mode"] = "true";
@@ -136,7 +136,7 @@ class Framework
                 $conf = ZMConfig::get("global", "sql_config");
                 $out["mysql_pool"] = $conf["sql_database"] . "@" . $conf["sql_host"] . ":" . $conf["sql_port"];
             }
-            if (ZMConfig::get("global", "mysql_config")["host"] !== "") {
+            if ((ZMConfig::get("global", "mysql_config")["host"] ?? null) !== "") {
                 $conf = ZMConfig::get("global", "mysql_config");
                 $out["mysql"] = $conf["dbname"] . "@" . $conf["host"] . ":" . $conf["port"];
             }

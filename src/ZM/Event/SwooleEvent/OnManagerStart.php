@@ -37,7 +37,6 @@ class OnManagerStart implements SwooleEvent
             SignalListener::signalManager();
         }
         self::$process = new Process(function() {
-            swoole_set_process_name($_SERVER["_"]." {ext-proc}");
             if (Framework::$argv["watch"]) {
                 if (extension_loaded('inotify')) {
                     Console::info("Enabled File watcher, framework will reload automatically.");
