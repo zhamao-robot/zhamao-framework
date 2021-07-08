@@ -72,12 +72,12 @@ $config['sql_config'] = [
 
 /** MySQL数据库连接信息，host留空则启动时不创建sql连接池 */
 $config['mysql_config'] = [
-    'host' => '127.0.0.1',
+    'host' => '',
     'port' => 33306,
     'unix_socket' => null,
     'username' => 'root',
     'password' => '123456',
-    'dbname' => 'adb',
+    'dbname' => '',
     'charset' => 'utf8mb4',
     'pool_size' => 64,
     'options' => [
