@@ -4,14 +4,9 @@
 namespace ZM\Utils;
 
 
-use Swoole\Event;
 use Swoole\Process;
 use Swoole\Server;
-use Swoole\Timer;
 use ZM\Console\Console;
-use ZM\Framework;
-use ZM\Store\ZMBuf;
-use ZM\Utils\Manager\ProcessManager;
 
 /**
  * 炸毛框架的Linux signal管理类
@@ -26,6 +21,7 @@ class SignalListener
      * @param Server $server
      */
     public static function signalMaster(Server $server) {
+        Console::debug("Listening Master SIGINT");
         Process::signal(SIGINT, function () use ($server) {
             if (zm_atomic("_int_is_reload")->get() === 1) {
                 zm_atomic("_int_is_reload")->set(0);
@@ -33,10 +29,6 @@ class SignalListener
             } else {
                 echo "\r";
                 Console::warning("Server interrupted(SIGINT) on Master.");
-                if ((Framework::$server->inotify ?? null) !== null)
-                    /** @noinspection PhpUndefinedFieldInspection */ Event::del(Framework::$server->inotify);
-                if (ZMBuf::$terminal !== null)
-                    Event::del(ZMBuf::$terminal);
                 Process::kill($server->master_pid, SIGTERM);
             }
         });
@@ -47,8 +39,17 @@ class SignalListener
      */
     public static function signalManager() {
         $func = function () {
-            Console::verbose("Interrupted in manager!");
+            if (\server()->master_pid == \server()->manager_pid) {
+                echo "\r";
+                Console::warning("Server interrupted(SIGINT) on Manager.");
+                swoole_timer_after(2, function() {
+                    Process::kill(posix_getpid(), SIGTERM);
+                });
+            } else {
+                Console::verbose("Interrupted in manager!");
+            }
         };
+        Console::debug("Listening Manager SIGINT");
         if (version_compare(SWOOLE_VERSION, "4.6.7") >= 0) {
             Process::signal(SIGINT, $func);
         } elseif (extension_loaded("pcntl")) {
@@ -62,14 +63,17 @@ class SignalListener
      * @param $worker_id
      */
     public static function signalWorker(Server $server, $worker_id) {
+        Console::debug("Listening Worker #".$worker_id." SIGINT");
         Process::signal(SIGINT, function () use ($worker_id, $server) {
+            if ($server->master_pid == $server->worker_pid) {
+                echo "\r";
+                Console::warning("Server interrupted(SIGINT) on Worker.");
+                swoole_timer_after(2, function() {
+                    Process::kill(posix_getpid(), SIGTERM);
+                });
+            }
+            //Console::verbose("Interrupted in worker");
             // do nothing
         });
-        if ($server->taskworker === false) {
-            Process::signal(SIGUSR1, function () use ($worker_id) {
-                Timer::clearAll();
-                ProcessManager::resumeAllWorkerCoroutines();
-            });
-        }
     }
 }

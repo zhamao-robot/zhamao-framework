@@ -15,6 +15,11 @@ use PDOStatement;
 use Swoole\Database\PDOStatementProxy;
 use ZM\Exception\DbException;
 
+/**
+ * Class DB
+ * @package ZM\DB
+ * @deprecated This will delete in 2.6 or future version, use \ZM\MySQL\MySQLManager::getConnection() instead
+ */
 class DB
 {
     private static $table_list = [];
@@ -64,13 +69,13 @@ class DB
      */
     public static function unprepared($line): bool {
         try {
-            $conn = SqlPoolStorage::$sql_pool->get();
+            $conn = SqlPoolStorage::$sql_pool->getConnection();
             if ($conn === false) {
-                SqlPoolStorage::$sql_pool->put(null);
+                SqlPoolStorage::$sql_pool->putConnection(null);
                 throw new DbException("无法连接SQL！" . $line);
             }
             $result = $conn->query($line) === false ? false : true;
-            SqlPoolStorage::$sql_pool->put($conn);
+            SqlPoolStorage::$sql_pool->putConnection($conn);
             return $result;
         } catch (DBException $e) {
             Console::warning($e->getMessage());
@@ -89,20 +94,20 @@ class DB
         if (!is_array($params)) $params = [$params];
         Console::debug("MySQL: " . $line . " | " . implode(", ", $params));
         try {
-            $conn = SqlPoolStorage::$sql_pool->get();
+            $conn = SqlPoolStorage::$sql_pool->getConnection();
             if ($conn === false) {
-                SqlPoolStorage::$sql_pool->put(null);
+                SqlPoolStorage::$sql_pool->putConnection(null);
                 throw new DbException("无法连接SQL！" . $line);
             }
             $ps = $conn->prepare($line);
             if ($ps === false) {
-                SqlPoolStorage::$sql_pool->put(null);
+                SqlPoolStorage::$sql_pool->putConnection(null);
                 /** @noinspection PhpUndefinedFieldInspection */
                 throw new DbException("SQL语句查询错误，" . $line . "，错误信息：" . $conn->error);
             } else {
                 if (!($ps instanceof PDOStatement) && !($ps instanceof PDOStatementProxy)) {
                     var_dump($ps);
-                    SqlPoolStorage::$sql_pool->put(null);
+                    SqlPoolStorage::$sql_pool->putConnection(null);
                     throw new DbException("语句查询错误！返回的不是 PDOStatement" . $line);
                 }
                 if ($params == []) $result = $ps->execute();
@@ -110,11 +115,11 @@ class DB
                     $result = $ps->execute([$params]);
                 } else $result = $ps->execute($params);
                 if ($result !== true) {
-                    SqlPoolStorage::$sql_pool->put(null);
+                    SqlPoolStorage::$sql_pool->putConnection(null);
                     throw new DBException("语句[$line]错误！" . $ps->errorInfo()[2]);
                     //echo json_encode(debug_backtrace(), 128 | 256);
                 }
-                SqlPoolStorage::$sql_pool->put($conn);
+                SqlPoolStorage::$sql_pool->putConnection($conn);
                 return $ps->fetchAll($fetch_mode);
             }
         } catch (DbException $e) {

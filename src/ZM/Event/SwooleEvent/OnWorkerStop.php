@@ -22,6 +22,6 @@ class OnWorkerStop implements SwooleEvent
         if ($worker_id == (ZMConfig::get("worker_cache")["worker"] ?? 0)) {
             LightCache::savePersistence();
         }
-        Console::verbose(($server->taskworker ? "Task" : "") . "Worker #$worker_id 已停止");
+        Console::verbose(($server->taskworker ? "Task" : "") . "Worker #$worker_id 已停止: ".$server->getWorkerStatus($worker_id));
     }
 }

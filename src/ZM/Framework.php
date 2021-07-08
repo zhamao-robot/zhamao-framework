@@ -6,6 +6,7 @@ namespace ZM;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Error;
 use Exception;
+use Phar;
 use Swoole\Server\Port;
 use Throwable;
 use ZM\Config\ZMConfig;
@@ -111,8 +112,15 @@ class Framework
 
             // 打印初始信息
             $out["listen"] = ZMConfig::get("global", "host") . ":" . ZMConfig::get("global", "port");
-            if (!isset($this->server_set["worker_num"])) $out["worker"] = swoole_cpu_num() . " (auto)";
-            else $out["worker"] = $this->server_set["worker_num"];
+            if (!isset($this->server_set["worker_num"])) {
+                if ((ZMConfig::get("global", "runtime")["swoole_server_mode"]) == SWOOLE_PROCESS) {
+                    $out["worker"] = swoole_cpu_num() . " (auto)";
+                } else {
+                    $out["single_proc_mode"] = "true";
+                }
+            } else {
+                $out["worker"] = $this->server_set["worker_num"];
+            }
             $out["environment"] = $args["env"] === null ? "default" : $args["env"];
             $out["log_level"] = Console::getLevel();
             $out["version"] = ZM_VERSION . (LOAD_MODE == 0 ? (" (build " . ZM_VERSION_ID . ")") : "");
@@ -127,6 +135,10 @@ class Framework
             if (ZMConfig::get("global", "sql_config")["sql_host"] !== "") {
                 $conf = ZMConfig::get("global", "sql_config");
                 $out["mysql_pool"] = $conf["sql_database"] . "@" . $conf["sql_host"] . ":" . $conf["sql_port"];
+            }
+            if (ZMConfig::get("global", "mysql_config")["host"] !== "") {
+                $conf = ZMConfig::get("global", "mysql_config");
+                $out["mysql"] = $conf["dbname"] . "@" . $conf["host"] . ":" . $conf["port"];
             }
             if (ZMConfig::get("global", "redis_config")["host"] !== "") {
                 $conf = ZMConfig::get("global", "redis_config");
@@ -151,7 +163,11 @@ class Framework
             }
 
 
-            self::$server = new Server(ZMConfig::get("global", "host"), ZMConfig::get("global", "port"));
+            self::$server = new Server(
+                ZMConfig::get("global", "host"),
+                ZMConfig::get("global", "port"),
+                ZMConfig::get("global", "runtime")["swoole_server_mode"] ?? SWOOLE_PROCESS
+            );
 
             if ($add_port) {
                 $conf = ZMConfig::get("global", "remote_terminal") ?? [
@@ -310,10 +326,13 @@ class Framework
         }
     }
 
+    /**
+     * @noinspection PhpIncludeInspection
+     */
     private function loadServerEvents() {
-        if (\Phar::running() !== "") {
+        if (Phar::running() !== "") {
             ob_start();
-            $r = include_once DataProvider::getFrameworkRootDir() . "/src/ZM/script_setup_loader.php";
+            include_once DataProvider::getFrameworkRootDir() . "/src/ZM/script_setup_loader.php";
             $r = ob_get_clean();
             $result_code = 0;
         } else {
@@ -440,7 +459,7 @@ class Framework
                 }
             }
         }
-        $global_hook = ZMConfig::get("global", 'runtime')['swoole_coroutine_hook_flags'] ?? SWOOLE_HOOK_ALL & (~SWOOLE_HOOK_CURL);
+        $global_hook = ZMConfig::get("global", 'runtime')['swoole_coroutine_hook_flags'] ?? (SWOOLE_HOOK_ALL & (~SWOOLE_HOOK_CURL));
         if ($coroutine_mode && $global_hook === false) Runtime::enableCoroutine(true, $global_hook);
         else Runtime::enableCoroutine(false, SWOOLE_HOOK_ALL);
     }

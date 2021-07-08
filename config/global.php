@@ -36,7 +36,8 @@ $config['swoole'] = [
 
 /** 一些框架与Swoole运行时设置的调整 */
 $config['runtime'] = [
-    'swoole_coroutine_hook_flags' => SWOOLE_HOOK_ALL & (~SWOOLE_HOOK_CURL)
+    'swoole_coroutine_hook_flags' => SWOOLE_HOOK_ALL & (~SWOOLE_HOOK_CURL),
+    'swoole_server_mode' => SWOOLE_BASE
 ];
 
 /** 轻量字符串缓存，默认开启 */
@@ -54,7 +55,7 @@ $config['worker_cache'] = [
     'transaction_timeout' => 30000
 ];
 
-/** MySQL数据库连接信息，host留空则启动时不创建sql连接池 */
+/** @deprecated 放弃使用，旧版数据库，请使用 mysql_config 和 doctrine/dbal 搭配使用 */
 $config['sql_config'] = [
     'sql_host' => '',
     'sql_port' => 3306,
@@ -67,6 +68,22 @@ $config['sql_config'] = [
     ],
     'sql_no_exception' => false,
     'sql_default_fetch_mode' => PDO::FETCH_ASSOC //added in 1.5.6
+];
+
+/** MySQL数据库连接信息，host留空则启动时不创建sql连接池 */
+$config['mysql_config'] = [
+    'host' => '127.0.0.1',
+    'port' => 33306,
+    'unix_socket' => null,
+    'username' => 'root',
+    'password' => '123456',
+    'dbname' => 'adb',
+    'charset' => 'utf8mb4',
+    'pool_size' => 64,
+    'options' => [
+        PDO::ATTR_STRINGIFY_FETCHES => false,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+    ]
 ];
 
 /** Redis连接信息，host留空则启动时不创建Redis连接池 */

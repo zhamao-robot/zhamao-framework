@@ -3,7 +3,11 @@
 
 namespace ZM\DB;
 
-
+/**
+ * Trait WhereBody
+ * @package ZM\DB
+ * @deprecated This will delete in 2.6 or future version, use \ZM\MySQL\MySQLManager::getConnection() instead
+ */
 trait WhereBody
 {
     protected $where_thing = [];

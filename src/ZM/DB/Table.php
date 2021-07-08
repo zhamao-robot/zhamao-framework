@@ -5,7 +5,11 @@
 
 namespace ZM\DB;
 
-
+/**
+ * Class Table
+ * @package ZM\DB
+ * @deprecated This will delete in 2.6 or future version, use \ZM\MySQL\MySQLManager::getConnection() instead
+ */
 class Table
 {
     private $table_name;

@@ -6,6 +6,11 @@ namespace ZM\DB;
 
 use ZM\Exception\DbException;
 
+/**
+ * Class DeleteBody
+ * @package ZM\DB
+ * @deprecated This will delete in 2.6 or future version, use \ZM\MySQL\MySQLManager::getConnection() instead
+ */
 class DeleteBody
 {
     use WhereBody;

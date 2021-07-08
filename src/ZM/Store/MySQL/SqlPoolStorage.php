@@ -4,10 +4,10 @@
 namespace ZM\Store\MySQL;
 
 
-use Swoole\Database\PDOPool;
+use ZM\MySQL\MySQLPool;
 
 class SqlPoolStorage
 {
-    /** @var PDOPool */
+    /** @var MySQLPool */
     public static $sql_pool = null;
 }

@@ -114,6 +114,7 @@ nav:
           - 编写管理员才能触发的功能: advanced/example/admin.md
   - FAQ:
       - FAQ: faq/FAQ.md
+      - 框架常见问题（持续更新）: faq/usual-question.md
       - 启动时报错 Address already in use: faq/address-already-in-use.md
       - 出现 deadlock 字样: faq/display-deadlock.md
       - 使用 LightCache 关闭时无法正常保存持久化: faq/light-cache-wrong.md

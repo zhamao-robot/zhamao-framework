@@ -2,6 +2,41 @@
 
 这里将会记录各个主版本的框架升级后，涉及 `global.php` 的更新日志，你可以根据这里描述的内容与你的旧配置文件进行合并。
 
+## v2.5.0 (build 410)
+
+- 新增 `$config['runtime']` 运行时设置。
+- 删除 `$config['server_event_handler_class']`，默认在启动时全局扫描。
+- 新增 `$config['module_loader']` 模块/插件 打包配置选项。
+- 新增 `$config['mysql_config']`，取代原先的 `$config['sql_config']`，此外废弃原先的MySQL 查询器 `\ZM\DB\DB` 类。
+
+更新部分：
+
+```php
+/** 一些框架与Swoole运行时设置的调整 */
+$config['runtime'] = [
+    'swoole_coroutine_hook_flags' => SWOOLE_HOOK_ALL & (~SWOOLE_HOOK_CURL)
+];
+
+/** MySQL数据库连接信息，host留空则启动时不创建sql连接池 */
+$config['mysql_config'] = [
+    'host' => '',
+    'port' => 3306,
+    'unix_socket' => null,
+    'username' => 'root',
+    'password' => '123456',
+    'dbname' => 'adb',
+    'charset' => 'utf8mb4',
+    'pool_size' => 64,
+    'options' => [
+        PDO::ATTR_STRINGIFY_FETCHES => false,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+    ]
+];
+
+/** 注册 Swoole Server 事件注解的类列表(deleted) */
+// 删除
+```
+
 ## v2.4.0 (build 400)
 - 调整 `$config['modules']['onebot']` 配置项到 `$config['onebot']`，旧版本的此段会向下兼容，建议更新，
 - 新增 `$config['remote_terminal']` 远程终端的配置项，新增此段即可。

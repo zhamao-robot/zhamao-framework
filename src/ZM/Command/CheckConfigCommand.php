@@ -6,6 +6,7 @@ namespace ZM\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use ZM\Config\ZMConfig;
 
 class CheckConfigCommand extends Command
 {
@@ -49,7 +50,10 @@ class CheckConfigCommand extends Command
      * @noinspection PhpIncludeInspection
      */
     private function check($remote, $local, OutputInterface $out) {
-        $local_file = include_once getcwd() . "/config/".$local;
+        $local_file = include_once WORKING_DIR . "/config/".$local;
+        if ($local_file === true) {
+            $local_file = ZMConfig::get("global");
+        }
         foreach($remote as $k => $v) {
             if (!isset($local_file[$k])) {
                 $out->writeln("<comment>配置文件 ".$local . " 需要更新！(当前配置文件缺少 `$k` 字段配置)</comment>");

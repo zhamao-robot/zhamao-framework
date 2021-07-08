@@ -9,7 +9,6 @@ use PDO;
 use ReflectionException;
 use Swoole\Coroutine;
 use Swoole\Database\PDOConfig;
-use Swoole\Database\PDOPool;
 use Swoole\Process;
 use Swoole\Server;
 use ZM\Annotation\AnnotationParser;
@@ -28,6 +27,7 @@ use ZM\Exception\DbException;
 use ZM\Exception\ZMException;
 use ZM\Framework;
 use ZM\Module\QQBot;
+use ZM\MySQL\MySQLPool;
 use ZM\Store\LightCacheInside;
 use ZM\Store\MySQL\SqlPoolStorage;
 use ZM\Store\Redis\ZMRedisPool;
@@ -42,11 +42,13 @@ use ZM\Utils\SignalListener;
 class OnWorkerStart implements SwooleEvent
 {
     public function onCall(Server $server, $worker_id) {
+        Console::debug("Calling onWorkerStart event(1)");
         if (!Framework::$argv["disable-safe-exit"]) {
             SignalListener::signalWorker($server, $worker_id);
         }
         unset(Context::$context[Coroutine::getCid()]);
         if ($server->taskworker === false) {
+
             zm_atomic("_#worker_" . $worker_id)->set($server->worker_pid);
             if (LightCacheInside::get("wait_api", "wait_api") !== null) {
                 LightCacheInside::unset("wait_api", "wait_api");
@@ -54,9 +56,11 @@ class OnWorkerStart implements SwooleEvent
             try {
                 register_shutdown_function(function () use ($server) {
                     $error = error_get_last();
-                    if (($error["type"] ?? -1) != 0) {
+                    if (($error["type"] ?? 0) != 0) {
                         Console::error(zm_internal_errcode("E00027") . "Internal fatal error: " . $error["message"] . " at " . $error["file"] . "({$error["line"]})");
                         zm_dump($error);
+                    } elseif (!isset($error["type"])) {
+                        return;
                     }
                     //DataProvider::saveBuffer();
                     /** @var Server $server */
@@ -68,42 +72,9 @@ class OnWorkerStart implements SwooleEvent
                 Framework::$server = $server;
                 //ZMBuf::resetCache(); //清空变量缓存
                 //ZMBuf::set("wait_start", []); //添加队列，在workerStart运行完成前先让其他协程等待执行
-                foreach ($server->connections as $v) {
-                    $server->close($v);
-                }
 
                 //TODO: 单独抽出来MySQL和Redis连接池
-                if (ZMConfig::get("global", "sql_config")["sql_host"] != "") {
-                    if (SqlPoolStorage::$sql_pool !== null) {
-                        SqlPoolStorage::$sql_pool->close();
-                        SqlPoolStorage::$sql_pool = null;
-                    }
-                    Console::info("新建SQL连接池中");
-                    ob_start();
-                    phpinfo(); //这个phpinfo是有用的，不能删除
-                    $str = ob_get_clean();
-                    $str = explode("\n", $str);
-                    foreach ($str as $v) {
-                        $v = trim($v);
-                        if ($v == "") continue;
-                        if (mb_strpos($v, "API Extensions") === false) continue;
-                        if (mb_strpos($v, "pdo_mysql") === false) {
-                            throw new DbException(zm_internal_errcode("E00028") . "未安装 mysqlnd php-mysql扩展。");
-                        }
-                    }
-                    $sql = ZMConfig::get("global", "sql_config");
-                    SqlPoolStorage::$sql_pool = new PDOPool((new PDOConfig())
-                        ->withHost($sql["sql_host"])
-                        ->withPort($sql["sql_port"])
-                        // ->withUnixSocket('/tmp/mysql.sock')
-                        ->withDbName($sql["sql_database"])
-                        ->withCharset('utf8mb4')
-                        ->withUsername($sql["sql_username"])
-                        ->withPassword($sql["sql_password"])
-                        ->withOptions($sql["sql_options"] ?? [PDO::ATTR_STRINGIFY_FETCHES => false])
-                    );
-                    DB::initTableList();
-                }
+                $this->initMySQLPool();
 
                 // 开箱即用的Redis
                 $redis = ZMConfig::get("global", "redis_config");
@@ -114,10 +85,7 @@ class OnWorkerStart implements SwooleEvent
 
                 $this->loadAnnotations(); //加载composer资源、phar外置包、注解解析注册等
 
-                //echo json_encode(debug_backtrace(), 128|256);
-
                 EventManager::registerTimerTick(); //启动计时器
-                //ZMBuf::unsetCache("wait_start");
                 set_coroutine_params(["server" => $server, "worker_id" => $worker_id]);
                 $dispatcher = new EventDispatcher(OnStart::class);
                 $dispatcher->setRuleFunction(function ($v) {
@@ -163,24 +131,9 @@ class OnWorkerStart implements SwooleEvent
      * @throws Exception
      */
     private function loadAnnotations() {
-        //加载phar包
-        /*Console::debug("加载外部phar包中");
-        $dir = DataProvider::getWorkingDir() . "/resources/package/";
-        if (version_compare(SWOOLE_VERSION, "4.4.0", ">=")) Timer::clearAll();
-        if (is_dir($dir)) {
-            $list = scandir($dir);
-            unset($list[0], $list[1]);
-            foreach ($list as $v) {
-                if (is_dir($dir . $v)) continue;
-                if (pathinfo($dir . $v, 4) == "phar") {
-                    Console::debug("加载Phar: " . $dir . $v . " 中");
-                    require_once($dir . $v);
-                }
-            }
-        }*/
 
         //加载各个模块的注解类，以及反射
-        Console::debug("检索Module中");
+        Console::debug("Mapping annotations");
         $parser = new AnnotationParser();
         $composer = json_decode(file_get_contents(DataProvider::getSourceRootDir() . "/composer.json"), true);
         foreach ($composer["autoload"]["psr-4"] as $k => $v) {
@@ -195,10 +148,10 @@ class OnWorkerStart implements SwooleEvent
         EventManager::loadEventByParser($parser); //加载事件
 
         //加载自定义的全局函数
-        Console::debug("加载自定义上下文中...");
+        Console::debug("Loading context class...");
         $context_class = ZMConfig::get("global", "context_class");
         if (!is_a($context_class, ContextInterface::class, true)) {
-            throw new ZMException(zm_internal_errcode("E00032") ."Context class must implemented from ContextInterface!");
+            throw new ZMException(zm_internal_errcode("E00032") . "Context class must implemented from ContextInterface!");
         }
 
         //加载插件
@@ -207,6 +160,7 @@ class OnWorkerStart implements SwooleEvent
             ["status" => true, "single_bot_mode" => false, "message_level" => 99999];
 
         if ($obb_onebot["status"]) {
+            Console::debug("OneBot support enabled, listening OneBot event(3).");
             $obj = new OnSwooleEvent();
             $obj->class = QQBot::class;
             $obj->method = 'handleByEvent';
@@ -222,5 +176,64 @@ class OnWorkerStart implements SwooleEvent
         }
 
         //TODO: 编写加载外部插件的方式
+    }
+
+    private function initMySQLPool() {
+        if (SqlPoolStorage::$sql_pool !== null) {
+            SqlPoolStorage::$sql_pool->close();
+            SqlPoolStorage::$sql_pool = null;
+        }
+        $real_conf = [];
+        if (isset(ZMConfig::get("global", "sql_config")["sql_host"])) {
+            if (ZMConfig::get("global", "sql_config")["sql_host"] != "") {
+                if (\server()->worker_id === 0) {
+                    Console::warning("使用 'sql_config' 配置项和 DB 数据库查询构造器进行查询数据库可能会在下一个大版本中废弃，请使用 'mysql_config' 搭配 doctrine dbal 使用！");
+                    Console::warning("详见: `https://framework.zhamao.xin/`");
+                }
+                $origin_conf = ZMConfig::get("global", "sql_config");
+                $real_conf = [
+                    "host" => $origin_conf["sql_host"],
+                    "port" => $origin_conf["sql_port"],
+                    "username" => $origin_conf["sql_username"],
+                    "password" => $origin_conf["sql_password"],
+                    "dbname" => $origin_conf["sql_database"],
+                    "options" => $origin_conf["sql_options"],
+                    'unix_socket' => null,
+                    'charset' => 'utf8mb4',
+                    'pool_size' => 64
+                ];
+            }
+        }
+        if (isset(ZMConfig::get("global", "mysql_config")["host"])) {
+            if (ZMConfig::get("global", "mysql_config")["host"] != "") {
+                $real_conf = ZMConfig::get("global", "mysql_config");
+            }
+        }
+        if (!empty($real_conf)) {
+            Console::info("Connecting to MySQL pool");
+            ob_start();
+            phpinfo(); //这个phpinfo是有用的，不能删除
+            $str = ob_get_clean();
+            $str = explode("\n", $str);
+            foreach ($str as $v) {
+                $v = trim($v);
+                if ($v == "") continue;
+                if (mb_strpos($v, "API Extensions") === false) continue;
+                if (mb_strpos($v, "pdo_mysql") === false) {
+                    throw new DbException(zm_internal_errcode("E00028") . "未安装 mysqlnd php-mysql扩展。");
+                }
+            }
+            SqlPoolStorage::$sql_pool = new MySQLPool((new PDOConfig())
+                ->withHost($real_conf["host"])
+                ->withPort($real_conf["port"])
+                // ->withUnixSocket('/tmp/mysql.sock')
+                ->withDbName($real_conf["dbname"])
+                ->withCharset($real_conf["charset"])
+                ->withUsername($real_conf["username"])
+                ->withPassword($real_conf["password"])
+                ->withOptions($real_conf["options"] ?? [PDO::ATTR_STRINGIFY_FETCHES => false])
+            );
+            DB::initTableList();
+        }
     }
 }
