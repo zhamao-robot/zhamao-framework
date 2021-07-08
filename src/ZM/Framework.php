@@ -136,7 +136,7 @@ class Framework
                 $conf = ZMConfig::get("global", "sql_config");
                 $out["mysql_pool"] = $conf["sql_database"] . "@" . $conf["sql_host"] . ":" . $conf["sql_port"];
             }
-            if ((ZMConfig::get("global", "mysql_config")["host"] ?? null) !== "") {
+            if ((ZMConfig::get("global", "mysql_config")["host"] ?? "") !== "") {
                 $conf = ZMConfig::get("global", "mysql_config");
                 $out["mysql"] = $conf["dbname"] . "@" . $conf["host"] . ":" . $conf["port"];
             }
