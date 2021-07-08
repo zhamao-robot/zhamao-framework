@@ -129,9 +129,6 @@ class Framework
             if (isset($this->server_set["task_worker_num"])) {
                 $out["task_worker"] = $this->server_set["task_worker_num"];
             }
-            if (!isset($this->server_set["pid_file"])) {
-                $this->server_set["pid_file"] = ZMConfig::get("crash_dir") . ".zm.pid";
-            }
             if (ZMConfig::get("global", "sql_config")["sql_host"] !== "") {
                 $conf = ZMConfig::get("global", "sql_config");
                 $out["mysql_pool"] = $conf["sql_database"] . "@" . $conf["sql_host"] . ":" . $conf["sql_port"];

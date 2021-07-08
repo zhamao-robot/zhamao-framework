@@ -18,9 +18,17 @@ class DaemonStopCommand extends DaemonCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int {
         parent::execute($input, $output);
-        Process::kill(intval($this->daemon_file["pid"]), SIGINT);
-        unlink(DataProvider::getWorkingDir() . "/.daemon_pid");
-        $output->writeln("<info>成功停止！</info>");
+        Process::kill(intval($this->daemon_file["pid"]), SIGTERM);
+        $i = 10;
+        while (file_exists(DataProvider::getWorkingDir() . "/.daemon_pid") && $i > 0) {
+            sleep(1);
+            --$i;
+        }
+        if ($i === 0) {
+            $output->writeln("<error>停止失败，请检查进程pid #" . $this->daemon_file["pid"] . " 是否响应！</error>");
+        } else {
+            $output->writeln("<info>成功停止！</info>");
+        }
         return 0;
     }
 }

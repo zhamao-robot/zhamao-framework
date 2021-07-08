@@ -37,7 +37,7 @@ $config['swoole'] = [
 /** 一些框架与Swoole运行时设置的调整 */
 $config['runtime'] = [
     'swoole_coroutine_hook_flags' => SWOOLE_HOOK_ALL & (~SWOOLE_HOOK_CURL),
-    'swoole_server_mode' => SWOOLE_BASE
+    'swoole_server_mode' => SWOOLE_PROCESS
 ];
 
 /** 轻量字符串缓存，默认开启 */

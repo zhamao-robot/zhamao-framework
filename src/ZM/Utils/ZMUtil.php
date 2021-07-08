@@ -22,10 +22,6 @@ class ZMUtil
         Console::warning(Console::setColor('Stopping server...', 'red'));
         if (Console::getLevel() >= 4) Console::trace();
         ZMAtomic::get('stop_signal')->set(1);
-        for ($i = 0; $i < ZM_WORKER_NUM; ++$i) {
-            if (Process::kill(zm_atomic('_#worker_' . $i)->get(), 0))
-                Process::kill(zm_atomic('_#worker_' . $i)->get(), SIGUSR1);
-        }
         server()->shutdown();
     }
 

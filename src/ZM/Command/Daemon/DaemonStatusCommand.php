@@ -20,7 +20,7 @@ class DaemonStatusCommand extends DaemonCommand
         $output->writeln("<comment>----- 以下是stdout内容 -----</comment>");
         $stdout = file_get_contents($this->daemon_file["stdout"]);
         $stdout = explode("\n", $stdout);
-        for ($i = 10; $i > 0; --$i) {
+        for ($i = 15; $i > 0; --$i) {
             if (isset($stdout[count($stdout) - $i]))
                 echo $stdout[count($stdout) - $i] . PHP_EOL;
         }
