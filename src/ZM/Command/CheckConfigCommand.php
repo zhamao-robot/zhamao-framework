@@ -38,7 +38,7 @@ class CheckConfigCommand extends Command
             $this->check($remote_cfg, "global.production.php", $output);
         }
         if ($this->need_update === true) {
-            $output->writeln("<comment>有配置文件需要更新，详情见文档 `https://framework.zhamao.xin/update/config.md`</comment>");
+            $output->writeln("<comment>有配置文件需要更新，详情见文档 `https://framework.zhamao.xin/update/config`</comment>");
         } else {
             $output->writeln("<info>配置文件暂无更新！</info>");
         }

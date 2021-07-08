@@ -2,7 +2,7 @@
 
 这里将会记录各个主版本的框架升级后，涉及 `global.php` 的更新日志，你可以根据这里描述的内容与你的旧配置文件进行合并。
 
-## v2.5.0 (build 410)
+## v2.5.0 (build 413)
 
 - 新增 `$config['runtime']` 运行时设置。
 - 删除 `$config['server_event_handler_class']`，默认在启动时全局扫描。
@@ -14,7 +14,8 @@
 ```php
 /** 一些框架与Swoole运行时设置的调整 */
 $config['runtime'] = [
-    'swoole_coroutine_hook_flags' => SWOOLE_HOOK_ALL & (~SWOOLE_HOOK_CURL)
+    'swoole_coroutine_hook_flags' => SWOOLE_HOOK_ALL & (~SWOOLE_HOOK_CURL),
+    'swoole_server_mode' => SWOOLE_PROCESS
 ];
 
 /** MySQL数据库连接信息，host留空则启动时不创建sql连接池 */
