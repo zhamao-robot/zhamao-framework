@@ -29,6 +29,7 @@ markdown_extensions:
   - pymdownx.superfences
   - pymdownx.inlinehilite
   - pymdownx.snippets
+  - pymdownx.details
   - abbr
   - pymdownx.highlight:
       linenums: true
@@ -93,13 +94,15 @@ nav:
       - HTTP 服务器工具类:
           - HTTP 和 WebSocket 客户端: component/zmrequest.md
           - HTTP 路由管理: component/route-manager.md
+      - 模块/插件管理:
+          - 模块打包: component/module/module-pack.md
       - 协程池: component/coroutine-pool.md
       - 单例类: component/singleton-trait.md
       - ZMUtil 杂项: component/zmutil.md
       - 全局方法: component/global-functions.md
       - Console 终端: component/console.md
       - TaskWorker 管理: component/task-worker.md
-      - 远程终端: component/remote-terminal.md
+      - Terminal 终端: component/remote-terminal.md
   - 进阶开发:
       - 进阶开发: advanced/index.md
       - 框架剖析: advanced/framework-structure.md

@@ -190,6 +190,6 @@ class Hello
      */
     public function closeUnknownConn() {
         Console::info("Unknown connection , I will close it.");
-        server()->close(ctx()->getConnection()->getFd());
+        server()->disconnect(ctx()->getConnection()->getFd());
     }
 }

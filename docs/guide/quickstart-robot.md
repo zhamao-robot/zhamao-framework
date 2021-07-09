@@ -42,16 +42,16 @@ OneBot 机器人部分的选择详情见 [OneBot 实例](/guide/OneBot实例/)�
         delay: 3   # 首次重连延迟, 单位秒
         interval: 3   # 重连间隔
         max-times: 0  # 最大重连次数, 0为无限制
-
+    
       # 是否使用服务器下发的新地址进行重连
       # 注意, 此设置可能导致在海外服务器上连接情况更差
       use-sso-address: true
-
+    
     heartbeat:
     # 心跳频率, 单位秒
     # -1 为关闭心跳
     interval: 5
-
+    
     message:
       # 上报数据类型
       # 可选: string,array
@@ -72,13 +72,13 @@ OneBot 机器人部分的选择详情见 [OneBot 实例](/guide/OneBot实例/)�
       remove-reply-at: false
       # 为Reply附加更多信息
       extra-reply-data: false
-
+    
     output:
       # 日志等级 trace,debug,info,warn,error
       log-level: warn
       # 是否启用 DEBUG
       debug: false # 开启调试模式
-
+    
     # 默认中间件锚点
     default-middlewares: &default
       # 访问密钥, 强烈推荐在公网的服务器设置
@@ -94,14 +94,14 @@ OneBot 机器人部分的选择详情见 [OneBot 实例](/guide/OneBot实例/)�
         enabled: false # 是否启用限速
         frequency: 1  # 令牌回复频率, 单位秒
         bucket: 1     # 令牌桶大小
-
+    
     database: # 数据库相关设置
       leveldb:
         # 是否启用内置leveldb数据库
         # 启用将会增加10-20MB的内存占用和一定的磁盘空间
         # 关闭将无法使用 撤回 回复 get_msg 等上下文相关功能
         enable: true
-
+    
     # 连接服务列表
     servers:
       # 添加方式，同一连接方式可添加多个，具体配置说明请查看文档
@@ -331,3 +331,10 @@ public function repeat() {
 
 > 如果你只回复 `echo` 的话，它会先和你进入一个会话状态，并问你 `请输入你要回复的内容`，这时你再次说一些内容例如 `哦豁`，会回复你 `哦豁`。效果和直接输入 `echo 哦豁` 是一致的，这是炸毛框架内的一个封装好的命令参数对话询问功能。有关参数询问功能，请看后面的进阶模块。
 
+
+
+## 使用机器人 API 和事件
+
+如果你想不只是回复消息，还要做其他复杂的动作（Action），使用 OneBot Action（又名 OneBot API）进行发送即可，见 [机器人 API](/component/bot/robot-api)。
+
+如果想处理其他类型的事件，比如 QQ 群通知事件等，见 [机器人注解事件](/event/robot-annotations/)。
