@@ -20,6 +20,10 @@ class ModuleListCommand extends Command
     protected function configure() {
         $this->setDescription("Build an \".phar\" file | 将项目构建一个phar包");
         $this->setHelp("此功能将会把炸毛框架的模块打包为\".phar\"，供发布和执行。");
+        // ...
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output): int {
         ZMConfig::setDirectory(DataProvider::getSourceRootDir() . '/config');
         ZMConfig::setEnv($args["env"] ?? "");
         if (ZMConfig::get("global") === false) {
@@ -38,10 +42,7 @@ class ModuleListCommand extends Command
 
         $timezone = ZMConfig::get("global", "timezone") ?? "Asia/Shanghai";
         date_default_timezone_set($timezone);
-        // ...
-    }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int {
         $list = ModuleManager::getConfiguredModules();
 
         foreach ($list as $v) {

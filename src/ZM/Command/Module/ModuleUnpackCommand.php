@@ -28,6 +28,10 @@ class ModuleUnpackCommand extends Command
         ]);
         $this->setDescription("Unpack a phar module into src directory");
         $this->setHelp("此功能将phar格式的模块包解包到src目录下。");
+        // ...
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output): int {
         ZMConfig::setDirectory(DataProvider::getSourceRootDir() . '/config');
         ZMConfig::setEnv($args["env"] ?? "");
         if (ZMConfig::get("global") === false) {
@@ -46,10 +50,7 @@ class ModuleUnpackCommand extends Command
 
         $timezone = ZMConfig::get("global", "timezone") ?? "Asia/Shanghai";
         date_default_timezone_set($timezone);
-        // ...
-    }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int {
         $list = ModuleManager::getPackedModules();
         if (!isset($list[$input->getArgument("module-name")])) {
             $output->writeln("<error>不存在打包的模块 ".$input->getArgument("module-name")." !</error>");

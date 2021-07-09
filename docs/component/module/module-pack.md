@@ -100,14 +100,62 @@ src/
 	}
 	```
 
+#### - global-config-override
 
+- 类型：string | false。
+- 含义：解包时是否需要手动编辑全局配置（`global.php`）。
 
-| 字段名                 | 类型                               | 含义                                     |
-| ---------------------- | ---------------------------------- | ---------------------------------------- |
-| description            | string                             | 模块的描述                               |
-| version                | string                             | 模块的版本（建议使用 x.y.z 三段式）      |
-| depends                | array of string（例如`{"a":"b"}`） | 模块依赖关系声明                         |
-| light-cache-store      | string[]                           | 打包模块时要储存的持久化 LightCache 键名 |
-| global-config-override | string \| false                    | 是否需要手动编辑全局配置（`global.php`） |
-|                        |                                    |                                          |
+这里如果写 string 类型的，那么就是相当于在解包时会提示此处的内容，内容推荐填写要求解包模块用户需要编辑的项目，比如 「请将 static_file_server 的 status 改为 true，以便使用静态文本功能」。
 
+如果是 false，那么和不指定此参数效果是一样的，无需用户修改 global.php。
+
+??? note "点我查看编写实例："
+	```json
+	{
+	    "name": "foo",
+	    "description": "这个是一个示例模块打包教程",
+	    "global-config-override": "请将 static_file_server 的 status 改为 true"
+	}
+	```
+
+#### - allow-hotload
+
+- 类型：bool。
+- 含义：是否允许用户无需解压直接加载模块包文件（phar）。
+
+当此项为 true 时，可以将模块包直接放入 `zm_data/modules` 文件夹下，然后将 `global.php` 中的 `module_loader` 项中的 `enable_hotload` 改为 true，启动框架即可加载。
+
+??? note "点我查看编写实例："
+	```json
+	{
+	    "name": "foo",
+	    "description": "这个是一个示例模块打包教程",
+	    "allow-hotload": true
+	}
+	```
+
+!!! warning "注意"
+	如果使用允许热加载，那么模块包中的配置最好不要有 `global-config-override` 和 `light-cache-store`，以此来达到最正确的效果，一般热加载更适合 Library（库）类型的模块。
+
+#### - zm-data-store
+
+- 类型：array of string（例如 `["foo","bar"]`）。
+- 含义：打包时要添加到模块包内的 `zm_data` 目录下的子目录或文件。
+
+其中项目必须是相对路径，不能是绝对路径，且必须是在配置项 `zm_data` 指定的目录（默认会在框架项目的根目录下的 `zm_data/` 目录。
+
+我们假设要打包一个 `{zm_data 目录}/config/` 目录及其目录下的文件，和一个 `main.png` 文件，下方是实例。
+
+??? note "点我查看编写实例："
+	```json
+	{
+	    "name": "foo",
+	    "description": "这个是一个示例模块打包教程",
+	    "zm-data-store": [
+	        "config/",
+	        "main.png"
+	    ]
+	}
+	```
+
+在打包时框架会自动添加这些文件到 phar 插件包内，到解包时，会自动将这些文件释放到对应框架的 `zm_data` 目录下。

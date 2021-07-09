@@ -24,6 +24,10 @@ class ModulePackCommand extends Command
         $this->setDescription("Build an \".phar\" file | 将项目构建一个phar包");
         $this->setHelp("此功能将会把炸毛框架的模块打包为\".phar\"，供发布和执行。");
         $this->addOption("target", "D", InputOption::VALUE_REQUIRED, "Output Directory | 指定输出目录");
+        // ...
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output): int {
         ZMConfig::setDirectory(DataProvider::getSourceRootDir() . '/config');
         ZMConfig::setEnv($args["env"] ?? "");
         if (ZMConfig::get("global") === false) {
@@ -42,10 +46,7 @@ class ModulePackCommand extends Command
 
         $timezone = ZMConfig::get("global", "timezone") ?? "Asia/Shanghai";
         date_default_timezone_set($timezone);
-        // ...
-    }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int {
         $list = ModuleManager::getConfiguredModules();
         if (!isset($list[$input->getArgument("module-name")])) {
             $output->writeln("<error>不存在模块 ".$input->getArgument("module-name")." !</error>");

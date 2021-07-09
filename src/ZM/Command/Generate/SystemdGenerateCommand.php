@@ -17,10 +17,10 @@ class SystemdGenerateCommand extends Command
 
     protected function configure() {
         $this->setDescription("生成框架的 systemd 配置文件");
-        ZMConfig::setDirectory(DataProvider::getSourceRootDir() . '/config');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int {
+        ZMConfig::setDirectory(DataProvider::getSourceRootDir() . '/config');
         $path = $this->generate();
         $output->writeln("<info>成功生成 systemd 文件，位置：" . $path . "</info>");
         $output->writeln("<info>有关如何使用 systemd 配置文件，请访问 `https://github.com/zhamao-robot/zhamao-framework/issues/36`</info>");
