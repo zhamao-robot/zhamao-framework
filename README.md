@@ -48,7 +48,7 @@ cd zhamao-app/
 bash -c "$(curl -fsSL https://api.zhamao.xin/go.sh)"
 
 # 启动
-runtime/php vendor/bin/start server
+vendor/bin/start server
 ```
 
 ## 文档（v2 版本）
