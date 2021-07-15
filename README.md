@@ -42,7 +42,7 @@ public function index() {
 ## 开始
 如果你是初学者，可以直接使用以下脚本部署 PHP 环境和安装框架的脚手架：
 ```bash
-# 新建一个自己喜欢名字的文件夹，运行一键安装脚本
+# 新建一个自己喜欢名字的文件夹，运行一键安装脚本 (仅限 x86_64 和 aarch64 平台)
 mkdir zhamao-app/
 cd zhamao-app/
 bash -c "$(curl -fsSL https://api.zhamao.xin/go.sh)"
