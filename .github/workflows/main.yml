@@ -16,6 +16,7 @@ jobs:
         uses: mhausenblas/mkdocs-deploy-gh-pages@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CUSTOM_DOMAIN: framework.zhamao.me
           CONFIG_FILE: mkdocs.yml
           EXTRA_PACKAGES: build-base
       - name: Copy deployment to current folder
