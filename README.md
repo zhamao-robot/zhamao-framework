@@ -52,9 +52,9 @@ vendor/bin/start server
 ```
 
 ## 文档（v2 版本）
-查看文档（国内自建）：<https://docs-v2.zhamao.xin/>
+查看文档（国内自建）：<https://framework.zhamao.xin/>
 
-备用链接（国外托管）：<https://docs-v2.zhamao.me/>
+备用链接（国外托管）：<https://framework.zhamao.me/>
 
 自行构建文档：`mkdocs build -d distribute`
 
