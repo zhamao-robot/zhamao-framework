@@ -7,6 +7,7 @@
 [![zhamao License](https://img.shields.io/hexpm/l/plug.svg?maxAge=2592000)](https://github.com/zhamao-robot/zhamao-framework/blob/master/LICENSE)
 [![Latest Stable Version](http://img.shields.io/packagist/v/zhamao/framework.svg)](https://packagist.org/packages/zhamao/framework)
 [![Banner](https://img.shields.io/badge/OneBot-v11-success)](https://github.com/howmanybots/onebot)
+![Build Actions](https://github.com/zhamao-robot/zhamao-framework/actions/workflows/main.yml/badge.svg)
 
 [![注解数量](https://img.shields.io/github/search/zhamao-robot/zhamao-framework/AnnotationBase.svg)](https://github.com/zhamao-robot/zhamao-framework/search?q=AnnotationBase)
 [![TODO 数量](https://img.shields.io/github/search/zhamao-robot/zhamao-framework/TODO.svg)](https://github.com/zhamao-robot/zhamao-framework/search?q=TODO)
