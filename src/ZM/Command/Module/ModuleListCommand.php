@@ -18,8 +18,8 @@ class ModuleListCommand extends Command
     protected static $defaultName = 'module:list';
 
     protected function configure() {
-        $this->setDescription("Build an \".phar\" file | 将项目构建一个phar包");
-        $this->setHelp("此功能将会把炸毛框架的模块打包为\".phar\"，供发布和执行。");
+        $this->setDescription("查看所有模块信息");
+        $this->setHelp("此功能将会把炸毛框架的模块列举出来。");
         // ...
     }
 
@@ -31,6 +31,7 @@ class ModuleListCommand extends Command
         }
 
         //定义常量
+        /** @noinspection PhpIncludeInspection */
         include_once DataProvider::getFrameworkRootDir() . "/src/ZM/global_defines.php";
 
         Console::init(
@@ -47,7 +48,7 @@ class ModuleListCommand extends Command
 
         foreach ($list as $v) {
             echo "[" . Console::setColor($v["name"], "green") . "]" . PHP_EOL;
-            $out_list = ["类型" => "source"];
+            $out_list = ["类型" => "源码(source)"];
             if (isset($v["version"])) $out_list["版本"] = $v["version"];
             if (isset($v["description"])) $out_list["描述"] = $v["description"];
             $out_list["目录"] = str_replace(DataProvider::getSourceRootDir() . "/", "", $v["module-path"]);
@@ -59,7 +60,7 @@ class ModuleListCommand extends Command
         $list = ModuleManager::getPackedModules();
         foreach ($list as $v) {
             echo "[" . Console::setColor($v["name"], "gold") . "]" . PHP_EOL;
-            $out_list = ["类型" => "archive(phar)"];
+            $out_list = ["类型" => "模块包(phar)"];
             if (isset($v["module-config"]["version"])) $out_list["版本"] = $v["module-config"]["version"];
             if (isset($v["module-config"]["description"])) $out_list["描述"] = $v["module-config"]["description"];
             $out_list["位置"] = str_replace(DataProvider::getSourceRootDir() . "/", "", $v["phar-path"]);

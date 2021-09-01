@@ -4,17 +4,12 @@
 namespace ZM\MySQL;
 
 
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DriverManager;
-use Doctrine\DBAL\Exception;
-
 class MySQLManager
 {
     /**
-     * @return Connection
-     * @throws Exception
+     * @return MySQLWrapper
      */
-    public static function getConnection() {
-        return DriverManager::getConnection(["driverClass" => MySQLDriver::class]);
+    public static function getWrapper(): MySQLWrapper {
+        return new MySQLWrapper();
     }
 }

@@ -4,9 +4,11 @@
 namespace ZM\Event;
 
 
+use Closure;
 use Doctrine\Common\Annotations\AnnotationException;
 use Error;
 use Exception;
+use ZM\Config\ZMConfig;
 use ZM\Console\Console;
 use ZM\Exception\InterruptException;
 use ZM\Store\LightCacheInside;
@@ -117,7 +119,7 @@ class EventDispatcher
     public function dispatchEvent($v, $rule_func = null, ...$params) {
         $q_c = $v->class;
         $q_f = $v->method;
-        if ($q_c === "" && ($q_f instanceof \Closure)) {
+        if ($q_c === "" && ($q_f instanceof Closure)) {
             if ($this->log) Console::verbose("[事件分发{$this->eid}] 闭包函数的事件触发过程！");
             if ($rule_func !== null && !$rule_func($v)) {
                 if ($this->log) Console::verbose("[事件分发{$this->eid}] 闭包函数下的 ruleFunc 判断为 false, 拒绝执行此方法。");
@@ -137,11 +139,16 @@ class EventDispatcher
         if ($this->log) Console::verbose("[事件分发{$this->eid}] " . $q_c . "::" . $q_f . " 方法下的 ruleFunc 为真，继续执行方法本身 ...");
         if (isset(EventManager::$middleware_map[$q_c][$q_f])) {
             $middlewares = EventManager::$middleware_map[$q_c][$q_f];
-            if ($this->log) Console::verbose("[事件分发{$this->eid}] " . $q_c . "::" . $q_f . " 方法还绑定了 Middleware：" . implode(", ", array_map(function($x){ return $x->middleware; }, $middlewares)));
+            if ($this->log) Console::verbose("[事件分发{$this->eid}] " . $q_c . "::" . $q_f . " 方法还绑定了 Middleware：" . implode(", ", array_map(function ($x) { return $x->middleware; }, $middlewares)));
             $before_result = true;
             $r = [];
             foreach ($middlewares as $k => $middleware) {
-                if (!isset(EventManager::$middlewares[$middleware->middleware])) throw new AnnotationException("Annotation parse error: Unknown MiddlewareClass named \"{$middleware->middleware}\"!");
+                if (!isset(EventManager::$middlewares[$middleware->middleware])) {
+                    if ((ZMConfig::get("global", "runtime")["middleware_error_policy"] ?? 1) == 1)
+                        throw new AnnotationException("Annotation parse error: Unknown MiddlewareClass named \"{$middleware->middleware}\"!");
+                    else
+                        continue;
+                }
                 $middleware_obj = EventManager::$middlewares[$middleware->middleware];
                 $before = $middleware_obj["class"];
                 //var_dump($middleware_obj);
@@ -186,7 +193,8 @@ class EventDispatcher
                     }
                     throw $e;
                 }
-                for ($i = count($middlewares) - 1; $i >= 0; --$i) {
+                $cnts = count($middlewares) - 1;
+                for ($i = $cnts; $i >= 0; --$i) {
                     $middleware_obj = EventManager::$middlewares[$middlewares[$i]->middleware];
                     if (isset($middleware_obj["after"], $r[$i])) {
                         if ($this->log) Console::verbose("[事件分发{$this->eid}] Middleware 存在后置事件，执行中 ...");

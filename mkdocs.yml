@@ -86,7 +86,8 @@ nav:
           - 图灵机器人 API: component/bot/turing-api.md
       - 存储:
           - LightCache 轻量缓存: component/store/light-cache.md
-          - MySQL 数据库: component/store/mysql.md
+          - MySQL 查询器: component/store/mysql.md
+          - MySQL 查询器（废弃）: component/store/mysql-db.md
           - Redis 数据库: component/store/redis.md
           - ZMAtomic 原子计数器: component/store/atomics.md
           - SpinLock 自旋锁: component/store/spin-lock.md
@@ -96,6 +97,7 @@ nav:
           - HTTP 路由管理: component/route-manager.md
       - 模块/插件管理:
           - 模块打包: component/module/module-pack.md
+          - 模块解包: component/module/module-unpack.md
       - 协程池: component/coroutine-pool.md
       - 单例类: component/singleton-trait.md
       - ZMUtil 杂项: component/zmutil.md
@@ -125,5 +127,6 @@ nav:
   - 更新日志:
       - 更新日志（v2）: update/v2.md
       - 更新日志（v1）: update/v1.md
+      - 更新日志（build update）: update/build-update.md
       - 配置文件更新日志: update/config.md
   - <u>炸毛框架 v1</u>: https://docs-v1.zhamao.xin/

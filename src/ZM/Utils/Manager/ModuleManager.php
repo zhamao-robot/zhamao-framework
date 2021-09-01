@@ -4,9 +4,11 @@
 namespace ZM\Utils\Manager;
 
 
+use ZM\Config\ZMConfig;
 use ZM\Console\Console;
 use ZM\Exception\ModulePackException;
 use ZM\Exception\ZMException;
+use ZM\Exception\ZMKnownException;
 use ZM\Module\ModulePacker;
 use ZM\Module\ModuleUnpacker;
 use ZM\Utils\DataProvider;
@@ -36,12 +38,12 @@ class ModuleManager
                 if ($json === null) continue;
                 if (!isset($json["name"])) continue;
                 if ($pathinfo["dirname"] == ".") {
-                    throw new ZMException(zm_internal_errcode("E00052") . "在/src/目录下不可以直接标记为模块(zm.json)，因为命名空间不能为根空间！");
+                    throw new ZMKnownException("E00052", "在/src/目录下不可以直接标记为模块(zm.json)，因为命名空间不能为根空间！");
                 }
                 $json["module-path"] = realpath($dir . "/" . $pathinfo["dirname"]);
                 $json["namespace"] = str_replace("/", "\\", $pathinfo["dirname"]);
                 if (isset($modules[$json["name"]])) {
-                    throw new ZMException(zm_internal_errcode("E00053") . "重名模块：" . $json["name"]);
+                    throw new ZMKnownException("E00053", "重名模块：" . $json["name"]);
                 }
                 $modules[$json["name"]] = $json;
             }
@@ -50,7 +52,7 @@ class ModuleManager
     }
 
     public static function getPackedModules(): array {
-        $dir = DataProvider::getDataFolder() . "modules";
+        $dir = ZMConfig::get("global", "module_loader")["load_path"] ?? (ZM_DATA . "modules");
         $ls = DataProvider::scanDirFiles($dir, true, false);
         if ($ls === false) return [];
         $modules = [];
@@ -88,7 +90,10 @@ class ModuleManager
     public static function packModule($module): bool {
         try {
             $packer = new ModulePacker($module);
-            $packer->setOutputPath(DataProvider::getDataFolder() . "output");
+            if (!is_dir(DataProvider::getDataFolder())) throw new ModulePackException(zm_internal_errcode("E00070") . "zm_data dir not found!");
+            $path = realpath(DataProvider::getDataFolder() . "/output");
+            if ($path === false) mkdir($path = DataProvider::getDataFolder() . "/output");
+            $packer->setOutputPath($path);
             $packer->setOverride();
             $packer->pack();
             return true;
@@ -107,7 +112,7 @@ class ModuleManager
     public static function unpackModule($module, array $options = []) {
         try {
             $packer = new ModuleUnpacker($module);
-            return $packer->unpack((bool)$options["override-light-cache"], (bool)$options["override-zm-data"], (bool)$options["override-source"]);
+            return $packer->unpack((bool)$options["overwrite-light-cache"], (bool)$options["overwrite-zm-data"], (bool)$options["overwrite-source"], (bool)$options["ignore-depends"]);
         } catch (ZMException $e) {
             Console::error($e->getMessage());
             return false;

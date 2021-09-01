@@ -1,26 +1,29 @@
-# 机器人 API（ZMRobot）
+# 机器人 API（OneBotV11）
 
-ZMRobot 类是封装好的 OneBot 标准的 API 接口调用类，可以在机器人连接后通过连接或者机器人 QQ 号获取对象并调用接口（如发送群消息、获取群列表等操作）。
+OneBotV11 类是封装好的 OneBot 标准的 API 接口调用类，可以在机器人连接后通过连接或者机器人 QQ 号获取对象并调用接口（如发送群消息、获取群列表等操作）。
 
-| 属性项   | 属性值           | 备注                           |
-| -------- | ---------------- | ------------------------------ |
-| 名称     | ZMRobot          |                                |
-| 类型     | 实例化类         | `$r = new ZMRobot($conn)`      |
-| 命名空间 | `ZM\API\ZMRobot` | 使用前先 `use ZM\API\ZMRobot;` |
+| 属性项   | 属性值             | 备注                             |
+| -------- | ------------------ | -------------------------------- |
+| 名称     | OneBotV11          |                                  |
+| 类型     | 实例化类           | `$r = new OneBotV11($conn)`      |
+| 命名空间 | `ZM\API\OneBotV11` | 使用前先 `use ZM\API\OneBotV11;` |
+| 别名     | `ZM\API\ZMRobot`   | 此类目前是 `extends OneBotV11`   |
+
+> 你也可以继续使用 2.5 版本之前的别名类 `ZMRobot`，但未来框架将会优先兼容 OneBot V12 版本的协议，可能会造成更新问题，建议切换为 OneBotV11 类。
 
 ## 属性
 
 对象属性方法是对 API 的调整，例如是否以 `_async`、`_rate_limited` 后缀发送 API、设置协程返回还是异步返回结果等。
 
-### ZMRobot::API_NORMAL
+### OneBotV11::API_NORMAL
 
 以默认（无后缀）方式请求 API。
 
-### ZMRobot::API_ASYNC
+### OneBotV11::API_ASYNC
 
 以后缀 `_async` 方式异步请求 API。
 
-### ZMRobot::API_RATE_LIMITED
+### OneBotV11::API_RATE_LIMITED
 
 以后缀 `_rate_limited` 方式请求 API。
 
@@ -30,7 +33,7 @@ ZMRobot 类是封装好的 OneBot 标准的 API 接口调用类，可以在机�
 
 设置后缀。目前支持 `_async`、`_rate_limited`。
 
-- **prefix**: `int` `默认:API_NORMAL`，可选 `ZMRobot::API_NORMAL`、`ZMRobot::API_ASYNC`、`ZMRobot::API_RATE_LIMITED`
+- **prefix**: `int` `默认:API_NORMAL`，可选 `OneBotV11::API_NORMAL`、`OneBotV11::API_ASYNC`、`OneBotV11::API_RATE_LIMITED`
 
 设置后缀后，请求的 API 会发生变化。例如发送私聊消息：`sendPrivateMsg()`，请求的 API 为 `send_private_msg_async`，详见 [OneBot 文档](https://github.com/howmanybots/onebot/blob/master/v11/specs/api/README.md)。
 
@@ -43,22 +46,22 @@ ZMRobot 类是封装好的 OneBot 标准的 API 接口调用类，可以在机�
 获取当前对象的机器人 QQ 或 OneBot 实例的 ID。
 
 ```php
-$bot = ZMRobot::get(123456);
+$bot = OneBotV11::get(123456);
 echo $bot->getSelfId(); //123456
 ```
 
-### ZMRobot::get()
+### OneBotV11::get()
 
-静态方法，用来通过机器人 QQ 或 OneBot 实例的 ID 获取 ZMRobot 对象。
+静态方法，用来通过机器人 QQ 或 OneBot 实例的 ID 获取 OneBotV11对象。
 
 参数：`$robot_id`，必填。
 
 ```php
-$r = ZMRobot::get(123456); 
+$r = OneBotV11::get(123456); 
 $r->sendPrivateMsg(55555, "hello");
 ```
 
-### ZMRobot::getRandom()
+### OneBotV11::getRandom()
 
 静态方法，随机获取一个连接到框架的机器人（多个机器人实例连接到框架时适用）。
 
@@ -66,21 +69,21 @@ $r->sendPrivateMsg(55555, "hello");
 
 ```php
 try {
-	$bot = ZMRobot::getRandom();
+	$bot = OneBotV11::getRandom();
 	$bot->sendPrivateMsg(55555, "foo");
 } catch (\ZM\Exception\RobotNotFoundException $e) {
     echo "还没有机器人连接到框架！\n";
 }
 ```
 
-### ZMRobot::getAllRobot()
+### OneBotV11::getAllRobot()
 
-获取所有连接到框架的机器人的 ZMRobot 对象。
+获取所有连接到框架的机器人的 OneBotV11 对象。
 
-返回值：`ZMRobot[]`。
+返回值：`OneBotV11[]`。
 
 ```php
-$all = ZMRobot::getAllRobot();
+$all = OneBotV11::getAllRobot();
 foreach($all as $v) {
     $v->sendPrivateMsg(55555, "机器人轮流给一个人发消息啦！");
 }
@@ -95,7 +98,7 @@ foreach($all as $v) {
 ```php
 //从上下文获取 Websocket 连接对象
 $conn = ctx()->getConnection();
-$bot = new ZMRobot($conn);
+$bot = new OneBotV11($conn);
 ```
 
 ## 返回结果处理
@@ -103,7 +106,7 @@ $bot = new ZMRobot($conn);
 因为框架的机器人是兼容 OneBot 标准的（原 CQHTTP），所以每次接收发送 API 请求的结果都是大体一样的结构。我们以 `sendPrivateMsg()` 为例，因为发送出去的每一条消息都会在 OneBot 实例（如 CQHTTP 插件、go-cqhttp 等）中对应一个消息 ID，以供我们核查消息和后续撤回等操作需要。
 
 ```php
-$bot = ZMRobot::get("123456"); // 机器人QQ号
+$bot = OneBotV11::get("123456"); // 机器人QQ号
 $obj = $bot->sendGroupMsg("234567", "你好");
 echo json_encode($obj, 128|256);
 ```
@@ -163,7 +166,7 @@ vardump($result["retcode"]); //如果成功撤回，输出 int(0)
 === "代码"
 
 	```php
-	$bot = ZMRobot::get(123456); // 123456是你的机器人QQ
+	$bot = OneBotV11::get(123456); // 123456是你的机器人QQ
 	$bot->sendPrivateMsg("627577391", "你好啊！你好你好！");
 	```
 

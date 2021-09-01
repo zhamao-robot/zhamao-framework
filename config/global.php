@@ -34,10 +34,12 @@ $config['swoole'] = [
     //'task_enable_coroutine' => true
 ];
 
-/** 一些框架与Swoole运行时设置的调整 */
+
+/** 一些框架与框架运行时设置的调整 */
 $config['runtime'] = [
     'swoole_coroutine_hook_flags' => SWOOLE_HOOK_ALL & (~SWOOLE_HOOK_CURL),
-    'swoole_server_mode' => SWOOLE_PROCESS
+    'swoole_server_mode' => SWOOLE_PROCESS,
+    'middleware_error_policy' => 1
 ];
 
 /** 轻量字符串缓存，默认开启 */
@@ -73,7 +75,7 @@ $config['sql_config'] = [
 /** MySQL数据库连接信息，host留空则启动时不创建sql连接池 */
 $config['mysql_config'] = [
     'host' => '',
-    'port' => 33306,
+    'port' => 3306,
     'unix_socket' => null,
     'username' => 'root',
     'password' => '123456',

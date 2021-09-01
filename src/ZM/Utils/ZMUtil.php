@@ -11,6 +11,17 @@ use ZM\Framework;
 use ZM\Store\Lock\SpinLock;
 use ZM\Store\ZMAtomic;
 use ZM\Store\ZMBuf;
+use function file_get_contents;
+use function get_included_files;
+use function is_callable;
+use function is_string;
+use function json_decode;
+use function mb_substr;
+use function md5_file;
+use function pathinfo;
+use function server;
+use function str_replace;
+use function substr;
 
 class ZMUtil
 {
@@ -45,15 +56,15 @@ class ZMUtil
      * 在工作进程中返回可以通过reload重新加载的php文件列表
      * @return string[]|string[][]
      */
-    public static function getReloadableFiles() {
-        return array_map(
-            function ($x) {
-                return str_replace(DataProvider::getSourceRootDir() . '/', '', $x);
-            }, array_diff(
-                get_included_files(),
-                Framework::$loaded_files
-            )
-        );
+    public static function getReloadableFiles(): array {
+        $array_map = [];
+        foreach (array_diff(
+                     get_included_files(),
+                     Framework::$loaded_files
+                 ) as $key => $x) {
+            $array_map[$key] = str_replace(DataProvider::getSourceRootDir() . '/', '', $x);
+        }
+        return $array_map;
     }
 
     /**
@@ -61,10 +72,10 @@ class ZMUtil
      * @param $dir
      * @param $base_namespace
      * @param null|mixed $rule
-     * @param bool $return_kv
+     * @param bool $return_path_value
      * @return String[]
      */
-    public static function getClassesPsr4($dir, $base_namespace, $rule = null, $return_kv = false) {
+    public static function getClassesPsr4($dir, $base_namespace, $rule = null, $return_path_value = false): array {
         // 预先读取下composer的file列表
         $composer = json_decode(file_get_contents(DataProvider::getSourceRootDir() . '/composer.json'), true);
         $classes = [];
@@ -72,7 +83,7 @@ class ZMUtil
         $files = DataProvider::scanDirFiles($dir, true, true);
         foreach ($files as $v) {
             $pathinfo = pathinfo($v);
-            if ($pathinfo['extension'] == 'php') {
+            if (($pathinfo['extension'] ?? '') == 'php') {
                 if ($rule === null) { //规则未设置回调时候，使用默认的识别过滤规则
                     if (substr(file_get_contents($dir . '/' . $v), 6, 6) == '#plain') continue;
                     elseif (mb_substr($v, 0, 7) == 'global_' || mb_substr($v, 0, 7) == 'script_') continue;
@@ -82,7 +93,7 @@ class ZMUtil
                 } elseif (is_callable($rule) && !($rule($dir, $pathinfo))) continue;
                 $dirname = $pathinfo['dirname'] == '.' ? '' : (str_replace('/', '\\', $pathinfo['dirname']) . '\\');
                 $class_name = $base_namespace . '\\' . $dirname . $pathinfo['filename'];
-                if ($return_kv) $classes[$class_name] = $v;
+                if (is_string($return_path_value)) $classes[$class_name] = $return_path_value . "/" .$v;
                 else $classes[] = $class_name;
             }
         }

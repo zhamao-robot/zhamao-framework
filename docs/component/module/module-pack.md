@@ -159,3 +159,23 @@ src/
 	```
 
 在打包时框架会自动添加这些文件到 phar 插件包内，到解包时，会自动将这些文件释放到对应框架的 `zm_data` 目录下。
+
+## 打包命令
+
+```bash
+# ./zhamao 和原先的 vendor/bin/start 是完全一致的
+./zhamao module:pack <module-name>
+```
+
+例如，打包上面的名叫 foo 的模块：`./zhamao module:pack foo`。
+
+打包命令执行后，将会在 `zm_data` 下的 `output` 目录输出一个 phar 文件。如果你指定了 `version` 参数，那么文件名将会是 `${name}_${version}.phar`，如果没有指定版本，那么只会有 `${name}.phar`，同时如果文件已经存在，将覆盖写入。
+
+## 查看模块信息命令
+
+```bash
+./zhamao module:list
+```
+
+通过此命令可以查看模块相关的信息，如未打包但已配置的模块信息等。
+

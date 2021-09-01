@@ -32,13 +32,14 @@ class ModuleUnpacker
      * @param bool $override_light_cache
      * @param bool $override_data_files
      * @param bool $override_source
+     * @param bool $ignore_depends
      * @return array
      * @throws ModulePackException
      * @throws ZMException
      */
-    public function unpack(bool $override_light_cache = false, bool $override_data_files = false, bool $override_source = false): array {
+    public function unpack(bool $override_light_cache = false, bool $override_data_files = false, bool $override_source = false, $ignore_depends = false): array {
         $this->checkConfig();
-        $this->checkDepends();
+        $this->checkDepends($ignore_depends);
         $this->checkLightCacheStore();
         $this->checkZMDataStore();
 
@@ -62,18 +63,19 @@ class ModuleUnpacker
 
     /**
      * 检查模块依赖关系
+     * @param bool $ignore_depends
      * @throws ModulePackException
      * @throws ZMException
      */
-    private function checkDepends() {
+    private function checkDepends($ignore_depends = false) {
         $configured = ModuleManager::getConfiguredModules();
         $depends = $this->module_config["depends"] ?? [];
         foreach ($depends as $k => $v) {
-            if (!isset($configured[$k])) {
+            if (!isset($configured[$k]) && !$ignore_depends) {
                 throw new ModulePackException(zm_internal_errcode("E00064") . "模块 " . $this->module_config["name"] . " 依赖的模块 $k 不存在");
             }
             $current_ver = $configured[$k]["version"] ?? "1.0";
-            if (!VersionComparator::compareVersionRange($current_ver, $v)) {
+            if (!VersionComparator::compareVersionRange($current_ver, $v) && !$ignore_depends) {
                 throw new ModulePackException(zm_internal_errcode("E00063") . "模块 " . $this->module_config["name"] . " 依赖的模块 $k 版本依赖不符合条件（现有版本: " . $current_ver . ", 需求版本: " . $v . "）");
             }
         }

@@ -22,11 +22,12 @@ class ModuleUnpackCommand extends Command
     protected function configure() {
         $this->setDefinition([
             new InputArgument("module-name", InputArgument::REQUIRED),
-            new InputOption("override-light-cache", null, null, "覆盖现有的LightCache项目"),
-            new InputOption("override-zm-data", null, null, "覆盖现有的zm_data文件"),
-            new InputOption("override-source", null, null, "覆盖现有的源码文件")
+            new InputOption("overwrite-light-cache", null, null, "覆盖现有的LightCache项目"),
+            new InputOption("overwrite-zm-data", null, null, "覆盖现有的zm_data文件"),
+            new InputOption("overwrite-source", null, null, "覆盖现有的源码文件"),
+            new InputOption("ignore-depends", null, null, "解包时忽略检查依赖")
         ]);
-        $this->setDescription("Unpack a phar module into src directory");
+        $this->setDescription("解包一个phar模块到src目录");
         $this->setHelp("此功能将phar格式的模块包解包到src目录下。");
         // ...
     }
@@ -39,6 +40,7 @@ class ModuleUnpackCommand extends Command
         }
 
         //定义常量
+        /** @noinspection PhpIncludeInspection */
         include_once DataProvider::getFrameworkRootDir()."/src/ZM/global_defines.php";
 
         Console::init(

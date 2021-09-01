@@ -5,6 +5,7 @@ namespace ZM\Annotation;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use ZM\Annotation\Interfaces\ErgodicAnnotation;
+use ZM\Config\ZMConfig;
 use ZM\Console\Console;
 use ReflectionClass;
 use ReflectionException;
@@ -17,6 +18,7 @@ use ZM\Annotation\Http\MiddlewareClass;
 use ZM\Annotation\Http\RequestMapping;
 use ZM\Annotation\Interfaces\Level;
 use ZM\Annotation\Module\Closed;
+use ZM\Exception\AnnotationException;
 use ZM\Utils\Manager\RouteManager;
 use ZM\Utils\ZMUtil;
 
@@ -53,7 +55,7 @@ class AnnotationParser
      */
     public function registerMods() {
         foreach ($this->path_list as $path) {
-            Console::debug("parsing annotation in " . $path[0]);
+            Console::debug("parsing annotation in " . $path[0].":".$path[1]);
             $all_class = ZMUtil::getClassesPsr4($path[0], $path[1]);
             $this->reader = new AnnotationReader();
             foreach ($all_class as $v) {
@@ -107,6 +109,7 @@ class AnnotationParser
                         unset($this->annotation_map[$v]);
                         continue 2;
                     } elseif ($vs instanceof MiddlewareClass) {
+                        //注册中间件本身的类，标记到 middlewares 属性中
                         Console::debug("正在注册中间件 " . $reflection_class->getName());
                         $rs = $this->registerMiddleware($vs, $reflection_class);
                         $this->middlewares[$rs["name"]] = $rs;
@@ -193,6 +196,12 @@ class AnnotationParser
         return $result;
     }
 
+    /**
+     * @internal 用于 level 排序
+     * @param $events
+     * @param string $class_name
+     * @param string $prefix
+     */
     public function sortByLevel(&$events, string $class_name, $prefix = "") {
         if (is_a($class_name, Level::class, true)) {
             $class_name .= $prefix;
@@ -201,6 +210,24 @@ class AnnotationParser
                 $right = $b->level;
                 return $left > $right ? -1 : ($left == $right ? 0 : 1);
             });
+        }
+    }
+
+    /**
+     * @throws AnnotationException
+     */
+    public function verifyMiddlewares() {
+        if ((ZMConfig::get("global", "runtime")["middleware_error_policy"] ?? 1) === 2) {
+            //我承认套三层foreach很不优雅，但是这个会很快的。
+            foreach($this->middleware_map as $class => $v) {
+                foreach ($v as $method => $vs) {
+                    foreach($vs as $mid) {
+                        if (!isset($this->middlewares[$mid->middleware])) {
+                            throw new AnnotationException("Annotation parse error: Unknown MiddlewareClass named \"{$mid->middleware}\"!");
+                        }
+                    }
+                }
+            }
         }
     }
 }

@@ -29,7 +29,14 @@ class MySQLStatement implements Statement, \IteratorAggregate
     }
 
     public function setFetchMode($fetchMode, $arg2 = null, $arg3 = []) {
-        return $this->statement->setFetchMode($fetchMode, $arg2, $arg3);
+        if ($arg2 !== null && $arg3 !== [])
+            return $this->statement->setFetchMode($fetchMode, $arg2, $arg3);
+        elseif ($arg2 !== null && $arg3 === [])
+            return $this->statement->setFetchMode($fetchMode, $arg2);
+        elseif ($arg2 === null && $arg3 !== [])
+            return $this->statement->setFetchMode($fetchMode, $arg2, $arg3);
+        else
+            return $this->statement->setFetchMode($fetchMode);
     }
 
     public function fetch($fetchMode = PDO::FETCH_ASSOC, $cursorOrientation = PDO::FETCH_ORI_NEXT, $cursorOffset = 0) {

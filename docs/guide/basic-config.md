@@ -20,6 +20,7 @@
 | `crash_dir`                  | 存放崩溃和运行日志的目录                                     | `zm_data` 下的 `crash/`      |
 | `config_dir`                 | 存放 saveToJson() 方法保存的数据的目录                       | `zm_data` 下的 `config/`     |
 | `swoole`                     | 对应 Swoole server 中 set 的参数，参考Swoole文档             | 见子表 `swoole`              |
+| `runtime`                    | 一些框架运行时调整的设置                                     | 见子表 `runtime`             |
 | `light_cache`                | 轻量内置 key-value 缓存                                      | 见字表 `light_cache`         |
 | `worker_cache`               | 跨进程变量级缓存                                             | 见子表 `worker_cache`        |
 | `sql_config`                 | MySQL 数据库连接信息                                         | 见子表 `sql_config`          |
@@ -46,6 +47,14 @@
 | `max_wait_time`         | 退出进程时等待协程恢复的最长时间（秒）                       | 5（2.4.3 版本后默认值）             |
 | `task_worker_num`       | TaskWorker 工作进程数                                        | 默认不开启（此参数被注释）          |
 | `task_enable_coroutine` | TaskWorker 工作进程启用协程                                  | 默认不开启（此参数被注释）或 `bool` |
+
+### 子表 runtime
+
+| 配置名称                      | 说明                                                         | 默认值                                  |
+| ----------------------------- | ------------------------------------------------------------ | --------------------------------------- |
+| `swoole_coroutine_hook_flags` | Swoole 启动时一键协程化 Hook 的 Flag 值，详见 [一键协程化](http://wiki.swoole.com/#/runtime?id=%e5%87%bd%e6%95%b0%e5%8e%9f%e5%9e%8b) | `SWOOLE_HOOK_ALL & (~SWOOLE_HOOK_CURL)` |
+| `swoole_server_mode`          | Swoole Server 启动的进程模式，有 `SWOOLE_PROCESS` 和 `SWOOLE_BASE` 两种，见 [启动方式](http://wiki.swoole.com/#/learn?id=swoole_process) | `SWOOLE_PROCESS`                        |
+| `middleware_error_policy`     | 中间件错误处理策略，见 [中间件 - 错误处理策略](event/middleware/#_6) | 1                                       |
 
 ### 子表 **light_cache**
 

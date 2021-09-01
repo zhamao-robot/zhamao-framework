@@ -7,5 +7,4 @@ function loader__generated_id__() {
     }
 
 }
-echo "OK!\n";
 return json_decode(file_get_contents(__DIR__.'/zmplugin.json'), true) ?? ['zm_module' => false];

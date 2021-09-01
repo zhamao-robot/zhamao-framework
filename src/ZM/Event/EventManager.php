@@ -32,6 +32,7 @@ class EventManager
         self::$middlewares = $parser->getMiddlewares();
         self::$middleware_map = $parser->getMiddlewareMap();
         self::$req_mapping = $parser->getReqMapping();
+        $parser->verifyMiddlewares();
     }
 
     /**

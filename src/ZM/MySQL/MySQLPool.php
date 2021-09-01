@@ -34,4 +34,8 @@ class MySQLPool extends PDOPool
         $this->count--;
         parent::put($connection);
     }
+
+    public function getCount() {
+        return $this->count;
+    }
 }

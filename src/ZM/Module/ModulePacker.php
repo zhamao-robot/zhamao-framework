@@ -122,7 +122,13 @@ class ModulePacker
     }
 
     private function generatePharAutoload(): array {
-        return ZMUtil::getClassesPsr4($this->module['module-path'], $this->module['namespace'], null, true);
+        $pos = strpos($this->module['module-path'], DataProvider::getSourceRootDir().'/');
+        if ($pos === 0) {
+            $path_value = substr($this->module['module-path'], strlen(DataProvider::getSourceRootDir().'/'));
+        } else {
+            throw new ModulePackException(zm_internal_errcode("E99999")); //未定义的错误
+        }
+        return ZMUtil::getClassesPsr4($this->module['module-path'], $this->module['namespace'], null, $path_value);
     }
 
     private function getComposerAutoloadItems(): array {

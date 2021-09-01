@@ -25,6 +25,33 @@ use ZM\Annotation\Swoole\SwooleHandler;
 use ZM\Console\Console;
 use ZM\Utils\Terminal;
 use ZM\Utils\ZMUtil;
+use function date_default_timezone_set, define;
+use function exec;
+use function explode;
+use function file_exists;
+use function file_get_contents;
+use function file_put_contents;
+use function get_class;
+use function get_included_files;
+use function in_array;
+use function intval;
+use function is_array;
+use function is_dir;
+use function json_decode;
+use function json_encode;
+use function mkdir;
+use function ob_get_clean;
+use function ob_start;
+use function posix_getpid;
+use function str_pad;
+use function strlen;
+use function substr;
+use function swoole_cpu_num;
+use function trim;
+use function uuidgen;
+use function working_dir;
+use function zm_atomic;
+use function zm_internal_errcode;
 
 class Framework
 {
@@ -305,9 +332,7 @@ class Framework
             $motd = file_get_contents(__DIR__ . "/../../config/motd.txt");
         }
         $motd = explode("\n", $motd);
-        foreach ($motd as $k => $v) {
-            $motd[$k] = substr($v, 0, $tty_width);
-        }
+        foreach ($motd as $k => $v) $motd[$k] = substr($v, 0, $tty_width);
         $motd = implode("\n", $motd);
         echo $motd;
     }

@@ -24,7 +24,7 @@ trait CQAPI
             return $this->processHttpAPI($connection, $reply, $function);
     }
 
-    public function processWebsocketAPI($connection, $reply, $function = false) {
+    private function processWebsocketAPI($connection, $reply, $function = false) {
         $api_id = ZMAtomic::get("wait_msg_id")->add(1);
         $reply["echo"] = $api_id;
         if (server()->push($connection->getFd(), json_encode($reply))) {
@@ -35,7 +35,7 @@ trait CQAPI
                     "self_id" => $connection->getOption("connect_id"),
                     "echo" => $api_id
                 ];
-                return CoMessage::yieldByWS($obj, ["echo"], 60);
+                return CoMessage::yieldByWS($obj, ["echo"], 30);
             }
             return true;
         } else {
@@ -63,7 +63,7 @@ trait CQAPI
      * @return bool
      * @noinspection PhpUnusedParameterInspection
      */
-    public function processHttpAPI($connection, $reply, $function = null): bool {
+    private function processHttpAPI($connection, $reply, $function = null): bool {
         return false;
     }
 

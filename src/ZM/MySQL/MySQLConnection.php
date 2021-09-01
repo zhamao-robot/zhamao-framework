@@ -21,12 +21,13 @@ class MySQLConnection implements Connection
     private $conn;
 
     public function __construct() {
-        Console::info("Constructing...");
+        Console::debug("Constructing...");
         $this->conn = SqlPoolStorage::$sql_pool->getConnection();
     }
 
     public function prepare($sql, $options = []) {
         try {
+            Console::debug("Running SQL prepare: ".$sql);
             $statement = $this->conn->prepare($sql, $options);
             assert(($statement instanceof PDOStatementProxy) || ($statement instanceof PDOStatement));
         } catch (PDOException $exception) {
@@ -51,6 +52,7 @@ class MySQLConnection implements Connection
 
     public function exec($sql) {
         try {
+            Console::debug("Running SQL exec: ".$sql);
             $statement = $this->conn->exec($sql);
             assert($statement !== false);
             return $statement;
@@ -88,7 +90,7 @@ class MySQLConnection implements Connection
     }
 
     public function __destruct() {
-        Console::info("Destructing！！！");
+        Console::debug("Destructing！！！");
         SqlPoolStorage::$sql_pool->putConnection($this->conn);
     }
 }

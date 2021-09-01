@@ -4,16 +4,16 @@
 namespace ZM\MySQL;
 
 
-use Doctrine\DBAL\Driver;
+use Doctrine\DBAL\Driver as DoctrineDriver;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Schema\MySqlSchemaManager;
 use ZM\Config\ZMConfig;
 use ZM\Console\Console;
 
-class MySQLDriver implements Driver
+class MySQLDriver implements DoctrineDriver
 {
     public function connect(array $params, $username = null, $password = null, array $driverOptions = []) {
-        Console::info("Requiring new connection");
+        Console::debug("Requiring new connection");
         return new MySQLConnection();
     }
 

@@ -28,8 +28,8 @@ class ConsoleApplication extends Application
 {
     private static $obj = null;
 
-    const VERSION_ID = 416;
-    const VERSION = "2.5.1";
+    const VERSION_ID = 417;
+    const VERSION = "2.5.2";
 
     /**
      * @throws InitException
@@ -43,6 +43,8 @@ class ConsoleApplication extends Application
     }
 
     /**
+     * @param string $with_default_cmd
+     * @return ConsoleApplication
      * @throws InitException
      */
     public function initEnv($with_default_cmd = ""): ConsoleApplication {

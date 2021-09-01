@@ -6,7 +6,7 @@ namespace ZM\Exception;
 
 use Exception;
 
-class ZMException extends Exception
+abstract class ZMException extends Exception
 {
 
 }

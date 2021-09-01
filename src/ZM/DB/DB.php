@@ -6,9 +6,8 @@
 namespace ZM\DB;
 
 
-use Exception;
-use ZM\Config\ZMConfig;
 use ZM\Console\Console;
+use ZM\MySQL\MySQLManager;
 use ZM\Store\MySQL\SqlPoolStorage;
 use PDOException;
 use PDOStatement;
@@ -25,12 +24,12 @@ class DB
     private static $table_list = [];
 
     /**
+     * @param $db_name
      * @throws DbException
-     * @throws Exception
      */
-    public static function initTableList() {
-        if (!extension_loaded("mysqlnd")) throw new Exception("Can not find mysqlnd PHP extension.");
-        $result = self::rawQuery("select TABLE_NAME from INFORMATION_SCHEMA.TABLES where TABLE_SCHEMA='" . ZMConfig::get("global", "sql_config")["sql_database"] . "';", []);
+    public static function initTableList($db_name) {
+        if (!extension_loaded("mysqlnd")) throw new DbException("Can not find mysqlnd PHP extension.");
+        $result = MySQLManager::getWrapper()->fetchAllAssociative("select TABLE_NAME from INFORMATION_SCHEMA.TABLES where TABLE_SCHEMA=?;", [$db_name]);
         foreach ($result as $v) {
             self::$table_list[] = $v['TABLE_NAME'];
         }

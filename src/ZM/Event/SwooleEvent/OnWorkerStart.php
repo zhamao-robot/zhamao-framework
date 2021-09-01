@@ -24,7 +24,7 @@ use ZM\Event\EventDispatcher;
 use ZM\Event\EventManager;
 use ZM\Event\SwooleEvent;
 use ZM\Exception\DbException;
-use ZM\Exception\ZMException;
+use ZM\Exception\ZMKnownException;
 use ZM\Framework;
 use ZM\Module\QQBot;
 use ZM\MySQL\MySQLPool;
@@ -32,6 +32,7 @@ use ZM\Store\LightCacheInside;
 use ZM\Store\MySQL\SqlPoolStorage;
 use ZM\Store\Redis\ZMRedisPool;
 use ZM\Utils\DataProvider;
+use ZM\Utils\Manager\ModuleManager;
 use ZM\Utils\SignalListener;
 
 /**
@@ -48,7 +49,6 @@ class OnWorkerStart implements SwooleEvent
         }
         unset(Context::$context[Coroutine::getCid()]);
         if ($server->taskworker === false) {
-
             zm_atomic("_#worker_" . $worker_id)->set($server->worker_pid);
             if (LightCacheInside::get("wait_api", "wait_api") !== null) {
                 LightCacheInside::unset("wait_api", "wait_api");
@@ -144,14 +144,12 @@ class OnWorkerStart implements SwooleEvent
                 $parser->addRegisterPath(DataProvider::getSourceRootDir() . "/" . $v . "/", trim($k, "\\"));
             }
         }
-        $parser->registerMods();
-        EventManager::loadEventByParser($parser); //加载事件
 
         //加载自定义的全局函数
         Console::debug("Loading context class...");
         $context_class = ZMConfig::get("global", "context_class");
         if (!is_a($context_class, ContextInterface::class, true)) {
-            throw new ZMException(zm_internal_errcode("E00032") . "Context class must implemented from ContextInterface!");
+            throw new ZMKnownException("E00032", "Context class must implemented from ContextInterface!");
         }
 
         //加载插件
@@ -175,7 +173,21 @@ class OnWorkerStart implements SwooleEvent
             }
         }
 
-        //TODO: 编写加载外部插件的方式
+        // 检查是否允许热加载phar模块，允许的话将遍历phar内的文件
+        $plugin_enable_hotload = ZMConfig::get("global", "module_loader")["enable_hotload"] ?? false;
+        if ($plugin_enable_hotload) {
+            $list = ModuleManager::getPackedModules();
+            foreach($list as $k => $v) {
+                if (\server()->worker_id === 0) Console::info("Loading packed module: ".$k);
+                require_once $v["phar-path"];
+                $func = "loader".$v["generated-id"];
+                $func();
+                $parser->addRegisterPath("phar://".$v["phar-path"]."/".$v["module-root-path"], $v["namespace"]);
+            }
+        }
+
+        $parser->registerMods();
+        EventManager::loadEventByParser($parser); //加载事件
     }
 
     private function initMySQLPool() {
@@ -233,7 +245,7 @@ class OnWorkerStart implements SwooleEvent
                 ->withPassword($real_conf["password"])
                 ->withOptions($real_conf["options"] ?? [PDO::ATTR_STRINGIFY_FETCHES => false])
             );
-            DB::initTableList();
+            DB::initTableList($real_conf["dbname"]);
         }
     }
 }

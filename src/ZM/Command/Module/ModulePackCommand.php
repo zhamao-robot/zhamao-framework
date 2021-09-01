@@ -21,7 +21,7 @@ class ModulePackCommand extends Command
 
     protected function configure() {
         $this->addArgument("module-name", InputArgument::REQUIRED);
-        $this->setDescription("Build an \".phar\" file | 将项目构建一个phar包");
+        $this->setDescription("将配置好的模块构建一个phar包");
         $this->setHelp("此功能将会把炸毛框架的模块打包为\".phar\"，供发布和执行。");
         $this->addOption("target", "D", InputOption::VALUE_REQUIRED, "Output Directory | 指定输出目录");
         // ...
