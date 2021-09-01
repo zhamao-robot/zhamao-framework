@@ -7,6 +7,7 @@
 [![zhamao License](https://img.shields.io/hexpm/l/plug.svg?maxAge=2592000)](https://github.com/zhamao-robot/zhamao-framework/blob/master/LICENSE)
 [![Latest Stable Version](http://img.shields.io/packagist/v/zhamao/framework.svg)](https://packagist.org/packages/zhamao/framework)
 [![Banner](https://img.shields.io/badge/OneBot-v11-success)](https://github.com/howmanybots/onebot)
+![Build Actions](https://github.com/zhamao-robot/zhamao-framework/actions/workflows/main.yml/badge.svg)
 
 [![注解数量](https://img.shields.io/github/search/zhamao-robot/zhamao-framework/AnnotationBase.svg)](https://github.com/zhamao-robot/zhamao-framework/search?q=AnnotationBase)
 [![TODO 数量](https://img.shields.io/github/search/zhamao-robot/zhamao-framework/TODO.svg)](https://github.com/zhamao-robot/zhamao-framework/search?q=TODO)
@@ -52,9 +53,9 @@ vendor/bin/start server
 ```
 
 ## 文档（v2 版本）
-查看文档（国内自建）：<https://docs-v2.zhamao.xin/>
+查看文档（国内自建）：<https://framework.zhamao.xin/>
 
-备用链接（国外托管）：<https://docs-v2.zhamao.me/>
+备用链接（国外托管）：<https://framework.zhamao.me/>
 
 自行构建文档：`mkdocs build -d distribute`
 

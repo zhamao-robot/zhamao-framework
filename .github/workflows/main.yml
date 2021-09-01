@@ -1,0 +1,33 @@
+name: Docs Build
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Deploy docs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout master
+        uses: actions/checkout@v2
+
+      - name: Deploy docs to GitHub Pages
+        uses: mhausenblas/mkdocs-deploy-gh-pages@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CUSTOM_DOMAIN: framework.zhamao.me
+          CONFIG_FILE: mkdocs.yml
+          EXTRA_PACKAGES: build-base
+      - name: Copy deployment to current folder
+        run: |
+          cp -r "${GITHUB_WORKSPACE}/site" "./deploy"
+      - name: Deploy to Zhamao Server
+        uses: easingthemes/ssh-deploy@main
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.ZHAMAO_XIN_PRIVATE_KEY }}
+          ARGS: "-rltgoDzvO --delete"
+          SOURCE: "deploy/"
+          REMOTE_HOST: ${{ secrets.ZHAMAO_XIN_HOST }}
+          REMOTE_USER: ${{ secrets.ZHAMAO_XIN_USER }}
+          TARGET: ${{ secrets.ZHAMAO_XIN_TARGET }}
