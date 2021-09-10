@@ -28,7 +28,7 @@ class ConsoleApplication extends Application
 {
     private static $obj = null;
 
-    const VERSION_ID = 417;
+    const VERSION_ID = 418;
     const VERSION = "2.5.2";
 
     /**

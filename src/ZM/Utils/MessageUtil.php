@@ -23,7 +23,7 @@ class MessageUtil
      */
     public static function downloadCQImage($msg, $path = null) {
         $path = $path ?? DataProvider::getDataFolder() . "images/";
-        if (!is_dir($path)) mkdir($path);
+        if (!is_dir($path)) @mkdir($path);
         $path = realpath($path);
         if ($path === false) {
             Console::warning(zm_internal_errcode("E00059") . "指定的路径错误不存在！");

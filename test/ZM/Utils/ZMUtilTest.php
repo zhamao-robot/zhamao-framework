@@ -16,4 +16,9 @@ class ZMUtilTest extends TestCase
         $this->assertContains(TimerMiddleware::class, ZMUtil::getClassesPsr4(DataProvider::getSourceRootDir()."/src/Module", "Module"));
         $this->assertContains(Framework::class, ZMUtil::getClassesPsr4(DataProvider::getSourceRootDir()."/src/ZM", "ZM"));
     }
+
+    public function testGetModInstance() {
+        $class = Hello::class;
+        $this->assertTrue(ZMUtil::getModInstance($class) instanceof Hello);
+    }
 }

@@ -4,6 +4,12 @@
 
 同时此处将只使用 build 版本号进行区分。
 
+## build 418 (2021-9-10)
+
+- 修复 ZMAtomic 在 test 环境下的 bug
+- 修复 MessageUtil 的报错
+- 
+
 ## build 417 (2021-8-29)
 
 - 新增 AnnotationException，统一框架内部的抛出异常的类型
