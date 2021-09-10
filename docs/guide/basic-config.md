@@ -35,6 +35,7 @@
 | `server_event_handler_class` | 注册 Swoole Server 事件注解的类列表，在 Swoole 服务器启动前就被加载 | 空                           |
 | `onebot`                     | OneBot 协议相关配置                                          | 见子表 `onebot`              |
 | `remote_terminal`            | 远程终端相关配置                                             | 见子表 `remote_terminal`     |
+| `module_loader`              | 模块/插件 加载相关配置                                       | 见子表 `module_loader` |
 
 ### 子表 **swoole**
 
@@ -118,6 +119,13 @@
 | `host`   | 远程终端监听地址，为安全起见，默认值只允许本地回环地址（127.0.0.1） | `127.0.0.1` |
 | `port`   | 远程终端监听的 TCP 端口                                      | 20002       |
 | `token`  | 远程终端连接的令牌（如果为空（""）则不验证）                 | ""          |
+
+### 子表 module_loader
+
+| 配置名称 | 说明                                                         | 默认值      |
+| -------- | ------------------------------------------------------------ | ----------- |
+| `enable_hotload` | 是否开启热加载模块包的功能 | false       |
+| `load_path`   | 模块包加载的目录地址 | `zm_data` 下的 `modules` |
 
 ## 多环境下的配置文件
 
