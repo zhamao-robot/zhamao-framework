@@ -12,6 +12,7 @@ use Swoole\Database\PDOConfig;
 use Swoole\Process;
 use Swoole\Server;
 use ZM\Annotation\AnnotationParser;
+use ZM\Annotation\Swoole\OnMessageEvent;
 use ZM\Annotation\Swoole\OnStart;
 use ZM\Annotation\Swoole\OnSwooleEvent;
 use ZM\Annotation\Swoole\SwooleHandler;
@@ -157,21 +158,7 @@ class OnWorkerStart implements SwooleEvent
             ZMConfig::get("global", "modules")["onebot"] ??
             ["status" => true, "single_bot_mode" => false, "message_level" => 99999];
 
-        if ($obb_onebot["status"]) {
-            Console::debug("OneBot support enabled, listening OneBot event(3).");
-            $obj = new OnSwooleEvent();
-            $obj->class = QQBot::class;
-            $obj->method = 'handleByEvent';
-            $obj->type = 'message';
-            $obj->level = $obb_onebot["message_level"] ?? 99999;
-            $obj->rule = 'connectIsQQ()';
-            EventManager::addEvent(OnSwooleEvent::class, $obj);
-            if ($obb_onebot["single_bot_mode"]) {
-                LightCacheInside::set("connect", "conn_fd", -1);
-            } else {
-                LightCacheInside::set("connect", "conn_fd", -2);
-            }
-        }
+
 
         // 检查是否允许热加载phar模块，允许的话将遍历phar内的文件
         $plugin_enable_hotload = ZMConfig::get("global", "module_loader")["enable_hotload"] ?? false;
@@ -188,6 +175,22 @@ class OnWorkerStart implements SwooleEvent
 
         $parser->registerMods();
         EventManager::loadEventByParser($parser); //加载事件
+
+        if ($obb_onebot["status"]) {
+            Console::debug("OneBot support enabled, listening OneBot event(3).");
+            $obj = new OnMessageEvent();
+            $obj->class = QQBot::class;
+            $obj->method = 'handleByEvent';
+            $obj->level = $obb_onebot["message_level"] ?? 99999;
+            $obj->rule = 'connectIsQQ()';
+            EventManager::addEvent(OnMessageEvent::class, $obj);
+            zm_dump(EventManager::$events[OnMessageEvent::class]);
+            if ($obb_onebot["single_bot_mode"]) {
+                LightCacheInside::set("connect", "conn_fd", -1);
+            } else {
+                LightCacheInside::set("connect", "conn_fd", -2);
+            }
+        }
     }
 
     private function initMySQLPool() {

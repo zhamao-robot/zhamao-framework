@@ -25,6 +25,9 @@ use ZM\Event\SwooleEvent;
  */
 class OnMessage implements SwooleEvent
 {
+    /**
+     * @noinspection PhpUnreachableStatementInspection
+     */
     public function onCall($server, Frame $frame) {
         Console::debug("Calling Swoole \"message\" from fd=" . $frame->fd . ": " . TermColor::ITALIC . $frame->data . TermColor::RESET);
         unset(Context::$context[Coroutine::getCid()]);
@@ -32,8 +35,8 @@ class OnMessage implements SwooleEvent
         set_coroutine_params(["server" => $server, "frame" => $frame, "connection" => $conn]);
         $dispatcher1 = new EventDispatcher(OnMessageEvent::class);
         $dispatcher1->setRuleFunction(function ($v) {
-            /** @noinspection PhpUnreachableStatementInspection */
-            return ctx()->getConnection()->getName() == $v->connect_type && eval("return " . $v->getRule() . ";");
+            if ($v->getRule() == '') return true;
+            else return eval("return " . $v->getRule() . ";");
         });
 
 

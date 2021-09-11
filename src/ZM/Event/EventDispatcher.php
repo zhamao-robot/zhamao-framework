@@ -72,11 +72,13 @@ class EventDispatcher
     }
 
     public function setRuleFunction(callable $rule = null): EventDispatcher {
+        if ($this->log) Console::verbose("[事件分发{$this->eid}] 设置事件rule: " . $this->class);
         $this->rule = $rule;
         return $this;
     }
 
     public function setReturnFunction(callable $return_func): EventDispatcher {
+        if ($this->log) Console::verbose("[事件分发{$this->eid}] 设置事件returnFunc: " . $this->class);
         $this->return_func = $return_func;
         return $this;
     }

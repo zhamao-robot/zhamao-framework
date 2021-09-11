@@ -54,6 +54,7 @@ class ModulePacker
      */
     public function setOutputPath($path) {
         $this->output_path = $path;
+        if (!is_dir($path)) mkdir($path, 0755, true);
     }
 
     /**

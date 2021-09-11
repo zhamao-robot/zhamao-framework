@@ -52,7 +52,7 @@ class ModulePackCommand extends Command
             $output->writeln("<error>不存在模块 ".$input->getArgument("module-name")." !</error>");
             return 1;
         }
-        $result = ModuleManager::packModule($list[$input->getArgument("module-name")]);
+        $result = ModuleManager::packModule($list[$input->getArgument("module-name")], $input->getOption("target"));
         if ($result) Console::success("打包完成！");
         else Console::error("打包失败！");
         return 0;

@@ -23,6 +23,7 @@ class EventManager
     public static $req_mapping = [];
 
     public static function addEvent($event_name, ?AnnotationBase $event_obj) {
+        Console::debug("Adding event $event_name at ".$event_obj->class.":".$event_obj->method);
         self::$events[$event_name][] = $event_obj;
         (new AnnotationParser())->sortByLevel(self::$events, $event_name);
     }

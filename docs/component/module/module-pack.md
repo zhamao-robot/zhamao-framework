@@ -14,7 +14,6 @@ src/
     │   └── zm.json
     └── Middleware/
         └── TimerMiddleware.php
-
 ```
 
 我们在 Example 目录下创建一个 `zm.json` 的文件，编写配置，即代表 `src/Module/Example/` 文件夹及里面的用户模块源码为一个模块包，也就可以被框架识别并打包处理。
@@ -159,6 +158,68 @@ src/
 	```
 
 在打包时框架会自动添加这些文件到 phar 插件包内，到解包时，会自动将这些文件释放到对应框架的 `zm_data` 目录下。
+
+## 打包模块命令
+
+编写配置文件 `zm.json` 后，就可以被框架正常识别为模块形式，你也可以使用对无需打包的模块进行配置以进行分类管理。
+
+### module:list
+
+使用 list 命令可以列出炸毛框架检测到配置文件或打包好的模块。
+
+```
+$ ./zhamao module:list
+[foo]
+        类型: source
+        版本: 1.0.0
+        描述: 示例模块打包文件
+        目录: src/Module/Example
+没有发现已打包且装载的模块！
+```
+
+其中 `[ ]` 内为识别出来的模块名称，由上方用户编写的 `zm.json` 定义，类型为 `source` 是源码形式，也就是指定了 `zm.json` 形式的模块，目录为模块所在子目录。
+
+我们假设打包上方定义的 `foo` 模块，使用下方命令 `module:pack` 即可。
+
+### module:pack
+
+使用 pack 命令可以将配置好的模块打包为 `xxx.phar` 文件并转移或发布给他人。
+
+我们假设打包模块脚手架的默认模块 `src/Module/Example` 下面的模块源码和附带一个 `zm_data` 目录下的文件（我们就随便打包一下 Swoole 的输出日志吧）。`zm.json` 文件内容如下：
+
+```json
+{
+  "name": "foo",
+  "description": "示例模块打包文件",
+  "version": "1.0.0",
+  "allow-hotload": true,
+  "zm-data-store": [
+    "crash/swoole_error.log"
+  ]
+}
+```
+
+然后输入命令：
+
+```
+$ ./zhamao module:pack foo
+[15:07:11] [I] 模块输出文件：/root/zhamao-framework/zm_data/output/foo_1.0.0.phar
+[15:07:11] [S] 打包完成！
+```
+
+如果提示文件夹不存在，请先手动创建文件夹：`mkdir /path/to/your/zm_data/output`
+
+在打包后，你将获得一个 `foo_1.0.0.phar` 的文件。
+
+> 如果你没有在 `zm.json` 中指定 `version`，那么输出的 phar 文件是不会带版本号的。
+
+打包后的 phar 内将包含：
+
+- Hello.php
+- zm.json
+- crash/swoole_error.log
+- 必要的框架热加载以及解包需要的配置信息
+
 
 ## 打包命令
 
