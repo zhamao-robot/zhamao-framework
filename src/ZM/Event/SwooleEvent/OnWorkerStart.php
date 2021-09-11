@@ -184,7 +184,6 @@ class OnWorkerStart implements SwooleEvent
             $obj->level = $obb_onebot["message_level"] ?? 99999;
             $obj->rule = 'connectIsQQ()';
             EventManager::addEvent(OnMessageEvent::class, $obj);
-            zm_dump(EventManager::$events[OnMessageEvent::class]);
             if ($obb_onebot["single_bot_mode"]) {
                 LightCacheInside::set("connect", "conn_fd", -1);
             } else {
