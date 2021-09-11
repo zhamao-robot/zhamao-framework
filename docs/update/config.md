@@ -2,6 +2,10 @@
 
 这里将会记录各个主版本的框架升级后，涉及 `global.php` 的更新日志，你可以根据这里描述的内容与你的旧配置文件进行合并。
 
+## v2.5.1 (build 417)
+
+- 新增 `$config['runtime']` 下的 `middleware_error_policy` 选项。
+
 ## v2.5.0 (build 413)
 
 - 新增 `$config['runtime']` 运行时设置。

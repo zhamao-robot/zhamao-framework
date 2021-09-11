@@ -55,7 +55,7 @@
 | ----------------------------- | ------------------------------------------------------------ | --------------------------------------- |
 | `swoole_coroutine_hook_flags` | Swoole 启动时一键协程化 Hook 的 Flag 值，详见 [一键协程化](http://wiki.swoole.com/#/runtime?id=%e5%87%bd%e6%95%b0%e5%8e%9f%e5%9e%8b) | `SWOOLE_HOOK_ALL & (~SWOOLE_HOOK_CURL)` |
 | `swoole_server_mode`          | Swoole Server 启动的进程模式，有 `SWOOLE_PROCESS` 和 `SWOOLE_BASE` 两种，见 [启动方式](http://wiki.swoole.com/#/learn?id=swoole_process) | `SWOOLE_PROCESS`                        |
-| `middleware_error_policy`     | 中间件错误处理策略，见 [中间件 - 错误处理策略](event/middleware/#_6) | 1                                       |
+| `middleware_error_policy`     | 中间件错误处理策略，见 [中间件 - 错误处理策略](../../event/middleware/#_6) | 1                                       |
 
 ### 子表 **light_cache**
 
