@@ -93,6 +93,7 @@ class DB
         if (!is_array($params)) $params = [$params];
         Console::debug("MySQL: " . $line . " | " . implode(", ", $params));
         try {
+            if (SqlPoolStorage::$sql_pool === null) throw new DbException("未连接到任何数据库！");
             $conn = SqlPoolStorage::$sql_pool->getConnection();
             if ($conn === false) {
                 SqlPoolStorage::$sql_pool->putConnection(null);
