@@ -42,6 +42,21 @@ MessageUtil::containsImage("[CQ:image,file=a.jpg,url=http://xxx]"); // true
 MessageUtil::containsImage("[CQ:face,id=140] 咦，这是一条带表情的消息"); // false
 ```
 
+### isAtMe()
+
+检查消息中是否含有@bot的消息。
+
+定义：`isAtMe($msg, $me_id)`
+
+参数 `$me_id` 为Bot的QQ号。
+
+返回：`bool`，true 就是有，false 就没有。
+
+```php
+MessageUtil::isAtMe("[CQ:at,qq=123456]炸毛你好","123456"); // true
+MessageUtil::isAtMe("[CQ:at,qq=123456789]另一个朋友你好","123456"); // false
+```
+
 ### getImageCQFromLocal()
 
 通过文件路径获取图片的发送 CQ 码。
