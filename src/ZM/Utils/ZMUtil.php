@@ -86,7 +86,7 @@ class ZMUtil
             if (($pathinfo['extension'] ?? '') == 'php') {
                 if ($rule === null) { //规则未设置回调时候，使用默认的识别过滤规则
                     if (substr(file_get_contents($dir . '/' . $v), 6, 6) == '#plain') continue;
-                    elseif (mb_substr($v, 0, 7) == 'global_' || mb_substr($v, 0, 7) == 'script_') continue;
+                    elseif (mb_substr($pathinfo["basename"], 0, 7) == 'global_' || mb_substr($pathinfo["basename"], 0, 7) == 'script_') continue;
                     foreach (($composer['autoload']['files'] ?? []) as $fi) {
                         if (md5_file(DataProvider::getSourceRootDir().'/'.$fi) == md5_file($dir.'/'.$v)) continue 2;
                     }

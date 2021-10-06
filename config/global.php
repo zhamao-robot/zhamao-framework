@@ -57,21 +57,6 @@ $config['worker_cache'] = [
     'transaction_timeout' => 30000
 ];
 
-/** @deprecated 放弃使用，旧版数据库，请使用 mysql_config 和 doctrine/dbal 搭配使用 */
-$config['sql_config'] = [
-    'sql_host' => '',
-    'sql_port' => 3306,
-    'sql_username' => 'name',
-    'sql_database' => 'db_name',
-    'sql_password' => '',
-    'sql_options' => [
-        PDO::ATTR_STRINGIFY_FETCHES => false,
-        PDO::ATTR_EMULATE_PREPARES => false
-    ],
-    'sql_no_exception' => false,
-    'sql_default_fetch_mode' => PDO::FETCH_ASSOC //added in 1.5.6
-];
-
 /** MySQL数据库连接信息，host留空则启动时不创建sql连接池 */
 $config['mysql_config'] = [
     'host' => '',
