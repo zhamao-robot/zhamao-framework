@@ -125,9 +125,9 @@ dump(LightCache::getExpire("test")); // 返回 10
 ```php
 $s = LightCache::set("test", "hello", 20); //假设这条代码执行时时间戳是 1616838482
 zm_sleep(10);
-dump(LightCache::getExpire("test")); // 返回 1616838502
+dump(LightCache::getExpireTS("test")); // 返回 1616838502
 zm_sleep(10);
-dump(LightCache::getExpire("test")); // 返回 null
+dump(LightCache::getExpireTS("test")); // 返回 null
 ```
 
 ### LightCache::getMemoryUsage()
