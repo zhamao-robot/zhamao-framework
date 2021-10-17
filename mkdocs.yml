@@ -88,7 +88,10 @@ nav:
           - 图灵机器人 API: component/bot/turing-api.md
       - 存储:
           - LightCache 轻量缓存: component/store/light-cache.md
-          - MySQL 查询器: component/store/mysql.md
+          - MySQL 查询器:
+              - 简介: component/store/mysql/mysql.md
+              - 配置: component/store/mysql/config.md
+              - 执行 SQL 语句: component/store/mysql/common-query.md
           - MySQL 查询器（废弃）: component/store/mysql-db.md
           - Redis 数据库: component/store/redis.md
           - ZMAtomic 原子计数器: component/store/atomics.md
