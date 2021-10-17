@@ -7,11 +7,12 @@ namespace ZM\MySQL;
 use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\Driver\StatementIterator;
 use Doctrine\DBAL\ParameterType;
+use IteratorAggregate;
 use PDO;
 use PDOStatement;
 use Swoole\Database\PDOStatementProxy;
 
-class MySQLStatement implements Statement, \IteratorAggregate
+class MySQLStatement implements IteratorAggregate, Statement
 {
     /** @var PDOStatement|PDOStatementProxy */
     private $statement;
