@@ -7,37 +7,6 @@
 $wrapper = \ZM\MySQL\MySQLManager::getWrapper();
 ```
 
-## 执行 SQL 语句查询
-
-使用方法 `query()` 即可执行最基本的 SQL 语句查询。
-
-!!! warning "警告"
-
-    不推荐使用此方法，因为此方法容易造成 SQL 注入等安全问题，除非你知道你在做什么！
-
-```php
-$wrapper = \ZM\MySQL\MySQLManager::getWrapper();
-$sql = "SELECT * FROM users";
-$stmt = $wrapper->executeQuery($sql);
-```
-
-`MySQLWrapper->query()` 方法返回一个查询语句对象，此对象保存了数据库语句查询的结果。
-
-有关查询对象的相关方法说明，见 [数据库语句对象](../mysql-statement)。
-
-```php
-while (($row = $stmt->fetchAssociative()) !== false) {
-    echo $row['username'] . PHP_EOL; // 返回 jack [换行] rose
-}
-```
-
-此方式有以下缺点不推荐使用：
-
-- 易造成 SQL 注入安全问题
-- 将数据直接写入裸 SQL 是一项繁琐的操作，效率不高
-
-一般情况如果需要手写 SQL 语句进行查询，建议使用下面的预处理方式进行 SQL 查询。
-
 ## 执行预处理 SQL 语句
 
 预处理查询很巧妙地解决了 SQL 注入问题，并且可以方便地绑定参数进行查询。
