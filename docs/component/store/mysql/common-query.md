@@ -7,6 +7,10 @@
 $wrapper = \ZM\MySQL\MySQLManager::getWrapper();
 ```
 
+!!! tip "提示"
+
+    这部分内容部分直接取自 [DBAL - Data Retrieval And Manipulation](https://www.doctrine-project.org/projects/doctrine-dbal/en/2.13/reference/data-retrieval-and-manipulation.html) 原文并直接翻译，如有实际不同请提交 Issue 反馈。
+
 ## 执行预处理 SQL 语句
 
 预处理查询很巧妙地解决了 SQL 注入问题，并且可以方便地绑定参数进行查询。

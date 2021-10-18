@@ -23,7 +23,7 @@
 | `runtime`                    | 一些框架运行时调整的设置                                     | 见子表 `runtime`             |
 | `light_cache`                | 轻量内置 key-value 缓存                                      | 见字表 `light_cache`         |
 | `worker_cache`               | 跨进程变量级缓存                                             | 见子表 `worker_cache`        |
-| `sql_config`                 | MySQL 数据库连接信息                                         | 见子表 `sql_config`          |
+| `mysql_config`               | MySQL 数据库连接信息                                         | 见子表 `mysql_config`        |
 | `redis_config`               | Redis 连接信息                                               | 见子表 `redis_config`        |
 | `access_token`               | OneBot 客户端连接约定的token，留空则无，相关设置见 [组件 - Access Token 验证](component/access-token) | 空                           |
 | `http_header`                | HTTP 请求自定义返回的header                                  | 见配置文件                   |
@@ -73,17 +73,18 @@
 | -------- | --------------------------- | ------ |
 | `worker` | 跨进程缓存的存储工作进程 id | 0      |
 
-### 子表 **sql_config**
+### 子表 **mysql_config**
 
 | 配置名称                 | 说明                           | 默认值                                                       |
 | ------------------------ | ------------------------------ | ------------------------------------------------------------ |
-| `sql_host`               | 数据库地址(留空则不使用数据库) | 空                                                           |
-| `sql_port`               | 数据库端口                     | 3306                                                         |
-| `sql_username`           | 连接数据库的用户名             |                                                              |
-| `sql_database`           | 要连接的数据库名               |                                                              |
-| `sql_password`           | 数据库连接密码                 |                                                              |
-| `sql_options`            | PDO 数据库的 options 参数      | `[PDO::ATTR_STRINGIFY_FETCHES => false,PDO::ATTR_EMULATE_PREPARES => false]` |
-| `sql_default_fetch_mode` | PDO 的 fetch 模式              | `PDO::FETCH_ASSOC`                                           |
+| `host`               | 数据库地址(留空则不使用数据库) | 空                                                           |
+| `port`               | 数据库端口                     | 3306                                                         |
+| `username`           | 连接数据库的用户名             |                                                              |
+| `dbname`           | 要连接的数据库名               |                                                              |
+| `password`           | 数据库连接密码                 |                                                              |
+| `options`            | PDO 数据库的 options 参数      | `[PDO::ATTR_STRINGIFY_FETCHES => false,PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]` |
+| `pool_size` | MySQL 连接池大小              | 64                                           |
+| `charset` | MySQL 字符集              | `utf8mb4`                                           |
 
 ### 子表 **redis_config**
 
