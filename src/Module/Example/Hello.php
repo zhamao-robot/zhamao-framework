@@ -50,11 +50,11 @@ class Hello
      * @CQCommand("我是谁")
      */
     public function whoami() {
-        $bot = ctx() -> getRobot() -> getLoginInfo();
-        $botId = $bot["data"]["user_id"];
-        $r = OneBotV11::get($botId); 
-        $QQid = ctx() -> getUserId();
-        $nick = $r -> getStrangerInfo($QQid)["data"]["nickname"];
+        $bot = ctx()->getRobot()->getLoginInfo();
+        $bot_id = $bot["data"]["user_id"];
+        $r = OneBotV11::get($bot_id); 
+        $QQid = ctx()->getUserId();
+        $nick = $r->getStrangerInfo($QQid)["data"]["nickname"];
         return "你是" . $nick . "，QQ号是" . $QQid;
     }
 
