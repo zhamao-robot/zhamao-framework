@@ -10,6 +10,7 @@ use ZM\Annotation\Swoole\OnOpenEvent;
 use ZM\Annotation\Swoole\OnRequestEvent;
 use ZM\API\CQ;
 use ZM\API\TuringAPI;
+use ZM\API\OneBotV11;
 use ZM\ConnectionManager\ConnectionObject;
 use ZM\Console\Console;
 use ZM\Annotation\CQ\CQCommand;
@@ -49,8 +50,12 @@ class Hello
      * @CQCommand("我是谁")
      */
     public function whoami() {
-        $user = ctx()->getRobot()->getLoginInfo();
-        return "你是" . $user["data"]["nickname"] . "，QQ号是" . $user["data"]["user_id"];
+        $bot = ctx() -> getRobot() -> getLoginInfo();
+        $botId = $bot["data"]["user_id"];
+        $r = OneBotV11::get($botId); 
+        $QQid = ctx() -> getUserId();
+        $nick = $r -> getStrangerInfo($QQid)["data"]["nickname"];
+        return "你是" . $nick . "，QQ号是" . $QQid;
     }
 
     /**
