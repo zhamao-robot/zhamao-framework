@@ -70,7 +70,7 @@ class OnOpen implements SwooleEvent
         try {
             $obb_onebot = ZMConfig::get("global", "onebot") ??
                 ZMConfig::get("global", "modules")["onebot"] ??
-                ["status" => true, "single_bot_mode" => false, "message_level" => 99999];
+                ["status" => true, "single_bot_mode" => false, "message_level" => 99];
             $onebot_status = $obb_onebot["status"];
             if ($conn->getName() === 'qq' && $onebot_status === true) {
                 if ($obb_onebot["single_bot_mode"]) {

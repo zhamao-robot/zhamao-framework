@@ -91,7 +91,7 @@ class EventDispatcher
         try {
             foreach ((EventManager::$events[$this->class] ?? []) as $v) {
                 $this->dispatchEvent($v, $this->rule, ...$params);
-                if ($this->log) Console::verbose("[事件分发{$this->eid}] 单一对象 " . $v->class . "::" . $v->method . " 分发结束。");
+                if ($this->log) Console::verbose("[事件分发{$this->eid}] 单一对象 " . $v->class . "::" . (is_string($v->method) ? $v->method : "{closure}") . " 分发结束。");
                 if ($this->status == self::STATUS_BEFORE_FAILED || $this->status == self::STATUS_RULE_FAILED) continue;
                 if (is_callable($this->return_func) && $this->status === self::STATUS_NORMAL) {
                     if ($this->log) Console::verbose("[事件分发{$this->eid}] 单一对象 " . $v->class . "::" . $v->method . " 正在执行返回值处理函数 ...");
@@ -121,7 +121,7 @@ class EventDispatcher
     public function dispatchEvent($v, $rule_func = null, ...$params) {
         $q_c = $v->class;
         $q_f = $v->method;
-        if ($q_c === "" && ($q_f instanceof Closure)) {
+        if (($q_c ?? "") === "" && ($q_f instanceof Closure)) {
             if ($this->log) Console::verbose("[事件分发{$this->eid}] 闭包函数的事件触发过程！");
             if ($rule_func !== null && !$rule_func($v)) {
                 if ($this->log) Console::verbose("[事件分发{$this->eid}] 闭包函数下的 ruleFunc 判断为 false, 拒绝执行此方法。");
@@ -158,6 +158,7 @@ class EventDispatcher
                 $r[$k]->class = $q_c;
                 $r[$k]->method = $q_f;
                 $r[$k]->middleware = $middleware;
+                $r[$k]->current_event = $v;
                 if (isset($middleware_obj["before"])) {
                     if ($this->log) Console::verbose("[事件分发{$this->eid}] Middleware 存在前置事件，执行中 ...");
                     $rs = $middleware_obj["before"];

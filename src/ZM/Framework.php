@@ -9,6 +9,7 @@ use Exception;
 use Phar;
 use Swoole\Server\Port;
 use Throwable;
+use ZM\Annotation\CQ\CQCommand;
 use ZM\Config\ZMConfig;
 use ZM\ConnectionManager\ManagerGM;
 use ZM\Console\TermColor;
@@ -76,9 +77,11 @@ class Framework
      */
     private $setup_events = [];
 
-    public function __construct($args = []) {
-        $tty_width = $this->getTtyWidth();
+    public static $instant_mode = false;
 
+    public function __construct($args = [], $instant_mode = false) {
+        $tty_width = $this->getTtyWidth();
+        self::$instant_mode = $instant_mode;
         self::$argv = $args;
         ZMConfig::setDirectory(DataProvider::getSourceRootDir() . '/config');
         ZMConfig::setEnv($args["env"] ?? "");
@@ -124,7 +127,9 @@ class Framework
             $this->server_set["log_level"] = SWOOLE_LOG_DEBUG;
             $add_port = ZMConfig::get("global", "remote_terminal")["status"] ?? false;
 
-            $this->loadServerEvents();
+            if ($instant_mode) {
+                $this->loadServerEvents();
+            }
 
             $this->parseCliArgs(self::$argv, $add_port);
 
@@ -148,7 +153,7 @@ class Framework
             } else {
                 $out["worker"] = $this->server_set["worker_num"];
             }
-            $out["environment"] = $args["env"] === null ? "default" : $args["env"];
+            $out["environment"] = ($args["env"] ?? null) === null ? "default" : $args["env"];
             $out["log_level"] = Console::getLevel();
             $out["version"] = ZM_VERSION . (LOAD_MODE == 0 ? (" (build " . ZM_VERSION_ID . ")") : "");
             $out["master_pid"] = posix_getpid();
@@ -182,7 +187,7 @@ class Framework
             }
 
             self::printProps($out, $tty_width, $args["log-theme"] === null);
-            if ($args["preview"]) {
+            if ($args["preview"] ?? false) {
                 exit();
             }
 

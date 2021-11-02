@@ -50,4 +50,10 @@ class RunServerCommand extends Command
         (new Framework($input->getOptions()))->start();
         return 0;
     }
+
+    public static function exportDefinition() {
+        $cmd = new self();
+        $cmd->configure();
+        return $cmd->getDefinition();
+    }
 }

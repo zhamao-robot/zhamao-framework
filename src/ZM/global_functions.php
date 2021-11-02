@@ -29,6 +29,19 @@ function getClassPath($class_name) {
     if (file_exists($dir2)) return $dir2;
     else return null;
 }
+/**
+ * 检查炸毛框架运行的环境
+ * @internal
+ */
+function _zm_env_check() {
+    if (!extension_loaded("swoole")) die(zm_internal_errcode("E00001") . "Can not find swoole extension.\n");
+    if (version_compare(SWOOLE_VERSION, "4.5.0") == -1) die(zm_internal_errcode("E00002") . "You must install swoole version >= 4.5.0 !");
+    if (version_compare(PHP_VERSION, "7.2") == -1) die(zm_internal_errcode("E00003") . "PHP >= 7.2 required.");
+    if (version_compare(SWOOLE_VERSION, "4.6.7") < 0 && !extension_loaded("pcntl")) {
+        Console::error(zm_internal_errcode("E00004") . "Swoole 版本必须不低于 4.6.7 或 PHP 安装加载了 pcntl 扩展！");
+        die();
+    }
+}
 
 /**
  * 使用自己定义的万（san）能分割函数
@@ -331,19 +344,33 @@ function zm_dump($var, ...$moreVars) {
     return $var;
 }
 
-function zm_info($obj) { Console::info($obj); }
+function zm_info($obj) {
+    Console::info($obj);
+}
 
-function zm_warning($obj) { Console::warning($obj); }
+function zm_warning($obj) {
+    Console::warning($obj);
+}
 
-function zm_success($obj) { Console::success($obj); }
+function zm_success($obj) {
+    Console::success($obj);
+}
 
-function zm_debug($obj) { Console::debug($obj); }
+function zm_debug($obj) {
+    Console::debug($obj);
+}
 
-function zm_verbose($obj) { Console::verbose($obj); }
+function zm_verbose($obj) {
+    Console::verbose($obj);
+}
 
-function zm_error($obj) { Console::error($obj); }
+function zm_error($obj) {
+    Console::error($obj);
+}
 
-function zm_config($name, $key = null) { return ZMConfig::get($name, $key); }
+function zm_config($name, $key = null) {
+    return ZMConfig::get($name, $key);
+}
 
 function quick_reply_closure($reply) {
     return function () use ($reply) {

@@ -39,7 +39,10 @@ $config['swoole'] = [
 $config['runtime'] = [
     'swoole_coroutine_hook_flags' => SWOOLE_HOOK_ALL & (~SWOOLE_HOOK_CURL),
     'swoole_server_mode' => SWOOLE_PROCESS,
-    'middleware_error_policy' => 1
+    'middleware_error_policy' => 1,
+    'reload_kill_connect' => false,
+    'global_middleware_binding' => [
+    ]
 ];
 
 /** 轻量字符串缓存，默认开启 */
@@ -120,7 +123,8 @@ $config['static_file_server'] = [
 $config['onebot'] = [
     'status' => true,
     'single_bot_mode' => false,
-    'message_level' => 99999
+    'message_level' => 99,
+    'message_format' => 'string'
 ];
 
 /** 一个远程简易终端，使用nc直接连接即可，但是不建议开放host为0.0.0.0(远程连接) */

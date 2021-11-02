@@ -132,7 +132,7 @@ class OnWorkerStart implements SwooleEvent
      * @throws Exception
      */
     private function loadAnnotations() {
-
+        if (Framework::$instant_mode) goto skip;
         //加载各个模块的注解类，以及反射
         Console::debug("Mapping annotations");
         $parser = new AnnotationParser();
@@ -145,20 +145,6 @@ class OnWorkerStart implements SwooleEvent
                 $parser->addRegisterPath(DataProvider::getSourceRootDir() . "/" . $v . "/", trim($k, "\\"));
             }
         }
-
-        //加载自定义的全局函数
-        Console::debug("Loading context class...");
-        $context_class = ZMConfig::get("global", "context_class");
-        if (!is_a($context_class, ContextInterface::class, true)) {
-            throw new ZMKnownException("E00032", "Context class must implemented from ContextInterface!");
-        }
-
-        //加载插件
-        $obb_onebot = ZMConfig::get("global", "onebot") ??
-            ZMConfig::get("global", "modules")["onebot"] ??
-            ["status" => true, "single_bot_mode" => false, "message_level" => 99999];
-
-
 
         // 检查是否允许热加载phar模块，允许的话将遍历phar内的文件
         $plugin_enable_hotload = ZMConfig::get("global", "module_loader")["enable_hotload"] ?? false;
@@ -176,12 +162,23 @@ class OnWorkerStart implements SwooleEvent
         $parser->registerMods();
         EventManager::loadEventByParser($parser); //加载事件
 
+        skip:
+        //加载自定义的全局函数
+        Console::debug("Loading context class...");
+        $context_class = ZMConfig::get("global", "context_class");
+        if (!is_a($context_class, ContextInterface::class, true)) {
+            throw new ZMKnownException("E00032", "Context class must implemented from ContextInterface!");
+        }
+        //加载插件
+        $obb_onebot = ZMConfig::get("global", "onebot") ??
+            ZMConfig::get("global", "modules")["onebot"] ??
+            ["status" => true, "single_bot_mode" => false, "message_level" => 99999];
         if ($obb_onebot["status"]) {
             Console::debug("OneBot support enabled, listening OneBot event(3).");
             $obj = new OnMessageEvent();
             $obj->class = QQBot::class;
             $obj->method = 'handleByEvent';
-            $obj->level = $obb_onebot["message_level"] ?? 99999;
+            $obj->level = $obb_onebot["message_level"] ?? 99;
             $obj->rule = 'connectIsQQ()';
             EventManager::addEvent(OnMessageEvent::class, $obj);
             if ($obb_onebot["single_bot_mode"]) {
