@@ -9,7 +9,6 @@ use Exception;
 use Phar;
 use Swoole\Server\Port;
 use Throwable;
-use ZM\Annotation\CQ\CQCommand;
 use ZM\Config\ZMConfig;
 use ZM\ConnectionManager\ManagerGM;
 use ZM\Console\TermColor;

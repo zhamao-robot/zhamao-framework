@@ -4,6 +4,33 @@
 
 同时此处将只使用 build 版本号进行区分。
 
+## build 425 (2021-11-3)
+
+- 删除未实际应用功能的配置参数
+- 修复 reload 时会断开 WebSocket 连接且导致进程崩溃的 Bug
+
+## build 424 (2021-11-2)
+
+- 新增 InstantModule 类、ZMServer 类、ModuleBase 类
+- 配置文件新增 `runtime.reload_kill_connect`、`runtime.global_middleware_binding` 选项
+- 修复部分情况下闭包事件分发时崩溃的 bug
+- 新增内部方法 `_zm_env_check`
+- 调整默认的 OneBot 模块对应的等级从 99999 调整为 99
+- 新增导出框架运行参数的列表功能
+
+## build 423 (2021-10-17)
+
+- 修复 PHP 7.2 ~ 7.3 下无法使用新版 MySQL 组件的 bug
+
+## build 422 (2021-10-6)
+
+- 修复 `script_` 前缀无法被排除加载模块的 bug
+- 修复 MySQL 组件的依赖问题
+
+## build 421 (2021-9-11)
+
+- 删除多余的调试信息
+
 ## build 420 (2021-9-11)
 
 - 修复 OneBot 事件无法响应的 bug
