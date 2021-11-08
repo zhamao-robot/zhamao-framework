@@ -356,7 +356,7 @@ class CQ
             }
             $cq["start"] = $offset + $head;
             $cq["end"] = $offset + $tmpmsg + $head;
-            $offset += $tmpmsg + 1;
+            $offset += $head + $tmpmsg + 1;
             $cqs[] = (!$is_object ? $cq : CQObject::fromArray($cq));
         }
         return $cqs;
