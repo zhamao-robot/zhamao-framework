@@ -4,6 +4,7 @@
 namespace ZM\Annotation;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use ZM\Annotation\CQ\CQCommand;
 use ZM\Annotation\Interfaces\ErgodicAnnotation;
 use ZM\Config\ZMConfig;
 use ZM\Console\Console;
@@ -98,7 +99,6 @@ class AnnotationParser
                     if ($vs instanceof ErgodicAnnotation) {
                         foreach (($this->annotation_map[$v]["methods"] ?? []) as $method) {
                             $copy = clone $vs;
-                            /** @noinspection PhpUndefinedFieldInspection */
                             $copy->method = $method->getName();
                             $this->annotation_map[$v]["methods_annotations"][$method->getName()][] = $copy;
                         }
@@ -116,12 +116,27 @@ class AnnotationParser
                     }
                 }
 
+                $inserted = [];
+
                 //预处理3：处理每个函数上面的特殊注解，就是需要操作一些东西的
                 foreach (($this->annotation_map[$v]["methods_annotations"] ?? []) as $method_name => $methods_annotations) {
                     foreach ($methods_annotations as $method_anno) {
                         /** @var AnnotationBase $method_anno */
                         $method_anno->class = $v;
                         $method_anno->method = $method_name;
+                        if (!($method_anno instanceof Middleware) && ($middlewares = ZMConfig::get("global", "runtime")["global_middleware_binding"][get_class($method_anno)] ?? []) !== []) {
+                            if (!isset($inserted[$v][$method_name])) {
+                                // 在这里在其他中间件前插入插入全局的中间件
+                                foreach ($middlewares as $middleware) {
+                                    $mid_class = new Middleware();
+                                    $mid_class->middleware = $middleware;
+                                    $mid_class->class = $v;
+                                    $mid_class->method = $method_name;
+                                    $this->middleware_map[$v][$method_name][] = $mid_class;
+                                }
+                                $inserted[$v][$method_name] = true;
+                            }
+                        }
                         if ($method_anno instanceof RequestMapping) {
                             RouteManager::importRouteByAnnotation($method_anno, $method_name, $v, $methods_annotations);
                         } elseif ($method_anno instanceof Middleware) {
@@ -134,9 +149,10 @@ class AnnotationParser
         Console::debug("解析注解完毕！");
     }
 
-    public function generateAnnotationEvents() {
+    public function generateAnnotationEvents(): array {
         $o = [];
         foreach ($this->annotation_map as $obj) {
+            // 这里的ErgodicAnnotation是为了解决类上的注解可穿透到方法上的问题
             foreach (($obj["class_annotations"] ?? []) as $class_annotation) {
                 if ($class_annotation instanceof ErgodicAnnotation) continue;
                 else $o[get_class($class_annotation)][] = $class_annotation;

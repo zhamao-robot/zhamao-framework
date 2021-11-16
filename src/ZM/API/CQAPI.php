@@ -3,6 +3,7 @@
 
 namespace ZM\API;
 
+use Closure;
 use ZM\Console\Console;
 use ZM\Store\LightCacheInside;
 use ZM\Store\Lock\SpinLock;
@@ -11,6 +12,13 @@ use ZM\Utils\CoMessage;
 
 trait CQAPI
 {
+    /** @var null|Closure */
+    private static $filter = null;
+
+    public static function registerFilter(callable $callable) {
+        self::$filter = $callable;
+    }
+
     /**
      * @param $connection
      * @param $reply
@@ -18,6 +26,11 @@ trait CQAPI
      * @return bool|array
      */
     private function processAPI($connection, $reply, $function = null) {
+        if (is_callable(self::$filter)) {
+            $reply2 = call_user_func(self::$filter, $reply);
+            if (is_bool($reply2)) return $reply2;
+            else $reply = $reply2;
+        }
         if ($connection->getOption("type") === CONN_WEBSOCKET)
             return $this->processWebsocketAPI($connection, $reply, $function);
         else

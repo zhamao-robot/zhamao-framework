@@ -33,7 +33,7 @@ class TimerMiddleware implements MiddlewareInterface
      * @HandleAfter()
      */
     public function onAfter() {
-        Console::info("Using " . round((microtime(true) - $this->starttime) * 1000, 2) . " ms.");
+        Console::info("Using " . round((microtime(true) - $this->starttime) * 1000, 3) . " ms.");
     }
 
     /**
@@ -42,7 +42,7 @@ class TimerMiddleware implements MiddlewareInterface
      * @throws Exception
      */
     public function onException(Exception $e) {
-        Console::error("Using " . round((microtime(true) - $this->starttime) * 1000, 2) . " ms but an Exception occurred.");
+        Console::error("Using " . round((microtime(true) - $this->starttime) * 1000, 3) . " ms but an Exception occurred.");
         throw $e;
     }
 }

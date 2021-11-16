@@ -59,7 +59,7 @@ class MessageUtil
         return false;
     }
 
-    public static function isAtMe($msg, $me_id) {
+    public static function isAtMe($msg, $me_id): bool {
         return strpos($msg, CQ::at($me_id)) !== false;
     }
 
@@ -72,7 +72,7 @@ class MessageUtil
      * @param int $type
      * @return string
      */
-    public static function getImageCQFromLocal($file, $type = 0): string {
+    public static function getImageCQFromLocal($file, int $type = 0): string {
         switch ($type) {
             case 0:
                 return CQ::image("base64://" . base64_encode(file_get_contents($file)));
@@ -90,7 +90,7 @@ class MessageUtil
      * @param $msg
      * @return array|string[]
      */
-    public static function splitCommand($msg) {
+    public static function splitCommand($msg): array {
         $word = explodeMsg(str_replace("\r", "", $msg));
         if (empty($word)) $word = [""];
         if (count(explode("\n", $word[0])) >= 2) {
@@ -98,7 +98,7 @@ class MessageUtil
             $first = split_explode(" ", array_shift($enter));
             $word = array_merge($first, $enter);
             foreach ($word as $k => $v) {
-                $word[$k] = trim($word[$k]);
+                $word[$k] = trim($v);
             }
         }
         return $word;
@@ -109,15 +109,15 @@ class MessageUtil
      * @param $obj
      * @return MatchResult
      */
-    public static function matchCommand($msg, $obj) {
+    public static function matchCommand($msg, $obj): MatchResult {
         $ls = EventManager::$events[CQCommand::class] ?? [];
         $word = self::splitCommand($msg);
         $matched = new MatchResult();
         foreach ($ls as $v) {
             if (array_diff([$v->match, $v->pattern, $v->regex, $v->keyword, $v->end_with, $v->start_with], [""]) == []) continue;
-            elseif (($v->user_id == 0 || ($v->user_id != 0 && $v->user_id == $obj["user_id"])) &&
-                ($v->group_id == 0 || ($v->group_id != 0 && $v->group_id == ($obj["group_id"] ?? 0))) &&
-                ($v->message_type == '' || ($v->message_type != '' && $v->message_type == $obj["message_type"]))
+            elseif (($v->user_id == 0 || ($v->user_id == $obj["user_id"])) &&
+                ($v->group_id == 0 || ($v->group_id == ($obj["group_id"] ?? 0))) &&
+                ($v->message_type == '' || ($v->message_type == $obj["message_type"]))
             ) {
                 if (($word[0] != "" && $v->match == $word[0]) || in_array($word[0], $v->alias)) {
                     array_shift($word);
@@ -165,5 +165,62 @@ class MessageUtil
         for ($i = 0; $i < ZM_WORKER_NUM; ++$i) {
             ProcessManager::sendActionToWorker($i, "add_short_command", [$command, $reply]);
         }
+    }
+
+    /**
+     * 字符串转数组
+     * @param $msg
+     * @param bool $ignore_space
+     * @param false $trim_text
+     * @return array
+     */
+    public static function strToArray($msg, bool $ignore_space = true, bool $trim_text = false): array {
+        $arr = [];
+        while (($rear = mb_strstr($msg, '[CQ:')) !== false && ($end = mb_strstr($rear, ']', true)) !== false) {
+            // 把 [CQ: 前面的文字生成段落
+            $front = mb_strstr($msg, '[CQ:', true);
+            // 如果去掉空格都还有文字，或者不去掉空格有字符，且不忽略空格，则生成段落，否则不生成
+            if (($trim_front = trim($front)) !== '' || ($front !== '' && !$ignore_space)) {
+                $arr[] = ['type' => 'text', 'data' => ['text' => CQ::decode($trim_text ? $trim_front : $front)]];
+            }
+            // 处理 CQ 码
+            $content = mb_substr($end, 4);
+            $cq = explode(",", $content);
+            $object_type = array_shift($cq);
+            $object_params = [];
+            foreach ($cq as $v) {
+                $key = mb_strstr($v, "=", true);
+                $object_params[$key] = CQ::decode(mb_substr(mb_strstr($v, "="), 1), true);
+            }
+            $arr[] = ["type" => $object_type, "data" => $object_params];
+            $msg = mb_substr(mb_strstr($rear, ']'), 1);
+        }
+        if (($trim_msg = trim($msg)) !== '' || ($msg !== '' && !$ignore_space)) {
+            $arr[] = ['type' => 'text', 'data' => ['text' => CQ::decode($trim_text ? $trim_msg : $msg)]];
+        }
+        return $arr;
+    }
+
+    /**
+     * 数组转字符串
+     * 纪念一下，这段代码完全由AI生成，没有人知道它是怎么写的，这句话是我自己写的，不知道是不是有人知道的
+     * @param array $array
+     * @return string
+     * @author Copilot
+     */
+    public static function arrayToStr(array $array): string {
+        $str = "";
+        foreach ($array as $v) {
+            if ($v['type'] == 'text') {
+                $str .= $v['data']['text'];
+            } else {
+                $str .= "[CQ:" . $v['type'];
+                foreach ($v['data'] as $key => $value) {
+                    $str .= "," . $key . "=" . CQ::encode($value, true);
+                }
+                $str .= "]";
+            }
+        }
+        return $str;
     }
 }

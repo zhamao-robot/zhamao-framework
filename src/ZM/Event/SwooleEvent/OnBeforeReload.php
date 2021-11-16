@@ -7,6 +7,7 @@ namespace ZM\Event\SwooleEvent;
 use Swoole\Process;
 use Swoole\WebSocket\Server;
 use ZM\Annotation\Swoole\SwooleHandler;
+use ZM\Config\ZMConfig;
 use ZM\Console\Console;
 use ZM\Event\SwooleEvent;
 
@@ -22,7 +23,7 @@ class OnBeforeReload implements SwooleEvent
         for ($i = 0; $i < ZM_WORKER_NUM; ++$i) {
             Process::kill(zm_atomic("_#worker_" . $i)->get(), SIGUSR1);
         }
-
-        usleep(800 * 1000);
+        $conf = ZMConfig::get("global", "runtime")["reload_delay_time"] ?? 800;
+        if ($conf !== 0) usleep($conf * 1000);
     }
 }

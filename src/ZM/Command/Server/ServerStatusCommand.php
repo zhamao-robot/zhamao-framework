@@ -1,14 +1,14 @@
 <?php
 
-
-namespace ZM\Command\Daemon;
+namespace ZM\Command\Server;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use ZM\Command\Daemon\DaemonCommand;
 
-class DaemonStatusCommand extends DaemonCommand
+class ServerStatusCommand extends DaemonCommand
 {
-    protected static $defaultName = 'daemon:status';
+    protected static $defaultName = 'server:status';
 
     protected function configure() {
         $this->setDescription("查看框架的运行状态");
@@ -28,4 +28,7 @@ class DaemonStatusCommand extends DaemonCommand
         }
         return 0;
     }
+}
+{
+
 }

@@ -1,15 +1,16 @@
 <?php
 
 
-namespace ZM\Command\Daemon;
+namespace ZM\Command\Server;
 
 use Swoole\Process;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use ZM\Command\Daemon\DaemonCommand;
 
-class DaemonReloadCommand extends DaemonCommand
+class ServerReloadCommand extends DaemonCommand
 {
-    protected static $defaultName = 'daemon:reload';
+    protected static $defaultName = 'server:reload';
 
     protected function configure() {
         $this->setDescription("重载框架");

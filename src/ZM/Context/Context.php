@@ -9,6 +9,7 @@ use Swoole\Coroutine;
 use Swoole\Http\Request;
 use Swoole\WebSocket\Frame;
 use Swoole\WebSocket\Server;
+use ZM\Config\ZMConfig;
 use ZM\ConnectionManager\ConnectionObject;
 use ZM\ConnectionManager\ManagerGM;
 use ZM\Console\Console;
@@ -19,6 +20,7 @@ use ZM\Exception\WaitTimeoutException;
 use ZM\Http\Response;
 use ZM\API\ZMRobot;
 use ZM\Utils\CoMessage;
+use ZM\Utils\MessageUtil;
 
 class Context implements ContextInterface
 {
@@ -56,8 +58,8 @@ class Context implements ContextInterface
      */
     public function getResponse(): ?Response { return self::$context[$this->cid]["response"] ?? null; }
 
-    /** @return ConnectionObject|null|Response */
-    public function getConnection() { return ManagerGM::get($this->getFd()); }
+    /** @return ConnectionObject|null */
+    public function getConnection(): ?ConnectionObject { return ManagerGM::get($this->getFd()); }
 
     /**
      * @return int|null
@@ -72,9 +74,20 @@ class Context implements ContextInterface
         return $conn instanceof ConnectionObject ? new ZMRobot($conn) : null;
     }
 
-    public function getMessage() { return self::$context[$this->cid]["data"]["message"] ?? null; }
+    public function getMessage() {
+        if ((ZMConfig::get("global", "onebot")["message_convert_string"] ?? true) === true && is_array($msg = $this->getOriginMessage())) {
+            return MessageUtil::arrayToStr($msg);
+        } else {
+            return self::$context[$this->cid]["data"]["message"] ?? null;
+        }
+    }
 
-    public function setMessage($msg) { self::$context[$this->cid]["data"]["message"] = $msg; }
+    public function setMessage($msg) {
+        if (is_string($msg) && is_array($this->getOriginMessage())) {
+            $msg = MessageUtil::strToArray($msg);
+        }
+        self::$context[$this->cid]["data"]["message"] = $msg;
+    }
 
     public function getUserId() { return $this->getData()["user_id"] ?? null; }
 
@@ -239,4 +252,6 @@ class Context implements ContextInterface
     public function copy() { return self::$context[$this->cid]; }
 
     public function getOption() { return self::getCache("match"); }
+
+    public function getOriginMessage() { return self::$context[$this->cid]["data"]["message"] ?? null; }
 }

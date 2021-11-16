@@ -12,6 +12,7 @@ use ZM\Annotation\AnnotationParser;
 use ZM\Annotation\Swoole\OnTick;
 use ZM\Config\ZMConfig;
 use ZM\Console\Console;
+use ZM\Exception\AnnotationException;
 use ZM\Store\LightCache;
 use ZM\Store\ZMAtomic;
 
@@ -32,6 +33,9 @@ class EventManager
         (new AnnotationParser())->sortByLevel(self::$events, $event_name);
     }
 
+    /**
+     * @throws AnnotationException
+     */
     public static function loadEventByParser(AnnotationParser $parser) {
         self::$events = $parser->generateAnnotationEvents();
         self::$middlewares = $parser->getMiddlewares();

@@ -8,12 +8,14 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use ZM\Framework;
+use ZM\Utils\DataProvider;
 
 class RunServerCommand extends Command
 {
     protected static $defaultName = 'server';
 
     protected function configure() {
+        $this->setAliases(['server:start']);
         $this->setDefinition([
             new InputOption("debug-mode", "D", null, "开启调试模式 (这将关闭协程化)"),
             new InputOption("log-debug", null, null, "调整消息等级到debug (log-level=4)"),
@@ -45,6 +47,17 @@ class RunServerCommand extends Command
             if (!in_array($opt, ["production", "staging", "development", ""])) {
                 $output->writeln("<error> \"--env\" option only accept production, development, staging and [empty] ! </error>");
                 return 1;
+            }
+        }
+        $pid_path = DataProvider::getWorkingDir() . "/.daemon_pid";
+        if (file_exists($pid_path)) {
+            $pid = json_decode(file_get_contents($pid_path), true)["pid"] ?? null;
+            if ($pid !== null && posix_getsid($pid) !== false) {
+                $output->writeln("<error>检测到已经在 pid: $pid 进程启动了框架！</error>");
+                $output->writeln("<error>不可以同时启动两个框架！</error>");
+                return 1;
+            } else {
+                unlink($pid_path);
             }
         }
         (new Framework($input->getOptions()))->start();

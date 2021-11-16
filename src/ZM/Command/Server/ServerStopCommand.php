@@ -1,16 +1,17 @@
 <?php
 
 
-namespace ZM\Command\Daemon;
+namespace ZM\Command\Server;
 
 use Swoole\Process;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use ZM\Command\Daemon\DaemonCommand;
 use ZM\Utils\DataProvider;
 
-class DaemonStopCommand extends DaemonCommand
+class ServerStopCommand extends DaemonCommand
 {
-    protected static $defaultName = 'daemon:stop';
+    protected static $defaultName = 'server:stop';
 
     protected function configure() {
         $this->setDescription("停止运行的框架");

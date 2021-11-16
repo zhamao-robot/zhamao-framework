@@ -4,6 +4,21 @@
 
 同时此处将只使用 build 版本号进行区分。
 
+## build 427 (2021-11-16)
+
+- 新增全局中间件，可在全局配置文件中设置
+- 修复部分 Typo
+- 新增指令 `server:status`、`server:reload`、`server:stop` 可用在新开终端中查看框架运行状态、重启和退出
+- 新增支持 `array` 格式的消息
+- 上下文 Context 对象新增 `getOriginMessage()` 用于获取原消息，`getMessage()` 如果在设置了转换后，将默认转换消息为字符串格式保持与旧模块兼容
+- OneBot API 新增全局过滤器，可用作 Action 过滤重写等操作
+- 配置文件新增 `runtime.reload_delay_time`，用于可配置重载 Worker 等待的时间（毫秒）
+- 配置文件新增 `runtime.global_middleware_binding`，用于配置全局中间件
+- 配置文件新增 `onebot.message_convert_string`，用于配置是否转换数组格式为字符串，保证与前版本的兼容性（默认为 true）
+- MessageUtil 消息工具类新增方法：`strToArray($msg, bool $ignore_space = true, bool $trim_text = false)`
+- MessageUtil 消息工具类新增方法：`arrayToStr(array $array)`
+- 新增框架启动多次监测功能，无法使用同一个框架项目同时启动两个框架
+
 ## build 426 (2021-11-10)
 
 - 修复 CQ 码的解析函数 Bug（#52）

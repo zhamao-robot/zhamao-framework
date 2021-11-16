@@ -21,14 +21,17 @@ use ZM\Command\RunServerCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use ZM\Command\Server\ServerReloadCommand;
+use ZM\Command\Server\ServerStatusCommand;
+use ZM\Command\Server\ServerStopCommand;
 use ZM\Exception\InitException;
 
 class ConsoleApplication extends Application
 {
     private static $obj = null;
 
-    const VERSION_ID = 426;
-    const VERSION = "2.5.8";
+    const VERSION_ID = 427;
+    const VERSION = "2.6.0";
 
     /**
      * @throws InitException
@@ -46,8 +49,8 @@ class ConsoleApplication extends Application
      * @return ConsoleApplication
      * @throws InitException
      */
-    public function initEnv($with_default_cmd = ""): ConsoleApplication {
-        if (defined("WORKDING_DIR")) throw new InitException();
+    public function initEnv(string $with_default_cmd = ""): ConsoleApplication {
+        if (defined("WORKING_DIR")) throw new InitException();
 
         _zm_env_check();
 
@@ -90,6 +93,9 @@ class ConsoleApplication extends Application
             new DaemonReloadCommand(),
             new DaemonStopCommand(),
             new RunServerCommand(), //运行主服务的指令控制器
+            new ServerStatusCommand(),
+            new ServerStopCommand(),
+            new ServerReloadCommand(),
             new PureHttpCommand(), //纯HTTP服务器指令
             new SystemdGenerateCommand()
         ]);
