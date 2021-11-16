@@ -128,3 +128,52 @@ public function onStart() {
 ( 其实还是很聪明的！
 </chat-box>
 
+### strToArray()
+
+将 `string` 类型的消息文本转换为 `array` 格式。
+
+定义：`strToArray($msg, bool $ignore_space = true, bool $trim_text = false)`
+
+参数 `$msg` 为带 OB/CQ 码的字符串消息，如 `你好啊，[CQ:at,qq=123]`。
+
+参数 `$ignore_space` 在 `false` 时，转换的数组内会包含空 `text` 段。
+
+参数 `$trim_text` 为 `true` 时，会自动去除 `text` 段消息头尾的换行符和空格。
+
+这个命令转换的数组格式符合 OneBot 11/12 标准，但细节上可能会与不同 OneBot 实现有所差异。
+
+```php
+$str = "你好啊，[CQ:at,qq=123]";
+$arr = \ZM\Utils\MessageUtil::strToArray($str);
+```
+
+转换结果参考如下：
+
+```json
+[
+    {
+        "type": "text",
+        "data": {
+            "text": "你好啊，"
+        }
+    },
+    {
+        "type": "at",
+        "data": {
+            "qq": "123"
+        }
+    }
+]
+```
+
+### arrayToStr()
+
+将 `array` 格式的消息内容转换为字符串 + CQ 码的形式。
+
+定义：`arrayToStr(array $array)`
+
+```php
+// 我们使用上边的 $arr 作为传入值。
+$new_str = \ZM\Utils\MessageUtil::arrayToStr($arr);
+// 结果："你好啊，[CQ:at,qq=123]"
+```

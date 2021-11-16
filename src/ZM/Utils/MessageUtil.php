@@ -111,6 +111,9 @@ class MessageUtil
      */
     public static function matchCommand($msg, $obj): MatchResult {
         $ls = EventManager::$events[CQCommand::class] ?? [];
+        if (is_array($msg)) {
+            $msg = self::arrayToStr($msg);
+        }
         $word = self::splitCommand($msg);
         $matched = new MatchResult();
         foreach ($ls as $v) {

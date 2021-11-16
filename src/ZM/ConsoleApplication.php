@@ -30,8 +30,8 @@ class ConsoleApplication extends Application
 {
     private static $obj = null;
 
-    const VERSION_ID = 427;
-    const VERSION = "2.6.0";
+    const VERSION_ID = 428;
+    const VERSION = "2.6.1";
 
     /**
      * @throws InitException
@@ -75,7 +75,7 @@ class ConsoleApplication extends Application
                     $composer["autoload"]["psr-4"]["Custom\\"] = "src/Custom";
                     $r = file_put_contents(WORKING_DIR . "/composer.json", json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
                     if ($r !== false) {
-                        echo "成功添加！请运行 composer dump-autoload ！\n";
+                        echo "成功添加！请运行 'composer dump-autoload'\n";
                         exit(0);
                     } else {
                         echo zm_internal_errcode("E00006") . "添加失败！请按任意键继续！";

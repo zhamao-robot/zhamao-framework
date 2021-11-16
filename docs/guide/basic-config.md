@@ -56,6 +56,8 @@
 | `swoole_coroutine_hook_flags` | Swoole 启动时一键协程化 Hook 的 Flag 值，详见 [一键协程化](http://wiki.swoole.com/#/runtime?id=%e5%87%bd%e6%95%b0%e5%8e%9f%e5%9e%8b) | `SWOOLE_HOOK_ALL & (~SWOOLE_HOOK_CURL)` |
 | `swoole_server_mode`          | Swoole Server 启动的进程模式，有 `SWOOLE_PROCESS` 和 `SWOOLE_BASE` 两种，见 [启动方式](http://wiki.swoole.com/#/learn?id=swoole_process) | `SWOOLE_PROCESS`                        |
 | `middleware_error_policy`     | 中间件错误处理策略，见 [中间件 - 错误处理策略](../../event/middleware/#_6) | 1                                       |
+| `reload_delay_time`           | 框架 reload 重载命令接收后延迟的时间（毫秒，0 为不等待）     | 800                                     |
+| `global_middleware_binding`   | 给注解事件绑定全局中间件，见 [中间件 - 全局中间件](../../event/middleware/#_6) | `[]`                                    |
 
 ### 子表 **light_cache**
 
@@ -106,11 +108,12 @@
 
 ### 子表 onebot
 
-| 配置名称          | 说明                                                         | 默认值 |
-| ----------------- | ------------------------------------------------------------ | ------ |
-| `status`          | 是否开启 OneBot 标准机器人解析功能                           | true   |
-| `single_bot_mode` | 是否开启单机器人模式                                         | false  |
-| `message_level`   | 机器人的 WebSocket 事件在 Swoole 原生事件 `@OnMessageEvent` 中的等级（越高说明越被优先处理） | 99999  |
+| 配置名称                 | 说明                                                         | 默认值 |
+| ------------------------ | ------------------------------------------------------------ | ------ |
+| `status`                 | 是否开启 OneBot 标准机器人解析功能                           | true   |
+| `single_bot_mode`        | 是否开启单机器人模式                                         | false  |
+| `message_level`          | 机器人的 WebSocket 事件在 Swoole 原生事件 `@OnMessageEvent` 中的等级（越高说明越被优先处理） | 99     |
+| `message_convert_string` | 是否将数组格式的消息转换为字符串以保证与旧版本的兼容性       | true   |
 
 ### 子表 remote_terminal
 

@@ -4,6 +4,12 @@
 
 同时此处将只使用 build 版本号进行区分。
 
+## build 428 (2021-11-16)
+
+- 修复 `ctx()->waitMessage()` 在 array 消息模式下无法正确返回消息字符串的问题
+- 新增 `ctx()->getArrayMessage()` 和 `ctx()->getStringMessage()` 两个方法
+- 修复注解事件 `CQCommand` 和 `CQMessage` 在 array 消息模式下无法正确解析的 Bug
+
 ## build 427 (2021-11-16)
 
 - 新增全局中间件，可在全局配置文件中设置

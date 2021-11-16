@@ -181,7 +181,11 @@ class Context implements ContextInterface
         if ($r === false) {
             throw new WaitTimeoutException($this, $timeout_prompt);
         }
-        return $r["message"];
+        if (is_array($r["message"]) && (ZMConfig::get("global", "onebot")["message_convert_string"] ?? true) === true) {
+            return MessageUtil::arrayToStr($r["message"]);
+        } else {
+            return $r["message"];
+        }
     }
 
     /**
@@ -254,4 +258,16 @@ class Context implements ContextInterface
     public function getOption() { return self::getCache("match"); }
 
     public function getOriginMessage() { return self::$context[$this->cid]["data"]["message"] ?? null; }
+
+    public function getArrayMessage(): array {
+        $msg = $this->getOriginMessage();
+        if (is_array($msg)) return $msg;
+        else return MessageUtil::strToArray($msg);
+    }
+
+    public function getStringMessage(): string {
+        $msg = $this->getOriginMessage();
+        if (is_string($msg)) return $msg;
+        else return MessageUtil::arrayToStr($msg);
+    }
 }

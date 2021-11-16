@@ -73,11 +73,11 @@ class QQBot
     public function dispatchBeforeEvents($data, $time): EventDispatcher {
         $before = new EventDispatcher(CQBefore::class);
         if ($time === "pre") {
-            $before->setRuleFunction(function($v) use ($data){
+            $before->setRuleFunction(function ($v) use ($data) {
                 return $v->level >= 200 && $v->cq_event == $data["post_type"];
             });
         } else {
-            $before->setRuleFunction(function($v) use ($data){
+            $before->setRuleFunction(function ($v) use ($data) {
                 return $v->level < 200 && $v->cq_event == $data["post_type"];
             });
         }
@@ -103,7 +103,7 @@ class QQBot
                     if (is_string($result)) ctx()->reply($result);
                     if (ctx()->getCache("has_reply") === true) EventDispatcher::interrupt();
                 });
-                $s = MessageUtil::matchCommand(ctx()->getMessage(), ctx()->getData());
+                $s = MessageUtil::matchCommand(ctx()->getStringMessage(), ctx()->getData());
                 if ($s->status !== false) {
                     if (!empty($s->match)) ctx()->setCache("match", $s->match);
                     $dispatcher->dispatchEvent($s->object, null);
@@ -114,11 +114,11 @@ class QQBot
                 //分发CQMessage事件
                 $msg_dispatcher = new EventDispatcher(CQMessage::class);
                 $msg_dispatcher->setRuleFunction(function ($v) {
-                    return ($v->message == '' || ($v->message != '' && $v->message == context()->getData()["message"])) &&
-                        ($v->user_id == 0 || ($v->user_id != 0 && $v->user_id == context()->getData()["user_id"])) &&
-                        ($v->group_id == 0 || ($v->group_id != 0 && $v->group_id == (context()->getData()["group_id"] ?? 0))) &&
-                        ($v->message_type == '' || ($v->message_type != '' && $v->message_type == context()->getData()["message_type"])) &&
-                        ($v->raw_message == '' || ($v->raw_message != '' && $v->raw_message == context()->getData()["raw_message"]));
+                    return ($v->message == '' || ($v->message == ctx()->getStringMessage())) &&
+                        ($v->user_id == 0 || ($v->user_id == ctx()->getUserId())) &&
+                        ($v->group_id == 0 || ($v->group_id == (ctx()->getGroupId() ?? 0))) &&
+                        ($v->message_type == '' || ($v->message_type == ctx()->getMessageType())) &&
+                        ($v->raw_message == '' || ($v->raw_message == context()->getData()["raw_message"]));
                 });
                 $msg_dispatcher->setReturnFunction(function ($result) {
                     if (is_string($result)) ctx()->reply($result);
