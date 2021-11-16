@@ -110,4 +110,8 @@ vendor/bin/start server
 
 在贡献代码时，请保管好自己的全局配置文件中的敏感信息，请勿将带有个人信息的配置文件上传 GitHub 等网站。
 
-![star](https://starchart.cc/zhamao-robot/zhamao-framework.svg)
+感谢 JetBrains 为此开源项目提供 PhpStorm 开发工具支持：
+
+<img src="https://resources.jetbrains.com/storage/products/company/brand/logos/PhpStorm.svg" width="300">
+
+<!-- ![star](https://starchart.cc/zhamao-robot/zhamao-framework.svg) -->
