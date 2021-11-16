@@ -2,6 +2,11 @@
 
 这里将会记录各个主版本的框架升级后，涉及 `global.php` 的更新日志，你可以根据这里描述的内容与你的旧配置文件进行合并。
 
+## v2.6.0 (build 427)
+
+- 新增 `$config['runtime']` 下的 `reload_delay_time`、`global_middleware_binding` 项。
+- 新增 `$config['onebot']` 下的 `message_convert_string` 项。
+
 ## v2.5.1 (build 417)
 
 - 新增 `$config['runtime']` 下的 `middleware_error_policy` 选项。
