@@ -4,6 +4,12 @@
 
 同时此处将只使用 build 版本号进行区分。
 
+## build 429 (2021-12-7)
+
+- 新增配置项 `onebot`.`message_command_policy`
+- 新增 CQCommand 阻断策略的自定义配置功能
+- 修复 CQAfter 无法正常使用的 bug #53
+
 ## build 428 (2021-11-16)
 
 - 修复 `ctx()->waitMessage()` 在 array 消息模式下无法正确返回消息字符串的问题
