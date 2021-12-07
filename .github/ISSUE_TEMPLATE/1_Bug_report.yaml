@@ -1,0 +1,38 @@
+name: 🐛 漏洞（BUG）报告
+description: ⚠️ 请不要直接在此提交安全漏洞
+labels: bug
+
+body:
+  - type: input
+    id: affected-versions
+    attributes:
+      label: 受影响版本
+      placeholder: x.y.z
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: 描述
+      description: 请详细地描述您的问题
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce-steps
+    attributes:
+      label: 复现步骤
+      description: |
+        请尽可能地提供可以复现此步骤的漏洞。
+        如果步骤过长或难以描述，您可以自行建立一个用于复现漏洞的仓库。
+    validations:
+      required: true
+  - type: textarea
+    id: possible-solution
+    attributes:
+      label: 解决方案
+      description: 如果您对这个漏洞的成因或修复有任何意见的话，请在此提出
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: 附加信息
+      description: 其他可能有帮助的信息，如日志、截图等
