@@ -114,4 +114,6 @@ vendor/bin/start server
 
 <img src="https://resources.jetbrains.com/storage/products/company/brand/logos/PhpStorm.svg" width="300">
 
+感谢 [php-libonebot](https://github.com/botuniverse/php-libonebot) 开发者 @sunxyw 中为项目开发规范化提出的一些建议。
+
 <!-- ![star](https://starchart.cc/zhamao-robot/zhamao-framework.svg) -->
