@@ -114,6 +114,7 @@
 | `single_bot_mode`        | 是否开启单机器人模式                                         | false  |
 | `message_level`          | 机器人的 WebSocket 事件在 Swoole 原生事件 `@OnMessageEvent` 中的等级（越高说明越被优先处理） | 99     |
 | `message_convert_string` | 是否将数组格式的消息转换为字符串以保证与旧版本的兼容性       | true   |
+| `message_command_policy` | CQCommand命令匹配后执行流程，`interrupt` 为不执行后续 CQMessage，`continue` 为继续       | `interrupt`   |
 
 ### 子表 remote_terminal
 

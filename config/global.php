@@ -123,7 +123,8 @@ $config['onebot'] = [
     'status' => true,
     'single_bot_mode' => false,
     'message_level' => 99,
-    'message_convert_string' => true
+    'message_convert_string' => true,
+    'message_command_policy' => 'interrupt',
 ];
 
 /** 一个远程简易终端，使用nc直接连接即可，但是不建议开放host为0.0.0.0(远程连接) */
