@@ -4,6 +4,7 @@
 namespace ZM\Module;
 
 use Exception;
+use ZM\Annotation\CQ\CQAfter;
 use ZM\Annotation\CQ\CQAPIResponse;
 use ZM\Annotation\CQ\CQBefore;
 use ZM\Annotation\CQ\CQCommand;
@@ -11,6 +12,7 @@ use ZM\Annotation\CQ\CQMessage;
 use ZM\Annotation\CQ\CQMetaEvent;
 use ZM\Annotation\CQ\CQNotice;
 use ZM\Annotation\CQ\CQRequest;
+use ZM\Config\ZMConfig;
 use ZM\Event\EventDispatcher;
 use ZM\Exception\InterruptException;
 use ZM\Exception\WaitTimeoutException;
@@ -59,9 +61,25 @@ class QQBot
             }
             if (isset($data["post_type"])) $this->dispatchEvents($data);
             else $this->dispatchAPIResponse($data);
+
+            if (($data["post_type"] ?? "meta_event") != "meta_event") {
+                $r = $this->dispatchAfterEvents($data); // before在这里执行，元事件不执行before为减少不必要的调试日志
+                if ($r->store === "block") EventDispatcher::interrupt();
+            }
         } /** @noinspection PhpRedundantCatchClauseInspection */ catch (WaitTimeoutException $e) {
+            if (($data["post_type"] ?? "meta_event") != "meta_event") {
+                $r = $this->dispatchAfterEvents($data); // before在这里执行，元事件不执行before为减少不必要的调试日志
+                if ($r->store === "block") EventDispatcher::interrupt();
+            }
             $e->module->finalReply($e->getMessage());
+        } catch (InterruptException $e) {
+            if (($data["post_type"] ?? "meta_event") != "meta_event") {
+                $r = $this->dispatchAfterEvents($data); // before在这里执行，元事件不执行before为减少不必要的调试日志
+                if ($r->store === "block") EventDispatcher::interrupt();
+            }
+            throw $e;
         }
+        // 这里修复CQAfter不能使用的问题，我竟然一直没写，绝了
     }
 
     /**
@@ -108,7 +126,18 @@ class QQBot
                     if (!empty($s->match)) ctx()->setCache("match", $s->match);
                     $dispatcher->dispatchEvent($s->object, null);
                     if (is_string($dispatcher->store)) ctx()->reply($dispatcher->store);
-                    if (ctx()->getCache("has_reply") === true) EventDispatcher::interrupt();
+                    if (ctx()->getCache("has_reply") === true) {
+                        $policy = ZMConfig::get("global", "onebot")['message_command_policy'] ?? 'interrupt';
+                        switch ($policy) {
+                            case 'interrupt':
+                                EventDispatcher::interrupt();
+                                break;
+                            case 'continue':
+                                break;
+                            default:
+                                throw new Exception("未知的消息命令策略：" . $policy);
+                        }
+                    }
                 }
 
                 //分发CQMessage事件
@@ -156,6 +185,16 @@ class QQBot
                 $dispatcher->dispatchEvents(ctx()->getData());
                 return;
         }
+    }
+
+    private function dispatchAfterEvents($data): EventDispatcher {
+        $after = new EventDispatcher(CQAfter::class);
+        $after->setRuleFunction(function ($v) use ($data) {
+            return $v->cq_event == $data["post_type"];
+        });
+        zm_dump("开始触发！", $data);
+        $after->dispatchEvents($data);
+        return $after;
     }
 
     /**
