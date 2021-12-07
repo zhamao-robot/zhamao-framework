@@ -1,0 +1,19 @@
+name: 🚀 功能建议
+description: 新功能、改进的意见、草案
+labels: enhancement
+
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: 描述
+      description: 请提供简洁清楚的描述
+    validations:
+      required: true
+  - type: textarea
+    id: example
+    attributes:
+      label: 例子
+      description: |
+        一个简单的例子，展示该功能将如何被使用（包括代码、配置文件等）
+        如果这是针对已有功能的改进，请展示改进前后使用方式（或效能）的对比
