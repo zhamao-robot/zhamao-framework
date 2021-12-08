@@ -192,7 +192,6 @@ class QQBot
         $after->setRuleFunction(function ($v) use ($data) {
             return $v->cq_event == $data["post_type"];
         });
-        zm_dump("开始触发！", $data);
         $after->dispatchEvents($data);
         return $after;
     }

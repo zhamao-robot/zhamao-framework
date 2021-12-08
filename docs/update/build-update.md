@@ -4,6 +4,11 @@
 
 同时此处将只使用 build 版本号进行区分。
 
+## build 430 (2021-12-8)
+
+- 删除调试信息
+- 修复 #56 中关于数据库组件的 Bug
+
 ## build 429 (2021-12-7)
 
 - 新增配置项 `onebot`.`message_command_policy`
