@@ -440,6 +440,7 @@ class Framework
                         $coroutine_mode = false;
                         break;
                     case 'debug-mode':
+                        self::$argv["disable-safe-exit"] = true;
                         $coroutine_mode = false;
                         $terminal_id = null;
                         self::$argv["watch"] = true;
