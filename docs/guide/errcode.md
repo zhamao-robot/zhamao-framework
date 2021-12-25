@@ -70,5 +70,6 @@
 | E00068 | 模块解包时无法正常拷贝文件                                   | 检查文件夹是否正常可以创建和写入。                           |
 | E00069 | 框架不能启动两个 ConsoleApplication 实例                     | 不要重复使用 `new ConsoleApplication()`。                    |
 | E00070 | 框架找不到 `zm_data` 目录                                    | 检查配置中指定的 `zm_data` 目录是否存在。                    |
+| E00071 | 框架找不到对应类型的 API 调用类                              | 检查 `getExtendedAPI($name)` 传入的 `$name` 是否正确                    |
 | E99999 | 未知错误                                                     |                                                              |
 

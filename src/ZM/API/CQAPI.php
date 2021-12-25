@@ -80,6 +80,12 @@ trait CQAPI
         return false;
     }
 
+    public function getActionName($suffix, string $method) {
+        $postfix = ($suffix == OneBotV11::API_ASYNC ? '_async' : ($suffix == OneBotV11::API_RATE_LIMITED ? '_rate_limited' : ''));
+        $func_name = strtolower(preg_replace('/(?<=[a-z])([A-Z])/', '_$1', $method));
+        return $func_name . $postfix;
+    }
+
     public function __call($name, $arguments) {
         return false;
     }

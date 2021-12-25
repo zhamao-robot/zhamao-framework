@@ -769,6 +769,21 @@ vardump($result["retcode"]); //如果成功撤回，输出 int(0)
 
 响应数据：无
 
+### getExtendedAPI()
+
+用来调用 OneBot 标准之外扩展出来的自定义 API。与下方 `callExtendedAPI` 不同的是，为了方便用户使用，炸毛框架内置了热门使用并且相对稳定的机器人客户端的专有 API。
+
+目前内置了 `go-cqhttp` 频道相关的扩充 API。
+
+使用示例：`getExtendedAPI('go-cqhttp')->getGuildList()`
+使用示例2：`getExtendedAPI()->sendGuildChannelMsg($guild_id, $channel_id, '频道的消息')`
+
+唯一一个参数做保留，用于选择不同客户端，目前仅支持 `go-cqhttp`，所以缺省也默认为 `go-cqhttp`。
+
+!!! warning "注意"
+
+    由于不同版本的扩展 API 变化可能会很大，改动较多，炸毛框架不会将对应扩展方法写入文档，具体调用情况可根据 IDE 自动补全中的文档或对应类的注释查看。
+
 ### callExtendedAPI() （扩充 API）
 
 用来调用 OneBot 标准之外扩展出来的自定义 API。

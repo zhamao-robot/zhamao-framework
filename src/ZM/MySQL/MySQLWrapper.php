@@ -94,7 +94,7 @@ class MySQLWrapper
      * @return false|mixed
      * @throws DbException
      */
-    public function fetchOne(string $query, array $params = [], array $types = []): bool {
+    public function fetchOne(string $query, array $params = [], array $types = []) {
         try {
             return $this->connection->fetchOne($query, $params, $types);
         } catch (Throwable $e) {

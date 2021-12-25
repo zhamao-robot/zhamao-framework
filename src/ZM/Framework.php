@@ -487,7 +487,7 @@ class Framework
             }
         }
         $global_hook = ZMConfig::get("global", 'runtime')['swoole_coroutine_hook_flags'] ?? (SWOOLE_HOOK_ALL & (~SWOOLE_HOOK_CURL));
-        if ($coroutine_mode && $global_hook === false) Runtime::enableCoroutine(true, $global_hook);
+        if ($coroutine_mode) Runtime::enableCoroutine(true, $global_hook);
         else Runtime::enableCoroutine(false, SWOOLE_HOOK_ALL);
     }
 

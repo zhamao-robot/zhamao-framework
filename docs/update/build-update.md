@@ -4,6 +4,12 @@
 
 同时此处将只使用 build 版本号进行区分。
 
+## build 432 (2021-12-25)
+
+- 新增 GoCqhttpAPI 包，用于支持额外的 OneBot Action（API）
+- 修复 MySQL 查询器中 `fetchOne()` 方法无法正确返回值的 Bug
+- 修复 Swoole Hook 因配置不当无法正确使用的 Bug
+
 ## build 431 (2021-12-22)
 
 - 修复 Issue #50
