@@ -33,7 +33,8 @@ class OneBotV11
      * @return ZMRobot
      * @throws RobotNotFoundException
      */
-    public static function get($robot_id) {
+    public static function get($robot_id)
+    {
         $r = ManagerGM::getAllByName('qq');
         foreach ($r as $v) {
             if ($v->getOption('connect_id') == $robot_id) return new ZMRobot($v);
@@ -45,7 +46,8 @@ class OneBotV11
      * @return ZMRobot
      * @throws RobotNotFoundException
      */
-    public static function getRandom() {
+    public static function getRandom()
+    {
         $r = ManagerGM::getAllByName('qq');
         if ($r == []) throw new RobotNotFoundException("没有任何机器人连接到框架！");
         return new ZMRobot($r[array_rand($r)]);
@@ -54,7 +56,8 @@ class OneBotV11
     /**
      * @return ZMRobot[]
      */
-    public static function getAllRobot() {
+    public static function getAllRobot()
+    {
         $r = ManagerGM::getAllByName('qq');
         $obj = [];
         foreach ($r as $v) {
@@ -63,21 +66,25 @@ class OneBotV11
         return $obj;
     }
 
-    public function __construct(ConnectionObject $connection) {
+    public function __construct(ConnectionObject $connection)
+    {
         $this->connection = $connection;
     }
 
-    public function setCallback($callback = true) {
+    public function setCallback($callback = true)
+    {
         $this->callback = $callback;
         return $this;
     }
 
-    public function setPrefix($prefix = self::API_NORMAL) {
+    public function setPrefix($prefix = self::API_NORMAL)
+    {
         $this->prefix = $prefix;
         return $this;
     }
 
-    public function getSelfId() {
+    public function getSelfId()
+    {
         return $this->connection->getOption('connect_id');
     }
 
@@ -91,7 +98,8 @@ class OneBotV11
      * @param bool $auto_escape
      * @return array|bool|null
      */
-    public function sendPrivateMsg($user_id, $message, $auto_escape = false) {
+    public function sendPrivateMsg($user_id, $message, bool $auto_escape = false)
+    {
         return $this->processAPI($this->connection, [
             'action' => $this->getActionName($this->prefix, __FUNCTION__),
             'params' => [
@@ -110,7 +118,8 @@ class OneBotV11
      * @param bool $auto_escape
      * @return array|bool|null
      */
-    public function sendGroupMsg($group_id, $message, $auto_escape = false) {
+    public function sendGroupMsg($group_id, $message, bool $auto_escape = false)
+    {
         return $this->processAPI($this->connection, [
             'action' => $this->getActionName($this->prefix, __FUNCTION__),
             'params' => [
@@ -130,7 +139,8 @@ class OneBotV11
      * @param bool $auto_escape
      * @return array|bool|null
      */
-    public function sendMsg($message_type, $target_id, $message, $auto_escape = false) {
+    public function sendMsg($message_type, $target_id, $message, bool $auto_escape = false)
+    {
         return $this->processAPI($this->connection, [
             'action' => $this->getActionName($this->prefix, __FUNCTION__),
             'params' => [
@@ -148,7 +158,8 @@ class OneBotV11
      * @param $message_id
      * @return array|bool|null
      */
-    public function deleteMsg($message_id) {
+    public function deleteMsg($message_id)
+    {
         return $this->processAPI($this->connection, [
             'action' => $this->getActionName($this->prefix, __FUNCTION__),
             'params' => [
@@ -163,7 +174,8 @@ class OneBotV11
      * @param $message_id
      * @return array|bool|null
      */
-    public function getMsg($message_id) {
+    public function getMsg($message_id)
+    {
         return $this->processAPI($this->connection, [
             'action' => $this->getActionName($this->prefix, __FUNCTION__),
             'params' => [
@@ -178,7 +190,8 @@ class OneBotV11
      * @param $id
      * @return array|bool|null
      */
-    public function getForwardMsg($id) {
+    public function getForwardMsg($id)
+    {
         return $this->processAPI($this->connection, [
             'action' => $this->getActionName($this->prefix, __FUNCTION__),
             'params' => [
@@ -194,7 +207,8 @@ class OneBotV11
      * @param int $times
      * @return array|bool|null
      */
-    public function sendLike($user_id, $times = 1) {
+    public function sendLike($user_id, int $times = 1)
+    {
         return $this->processAPI($this->connection, [
             'action' => $this->getActionName($this->prefix, __FUNCTION__),
             'params' => [
@@ -212,7 +226,8 @@ class OneBotV11
      * @param bool $reject_add_request
      * @return array|bool|null
      */
-    public function setGroupKick($group_id, $user_id, $reject_add_request = false) {
+    public function setGroupKick($group_id, $user_id, bool $reject_add_request = false)
+    {
         return $this->processAPI($this->connection, [
             'action' => $this->getActionName($this->prefix, __FUNCTION__),
             'params' => [
@@ -228,10 +243,11 @@ class OneBotV11
      * @link https://github.com/howmanybots/onebot/blob/master/v11/specs/api/public.md#set_group_ban-%E7%BE%A4%E7%BB%84%E5%8D%95%E4%BA%BA%E7%A6%81%E8%A8%80
      * @param $group_id
      * @param $user_id
-     * @param $duration
+     * @param int $duration
      * @return array|bool|null
      */
-    public function setGroupBan($group_id, $user_id, $duration = 1800) {
+    public function setGroupBan($group_id, $user_id, int $duration = 1800)
+    {
         return $this->processAPI($this->connection, [
             'action' => $this->getActionName($this->prefix, __FUNCTION__),
             'params' => [
@@ -250,7 +266,8 @@ class OneBotV11
      * @param int $duration
      * @return array|bool|null
      */
-    public function setGroupAnonymousBan($group_id, $anonymous_or_flag, $duration = 1800) {
+    public function setGroupAnonymousBan($group_id, $anonymous_or_flag, int $duration = 1800)
+    {
         return $this->processAPI($this->connection, [
             'action' => $this->getActionName($this->prefix, __FUNCTION__),
             'params' => [
@@ -268,7 +285,8 @@ class OneBotV11
      * @param bool $enable
      * @return array|bool|null
      */
-    public function setGroupWholeBan($group_id, $enable = true) {
+    public function setGroupWholeBan($group_id, bool $enable = true)
+    {
         return $this->processAPI($this->connection, [
             'action' => $this->getActionName($this->prefix, __FUNCTION__),
             'params' => [
@@ -286,7 +304,8 @@ class OneBotV11
      * @param bool $enable
      * @return array|bool|null
      */
-    public function setGroupAdmin($group_id, $user_id, $enable = true) {
+    public function setGroupAdmin($group_id, $user_id, bool $enable = true)
+    {
         return $this->processAPI($this->connection, [
             'action' => $this->getActionName($this->prefix, __FUNCTION__),
             'params' => [
@@ -304,7 +323,8 @@ class OneBotV11
      * @param bool $enable
      * @return array|bool|null
      */
-    public function setGroupAnonymous($group_id, $enable = true) {
+    public function setGroupAnonymous($group_id, bool $enable = true)
+    {
         return $this->processAPI($this->connection, [
             'action' => $this->getActionName($this->prefix, __FUNCTION__),
             'params' => [
@@ -322,7 +342,8 @@ class OneBotV11
      * @param string $card
      * @return array|bool|null
      */
-    public function setGroupCard($group_id, $user_id, $card = "") {
+    public function setGroupCard($group_id, $user_id, string $card = '')
+    {
         return $this->processAPI($this->connection, [
             'action' => $this->getActionName($this->prefix, __FUNCTION__),
             'params' => [
@@ -340,7 +361,8 @@ class OneBotV11
      * @param $group_name
      * @return array|bool|null
      */
-    public function setGroupName($group_id, $group_name) {
+    public function setGroupName($group_id, $group_name)
+    {
         return $this->processAPI($this->connection, [
             'action' => $this->getActionName($this->prefix, __FUNCTION__),
             'params' => [
@@ -357,7 +379,8 @@ class OneBotV11
      * @param bool $is_dismiss
      * @return array|bool|null
      */
-    public function setGroupLeave($group_id, $is_dismiss = false) {
+    public function setGroupLeave($group_id, bool $is_dismiss = false)
+    {
         return $this->processAPI($this->connection, [
             'action' => $this->getActionName($this->prefix, __FUNCTION__),
             'params' => [
@@ -376,7 +399,8 @@ class OneBotV11
      * @param int $duration
      * @return array|bool|null
      */
-    public function setGroupSpecialTitle($group_id, $user_id, $special_title = "", $duration = -1) {
+    public function setGroupSpecialTitle($group_id, $user_id, string $special_title = "", int $duration = -1)
+    {
         return $this->processAPI($this->connection, [
             'action' => $this->getActionName($this->prefix, __FUNCTION__),
             'params' => [
@@ -396,7 +420,8 @@ class OneBotV11
      * @param string $remark
      * @return array|bool|null
      */
-    public function setFriendAddRequest($flag, $approve = true, $remark = "") {
+    public function setFriendAddRequest($flag, bool $approve = true, string $remark = "")
+    {
         return $this->processAPI($this->connection, [
             'action' => $this->getActionName($this->prefix, __FUNCTION__),
             'params' => [
@@ -416,7 +441,8 @@ class OneBotV11
      * @param string $reason
      * @return array|bool|null
      */
-    public function setGroupAddRequest($flag, $sub_type, $approve = true, $reason = "") {
+    public function setGroupAddRequest($flag, $sub_type, bool $approve = true, string $reason = "")
+    {
         return $this->processAPI($this->connection, [
             'action' => $this->getActionName($this->prefix, __FUNCTION__),
             'params' => [
@@ -433,7 +459,8 @@ class OneBotV11
      * @link https://github.com/howmanybots/onebot/blob/master/v11/specs/api/public.md#get_login_info-%E8%8E%B7%E5%8F%96%E7%99%BB%E5%BD%95%E5%8F%B7%E4%BF%A1%E6%81%AF
      * @return array|bool|null
      */
-    public function getLoginInfo() {
+    public function getLoginInfo()
+    {
         return $this->processAPI($this->connection, ['action' => $this->getActionName($this->prefix, __FUNCTION__)], $this->callback);
     }
 
@@ -444,7 +471,8 @@ class OneBotV11
      * @param bool $no_cache
      * @return array|bool|null
      */
-    public function getStrangerInfo($user_id, bool $no_cache) {
+    public function getStrangerInfo($user_id, bool $no_cache = false)
+    {
         return $this->processAPI($this->connection, [
             'action' => $this->getActionName($this->prefix, __FUNCTION__),
             'params' => [
@@ -459,7 +487,8 @@ class OneBotV11
      * @link https://github.com/howmanybots/onebot/blob/master/v11/specs/api/public.md#get_friend_list-%E8%8E%B7%E5%8F%96%E5%A5%BD%E5%8F%8B%E5%88%97%E8%A1%A8
      * @return array|bool|null
      */
-    public function getFriendList() {
+    public function getFriendList()
+    {
         return $this->processAPI($this->connection, [
             'action' => $this->getActionName($this->prefix, __FUNCTION__)
         ], $this->callback);
@@ -472,7 +501,8 @@ class OneBotV11
      * @param bool $no_cache
      * @return array|bool|null
      */
-    public function getGroupInfo($group_id, $no_cache = false) {
+    public function getGroupInfo($group_id, bool $no_cache = false)
+    {
         return $this->processAPI($this->connection, [
             'action' => $this->getActionName($this->prefix, __FUNCTION__),
             'params' => [
@@ -487,7 +517,8 @@ class OneBotV11
      * @link https://github.com/howmanybots/onebot/blob/master/v11/specs/api/public.md#get_group_list-%E8%8E%B7%E5%8F%96%E7%BE%A4%E5%88%97%E8%A1%A8
      * @return array|bool|null
      */
-    public function getGroupList() {
+    public function getGroupList()
+    {
         return $this->processAPI($this->connection, [
             'action' => $this->getActionName($this->prefix, __FUNCTION__)
         ], $this->callback);
@@ -501,7 +532,8 @@ class OneBotV11
      * @param bool $no_cache
      * @return array|bool|null
      */
-    public function getGroupMemberInfo($group_id, $user_id, bool $no_cache) {
+    public function getGroupMemberInfo($group_id, $user_id, bool $no_cache = false)
+    {
         return $this->processAPI($this->connection, [
             'action' => $this->getActionName($this->prefix, __FUNCTION__),
             'params' => [
@@ -518,7 +550,8 @@ class OneBotV11
      * @param $group_id
      * @return array|bool|null
      */
-    public function getGroupMemberList($group_id) {
+    public function getGroupMemberList($group_id)
+    {
         return $this->processAPI($this->connection, [
             'action' => $this->getActionName($this->prefix, __FUNCTION__),
             'params' => [
@@ -534,7 +567,8 @@ class OneBotV11
      * @param $type
      * @return array|bool|null
      */
-    public function getGroupHonorInfo($group_id, $type) {
+    public function getGroupHonorInfo($group_id, $type)
+    {
         return $this->processAPI($this->connection, [
             'action' => $this->getActionName($this->prefix, __FUNCTION__),
             'params' => [
@@ -549,7 +583,8 @@ class OneBotV11
      * @link https://github.com/howmanybots/onebot/blob/master/v11/specs/api/public.md#get_csrf_token-%E8%8E%B7%E5%8F%96-csrf-token
      * @return array|bool|null
      */
-    public function getCsrfToken() {
+    public function getCsrfToken()
+    {
         return $this->processAPI($this->connection, [
             'action' => $this->getActionName($this->prefix, __FUNCTION__)
         ], $this->callback);
@@ -561,7 +596,8 @@ class OneBotV11
      * @param string $domain
      * @return array|bool|null
      */
-    public function getCredentials($domain = "") {
+    public function getCredentials(string $domain = "")
+    {
         return $this->processAPI($this->connection, [
             'action' => $this->getActionName($this->prefix, __FUNCTION__),
             'params' => [
@@ -577,7 +613,8 @@ class OneBotV11
      * @param $out_format
      * @return array|bool|null
      */
-    public function getRecord($file, $out_format) {
+    public function getRecord($file, $out_format)
+    {
         return $this->processAPI($this->connection, [
             'action' => $this->getActionName($this->prefix, __FUNCTION__),
             'params' => [
@@ -593,7 +630,8 @@ class OneBotV11
      * @param $file
      * @return array|bool|null
      */
-    public function getImage($file) {
+    public function getImage($file)
+    {
         return $this->processAPI($this->connection, [
             'action' => $this->getActionName($this->prefix, __FUNCTION__),
             'params' => [
@@ -607,7 +645,8 @@ class OneBotV11
      * @link https://github.com/howmanybots/onebot/blob/master/v11/specs/api/public.md#can_send_image-%E6%A3%80%E6%9F%A5%E6%98%AF%E5%90%A6%E5%8F%AF%E4%BB%A5%E5%8F%91%E9%80%81%E5%9B%BE%E7%89%87
      * @return array|bool|null
      */
-    public function canSendImage() {
+    public function canSendImage()
+    {
         return $this->processAPI($this->connection, [
             'action' => $this->getActionName($this->prefix, __FUNCTION__)
         ], $this->callback);
@@ -618,7 +657,8 @@ class OneBotV11
      * @link https://github.com/howmanybots/onebot/blob/master/v11/specs/api/public.md#can_send_record-%E6%A3%80%E6%9F%A5%E6%98%AF%E5%90%A6%E5%8F%AF%E4%BB%A5%E5%8F%91%E9%80%81%E8%AF%AD%E9%9F%B3
      * @return array|bool|null
      */
-    public function canSendRecord() {
+    public function canSendRecord()
+    {
         return $this->processAPI($this->connection, [
             'action' => $this->getActionName($this->prefix, __FUNCTION__)
         ], $this->callback);
@@ -629,7 +669,8 @@ class OneBotV11
      * @link https://github.com/howmanybots/onebot/blob/master/v11/specs/api/public.md#get_status-%E8%8E%B7%E5%8F%96%E8%BF%90%E8%A1%8C%E7%8A%B6%E6%80%81
      * @return array|bool|null
      */
-    public function getStatus() {
+    public function getStatus()
+    {
         return $this->processAPI($this->connection, [
             'action' => $this->getActionName($this->prefix, __FUNCTION__)
         ], $this->callback);
@@ -640,7 +681,8 @@ class OneBotV11
      * @link https://github.com/howmanybots/onebot/blob/master/v11/specs/api/public.md#get_version_info-%E8%8E%B7%E5%8F%96%E7%89%88%E6%9C%AC%E4%BF%A1%E6%81%AF
      * @return array|bool|null
      */
-    public function getVersionInfo() {
+    public function getVersionInfo()
+    {
         return $this->processAPI($this->connection, [
             'action' => $this->getActionName($this->prefix, __FUNCTION__)
         ], $this->callback);
@@ -652,7 +694,8 @@ class OneBotV11
      * @param int $delay
      * @return array|bool|null
      */
-    public function setRestart($delay = 0) {
+    public function setRestart(int $delay = 0)
+    {
         return $this->processAPI($this->connection, [
             'action' => $this->getActionName($this->prefix, __FUNCTION__),
             'params' => [
@@ -666,7 +709,8 @@ class OneBotV11
      * @link https://github.com/howmanybots/onebot/blob/master/v11/specs/api/public.md#clean_cache-%E6%B8%85%E7%90%86%E7%BC%93%E5%AD%98
      * @return array|bool|null
      */
-    public function cleanCache() {
+    public function cleanCache()
+    {
         return $this->processAPI($this->connection, [
             'action' => $this->getActionName($this->prefix, __FUNCTION__)
         ], $this->callback);
@@ -679,7 +723,8 @@ class OneBotV11
      * @return mixed
      * @throws ZMKnownException
      */
-    public function getExtendedAPI(string $package_name = 'go-cqhttp') {
+    public function getExtendedAPI(string $package_name = 'go-cqhttp')
+    {
         $table = [
             'go-cqhttp' => GoCqhttpAPIV11::class,
         ];
@@ -690,7 +735,8 @@ class OneBotV11
         }
     }
 
-    public function callExtendedAPI($action, $params = []) {
+    public function callExtendedAPI($action, $params = [])
+    {
         return $this->processAPI($this->connection, [
             'action' => $action,
             'params' => $params

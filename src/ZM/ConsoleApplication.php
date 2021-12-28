@@ -30,8 +30,8 @@ class ConsoleApplication extends Application
 {
     private static $obj = null;
 
-    const VERSION_ID = 432;
-    const VERSION = "2.6.4";
+    const VERSION_ID = 433;
+    const VERSION = "2.6.5";
 
     /**
      * @throws InitException

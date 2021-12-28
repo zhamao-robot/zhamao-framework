@@ -4,6 +4,10 @@
 
 同时此处将只使用 build 版本号进行区分。
 
+## build 433 (2021-12-28)
+
+- 修复 OneBotV11 因 IDE 自动优化导致 API 接口发生变化的问题
+
 ## build 432 (2021-12-25)
 
 - 新增 GoCqhttpAPI 包，用于支持额外的 OneBot Action（API）
