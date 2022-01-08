@@ -41,7 +41,8 @@ $config['runtime'] = [
     'swoole_server_mode' => SWOOLE_PROCESS,
     'middleware_error_policy' => 1,
     'reload_delay_time' => 800,
-    'global_middleware_binding' => []
+    'global_middleware_binding' => [],
+    'save_console_log_file' => false, // 改为目标路径，则将 Console 输出的日志保存到文件
 ];
 
 /** 轻量字符串缓存，默认开启 */

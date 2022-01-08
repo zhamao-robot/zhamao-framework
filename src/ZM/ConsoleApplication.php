@@ -30,8 +30,8 @@ class ConsoleApplication extends Application
 {
     private static $obj = null;
 
-    const VERSION_ID = 433;
-    const VERSION = "2.6.5";
+    const VERSION_ID = 434;
+    const VERSION = "2.6.6";
 
     /**
      * @throws InitException
@@ -64,28 +64,6 @@ class ConsoleApplication extends Application
             define("SOURCE_ROOT_DIR", WORKING_DIR);
             define("LOAD_MODE", is_dir(SOURCE_ROOT_DIR . "/src/ZM") ? 0 : 1);
             define("FRAMEWORK_ROOT_DIR", realpath(__DIR__ . "/../../"));
-        }
-        if (LOAD_MODE == 0) {
-            $composer = json_decode(file_get_contents(SOURCE_ROOT_DIR . "/composer.json"), true);
-            if (!isset($composer["autoload"]["psr-4"]["Module\\"])) {
-                echo "框架源码模式需要在autoload文件中添加Module目录为自动加载，是否添加？[Y/n] ";
-                $r = strtolower(trim(fgets(STDIN)));
-                if ($r === "" || $r === "y") {
-                    $composer["autoload"]["psr-4"]["Module\\"] = "src/Module";
-                    $composer["autoload"]["psr-4"]["Custom\\"] = "src/Custom";
-                    $r = file_put_contents(WORKING_DIR . "/composer.json", json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-                    if ($r !== false) {
-                        echo "成功添加！请运行 'composer dump-autoload'\n";
-                        exit(0);
-                    } else {
-                        echo zm_internal_errcode("E00006") . "添加失败！请按任意键继续！";
-                        fgets(STDIN);
-                        exit(1);
-                    }
-                } else {
-                    exit(1);
-                }
-            }
         }
 
         $this->addCommands([

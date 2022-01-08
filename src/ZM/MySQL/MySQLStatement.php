@@ -94,7 +94,7 @@ class MySQLStatement implements IteratorAggregate, Statement
         return $this->statement->rowCount();
     }
 
-    public function getIterator()
+    public function getIterator(): StatementIterator
     {
         return new StatementIterator($this);
     }

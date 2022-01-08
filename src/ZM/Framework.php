@@ -118,6 +118,9 @@ class Framework
                 $args["log-theme"] ?? "default",
                 ($o = ZMConfig::get("console_color")) === false ? [] : $o
             );
+            if ((ZMConfig::get("global", "runtime")["save_console_log_file"] ?? false) !== false) {
+                Console::setOutputFile(ZMConfig::get("global", "runtime")["save_console_log_file"]);
+            }
 
             $timezone = ZMConfig::get("global", "timezone") ?? "Asia/Shanghai";
             date_default_timezone_set($timezone);
