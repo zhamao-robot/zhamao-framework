@@ -17,7 +17,8 @@
     "prefer-stable": true,
     "bin": [
         "bin/start",
-        "bin/phpunit-swoole"
+        "bin/phpunit-swoole",
+        "bin/watcher"
     ],
     "require": {
         "php": ">=7.2",
@@ -51,6 +52,12 @@
         "files": [
             "src/ZM/global_functions.php"
         ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Module\\": "src/Module",
+            "Custom\\": "src/Custom"
+        }
     },
     "require-dev": {
         "swoole/ide-helper": "@dev",

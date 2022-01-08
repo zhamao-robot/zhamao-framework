@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+
+_red="\e[33m"
+_green="\e[32m"
+_reset="\e[0m"
+
+unix_s=$(uname -s)
+
+unix_release=$(
+    marked_release=""
+    if [ "$unix_s" = "Linux" ]; then
+        echo $HOME | grep com.termux >/dev/null
+        if [ $? == 0 ]; then
+            marked_release="termux"
+        elif [ -f "/etc/redhat-release" ]; then
+            if [ "$(cat /etc/redhat-release | awk '{print $1}' | grep -v '^$')" = "CentOS" ]; then
+                marked_release="CentOS"
+            else
+                marked_release="unknown"
+            fi
+        elif [ -f "/etc/os-release" ]; then
+            cat /etc/os-release | grep Alpine > /dev/null
+            if [ $? == 0 ]; then
+                marked_release="Alpine"
+            fi
+        fi
+        if [ "$marked_release" = "" ]; then
+            if [ -f "/etc/issue" ]; then
+                marked_release=$(cat /etc/issue | grep -v '^$' | awk '{print $1}')
+            else
+                marked_release="unknown"
+            fi
+        fi
+    elif [ "$unix_s" = "Darwin" ]; then
+        marked_release=$(sw_vers | grep ProductName | awk '{print $2" "$3" "$4}')
+    fi
+    echo $marked_release
+)
+unix_release=$(echo $unix_release | xargs)
+
+function echo_error() {
+    echo -e "${_red}$1${_reset}"
+}
+
+function echo_info() {
+    echo -e "${_green}$1${_reset}"
+}
+
+function install_test() {
+    which fswatch >/dev/null
+    if [ $? != 0 ]; then
+        operate_confirm "fswatch还没有安装，是否确认安装？" && install_fswatch
+    fi
+}
+function install_fswatch() {
+    if [ "$unix_s" = "Linux" ]; then
+        case $unix_release in
+        "Kali" | "Ubuntu" | "Debian" | "Raspbian" | 'Pop!_OS')
+            sudo apt-get install fswatch -y ;;
+        #"termux") pkg install $1 -y ;;
+        "CentOS")
+            curl -o fswatch.tgz https://download.fastgit.org/emcrisostomo/fswatch/releases/download/1.16.0/fswatch-1.16.0.tar.gz && \
+                tar -xzf fswatch.tgz && \
+                cd fswatch-1.16.0 && \
+                ./configure && \
+                make && \
+                sudo make install && \
+                cd .. && \
+                rm -rf fswatch.tgz fswatch-1.16.0
+                ;;
+        #"Alpine") apk add $1 ;;
+        *)
+            echo_error "不支持的 Linux 发行版：$unix_release"
+            exit 1
+            ;;
+        esac
+    elif [ "$unix_s" = "Darwin" ]; then
+        brew install fswatch
+    else
+        echo_error "不支持的操作系统：$unix_s"
+        exit 1
+    fi
+}
+function operate_confirm() {
+    echo -n $(echo_info "$1 [Y/n]  ")
+    read operate
+    operate=$(echo $operate | tr A-Z a-z)
+    if [[ "$operate" = "y" || "$operate" = "" ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+echo_info "当前系统：$unix_release"
+install_test
+if [ $? -ne 0 ]; then
+    exit 1
+else
+    echo_info "程序路径：$(which fswatch)"
+fi
+watch_dir="./src"
+if [ ! -d "$watch_dir" ]; then
+    echo_error "src目录不存在！"
+    exit 1
+else
+    echo_info "监听目录：$watch_dir"
+fi
+_pid=$(cat .daemon_pid | awk -F"\"pid\": " '{print $2}' | grep -v ^$ | sed 's/,//g')
+if [ "$_pid" = "" ]; then
+    echo_error "未检测到框架进程"
+    exit 1
+fi
+fswatch $watch_dir | while read file
+do
+    echo "Detect file change: $file"
+    kill -USR1 $_pid
+done
