@@ -36,7 +36,8 @@ class RunServerCommand extends Command
             new InputOption("env", null, InputOption::VALUE_REQUIRED, "设置环境类型 (production, development, staging)"),
             new InputOption("disable-safe-exit", null, null, "关闭安全退出（关闭后按CtrlC时直接杀死进程）"),
             new InputOption("preview", null, null, "只显示参数，不启动服务器"),
-            new InputOption("force-load-module", null, InputOption::VALUE_OPTIONAL, "强制打包状态下加载模块（使用英文逗号分割多个）")
+            new InputOption("force-load-module", null, InputOption::VALUE_OPTIONAL, "强制打包状态下加载模块（使用英文逗号分割多个）"),
+            new InputOption("polling-watch", null, null, "强制启用轮询模式监听"),
         ]);
         $this->setDescription("Run zhamao-framework | 启动框架");
         $this->setHelp("直接运行可以启动");
@@ -49,16 +50,11 @@ class RunServerCommand extends Command
                 return 1;
             }
         }
-        $pid_path = DataProvider::getWorkingDir() . "/.daemon_pid";
-        if (file_exists($pid_path)) {
-            $pid = json_decode(file_get_contents($pid_path), true)["pid"] ?? null;
-            if ($pid !== null && posix_getsid($pid) !== false) {
-                $output->writeln("<error>检测到已经在 pid: $pid 进程启动了框架！</error>");
-                $output->writeln("<error>不可以同时启动两个框架！</error>");
-                return 1;
-            } else {
-                unlink($pid_path);
-            }
+        $state = Framework::getProcessState(ZM_PROCESS_MASTER);
+        if (is_array($state) && posix_getsid($state['pid'] ?? -1) !== false) {
+            $output->writeln("<error>检测到已经在 pid: {$state['pid']} 进程启动了框架！</error>");
+            $output->writeln("<error>不可以同时启动两个框架！</error>");
+            return 1;
         }
         (new Framework($input->getOptions()))->start();
         return 0;
