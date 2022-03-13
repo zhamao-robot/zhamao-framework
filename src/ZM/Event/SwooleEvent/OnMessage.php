@@ -25,9 +25,6 @@ use ZM\Event\SwooleEvent;
  */
 class OnMessage implements SwooleEvent
 {
-    /**
-     * @noinspection PhpUnreachableStatementInspection
-     */
     public function onCall($server, Frame $frame) {
         Console::debug("Calling Swoole \"message\" from fd=" . $frame->fd . ": " . TermColor::ITALIC . $frame->data . TermColor::RESET);
         unset(Context::$context[Coroutine::getCid()]);
