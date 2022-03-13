@@ -19,3 +19,4 @@ composer.lock
 /ext/go-cqhttp/device.json
 /ext/go-cqhttp/go-cqhttp
 /ext/go-cqhttp/session.token
+.zm_worker_*.pid
