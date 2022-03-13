@@ -12,6 +12,7 @@ use Throwable;
 use ZM\Config\ZMConfig;
 use ZM\ConnectionManager\ManagerGM;
 use ZM\Console\TermColor;
+use ZM\Exception\ZMKnownException;
 use ZM\Store\LightCache;
 use ZM\Store\LightCacheInside;
 use ZM\Store\Lock\SpinLock;
@@ -78,7 +79,8 @@ class Framework
 
     public static $instant_mode = false;
 
-    public function __construct($args = [], $instant_mode = false) {
+    public function __construct($args = [], $instant_mode = false)
+    {
         $tty_width = $this->getTtyWidth();
         self::$instant_mode = $instant_mode;
         self::$argv = $args;
@@ -129,9 +131,9 @@ class Framework
             $this->server_set["log_level"] = SWOOLE_LOG_DEBUG;
             $add_port = ZMConfig::get("global", "remote_terminal")["status"] ?? false;
 
-            if ($instant_mode) {
-                $this->loadServerEvents();
-            }
+            //if ($instant_mode) {
+            $this->loadServerEvents();
+            //}
 
             $this->parseCliArgs(self::$argv, $add_port);
 
@@ -332,7 +334,8 @@ class Framework
         }
     }
 
-    private static function printMotd($tty_width) {
+    private static function printMotd($tty_width)
+    {
         if (file_exists(DataProvider::getSourceRootDir() . "/config/motd.txt")) {
             $motd = file_get_contents(DataProvider::getSourceRootDir() . "/config/motd.txt");
         } else {
@@ -344,7 +347,118 @@ class Framework
         echo $motd;
     }
 
-    public function start() {
+    /**
+     * 将各进程的pid写入文件，以备后续崩溃及僵尸进程处理使用
+     * @param int $type
+     * @param int|string $pid
+     * @param array $data
+     * @internal
+     */
+    public static function saveProcessState(int $type, $pid, array $data = [])
+    {
+        switch ($type) {
+            case ZM_PROCESS_MASTER:
+                $file = _zm_pid_dir() . '/master.json';
+                $json = [
+                    'pid' => intval($pid),
+                    'stdout' => $data['stdout'],
+                    'daemon' => $data['daemon']
+                ];
+                file_put_contents($file, json_encode($json, JSON_UNESCAPED_UNICODE));
+                return;
+            case ZM_PROCESS_MANAGER:
+                $file = _zm_pid_dir() . '/manager.pid';
+                file_put_contents($file, strval($pid));
+                return;
+            case ZM_PROCESS_WORKER:
+                $file = _zm_pid_dir() . '/worker.' . $data['worker_id'] . '.pid';
+                file_put_contents($file, strval($pid));
+                return;
+            case ZM_PROCESS_USER:
+                $file = _zm_pid_dir() . '/user.' . $data['process_name'] . '.pid';
+                file_put_contents($file, strval($pid));
+                return;
+            case ZM_PROCESS_TASKWORKER:
+                $file = _zm_pid_dir() . '/taskworker.' . $data['worker_id'] . '.pid';
+                file_put_contents($file, strval($pid));
+                return;
+        }
+    }
+
+    /**
+     * 用于框架内部获取多进程运行状态的函数
+     * @param int $type
+     * @param null $id_or_name
+     * @return false|int|mixed
+     * @throws ZMKnownException
+     * @internal
+     */
+    public static function getProcessState(int $type, $id_or_name = null)
+    {
+        $file = _zm_pid_dir();
+        switch ($type) {
+            case ZM_PROCESS_MASTER:
+                if (!file_exists($file . '/master.json')) return false;
+                $json = json_decode(file_get_contents($file . '/master.json'), true);
+                if ($json !== null) return $json;
+                else return false;
+            case ZM_PROCESS_MANAGER:
+                if (!file_exists($file . '/manager.pid')) return false;
+                return intval(file_get_contents($file . '/manager.pid'));
+            case ZM_PROCESS_WORKER:
+                if (!is_int($id_or_name)) throw new ZMKnownException('E99999', 'worker_id必须为整数');
+                if (!file_exists($file . '/worker.' . $id_or_name . '.pid')) return false;
+                return intval(file_get_contents($file . '/worker.' . $id_or_name . '.pid'));
+            case ZM_PROCESS_USER:
+                if (!is_string($id_or_name)) throw new ZMKnownException('E99999', 'process_name必须为字符串');
+                if (!file_exists($file . '/user.' . $id_or_name . '.pid')) return false;
+                return intval(file_get_contents($file . '/user.' . $id_or_name . '.pid'));
+            case ZM_PROCESS_TASKWORKER:
+                if (!is_int($id_or_name)) throw new ZMKnownException('E99999', 'worker_id必须为整数');
+                if (!file_exists($file . '/taskworker.' . $id_or_name . '.pid')) return false;
+                return intval(file_get_contents($file . '/taskworker.' . $id_or_name . '.pid'));
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * @param int $type
+     * @param null $id_or_name
+     * @throws ZMKnownException
+     * @internal
+     */
+    public static function removeProcessState(int $type, $id_or_name = null)
+    {
+        switch ($type) {
+            case ZM_PROCESS_MASTER:
+                $file = _zm_pid_dir() . '/master.json';
+                if (file_exists($file)) unlink($file);
+                return;
+            case ZM_PROCESS_MANAGER:
+                $file = _zm_pid_dir() . '/manager.pid';
+                if (file_exists($file)) unlink($file);
+                return;
+            case ZM_PROCESS_WORKER:
+                if (!is_int($id_or_name)) throw new ZMKnownException('E99999', 'worker_id必须为整数');
+                $file = _zm_pid_dir() . '/worker.' . $id_or_name . '.pid';
+                if (file_exists($file)) unlink($file);
+                return;
+            case ZM_PROCESS_USER:
+                if (!is_string($id_or_name)) throw new ZMKnownException('E99999', 'process_name必须为字符串');
+                $file = _zm_pid_dir() . '/user.' . $id_or_name . '.pid';
+                if (file_exists($file)) unlink($file);
+                return;
+            case ZM_PROCESS_TASKWORKER:
+                if (!is_int($id_or_name)) throw new ZMKnownException('E99999', 'worker_id必须为整数');
+                $file = _zm_pid_dir() . '/taskworker.' . $id_or_name . '.pid';
+                if (file_exists($file)) unlink($file);
+                return;
+        }
+    }
+
+    public function start()
+    {
         try {
             self::$loaded_files = get_included_files();
             self::$server->start();
@@ -358,7 +472,8 @@ class Framework
     /**
      * @noinspection PhpIncludeInspection
      */
-    private function loadServerEvents() {
+    private function loadServerEvents()
+    {
         if (Phar::running() !== "") {
             ob_start();
             include_once DataProvider::getFrameworkRootDir() . "/src/ZM/script_setup_loader.php";
@@ -383,7 +498,8 @@ class Framework
      * @throws ReflectionException
      * @throws ReflectionException
      */
-    private function registerServerEvents() {
+    private function registerServerEvents()
+    {
         $reader = new AnnotationReader();
         $all = ZMUtil::getClassesPsr4(FRAMEWORK_ROOT_DIR . "/src/ZM/Event/SwooleEvent/", "ZM\\Event\\SwooleEvent");
         foreach ($all as $v) {
@@ -400,6 +516,7 @@ class Framework
         }
 
         foreach (($this->setup_events["setup"] ?? []) as $v) {
+            Console::debug('Calling @OnSetup: ' . $v["class"]);
             $c = ZMUtil::getModInstance($v["class"]);
             $method = $v["method"];
             $c->$method();
@@ -417,7 +534,8 @@ class Framework
      * @param $args
      * @param $add_port
      */
-    private function parseCliArgs($args, &$add_port) {
+    private function parseCliArgs($args, &$add_port)
+    {
         $coroutine_mode = true;
         global $terminal_id;
         $terminal_id = uuidgen();
@@ -494,7 +612,8 @@ class Framework
         else Runtime::enableCoroutine(false, SWOOLE_HOOK_ALL);
     }
 
-    private static function writeNoDouble($k, $v, &$line_data, &$line_width, &$current_line, $colorful, $max_border) {
+    private static function writeNoDouble($k, $v, &$line_data, &$line_width, &$current_line, $colorful, $max_border)
+    {
         $tmp_line = $k . ": " . $v;
         //Console::info("写入[".$tmp_line."]");
         if (strlen($tmp_line) > $line_width[$current_line]) { //输出的内容太多了，以至于一行都放不下一个，要折行
@@ -538,7 +657,8 @@ class Framework
         }
     }
 
-    public static function printProps($out, $tty_width, $colorful = true) {
+    public static function printProps($out, $tty_width, $colorful = true)
+    {
         $max_border = $tty_width < 65 ? $tty_width : 65;
         if (LOAD_MODE == 0) echo Console::setColor("* Framework started with source mode.\n", $colorful ? "yellow" : "");
         echo str_pad("", $max_border, "=") . PHP_EOL;
@@ -580,20 +700,23 @@ class Framework
         echo str_pad("", $max_border, "=") . PHP_EOL;
     }
 
-    public static function getTtyWidth(): string {
+    public static function getTtyWidth(): string
+    {
         $size = exec("stty size");
         if (empty($size)) return 65;
         return explode(" ", trim($size))[1];
     }
 
-    public static function loadFrameworkState() {
+    public static function loadFrameworkState()
+    {
         if (!file_exists(DataProvider::getDataFolder() . ".state.json")) return [];
         $r = json_decode(file_get_contents(DataProvider::getDataFolder() . ".state.json"), true);
         if ($r === null) $r = [];
         return $r;
     }
 
-    public static function saveFrameworkState($data) {
+    public static function saveFrameworkState($data)
+    {
         return file_put_contents(DataProvider::getDataFolder() . ".state.json", json_encode($data, 64 | 128 | 256));
     }
 }

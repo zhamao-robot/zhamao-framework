@@ -6,7 +6,7 @@ namespace ZM\Command\Daemon;
 use Swoole\Process;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use ZM\Utils\DataProvider;
+use ZM\Framework;
 
 class DaemonStopCommand extends DaemonCommand
 {
@@ -20,7 +20,7 @@ class DaemonStopCommand extends DaemonCommand
         parent::execute($input, $output);
         Process::kill(intval($this->daemon_file["pid"]), SIGTERM);
         $i = 10;
-        while (file_exists(DataProvider::getWorkingDir() . "/.daemon_pid") && $i > 0) {
+        while (Framework::getProcessState(ZM_PROCESS_MASTER) !== false && $i > 0) {
             sleep(1);
             --$i;
         }

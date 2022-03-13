@@ -7,22 +7,17 @@ namespace ZM\Command\Daemon;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use ZM\Utils\DataProvider;
+use ZM\Framework;
 
 abstract class DaemonCommand extends Command
 {
     protected $daemon_file = null;
 
     protected function execute(InputInterface $input, OutputInterface $output): int {
-        $pid_path = DataProvider::getWorkingDir() . "/.daemon_pid";
-        if (!file_exists($pid_path)) {
-            $output->writeln("<comment>没有检测到正在运行的守护进程或框架进程！</comment>");
-            die();
-        }
-        $file = json_decode(file_get_contents($pid_path), true);
-        if ($file === null || posix_getsid(intval($file["pid"])) === false) {
+        $file = Framework::getProcessState(ZM_PROCESS_MASTER);
+        if ($file === false || posix_getsid(intval($file["pid"])) === false) {
             $output->writeln("<comment>未检测到正在运行的守护进程或框架进程！</comment>");
-            unlink($pid_path);
+            Framework::removeProcessState(ZM_PROCESS_MASTER);
             die();
         }
         $this->daemon_file = $file;

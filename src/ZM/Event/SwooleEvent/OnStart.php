@@ -25,13 +25,9 @@ class OnStart implements SwooleEvent
         if (!Framework::$argv["disable-safe-exit"]) {
             SignalListener::signalMaster($server);
         }
-        $daemon_data = json_encode([
-            "pid" => $server->master_pid,
-            "stdout" => ZMConfig::get("global")["swoole"]["log_file"],
-            "daemon" => (bool)Framework::$argv["daemon"]
-        ], 128 | 256);
-        file_put_contents(DataProvider::getWorkingDir() . "/.daemon_pid", $daemon_data);
+        Framework::saveProcessState(ZM_PROCESS_MASTER, $server->master_pid, [
+            'stdout' => ZMConfig::get("global")["swoole"]["log_file"],
+            'daemon' => (bool)Framework::$argv["daemon"]
+        ]);
     }
-
-
 }

@@ -43,13 +43,15 @@ use ZM\Utils\SignalListener;
  */
 class OnWorkerStart implements SwooleEvent
 {
-    public function onCall(Server $server, $worker_id) {
+    public function onCall(Server $server, $worker_id)
+    {
         Console::debug("Calling onWorkerStart event(1)");
         if (!Framework::$argv["disable-safe-exit"]) {
             SignalListener::signalWorker($server, $worker_id);
         }
         unset(Context::$context[Coroutine::getCid()]);
         if ($server->taskworker === false) {
+            Framework::saveProcessState(ZM_PROCESS_WORKER, $server->worker_pid, ['worker_id' => $worker_id]);
             zm_atomic("_#worker_" . $worker_id)->set($server->worker_pid);
             if (LightCacheInside::get("wait_api", "wait_api") !== null) {
                 LightCacheInside::unset("wait_api", "wait_api");
@@ -105,10 +107,13 @@ class OnWorkerStart implements SwooleEvent
                 Console::error(zm_internal_errcode("E00030") . "PHP Error: " . $e->getMessage() . " in " . $e->getFile() . " on line " . $e->getLine());
                 Console::error("Maybe it caused by your own code if in your own Module directory.");
                 Console::log($e->getTraceAsString(), 'gray');
-                Process::kill($server->master_pid, SIGTERM);
+                if (!Framework::$argv["watch"]) { // 在热更新模式下不能退出
+                    Process::kill($server->master_pid, SIGTERM);
+                }
             }
         } else {
             // 这里是TaskWorker初始化的内容部分
+            Framework::saveProcessState(ZM_PROCESS_TASKWORKER, $server->worker_pid, ['worker_id' => $worker_id]);
             try {
                 Framework::$server = $server;
                 $this->loadAnnotations();
@@ -131,13 +136,15 @@ class OnWorkerStart implements SwooleEvent
      * @throws ReflectionException
      * @throws Exception
      */
-    private function loadAnnotations() {
+    private function loadAnnotations()
+    {
         if (Framework::$instant_mode) goto skip;
         //加载各个模块的注解类，以及反射
         Console::debug("Mapping annotations");
         $parser = new AnnotationParser();
         $composer = json_decode(file_get_contents(DataProvider::getSourceRootDir() . "/composer.json"), true);
-        foreach ($composer["autoload"]["psr-4"] as $k => $v) {
+        $merge = array_merge($composer["autoload"]["psr-4"] ?? [], $composer["autoload-dev"]["psr-4"] ?? []);
+        foreach ($merge as $k => $v) {
             if (is_dir(DataProvider::getSourceRootDir() . "/" . $v)) {
                 if (in_array(trim($k, "\\") . "\\", $composer["extra"]["exclude_annotate"] ?? [])) continue;
                 if (trim($k, "\\") == "ZM") continue;
@@ -150,12 +157,12 @@ class OnWorkerStart implements SwooleEvent
         $plugin_enable_hotload = ZMConfig::get("global", "module_loader")["enable_hotload"] ?? false;
         if ($plugin_enable_hotload) {
             $list = ModuleManager::getPackedModules();
-            foreach($list as $k => $v) {
-                if (\server()->worker_id === 0) Console::info("Loading packed module: ".$k);
+            foreach ($list as $k => $v) {
+                if (\server()->worker_id === 0) Console::info("Loading packed module: " . $k);
                 require_once $v["phar-path"];
-                $func = "loader".$v["generated-id"];
+                $func = "loader" . $v["generated-id"];
                 $func();
-                $parser->addRegisterPath("phar://".$v["phar-path"]."/".$v["module-root-path"], $v["namespace"]);
+                $parser->addRegisterPath("phar://" . $v["phar-path"] . "/" . $v["module-root-path"], $v["namespace"]);
             }
         }
 
@@ -189,7 +196,8 @@ class OnWorkerStart implements SwooleEvent
         }
     }
 
-    private function initMySQLPool() {
+    private function initMySQLPool()
+    {
         if (SqlPoolStorage::$sql_pool !== null) {
             SqlPoolStorage::$sql_pool->close();
             SqlPoolStorage::$sql_pool = null;
