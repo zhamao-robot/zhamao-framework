@@ -2,7 +2,7 @@
 
 此类管理的是 TaskWorker 相关工作。有关使用 TaskWorker 的教程，见 [进阶 - 使用 TaskWorker 进程处理密集运算](/advanced/task-worker)
 
-类定义：`\ZM\Utils\TaskManager`
+类定义：`\ZM\Utils\Manager\TaskManager`
 
 使用 TaskWorker 需要先在 `global.php` 配置文件中开启！
 

@@ -8,6 +8,10 @@ DataProvider 是框架内提供的一个简易的文件管理类。
 
 同 `working_dir()`。
 
+## DataProvider::getSourceRootDir()
+
+获取用户的源码根目录，除 Phar 模式外与 `getWorkingDir()` 相同。
+
 ## DataProvider::getFrameworkLink()
 
 同 `ZMConfig::get("global", "http_reverse_link")`，获取反向代理的链接。
