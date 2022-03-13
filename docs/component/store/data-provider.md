@@ -50,6 +50,45 @@ DataProvider::getDataFolder("TestModule"); // 例如返回 /root/zhamao-framewor
 
 文件名同上 `saveToJson()` 的定义，解析后的返回值为原先的内容或 `null`（如果文件不存在或 json 解析失败）。
 
+## DataProvider::scanDirFiles()
+
+递归或非递归扫描目录，返回相对目录的文件列表或绝对目录的文件列表。（非常好用）
+
+定义：`scanDirFiles($dir, $recursive = true, $relative = false)`
+
+`$dir` 为要扫描的目录，`$recursive` 为是否递归，`$relative` 为是否返回相对目录的文件列表。
+
+从给定的目录下开始遍历整个目录，如果将 `$recursive` 设置为 `true`，则会递归扫描子目录，否则将返回包含目录的文件列表。
+
+如果将 `$relative` 设置为 `true`，则会返回文件列表的相对路径，否则返回绝对路径。
+
+例如：假设目录 `/home/test/` 下有两个文件：`test1.txt` 和 `testdir/test2.txt`：如果将 `$recursive` 设置为 `true`，`$relative` 设置为 `false`，则返回的文件列表为：
+
+```json
+[
+    "/home/test/test1.txt",
+    "home/test/testdir/test2.txt"
+]
+```
+
+相同条件下，如果将 `$relative` 设置为 `true`：
+
+```json
+[
+    "test1.txt",
+    "testdir/test2.txt"
+]
+```
+
+如果再把 `$recursive` 设置为 `false`：
+
+```json
+[
+    "test1.txt",
+    "testdir"
+]
+```
+
 ## 其他文件读取
 
 框架比较贴近原生的 PHP，所以推荐直接使用原生的方法来读写文件（`file_get_contents` 和 `file_put_contents`）。但有一点要注意，框架内最好使用**工作目录或者绝对路径**。
