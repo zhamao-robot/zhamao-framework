@@ -119,7 +119,7 @@ class Response
      * @return mixed
      */
     public function header($key, $value, $ucwords = null) {
-        if (!$this->is_end) return $this->response->header($key, $value, $ucwords);
+        if (!$this->is_end) return $ucwords === null ? $this->response->header($key, $value) : $this->response->header($key, $value, $ucwords);
         else return false;
     }
 
@@ -130,7 +130,8 @@ class Response
      * @return mixed
      */
     public function setHeader($key, $value, $ucwords = null) {
-        return !$this->is_end ? $this->response->setHeader($key, $value, $ucwords) : false;
+        if (!$this->is_end) return $ucwords === null ? $this->response->setHeader($key, $value) : $this->response->setHeader($key, $value, $ucwords);
+        else return false;
     }
 
     /**
