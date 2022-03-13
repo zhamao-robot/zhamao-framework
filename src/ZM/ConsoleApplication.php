@@ -54,7 +54,20 @@ class ConsoleApplication extends Application
 
         _zm_env_check();
 
+        // 定义多进程的全局变量
+        define('ZM_PROCESS_MASTER', 1);
+        define('ZM_PROCESS_MANAGER', 2);
+        define('ZM_PROCESS_WORKER', 4);
+        define('ZM_PROCESS_USER', 8);
+        define('ZM_PROCESS_TASKWORKER', 16);
+
         define("WORKING_DIR", getcwd());
+
+
+        if (!is_dir(_zm_pid_dir())) {
+            @mkdir(_zm_pid_dir());
+        }
+
         if (Phar::running() !== "") {
             echo "* Running in phar mode.\n";
             define("SOURCE_ROOT_DIR", Phar::running());

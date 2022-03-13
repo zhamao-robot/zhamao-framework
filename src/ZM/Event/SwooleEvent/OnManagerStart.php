@@ -17,6 +17,7 @@ use ZM\Event\SwooleEvent;
 use ZM\Framework;
 use ZM\Store\ZMBuf;
 use ZM\Utils\DataProvider;
+use ZM\Utils\Manager\ProcessManager;
 use ZM\Utils\SignalListener;
 use ZM\Utils\Terminal;
 use ZM\Utils\ZMUtil;
@@ -28,15 +29,20 @@ use ZM\Utils\ZMUtil;
  */
 class OnManagerStart implements SwooleEvent
 {
-    /** @var null|Process */
-    public static $process = null;
+    private static $last_hash = "";
+    private static $watch = -1;
 
     public function onCall(Server $server) {
         Console::debug("Calling onManagerStart event(1)");
         if (!Framework::$argv["disable-safe-exit"]) {
             SignalListener::signalManager();
         }
-        self::$process = new Process(function() {
+        Framework::saveProcessState(ZM_PROCESS_MANAGER, $server->manager_pid);
+
+        ProcessManager::createUserProcess('monitor', function() use ($server){
+            Process::signal(SIGINT, function() {
+                Console::success("用户进程检测到了Ctrl+C");
+            });
             if (Framework::$argv["watch"]) {
                 if (extension_loaded('inotify')) {
                     Console::info("Enabled File watcher, framework will reload automatically.");
@@ -48,9 +54,26 @@ class OnManagerStart implements SwooleEvent
                         Console::verbose("File updated: " . $r[0]["name"]);
                         ZMUtil::reload();
                     });
+                    Framework::$argv["polling-watch"] = false; // 如果开启了inotify则关闭轮询热更新
                 } else {
-                    Console::warning(zm_internal_errcode("E00024") . "You have not loaded \"inotify\" extension, please install first.");
+                    Console::warning(zm_internal_errcode("E00024") . "你还没有安装或启用 inotify 扩展，将默认使用轮询检测模式开启热更新！");
+                    Framework::$argv["polling-watch"] = true;
                 }
+            }
+            if (Framework::$argv["polling-watch"]) {
+                self::$watch = swoole_timer_tick(3000, function () use ($server) {
+                    $data = (DataProvider::scanDirFiles(DataProvider::getSourceRootDir() . '/src/'));
+                    $hash = md5("");
+                    foreach ($data as $file) {
+                        $hash = md5($hash . md5_file($file));
+                    }
+                    if (self::$last_hash == "") {
+                        self::$last_hash = $hash;
+                    } elseif (self::$last_hash !== $hash) {
+                        self::$last_hash = $hash;
+                        $server->reload();
+                    }
+                });
             }
             if (Framework::$argv["interact"]) {
                 Console::info("Interact mode");
@@ -73,8 +96,16 @@ class OnManagerStart implements SwooleEvent
                 });
             }
         });
-        self::$process->set(['enable_coroutine' => true]);
-        self::$process->start();
+
+        ProcessManager::getUserProcess('monitor')->set(['enable_coroutine' => true]);
+        ProcessManager::getUserProcess('monitor')->start();
+
+        /*$dispatcher = new EventDispatcher(OnManagerStartEvent::class);
+        $dispatcher->setRuleFunction(function($v) {
+            return eval("return " . $v->getRule() . ";");
+        });
+        $dispatcher->dispatchEvents($server);
+*/
         Console::verbose("进程 Manager 已启动");
     }
 
