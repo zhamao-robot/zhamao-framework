@@ -1,0 +1,7 @@
+parameters:
+  reportUnmatchedIgnoredErrors: false
+  level: 0
+  paths:
+    - ./src/
+  ignoreErrors:
+    - '#Used constant OS_TYPE_(LINUX|WINDOWS) not found#'

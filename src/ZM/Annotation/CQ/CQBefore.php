@@ -1,8 +1,8 @@
 <?php
 
+declare(strict_types=1);
 
 namespace ZM\Annotation\CQ;
-
 
 use Doctrine\Common\Annotations\Annotation\Required;
 use Doctrine\Common\Annotations\Annotation\Target;
@@ -13,7 +13,6 @@ use ZM\Annotation\Interfaces\Level;
  * Class CQBefore
  * @Annotation
  * @Target("METHOD")
- * @package ZM\Annotation\CQ
  */
 class CQBefore extends AnnotationBase implements Level
 {
@@ -28,15 +27,16 @@ class CQBefore extends AnnotationBase implements Level
     /**
      * @return mixed
      */
-    public function getLevel(): int {
+    public function getLevel(): int
+    {
         return $this->level;
     }
 
     /**
      * @param mixed $level
      */
-    public function setLevel($level) {
+    public function setLevel($level)
+    {
         $this->level = $level;
     }
-
 }

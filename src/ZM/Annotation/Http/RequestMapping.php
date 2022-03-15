@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace ZM\Annotation\Http;
 
@@ -11,7 +12,6 @@ use ZM\Annotation\AnnotationBase;
  * Class RequestMapping
  * @Annotation
  * @Target("METHOD")
- * @package ZM\Annotation\Http
  */
 class RequestMapping extends AnnotationBase
 {

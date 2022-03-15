@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ZM;
 
 use ZM\Command\RunServerCommand;
@@ -18,15 +20,18 @@ class ZMServer
     /** @var ModuleBase[] */
     protected $modules = [];
 
-    public function __construct($app_name) {
+    public function __construct($app_name)
+    {
         $this->app_name = $app_name;
     }
 
-    public function addModule($module_class) {
+    public function addModule($module_class)
+    {
         $this->modules[] = $module_class;
     }
 
-    public function run() {
+    public function run()
+    {
         Console::setLevel(4);
         foreach ($this->modules as $module_class) {
             foreach ($module_class->getEvents() as $event) {
@@ -34,16 +39,18 @@ class ZMServer
             }
         }
         echo "Running...\n";
-        if (defined("WORKDING_DIR")) throw new InitException();
+        if (defined('WORKDING_DIR')) {
+            throw new InitException();
+        }
 
         _zm_env_check();
 
-        define("WORKING_DIR", getcwd());
-        define("SOURCE_ROOT_DIR", WORKING_DIR);
-        define("LOAD_MODE", is_dir(SOURCE_ROOT_DIR . "/src/ZM") ? 0 : 1);
-        define("FRAMEWORK_ROOT_DIR", realpath(__DIR__ . "/../../"));
-        define("ZM_VERSION_ID", ConsoleApplication::VERSION_ID);
-        define("ZM_VERSION", ConsoleApplication::VERSION);
+        define('WORKING_DIR', getcwd());
+        define('SOURCE_ROOT_DIR', WORKING_DIR);
+        define('LOAD_MODE', is_dir(SOURCE_ROOT_DIR . '/src/ZM') ? 0 : 1);
+        define('FRAMEWORK_ROOT_DIR', realpath(__DIR__ . '/../../'));
+        define('ZM_VERSION_ID', ConsoleApplication::VERSION_ID);
+        define('ZM_VERSION', ConsoleApplication::VERSION);
         $options = array_map(function ($x) {
             return $x->getDefault();
         }, RunServerCommand::exportDefinition()->getOptions());
@@ -53,7 +60,8 @@ class ZMServer
     /**
      * @return mixed
      */
-    public function getAppName() {
+    public function getAppName()
+    {
         return $this->app_name;
     }
 }

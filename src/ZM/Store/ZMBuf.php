@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Created by PhpStorm.
  * User: jerry
@@ -11,7 +13,10 @@ namespace ZM\Store;
 class ZMBuf
 {
     public static $events = [];
+
     public static $instance = [];
+
     public static $context_class = [];
-    public static $terminal = null;
+
+    public static $terminal;
 }

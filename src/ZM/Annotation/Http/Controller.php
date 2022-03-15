@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace ZM\Annotation\Http;
 
@@ -12,7 +13,6 @@ use ZM\Annotation\Interfaces\ErgodicAnnotation;
  * Class Controller
  * @Annotation
  * @Target("CLASS")
- * @package ZM\Annotation\Http
  */
 class Controller extends AnnotationBase implements ErgodicAnnotation
 {

@@ -1,8 +1,10 @@
-<?php /** @noinspection PhpComposerExtensionStubsInspection */
+<?php
 
+/** @noinspection PhpComposerExtensionStubsInspection */
+
+declare(strict_types=1);
 
 namespace ZM\MySQL;
-
 
 use Doctrine\DBAL\Driver\Connection;
 use Doctrine\DBAL\ParameterType;
@@ -20,14 +22,22 @@ class MySQLConnection implements Connection
     /** @var PDO|PDOProxy */
     private $conn;
 
-    public function __construct() {
-        Console::debug("Constructing...");
+    public function __construct()
+    {
+        Console::debug('Constructing...');
         $this->conn = SqlPoolStorage::$sql_pool->getConnection();
     }
 
-    public function prepare($sql, $options = []) {
+    public function __destruct()
+    {
+        Console::debug('Destructing！！！');
+        SqlPoolStorage::$sql_pool->putConnection($this->conn);
+    }
+
+    public function prepare($sql, $options = [])
+    {
         try {
-            Console::debug("Running SQL prepare: ".$sql);
+            Console::debug('Running SQL prepare: ' . $sql);
             $statement = $this->conn->prepare($sql, $options);
             assert(($statement instanceof PDOStatementProxy) || ($statement instanceof PDOStatement));
         } catch (PDOException $exception) {
@@ -36,7 +46,8 @@ class MySQLConnection implements Connection
         return new MySQLStatement($statement);
     }
 
-    public function query(...$args) {
+    public function query(...$args)
+    {
         try {
             $statement = $this->conn->query(...$args);
             assert(($statement instanceof PDOStatementProxy) || ($statement instanceof PDOStatement));
@@ -46,13 +57,15 @@ class MySQLConnection implements Connection
         return new MySQLStatement($statement);
     }
 
-    public function quote($value, $type = ParameterType::STRING) {
+    public function quote($value, $type = ParameterType::STRING)
+    {
         return $this->conn->quote($value, $type);
     }
 
-    public function exec($sql) {
+    public function exec($sql)
+    {
         try {
-            Console::debug("Running SQL exec: ".$sql);
+            Console::debug('Running SQL exec: ' . $sql);
             $statement = $this->conn->exec($sql);
             assert($statement !== false);
             return $statement;
@@ -61,7 +74,8 @@ class MySQLConnection implements Connection
         }
     }
 
-    public function lastInsertId($name = null) {
+    public function lastInsertId($name = null)
+    {
         try {
             return $name === null ? $this->conn->lastInsertId() : $this->conn->lastInsertId($name);
         } catch (PDOException $exception) {
@@ -69,28 +83,28 @@ class MySQLConnection implements Connection
         }
     }
 
-    public function beginTransaction() {
+    public function beginTransaction()
+    {
         return $this->conn->beginTransaction();
     }
 
-    public function commit() {
+    public function commit()
+    {
         return $this->conn->commit();
     }
 
-    public function rollBack() {
+    public function rollBack()
+    {
         return $this->conn->rollBack();
     }
 
-    public function errorCode() {
+    public function errorCode()
+    {
         return $this->conn->errorCode();
     }
 
-    public function errorInfo() {
+    public function errorInfo()
+    {
         return $this->conn->errorInfo();
-    }
-
-    public function __destruct() {
-        Console::debug("Destructing！！！");
-        SqlPoolStorage::$sql_pool->putConnection($this->conn);
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace ZM\Annotation\Http;
 
@@ -9,21 +10,26 @@ use ZM\Annotation\AnnotationBase;
 /**
  * Class RequestMethod
  * @Annotation
- * @package ZM\Annotation\Http
  */
 class RequestMethod extends AnnotationBase
 {
+    public const GET = 'GET';
+
+    public const POST = 'POST';
+
+    public const PUT = 'PUT';
+
+    public const PATCH = 'PATCH';
+
+    public const DELETE = 'DELETE';
+
+    public const OPTIONS = 'OPTIONS';
+
+    public const HEAD = 'HEAD';
+
     /**
      * @var string
      * @Required()
      */
     public $method = self::GET;
-
-    public const GET = 'GET';
-    public const POST = 'POST';
-    public const PUT = 'PUT';
-    public const PATCH = 'PATCH';
-    public const DELETE = 'DELETE';
-    public const OPTIONS = 'OPTIONS';
-    public const HEAD = 'HEAD';
 }

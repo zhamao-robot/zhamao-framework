@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace ZM\Annotation\Swoole;
 
@@ -10,7 +11,6 @@ use ZM\Annotation\Interfaces\Rule;
 
 /**
  * Class OnTask
- * @package ZM\Annotation\Swoole
  * @Annotation
  * @Target("METHOD")
  */
@@ -25,12 +25,13 @@ class OnTask extends AnnotationBase implements Rule
     /**
      * @var string
      */
-    public $rule = "";
+    public $rule = '';
 
     /**
      * @return mixed
      */
-    public function getRule(): string {
+    public function getRule(): string
+    {
         return $this->rule;
     }
 }

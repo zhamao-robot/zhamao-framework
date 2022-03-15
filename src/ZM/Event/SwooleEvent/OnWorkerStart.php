@@ -1,5 +1,8 @@
-<?php /** @noinspection PhpComposerExtensionStubsInspection */
+<?php
 
+/** @noinspection PhpComposerExtensionStubsInspection */
+
+declare(strict_types=1);
 
 namespace ZM\Event\SwooleEvent;
 
@@ -14,7 +17,6 @@ use Swoole\Server;
 use ZM\Annotation\AnnotationParser;
 use ZM\Annotation\Swoole\OnMessageEvent;
 use ZM\Annotation\Swoole\OnStart;
-use ZM\Annotation\Swoole\OnSwooleEvent;
 use ZM\Annotation\Swoole\SwooleHandler;
 use ZM\Config\ZMConfig;
 use ZM\Console\Console;
@@ -38,37 +40,39 @@ use ZM\Utils\SignalListener;
 
 /**
  * Class OnWorkerStart
- * @package ZM\Event\SwooleEvent
  * @SwooleHandler("WorkerStart")
  */
 class OnWorkerStart implements SwooleEvent
 {
     public function onCall(Server $server, $worker_id)
     {
-        Console::debug("Calling onWorkerStart event(1)");
-        if (!Framework::$argv["disable-safe-exit"]) {
+        Console::debug('Calling onWorkerStart event(1)');
+        if (!Framework::$argv['disable-safe-exit']) {
             SignalListener::signalWorker($server, $worker_id);
         }
         unset(Context::$context[Coroutine::getCid()]);
         if ($server->taskworker === false) {
             Framework::saveProcessState(ZM_PROCESS_WORKER, $server->worker_pid, ['worker_id' => $worker_id]);
-            zm_atomic("_#worker_" . $worker_id)->set($server->worker_pid);
-            if (LightCacheInside::get("wait_api", "wait_api") !== null) {
-                LightCacheInside::unset("wait_api", "wait_api");
+            zm_atomic('_#worker_' . $worker_id)->set($server->worker_pid);
+            if (LightCacheInside::get('wait_api', 'wait_api') !== null) {
+                LightCacheInside::unset('wait_api', 'wait_api');
             }
             try {
                 register_shutdown_function(function () use ($server) {
                     $error = error_get_last();
-                    if (($error["type"] ?? 0) != 0) {
-                        Console::error(zm_internal_errcode("E00027") . "Internal fatal error: " . $error["message"] . " at " . $error["file"] . "({$error["line"]})");
+                    if (($error['type'] ?? 0) != 0) {
+                        Console::error(zm_internal_errcode('E00027') . 'Internal fatal error: ' . $error['message'] . ' at ' . $error['file'] . "({$error['line']})");
                         zm_dump($error);
-                    } elseif (!isset($error["type"])) {
+                    } elseif (!isset($error['type'])) {
                         return;
                     }
                     //DataProvider::saveBuffer();
-                    /** @var Server $server */
-                    if (server() === null) $server->shutdown();
-                    else server()->shutdown();
+                    /* @var Server $server */
+                    if (server() === null) {
+                        $server->shutdown();
+                    } else {
+                        server()->shutdown();
+                    }
                 });
 
                 Console::verbose("Worker #{$server->worker_id} starting");
@@ -80,34 +84,40 @@ class OnWorkerStart implements SwooleEvent
                 $this->initMySQLPool();
 
                 // 开箱即用的Redis
-                $redis = ZMConfig::get("global", "redis_config");
-                if ($redis !== null && $redis["host"] != "") {
-                    if (!extension_loaded("redis")) Console::error(zm_internal_errcode("E00029") . "Can not find redis extension.\n");
-                    else ZMRedisPool::init($redis);
+                $redis = ZMConfig::get('global', 'redis_config');
+                if ($redis !== null && $redis['host'] != '') {
+                    if (!extension_loaded('redis')) {
+                        Console::error(zm_internal_errcode('E00029') . "Can not find redis extension.\n");
+                    } else {
+                        ZMRedisPool::init($redis);
+                    }
                 }
 
                 $this->loadAnnotations(); //加载composer资源、phar外置包、注解解析注册等
 
                 EventManager::registerTimerTick(); //启动计时器
-                set_coroutine_params(["server" => $server, "worker_id" => $worker_id]);
+                set_coroutine_params(['server' => $server, 'worker_id' => $worker_id]);
                 $dispatcher = new EventDispatcher(OnStart::class);
                 $dispatcher->setRuleFunction(function ($v) {
                     return server()->worker_id === $v->worker_id || $v->worker_id === -1;
                 });
                 $dispatcher->dispatchEvents($server, $worker_id);
-                if ($dispatcher->status === EventDispatcher::STATUS_NORMAL) Console::debug("@OnStart 执行完毕");
-                else Console::warning("@OnStart 执行异常！");
-                Console::success("Worker #" . $worker_id . " started");
+                if ($dispatcher->status === EventDispatcher::STATUS_NORMAL) {
+                    Console::debug('@OnStart 执行完毕');
+                } else {
+                    Console::warning('@OnStart 执行异常！');
+                }
+                Console::success('Worker #' . $worker_id . ' started');
             } catch (Exception $e) {
-                Console::error("Worker加载出错！停止服务！");
-                Console::error(zm_internal_errcode("E00030") . $e->getMessage() . "\n" . $e->getTraceAsString());
+                Console::error('Worker加载出错！停止服务！');
+                Console::error(zm_internal_errcode('E00030') . $e->getMessage() . "\n" . $e->getTraceAsString());
                 Process::kill($server->master_pid, SIGTERM);
                 return;
             } catch (Error $e) {
-                Console::error(zm_internal_errcode("E00030") . "PHP Error: " . $e->getMessage() . " in " . $e->getFile() . " on line " . $e->getLine());
-                Console::error("Maybe it caused by your own code if in your own Module directory.");
+                Console::error(zm_internal_errcode('E00030') . 'PHP Error: ' . $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine());
+                Console::error('Maybe it caused by your own code if in your own Module directory.');
                 Console::log($e->getTraceAsString(), 'gray');
-                if (!Framework::$argv["watch"]) { // 在热更新模式下不能退出
+                if (!Framework::$argv['watch']) { // 在热更新模式下不能退出
                     Process::kill($server->master_pid, SIGTERM);
                 }
             }
@@ -117,15 +127,15 @@ class OnWorkerStart implements SwooleEvent
             try {
                 Framework::$server = $server;
                 $this->loadAnnotations();
-                Console::success("TaskWorker #" . $server->worker_id . " started");
+                Console::success('TaskWorker #' . $server->worker_id . ' started');
             } catch (Exception $e) {
-                Console::error("Worker加载出错！停止服务！");
-                Console::error(zm_internal_errcode("E00030") . $e->getMessage() . "\n" . $e->getTraceAsString());
+                Console::error('Worker加载出错！停止服务！');
+                Console::error(zm_internal_errcode('E00030') . $e->getMessage() . "\n" . $e->getTraceAsString());
                 Process::kill($server->master_pid, SIGTERM);
                 return;
             } catch (Error $e) {
-                Console::error(zm_internal_errcode("E00030") . "PHP Error: " . $e->getMessage() . " in " . $e->getFile() . " on line " . $e->getLine());
-                Console::error("Maybe it caused by your own code if in your own Module directory.");
+                Console::error(zm_internal_errcode('E00030') . 'PHP Error: ' . $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine());
+                Console::error('Maybe it caused by your own code if in your own Module directory.');
                 Console::log($e->getTraceAsString(), 'gray');
                 Process::kill($server->master_pid, SIGTERM);
             }
@@ -138,31 +148,41 @@ class OnWorkerStart implements SwooleEvent
      */
     private function loadAnnotations()
     {
-        if (Framework::$instant_mode) goto skip;
+        if (Framework::$instant_mode) {
+            goto skip;
+        }
         //加载各个模块的注解类，以及反射
-        Console::debug("Mapping annotations");
+        Console::debug('Mapping annotations');
         $parser = new AnnotationParser();
-        $composer = json_decode(file_get_contents(DataProvider::getSourceRootDir() . "/composer.json"), true);
-        $merge = array_merge($composer["autoload"]["psr-4"] ?? [], $composer["autoload-dev"]["psr-4"] ?? []);
+        $composer = json_decode(file_get_contents(DataProvider::getSourceRootDir() . '/composer.json'), true);
+        $merge = array_merge($composer['autoload']['psr-4'] ?? [], $composer['autoload-dev']['psr-4'] ?? []);
         foreach ($merge as $k => $v) {
-            if (is_dir(DataProvider::getSourceRootDir() . "/" . $v)) {
-                if (in_array(trim($k, "\\") . "\\", $composer["extra"]["exclude_annotate"] ?? [])) continue;
-                if (trim($k, "\\") == "ZM") continue;
-                if (\server()->worker_id == 0) Console::verbose("Add " . $v . ":$k to register path");
-                $parser->addRegisterPath(DataProvider::getSourceRootDir() . "/" . $v . "/", trim($k, "\\"));
+            if (is_dir(DataProvider::getSourceRootDir() . '/' . $v)) {
+                if (in_array(trim($k, '\\') . '\\', $composer['extra']['exclude_annotate'] ?? [])) {
+                    continue;
+                }
+                if (trim($k, '\\') == 'ZM') {
+                    continue;
+                }
+                if (\server()->worker_id == 0) {
+                    Console::verbose('Add ' . $v . ":{$k} to register path");
+                }
+                $parser->addRegisterPath(DataProvider::getSourceRootDir() . '/' . $v . '/', trim($k, '\\'));
             }
         }
 
         // 检查是否允许热加载phar模块，允许的话将遍历phar内的文件
-        $plugin_enable_hotload = ZMConfig::get("global", "module_loader")["enable_hotload"] ?? false;
+        $plugin_enable_hotload = ZMConfig::get('global', 'module_loader')['enable_hotload'] ?? false;
         if ($plugin_enable_hotload) {
             $list = ModuleManager::getPackedModules();
             foreach ($list as $k => $v) {
-                if (\server()->worker_id === 0) Console::info("Loading packed module: " . $k);
-                require_once $v["phar-path"];
-                $func = "loader" . $v["generated-id"];
+                if (\server()->worker_id === 0) {
+                    Console::info('Loading packed module: ' . $k);
+                }
+                require_once $v['phar-path'];
+                $func = 'loader' . $v['generated-id'];
                 $func();
-                $parser->addRegisterPath("phar://" . $v["phar-path"] . "/" . $v["module-root-path"], $v["namespace"]);
+                $parser->addRegisterPath('phar://' . $v['phar-path'] . '/' . $v['module-root-path'], $v['namespace']);
             }
         }
 
@@ -171,27 +191,27 @@ class OnWorkerStart implements SwooleEvent
 
         skip:
         //加载自定义的全局函数
-        Console::debug("Loading context class...");
-        $context_class = ZMConfig::get("global", "context_class");
+        Console::debug('Loading context class...');
+        $context_class = ZMConfig::get('global', 'context_class');
         if (!is_a($context_class, ContextInterface::class, true)) {
-            throw new ZMKnownException("E00032", "Context class must implemented from ContextInterface!");
+            throw new ZMKnownException('E00032', 'Context class must implemented from ContextInterface!');
         }
         //加载插件
-        $obb_onebot = ZMConfig::get("global", "onebot") ??
-            ZMConfig::get("global", "modules")["onebot"] ??
-            ["status" => true, "single_bot_mode" => false, "message_level" => 99999];
-        if ($obb_onebot["status"]) {
-            Console::debug("OneBot support enabled, listening OneBot event(3).");
+        $obb_onebot = ZMConfig::get('global', 'onebot') ??
+            ZMConfig::get('global', 'modules')['onebot'] ??
+            ['status' => true, 'single_bot_mode' => false, 'message_level' => 99999];
+        if ($obb_onebot['status']) {
+            Console::debug('OneBot support enabled, listening OneBot event(3).');
             $obj = new OnMessageEvent();
             $obj->class = QQBot::class;
             $obj->method = 'handleByEvent';
-            $obj->level = $obb_onebot["message_level"] ?? 99;
+            $obj->level = $obb_onebot['message_level'] ?? 99;
             $obj->rule = 'connectIsQQ()';
             EventManager::addEvent(OnMessageEvent::class, $obj);
-            if ($obb_onebot["single_bot_mode"]) {
-                LightCacheInside::set("connect", "conn_fd", -1);
+            if ($obb_onebot['single_bot_mode']) {
+                LightCacheInside::set('connect', 'conn_fd', -1);
             } else {
-                LightCacheInside::set("connect", "conn_fd", -2);
+                LightCacheInside::set('connect', 'conn_fd', -2);
             }
         }
     }
@@ -203,56 +223,61 @@ class OnWorkerStart implements SwooleEvent
             SqlPoolStorage::$sql_pool = null;
         }
         $real_conf = [];
-        if (isset(ZMConfig::get("global", "sql_config")["sql_host"])) {
-            if (ZMConfig::get("global", "sql_config")["sql_host"] != "") {
+        if (isset(ZMConfig::get('global', 'sql_config')['sql_host'])) {
+            if (ZMConfig::get('global', 'sql_config')['sql_host'] != '') {
                 if (\server()->worker_id === 0) {
                     Console::warning("使用 'sql_config' 配置项和 DB 数据库查询构造器进行查询数据库可能会在下一个大版本中废弃，请使用 'mysql_config' 搭配 doctrine dbal 使用！");
-                    Console::warning("详见: `https://framework.zhamao.xin/`");
+                    Console::warning('详见: `https://framework.zhamao.xin/`');
                 }
-                $origin_conf = ZMConfig::get("global", "sql_config");
+                $origin_conf = ZMConfig::get('global', 'sql_config');
                 $real_conf = [
-                    "host" => $origin_conf["sql_host"],
-                    "port" => $origin_conf["sql_port"],
-                    "username" => $origin_conf["sql_username"],
-                    "password" => $origin_conf["sql_password"],
-                    "dbname" => $origin_conf["sql_database"],
-                    "options" => $origin_conf["sql_options"],
+                    'host' => $origin_conf['sql_host'],
+                    'port' => $origin_conf['sql_port'],
+                    'username' => $origin_conf['sql_username'],
+                    'password' => $origin_conf['sql_password'],
+                    'dbname' => $origin_conf['sql_database'],
+                    'options' => $origin_conf['sql_options'],
                     'unix_socket' => null,
                     'charset' => 'utf8mb4',
-                    'pool_size' => 64
+                    'pool_size' => 64,
                 ];
             }
         }
-        if (isset(ZMConfig::get("global", "mysql_config")["host"])) {
-            if (ZMConfig::get("global", "mysql_config")["host"] != "") {
-                $real_conf = ZMConfig::get("global", "mysql_config");
+        if (isset(ZMConfig::get('global', 'mysql_config')['host'])) {
+            if (ZMConfig::get('global', 'mysql_config')['host'] != '') {
+                $real_conf = ZMConfig::get('global', 'mysql_config');
             }
         }
         if (!empty($real_conf)) {
-            Console::info("Connecting to MySQL pool");
+            Console::info('Connecting to MySQL pool');
             ob_start();
             phpinfo(); //这个phpinfo是有用的，不能删除
             $str = ob_get_clean();
             $str = explode("\n", $str);
             foreach ($str as $v) {
                 $v = trim($v);
-                if ($v == "") continue;
-                if (mb_strpos($v, "API Extensions") === false) continue;
-                if (mb_strpos($v, "pdo_mysql") === false) {
-                    throw new DbException(zm_internal_errcode("E00028") . "未安装 mysqlnd php-mysql扩展。");
+                if ($v == '') {
+                    continue;
+                }
+                if (mb_strpos($v, 'API Extensions') === false) {
+                    continue;
+                }
+                if (mb_strpos($v, 'pdo_mysql') === false) {
+                    throw new DbException(zm_internal_errcode('E00028') . '未安装 mysqlnd php-mysql扩展。');
                 }
             }
-            SqlPoolStorage::$sql_pool = new MySQLPool((new PDOConfig())
-                ->withHost($real_conf["host"])
-                ->withPort($real_conf["port"])
+            SqlPoolStorage::$sql_pool = new MySQLPool(
+                (new PDOConfig())
+                    ->withHost($real_conf['host'])
+                    ->withPort($real_conf['port'])
                 // ->withUnixSocket('/tmp/mysql.sock')
-                ->withDbName($real_conf["dbname"])
-                ->withCharset($real_conf["charset"])
-                ->withUsername($real_conf["username"])
-                ->withPassword($real_conf["password"])
-                ->withOptions($real_conf["options"] ?? [PDO::ATTR_STRINGIFY_FETCHES => false])
+                    ->withDbName($real_conf['dbname'])
+                    ->withCharset($real_conf['charset'])
+                    ->withUsername($real_conf['username'])
+                    ->withPassword($real_conf['password'])
+                    ->withOptions($real_conf['options'] ?? [PDO::ATTR_STRINGIFY_FETCHES => false])
             );
-            DB::initTableList($real_conf["dbname"]);
+            DB::initTableList($real_conf['dbname']);
         }
     }
 }

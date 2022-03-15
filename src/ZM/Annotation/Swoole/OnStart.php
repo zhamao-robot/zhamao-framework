@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace ZM\Annotation\Swoole;
 
@@ -8,7 +9,6 @@ use ZM\Annotation\AnnotationBase;
 
 /**
  * Class OnWorkerStart
- * @package ZM\Annotation\Swoole
  * @Annotation
  * @Target("METHOD")
  */

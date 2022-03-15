@@ -1,11 +1,10 @@
-<?php /** @noinspection PhpFullyQualifiedNameUsageInspection */ #plain
+<?php
 
-//这里写你的全局函数
-/**
- * @param callable $func
- * @param string $name
- * @noinspection PhpUnused
- */
-function pgo(callable $func, $name = "default") {
-    \ZM\Utils\CoroutinePool::go($func, $name);
+declare(strict_types=1);
+
+use ZM\Utils\CoroutinePool;
+
+function pgo(callable $func, string $name = 'default')
+{
+    CoroutinePool::go($func, $name);
 }

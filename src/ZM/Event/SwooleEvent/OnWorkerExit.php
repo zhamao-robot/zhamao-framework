@@ -1,8 +1,10 @@
-<?php /** @noinspection PhpUnusedParameterInspection */
+<?php
 
+/** @noinspection PhpUnusedParameterInspection */
+
+declare(strict_types=1);
 
 namespace ZM\Event\SwooleEvent;
-
 
 use Swoole\Coroutine;
 use Swoole\Server;
@@ -14,18 +16,18 @@ use ZM\Store\LightCacheInside;
 
 /**
  * Class OnWorkerExit
- * @package ZM\Event\SwooleEvent
  * @SwooleHandler("WorkerExit")
  */
 class OnWorkerExit implements SwooleEvent
 {
-    public function onCall(Server $server, $worker_id) {
+    public function onCall(Server $server, $worker_id)
+    {
         Timer::clearAll();
-        foreach((LightCacheInside::get("wait_api", "wait_api") ?? []) as $v) {
-            if (($v["worker_id"] ?? -1) == $worker_id && isset($v["coroutine"])) {
-                Coroutine::resume($v["coroutine"]);
+        foreach ((LightCacheInside::get('wait_api', 'wait_api') ?? []) as $v) {
+            if (($v['worker_id'] ?? -1) == $worker_id && isset($v['coroutine'])) {
+                Coroutine::resume($v['coroutine']);
             }
         }
-        Console::info("正在结束 Worker #".$worker_id."，进程内可能有事务在运行...");
+        Console::info('正在结束 Worker #' . $worker_id . '，进程内可能有事务在运行...');
     }
 }

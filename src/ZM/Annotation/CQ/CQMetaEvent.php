@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace ZM\Annotation\CQ;
 
@@ -12,7 +13,6 @@ use ZM\Annotation\Interfaces\Level;
  * Class CQMetaEvent
  * @Annotation
  * @Target("ALL")
- * @package ZM\Annotation\CQ
  */
 class CQMetaEvent extends AnnotationBase implements Level
 {
@@ -21,18 +21,23 @@ class CQMetaEvent extends AnnotationBase implements Level
      * @Required()
      */
     public $meta_event_type = '';
+
     /** @var int */
     public $level;
 
     /**
      * @return mixed
      */
-    public function getLevel(): int { return $this->level; }
+    public function getLevel(): int
+    {
+        return $this->level;
+    }
 
     /**
      * @param int $level
      */
-    public function setLevel($level) {
+    public function setLevel($level)
+    {
         $this->level = $level;
     }
 }

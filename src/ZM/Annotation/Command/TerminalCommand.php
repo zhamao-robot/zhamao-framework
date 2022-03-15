@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace ZM\Annotation\Command;
 
@@ -9,7 +10,6 @@ use ZM\Annotation\AnnotationBase;
 
 /**
  * Class TerminalCommand
- * @package ZM\Annotation\Command
  * @Annotation
  * @Target("METHOD")
  */
@@ -26,5 +26,5 @@ class TerminalCommand extends AnnotationBase
     /**
      * @var string
      */
-    public $description = "";
+    public $description = '';
 }

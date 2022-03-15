@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace ZM\Annotation\Module;
 
@@ -10,9 +11,7 @@ use ZM\Annotation\AnnotationBase;
  * Class Closed
  * @Annotation
  * @Target("CLASS")
- * @package ZM\Annotation\Module
  */
 class Closed extends AnnotationBase
 {
-
 }

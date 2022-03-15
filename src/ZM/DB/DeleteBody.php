@@ -1,14 +1,13 @@
 <?php
 
+declare(strict_types=1);
 
 namespace ZM\DB;
-
 
 use ZM\Exception\DbException;
 
 /**
  * Class DeleteBody
- * @package ZM\DB
  * @deprecated This will delete in 2.6 or future version, use \ZM\MySQL\MySQLManager::getConnection() instead
  */
 class DeleteBody
@@ -22,18 +21,19 @@ class DeleteBody
 
     /**
      * DeleteBody constructor.
-     * @param Table $table
      */
-    public function __construct(Table $table) {
+    public function __construct(Table $table)
+    {
         $this->table = $table;
     }
 
     /**
-     * @return mixed
      * @throws DbException
+     * @return mixed
      */
-    public function save() {
-        list($sql, $param) = $this->getWhereSQL();
-        return DB::rawQuery("DELETE FROM " . $this->table->getTableName() . " WHERE " . $sql, $param);
+    public function save()
+    {
+        [$sql, $param] = $this->getWhereSQL();
+        return DB::rawQuery('DELETE FROM ' . $this->table->getTableName() . ' WHERE ' . $sql, $param);
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace ZM\Annotation\CQ;
 
@@ -11,7 +12,6 @@ use ZM\Annotation\Interfaces\Level;
  * Class CQAfter
  * @Annotation
  * @Target("METHOD")
- * @package ZM\Annotation\CQ
  */
 class CQAfter extends AnnotationBase implements Level
 {
@@ -26,14 +26,16 @@ class CQAfter extends AnnotationBase implements Level
     /**
      * @return mixed
      */
-    public function getLevel() {
+    public function getLevel()
+    {
         return $this->level;
     }
 
     /**
      * @param mixed $level
      */
-    public function setLevel($level) {
+    public function setLevel($level)
+    {
         $this->level = $level;
     }
 }

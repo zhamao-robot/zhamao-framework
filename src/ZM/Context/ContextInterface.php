@@ -1,15 +1,15 @@
-<?php /** @noinspection PhpMissingReturnTypeInspection */
+<?php
 
+declare(strict_types=1);
 
 namespace ZM\Context;
-
 
 use Swoole\Http\Request;
 use Swoole\WebSocket\Frame;
 use Swoole\WebSocket\Server;
+use ZM\API\ZMRobot;
 use ZM\ConnectionManager\ConnectionObject;
 use ZM\Http\Response;
-use ZM\API\ZMRobot;
 
 interface ContextInterface
 {
@@ -29,7 +29,7 @@ interface ContextInterface
     /** @return ConnectionObject */
     public function getConnection();
 
-    /** @return int|null */
+    /** @return null|int */
     public function getFd();
 
     /** @return int */
@@ -74,50 +74,25 @@ interface ContextInterface
 
     public function getCQResponse();
 
-    /**
-     * @param $msg
-     * @param bool $yield
-     * @return mixed
-     */
     public function reply($msg, $yield = false);
 
-    /**
-     * @param $msg
-     * @param bool $yield
-     * @return mixed
-     */
     public function finalReply($msg, $yield = false);
 
-    /**
-     * @param string $prompt
-     * @param int $timeout
-     * @param string $timeout_prompt
-     * @return mixed
-     */
-    public function waitMessage($prompt = "", $timeout = 600, $timeout_prompt = "");
+    public function waitMessage($prompt = '', $timeout = 600, $timeout_prompt = '');
 
-    /**
-     * @param $mode
-     * @param $prompt_msg
-     * @return mixed
-     */
     public function getArgs($mode, $prompt_msg);
 
-    public function getNextArg($prompt_msg = "");
+    public function getNextArg($prompt_msg = '');
 
-    public function getFullArg($prompt_msg = "");
+    public function getFullArg($prompt_msg = '');
 
     public function setCache($key, $value);
 
-    /**
-     * @param $key
-     * @return mixed
-     */
     public function getCache($key);
 
     public function cloneFromParent();
 
-    public function getNumArg($prompt_msg = "");
+    public function getNumArg($prompt_msg = '');
 
     public function copy();
 

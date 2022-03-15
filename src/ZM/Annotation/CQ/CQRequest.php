@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace ZM\Annotation\CQ;
 
@@ -11,32 +12,34 @@ use ZM\Annotation\Interfaces\Level;
  * Class CQRequest
  * @Annotation
  * @Target("ALL")
- * @package ZM\Annotation\CQ
  */
 class CQRequest extends AnnotationBase implements Level
 {
     /** @var string */
-    public $request_type = "";
+    public $request_type = '';
+
     /** @var string */
-    public $sub_type = "";
+    public $sub_type = '';
+
     /** @var int */
     public $user_id = 0;
+
     /** @var string */
-    public $comment = "";
+    public $comment = '';
+
     /** @var int */
     public $level = 20;
 
-    /**
-     * @return int
-     */
-    public function getLevel(): int {
+    public function getLevel(): int
+    {
         return $this->level;
     }
 
     /**
      * @param int $level
      */
-    public function setLevel($level) {
+    public function setLevel($level)
+    {
         $this->level = $level;
     }
 }

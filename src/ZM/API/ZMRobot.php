@@ -1,17 +1,14 @@
-<?php /** @noinspection PhpMissingReturnTypeInspection */
+<?php
 
-/** @noinspection PhpUnused */
-
+declare(strict_types=1);
 
 namespace ZM\API;
 
 /**
  * Class ZMRobot
- * @package ZM\Utils
  * @since 1.2
  * @version V11
  */
 class ZMRobot extends OneBotV11
 {
-
 }

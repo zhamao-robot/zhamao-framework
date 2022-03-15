@@ -6,7 +6,18 @@
     "extra": {
         "exclude_annotate": [
             "src/ZM"
-        ]
+        ],
+        "hooks": {
+            "post-merge": "composer install",
+            "pre-commit": [
+                "echo committing as $(git config user.name)",
+                "./vendor/bin/php-cs-fixer fix --dry-run --diff ./src"
+            ],
+            "pre-push": [
+                "./vendor/bin/php-cs-fixer fix --dry-run --diff ./src",
+                "composer analyse"
+            ]
+        }
     },
     "authors": [
         {
@@ -21,7 +32,7 @@
         "bin/watcher"
     ],
     "require": {
-        "php": ">=7.2",
+        "php": "^7.2 || ^7.3 || ^7.4 || ^8.0 || ^8.1",
         "ext-json": "*",
         "ext-posix": "*",
         "doctrine/annotations": "~1.12 || ~1.4.0",
@@ -59,8 +70,22 @@
             "Custom\\": "src/Custom"
         }
     },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
     "require-dev": {
         "swoole/ide-helper": "@dev",
-        "phpunit/phpunit": "^8.5 || ^9.0"
+        "phpunit/phpunit": "^8.5 || ^9.0",
+        "brainmaestro/composer-git-hooks": "^2.8",
+        "friendsofphp/php-cs-fixer": "^3.2 != 3.7.0",
+        "phpstan/phpstan": "^1.1"
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "[ $COMPOSER_DEV_MODE -eq 0 ] || vendor/bin/cghooks add"
+        ],
+        "analyse": "phpstan analyse --memory-limit 300M -l 0 ./src",
+        "cs-fix": "php-cs-fixer fix $1"
     }
 }

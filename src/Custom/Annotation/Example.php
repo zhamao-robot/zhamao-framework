@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace Custom\Annotation;
 
@@ -11,7 +12,6 @@ use ZM\Annotation\Interfaces\CustomAnnotation;
  * Class CustomAnnotation
  * @Annotation
  * @Target("ALL")
- * @package Custom\Annotation
  */
 class Example extends AnnotationBase implements CustomAnnotation
 {

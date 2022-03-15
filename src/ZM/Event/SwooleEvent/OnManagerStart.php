@@ -1,10 +1,14 @@
-<?php /** @noinspection PhpUnusedParameterInspection */
+<?php
 
-/** @noinspection PhpComposerExtensionStubsInspection */
+/**
+ * @noinspection PhpPropertyOnlyWrittenInspection
+ * @noinspection PhpUnusedParameterInspection
+ * @noinspection PhpComposerExtensionStubsInspection
+ */
 
+declare(strict_types=1);
 
 namespace ZM\Event\SwooleEvent;
-
 
 use Error;
 use Exception;
@@ -24,50 +28,51 @@ use ZM\Utils\ZMUtil;
 
 /**
  * Class OnManagerStart
- * @package ZM\Event\SwooleEvent
  * @SwooleHandler("ManagerStart")
  */
 class OnManagerStart implements SwooleEvent
 {
-    private static $last_hash = "";
+    private static $last_hash = '';
+
     private static $watch = -1;
 
-    public function onCall(Server $server) {
-        Console::debug("Calling onManagerStart event(1)");
-        if (!Framework::$argv["disable-safe-exit"]) {
+    public function onCall(Server $server)
+    {
+        Console::debug('Calling onManagerStart event(1)');
+        if (!Framework::$argv['disable-safe-exit']) {
             SignalListener::signalManager();
         }
         Framework::saveProcessState(ZM_PROCESS_MANAGER, $server->manager_pid);
 
-        ProcessManager::createUserProcess('monitor', function() use ($server){
-            Process::signal(SIGINT, function() {
-                Console::success("用户进程检测到了Ctrl+C");
+        ProcessManager::createUserProcess('monitor', function () use ($server) {
+            Process::signal(SIGINT, function () {
+                Console::success('用户进程检测到了Ctrl+C');
             });
-            if (Framework::$argv["watch"]) {
+            if (Framework::$argv['watch']) {
                 if (extension_loaded('inotify')) {
-                    Console::info("Enabled File watcher, framework will reload automatically.");
-                    /** @noinspection PhpUndefinedFieldInspection */
+                    Console::info('Enabled File watcher, framework will reload automatically.');
+                    /* @noinspection PhpUndefinedFieldInspection */
                     Framework::$server->inotify = $fd = inotify_init();
-                    $this->addWatcher(DataProvider::getSourceRootDir() . "/src", $fd);
+                    $this->addWatcher(DataProvider::getSourceRootDir() . '/src', $fd);
                     Event::add($fd, function () use ($fd) {
                         $r = inotify_read($fd);
-                        Console::verbose("File updated: " . $r[0]["name"]);
+                        Console::verbose('File updated: ' . $r[0]['name']);
                         ZMUtil::reload();
                     });
-                    Framework::$argv["polling-watch"] = false; // 如果开启了inotify则关闭轮询热更新
+                    Framework::$argv['polling-watch'] = false; // 如果开启了inotify则关闭轮询热更新
                 } else {
-                    Console::warning(zm_internal_errcode("E00024") . "你还没有安装或启用 inotify 扩展，将默认使用轮询检测模式开启热更新！");
-                    Framework::$argv["polling-watch"] = true;
+                    Console::warning(zm_internal_errcode('E00024') . '你还没有安装或启用 inotify 扩展，将默认使用轮询检测模式开启热更新！');
+                    Framework::$argv['polling-watch'] = true;
                 }
             }
-            if (Framework::$argv["polling-watch"]) {
+            if (Framework::$argv['polling-watch']) {
                 self::$watch = swoole_timer_tick(3000, function () use ($server) {
                     $data = (DataProvider::scanDirFiles(DataProvider::getSourceRootDir() . '/src/'));
-                    $hash = md5("");
+                    $hash = md5('');
                     foreach ($data as $file) {
                         $hash = md5($hash . md5_file($file));
                     }
-                    if (self::$last_hash == "") {
+                    if (self::$last_hash == '') {
                         self::$last_hash = $hash;
                     } elseif (self::$last_hash !== $hash) {
                         self::$last_hash = $hash;
@@ -75,8 +80,8 @@ class OnManagerStart implements SwooleEvent
                     }
                 });
             }
-            if (Framework::$argv["interact"]) {
-                Console::info("Interact mode");
+            if (Framework::$argv['interact']) {
+                Console::info('Interact mode');
                 ZMBuf::$terminal = $r = STDIN;
                 Event::add($r, function () use ($r) {
                     $fget = fgets($r);
@@ -85,13 +90,15 @@ class OnManagerStart implements SwooleEvent
                         return;
                     }
                     $var = trim($fget);
-                    if ($var == "stop") Event::del($r);
+                    if ($var == 'stop') {
+                        Event::del($r);
+                    }
                     try {
                         Terminal::executeCommand($var);
                     } catch (Exception $e) {
-                        Console::error(zm_internal_errcode("E00025") . "Uncaught exception " . get_class($e) . ": " . $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")");
+                        Console::error(zm_internal_errcode('E00025') . 'Uncaught exception ' . get_class($e) . ': ' . $e->getMessage() . ' at ' . $e->getFile() . '(' . $e->getLine() . ')');
                     } catch (Error $e) {
-                        Console::error(zm_internal_errcode("E00025") . "Uncaught error " . get_class($e) . ": " . $e->getMessage() . " at " . $e->getFile() . "(" . $e->getLine() . ")");
+                        Console::error(zm_internal_errcode('E00025') . 'Uncaught error ' . get_class($e) . ': ' . $e->getMessage() . ' at ' . $e->getFile() . '(' . $e->getLine() . ')');
                     }
                 });
             }
@@ -106,19 +113,20 @@ class OnManagerStart implements SwooleEvent
         });
         $dispatcher->dispatchEvents($server);
 */
-        Console::verbose("进程 Manager 已启动");
+        Console::verbose('进程 Manager 已启动');
     }
 
-    private function addWatcher($maindir, $fd) {
+    private function addWatcher($maindir, $fd)
+    {
         $dir = scandir($maindir);
-        if ($dir[0] == ".") {
+        if ($dir[0] == '.') {
             unset($dir[0], $dir[1]);
         }
         foreach ($dir as $subdir) {
-            if (is_dir($maindir . "/" . $subdir)) {
-                Console::debug("添加监听目录：" . $maindir . "/" . $subdir);
-                inotify_add_watch($fd, $maindir . "/" . $subdir, IN_ATTRIB | IN_ISDIR);
-                $this->addWatcher($maindir . "/" . $subdir, $fd);
+            if (is_dir($maindir . '/' . $subdir)) {
+                Console::debug('添加监听目录：' . $maindir . '/' . $subdir);
+                inotify_add_watch($fd, $maindir . '/' . $subdir, IN_ATTRIB | IN_ISDIR);
+                $this->addWatcher($maindir . '/' . $subdir, $fd);
             }
         }
     }

@@ -13,10 +13,16 @@ composer.lock
 /runtime/
 /tmp/
 /temp/
+
+# go-cqhttp快速安装启动相关（可能被废弃）
 /ext/go-cqhttp/data/
 /ext/go-cqhttp/logs/
 /ext/go-cqhttp/config.hjson
 /ext/go-cqhttp/device.json
 /ext/go-cqhttp/go-cqhttp
 /ext/go-cqhttp/session.token
+
 .zm_worker_*.pid
+
+# Git Hook 的相关锁文件
+cghooks.lock

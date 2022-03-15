@@ -1,44 +1,56 @@
-<?php /** @noinspection PhpUnused */
+<?php
 
-/** @noinspection PhpMissingReturnTypeInspection */
+/**
+ * @noinspection PhpMissingReturnTypeInspection
+ * @noinspection PhpUnused
+ */
 
+declare(strict_types=1);
 
 namespace ZM\Http;
 
-
 class Response
 {
-
     public $fd = 0;
 
-    public $socket = null;
+    public $socket;
 
-    public $header = null;
+    public $header;
 
-    public $cookie = null;
+    public $cookie;
 
-    public $trailer = null;
+    public $trailer;
+
     /**
      * @var \Swoole\Http\Response
      */
     private $response;
+
     private $is_end = false;
+
     private $status_code;
 
-    public function __construct(\Swoole\Http\Response $response) {
+    public function __construct(\Swoole\Http\Response $response)
+    {
         $this->response = $response;
         $this->fd = $response->fd;
         $this->socket = $response->socket;
         $this->header = $response->header;
         $this->cookie = $response->cookie;
-        if (isset($response->trailer))
+        if (isset($response->trailer)) {
             $this->trailer = $response->trailer;
+        }
+    }
+
+    public function __destruct()
+    {
     }
 
     /**
      * @return mixed
      */
-    public function initHeader() {
+    public function initHeader()
+    {
         return $this->response->initHeader();
     }
 
@@ -53,7 +65,8 @@ class Response
      * @param $samesite
      * @return mixed
      */
-    public function cookie($name, $value = null, $expires = null, $path = null, $domain = null, $secure = null, $httponly = null, $samesite = null) {
+    public function cookie($name, $value = null, $expires = null, $path = null, $domain = null, $secure = null, $httponly = null, $samesite = null)
+    {
         return $this->response->rawcookie($name, $value, $expires, $path, $domain, $secure, $httponly, $samesite);
     }
 
@@ -68,7 +81,8 @@ class Response
      * @param $samesite
      * @return mixed
      */
-    public function setCookie($name, $value = null, $expires = null, $path = null, $domain = null, $secure = null, $httponly = null, $samesite = null) {
+    public function setCookie($name, $value = null, $expires = null, $path = null, $domain = null, $secure = null, $httponly = null, $samesite = null)
+    {
         return $this->response->setCookie($name, $value, $expires, $path, $domain, $secure, $httponly, $samesite);
     }
 
@@ -83,7 +97,8 @@ class Response
      * @param $samesite
      * @return mixed
      */
-    public function rawcookie($name, $value = null, $expires = null, $path = null, $domain = null, $secure = null, $httponly = null, $samesite = null) {
+    public function rawcookie($name, $value = null, $expires = null, $path = null, $domain = null, $secure = null, $httponly = null, $samesite = null)
+    {
         return $this->response->rawcookie($name, $value, $expires, $path, $domain, $secure, $httponly, $samesite);
     }
 
@@ -92,13 +107,17 @@ class Response
      * @param $reason
      * @return mixed
      */
-    public function status($http_code, $reason = null) {
+    public function status($http_code, $reason = null)
+    {
         $this->status_code = $http_code;
-        if (!$this->is_end) return $this->response->status($http_code, $reason);
-        else return false;
+        if (!$this->is_end) {
+            return $this->response->status($http_code, $reason);
+        }
+        return false;
     }
 
-    public function getStatusCode() {
+    public function getStatusCode()
+    {
         return $this->status_code ?? 200;
     }
 
@@ -107,9 +126,12 @@ class Response
      * @param $reason
      * @return mixed
      */
-    public function setStatusCode($http_code, $reason = null) {
-        if (!$this->is_end) return $this->response->setStatusCode($http_code, $reason);
-        else return false;
+    public function setStatusCode($http_code, $reason = null)
+    {
+        if (!$this->is_end) {
+            return $this->response->setStatusCode($http_code, $reason);
+        }
+        return false;
     }
 
     /**
@@ -118,9 +140,12 @@ class Response
      * @param $ucwords
      * @return mixed
      */
-    public function header($key, $value, $ucwords = null) {
-        if (!$this->is_end) return $ucwords === null ? $this->response->header($key, $value) : $this->response->header($key, $value, $ucwords);
-        else return false;
+    public function header($key, $value, $ucwords = null)
+    {
+        if (!$this->is_end) {
+            return $ucwords === null ? $this->response->header($key, $value) : $this->response->header($key, $value, $ucwords);
+        }
+        return false;
     }
 
     /**
@@ -129,9 +154,12 @@ class Response
      * @param $ucwords
      * @return mixed
      */
-    public function setHeader($key, $value, $ucwords = null) {
-        if (!$this->is_end) return $ucwords === null ? $this->response->setHeader($key, $value) : $this->response->setHeader($key, $value, $ucwords);
-        else return false;
+    public function setHeader($key, $value, $ucwords = null)
+    {
+        if (!$this->is_end) {
+            return $ucwords === null ? $this->response->setHeader($key, $value) : $this->response->setHeader($key, $value, $ucwords);
+        }
+        return false;
     }
 
     /**
@@ -139,14 +167,16 @@ class Response
      * @param $value
      * @return mixed
      */
-    public function trailer($key, $value) {
+    public function trailer($key, $value)
+    {
         return $this->response->trailer($key, $value);
     }
 
     /**
      * @return mixed
      */
-    public function ping() {
+    public function ping()
+    {
         return $this->response->ping();
     }
 
@@ -154,7 +184,8 @@ class Response
      * @param $content
      * @return mixed
      */
-    public function write($content) {
+    public function write($content)
+    {
         return $this->response->write($content);
     }
 
@@ -162,18 +193,22 @@ class Response
      * @param $content
      * @return mixed
      */
-    public function end($content = null) {
+    public function end($content = null)
+    {
         if (!$this->is_end) {
             $this->is_end = true;
             return $this->response->end($content);
-        } else {
-            return false;
         }
+        return false;
     }
 
-    public function isEnd() { return $this->is_end; }
+    public function isEnd()
+    {
+        return $this->is_end;
+    }
 
-    public function endWithStatus($status_code = 200, $content = null) {
+    public function endWithStatus($status_code = 200, $content = null)
+    {
         $this->status($status_code);
         $this->end($content);
     }
@@ -184,7 +219,8 @@ class Response
      * @param $length
      * @return mixed
      */
-    public function sendfile($filename, $offset = null, $length = null) {
+    public function sendfile($filename, $offset = null, $length = null)
+    {
         return $this->response->sendfile($filename, $offset, $length);
     }
 
@@ -193,7 +229,8 @@ class Response
      * @param $http_code
      * @return mixed
      */
-    public function redirect($location, $http_code = null) {
+    public function redirect($location, $http_code = null)
+    {
         $this->is_end = true;
         return $this->response->redirect($location, $http_code);
     }
@@ -201,7 +238,8 @@ class Response
     /**
      * @return mixed
      */
-    public function detach() {
+    public function detach()
+    {
         return $this->response->detach();
     }
 
@@ -209,43 +247,43 @@ class Response
      * @param $fd
      * @return mixed
      */
-    public static function create($fd) {
+    public static function create($fd)
+    {
         return \Swoole\Http\Response::create($fd);
     }
 
     /**
      * @return mixed
      */
-    public function upgrade() {
+    public function upgrade()
+    {
         return $this->response->upgrade();
     }
 
     /**
      * @param $data
-     * @param null $opcode
-     * @param null $flags
+     * @param  null  $opcode
+     * @param  null  $flags
      * @return mixed
      */
-    public function push($data, $opcode = null, $flags = null) {
+    public function push($data, $opcode = null, $flags = null)
+    {
         return $this->response->push($data, $opcode, $flags);
     }
 
     /**
      * @return mixed
      */
-    public function recv() {
+    public function recv()
+    {
         return $this->response->recv();
     }
 
     /**
      * @return mixed
      */
-    public function close() {
+    public function close()
+    {
         return $this->response->close();
     }
-
-    public function __destruct() {
-    }
-
-
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ZM\Module;
 
 /**
@@ -11,21 +13,21 @@ abstract class ModuleBase
 
     protected $events = [];
 
-    public function __construct($module_name) {
+    public function __construct($module_name)
+    {
         $this->module_name = $module_name;
     }
 
     /**
      * @return mixed
      */
-    public function getModuleName() {
+    public function getModuleName()
+    {
         return $this->module_name;
     }
 
-    /**
-     * @return array
-     */
-    public function getEvents(): array {
+    public function getEvents(): array
+    {
         return $this->events;
     }
 }

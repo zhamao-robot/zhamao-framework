@@ -1,8 +1,8 @@
 <?php
 
+declare(strict_types=1);
 
 namespace ZM\Utils;
-
 
 use Swoole\Coroutine;
 
@@ -16,8 +16,11 @@ class CoroutinePool
 
     private static $yields = [];
 
-    public static function go(callable $func, $name = "default") {
-        if (!isset(self::$cids[$name])) self::$cids[$name] = [];
+    public static function go(callable $func, $name = 'default')
+    {
+        if (!isset(self::$cids[$name])) {
+            self::$cids[$name] = [];
+        }
         if (count(self::$cids[$name]) >= (self::$sizes[$name] ?? self::$default_size)) {
             self::$yields[] = Coroutine::getCid();
             Coroutine::suspend();
@@ -30,19 +33,23 @@ class CoroutinePool
         });
     }
 
-    public static function defaultSize(int $size) {
+    public static function defaultSize(int $size)
+    {
         self::$default_size = $size;
     }
 
-    public static function setSize($name, int $size) {
+    public static function setSize($name, int $size)
+    {
         self::$sizes[$name] = $size;
     }
 
-    public static function getRunningCoroutineCount($name = "default") {
+    public static function getRunningCoroutineCount($name = 'default')
+    {
         return count(self::$cids[$name]);
     }
 
-    private static function checkCids($name) {
+    private static function checkCids($name)
+    {
         if (in_array(Coroutine::getCid(), self::$cids[$name])) {
             $a = array_search(Coroutine::getCid(), self::$cids[$name]);
             array_splice(self::$cids[$name], $a, 1);

@@ -1,20 +1,22 @@
-<?php /** @noinspection PhpMissingReturnTypeInspection */
+<?php
+
+declare(strict_types=1);
 
 namespace Module\Example;
 
 use ZM\Annotation\CQ\CQBefore;
+use ZM\Annotation\CQ\CQCommand;
 use ZM\Annotation\CQ\CQMessage;
 use ZM\Annotation\Http\Middleware;
+use ZM\Annotation\Http\RequestMapping;
 use ZM\Annotation\Swoole\OnCloseEvent;
 use ZM\Annotation\Swoole\OnOpenEvent;
 use ZM\Annotation\Swoole\OnRequestEvent;
 use ZM\API\CQ;
-use ZM\API\TuringAPI;
 use ZM\API\OneBotV11;
+use ZM\API\TuringAPI;
 use ZM\ConnectionManager\ConnectionObject;
 use ZM\Console\Console;
-use ZM\Annotation\CQ\CQCommand;
-use ZM\Annotation\Http\RequestMapping;
 use ZM\Event\EventDispatcher;
 use ZM\Exception\InterruptException;
 use ZM\Module\QQBot;
@@ -24,7 +26,6 @@ use ZM\Utils\ZMUtil;
 
 /**
  * Class Hello
- * @package Module\Example
  * @since 2.0
  */
 class Hello
@@ -41,41 +42,49 @@ class Hello
      * 使用命令 .reload 发给机器人远程重载，注意将 user_id 换成你自己的 QQ
      * @CQCommand(".reload",user_id=627577391)
      */
-    public function reload() {
-        ctx()->reply("重启中...");
+    public function reload()
+    {
+        ctx()->reply('重启中...');
         ZMUtil::reload();
     }
 
     /**
      * @CQCommand("我是谁")
      */
-    public function whoami() {
+    public function whoami()
+    {
         $bot = ctx()->getRobot()->getLoginInfo();
-        $bot_id = $bot["data"]["user_id"];
-        $r = OneBotV11::get($bot_id); 
+        $bot_id = $bot['data']['user_id'];
+        $r = OneBotV11::get($bot_id);
         $QQid = ctx()->getUserId();
-        $nick = $r->getStrangerInfo($QQid)["data"]["nickname"];
-        return "你是" . $nick . "，QQ号是" . $QQid;
+        $nick = $r->getStrangerInfo($QQid)['data']['nickname'];
+        return '你是' . $nick . '，QQ号是' . $QQid;
     }
 
     /**
      * 向机器人发送"你好啊"，也可回复这句话
      * @CQCommand(match="你好",alias={"你好啊","你是谁"})
      */
-    public function hello() {
-        return "你好啊，我是由炸毛框架构建的机器人！";
+    public function hello()
+    {
+        return '你好啊，我是由炸毛框架构建的机器人！';
     }
 
     /**
      * 一个最基本的第三方 API 接口使用示例
      * @CQCommand("一言")
      */
-    public function hitokoto() {
-        $api_result = ZMRequest::get("https://v1.hitokoto.cn/");
-        if ($api_result === false) return "接口请求出错，请稍后再试！";
+    public function hitokoto()
+    {
+        $api_result = ZMRequest::get('https://v1.hitokoto.cn/');
+        if ($api_result === false) {
+            return '接口请求出错，请稍后再试！';
+        }
         $obj = json_decode($api_result, true);
-        if ($obj === null) return "接口解析出错！可能返回了非法数据！";
-        return $obj["hitokoto"] . "\n----「" . $obj["from"] . "」";
+        if ($obj === null) {
+            return '接口解析出错！可能返回了非法数据！';
+        }
+        return $obj['hitokoto'] . "\n----「" . $obj['from'] . '」';
     }
 
     /**
@@ -83,33 +92,36 @@ class Hello
      * @CQCommand(start_with="机器人",end_with="机器人",message_type="group")
      * @CQMessage(message_type="private",level=1)
      */
-    public function turingAPI() {
+    public function turingAPI()
+    {
         $user_id = ctx()->getUserId();
-        $api = ""; // 请在这里填入你的图灵机器人的apikey
-        if ($api === "") return false; //如果没有填入apikey则此功能关闭
+        $api = ''; // 请在这里填入你的图灵机器人的apikey
+        if ($api === '') {
+            return false;
+        } //如果没有填入apikey则此功能关闭
         if (($this->_running_annotation ?? null) instanceof CQCommand) {
-            $msg = ctx()->getFullArg("我在！有什么事吗？");
+            $msg = ctx()->getFullArg('我在！有什么事吗？');
         } else {
             $msg = ctx()->getMessage();
         }
         ctx()->setMessage($msg);
         if (MessageUtil::matchCommand($msg, ctx()->getData())->status === false) {
             return TuringAPI::getTuringMsg($msg, $user_id, $api);
-        } else {
-            QQBot::getInstance()->handle(ctx()->getData(), ctx()->getCache("level") + 1);
-            //执行嵌套消息，递归层级+1
-            return true;
         }
+        QQBot::getInstance()->handle(ctx()->getData(), ctx()->getCache('level') + 1);
+        //执行嵌套消息，递归层级+1
+        return true;
     }
 
     /**
      * 响应at机器人的消息
      * @CQBefore("message")
      */
-    public function changeAt() {
+    public function changeAt()
+    {
         if (MessageUtil::isAtMe(ctx()->getMessage(), ctx()->getRobotId())) {
-            $msg = str_replace(CQ::at(ctx()->getRobotId()), "", ctx()->getMessage());
-            ctx()->setMessage("机器人" . $msg);
+            $msg = str_replace(CQ::at(ctx()->getRobotId()), '', ctx()->getMessage());
+            ctx()->setMessage('机器人' . $msg);
             Console::info(ctx()->getMessage());
         }
         return true;
@@ -123,15 +135,16 @@ class Hello
      * @CQCommand(pattern="*从*到*的随机数")
      * @return string
      */
-    public function randNum() {
+    public function randNum()
+    {
         // 获取第一个数字类型的参数
-        $num1 = ctx()->getNumArg("请输入第一个数字");
+        $num1 = ctx()->getNumArg('请输入第一个数字');
         // 获取第二个数字类型的参数
-        $num2 = ctx()->getNumArg("请输入第二个数字");
+        $num2 = ctx()->getNumArg('请输入第二个数字');
         $a = min(intval($num1), intval($num2));
         $b = max(intval($num1), intval($num2));
         // 回复用户结果
-        return "随机数是：" . mt_rand($a, $b);
+        return '随机数是：' . mt_rand($a, $b);
     }
 
     /**
@@ -139,8 +152,9 @@ class Hello
      * @RequestMapping("/httpTimer")
      * @Middleware("timer")
      */
-    public function timer() {
-        return "This page is used as testing TimerMiddleware! Do not use it in production.";
+    public function timer()
+    {
+        return 'This page is used as testing TimerMiddleware! Do not use it in production.';
     }
 
     /**
@@ -148,8 +162,9 @@ class Hello
      * @RequestMapping("/index")
      * @RequestMapping("/")
      */
-    public function index() {
-        return "Hello Zhamao!";
+    public function index()
+    {
+        return 'Hello Zhamao!';
     }
 
     /**
@@ -158,8 +173,9 @@ class Hello
      * @param $param
      * @return string
      */
-    public function paramGet($param) {
-        return "Hello, " . $param["name"];
+    public function paramGet($param)
+    {
+        return 'Hello, ' . $param['name'];
     }
 
     /**
@@ -167,17 +183,18 @@ class Hello
      * @OnOpenEvent("qq")
      * @param $conn
      */
-    public function onConnect(ConnectionObject $conn) {
-        Console::info("机器人 " . $conn->getOption("connect_id") . " 已连接！");
+    public function onConnect(ConnectionObject $conn)
+    {
+        Console::info('机器人 ' . $conn->getOption('connect_id') . ' 已连接！');
     }
 
     /**
      * 在机器人断开连接后向终端输出信息
      * @OnCloseEvent("qq")
-     * @param ConnectionObject $conn
      */
-    public function onDisconnect(ConnectionObject $conn) {
-        Console::info("机器人 " . $conn->getOption("connect_id") . " 已断开连接！");
+    public function onDisconnect(ConnectionObject $conn)
+    {
+        Console::info('机器人 ' . $conn->getOption('connect_id') . ' 已断开连接！');
     }
 
     /**
@@ -185,7 +202,8 @@ class Hello
      * @OnRequestEvent(rule="ctx()->getRequest()->server['request_uri'] == '/favicon.ico'",level=200)
      * @throws InterruptException
      */
-    public function onRequest() {
+    public function onRequest()
+    {
         EventDispatcher::interrupt();
     }
 
@@ -193,8 +211,9 @@ class Hello
      * 框架会默认关闭未知的WebSocket链接，因为这个绑定的事件，你可以根据你自己的需求进行修改
      * @OnOpenEvent("default")
      */
-    public function closeUnknownConn() {
-        Console::info("Unknown connection , I will close it.");
+    public function closeUnknownConn()
+    {
+        Console::info('Unknown connection , I will close it.');
         server()->disconnect(ctx()->getConnection()->getFd());
     }
 }

@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
 
 namespace ZM;
 
-
 use Exception;
 use Phar;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use ZM\Command\BuildCommand;
 use ZM\Command\CheckConfigCommand;
 use ZM\Command\Daemon\DaemonReloadCommand;
@@ -18,9 +21,6 @@ use ZM\Command\Module\ModulePackCommand;
 use ZM\Command\Module\ModuleUnpackCommand;
 use ZM\Command\PureHttpCommand;
 use ZM\Command\RunServerCommand;
-use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use ZM\Command\Server\ServerReloadCommand;
 use ZM\Command\Server\ServerStatusCommand;
 use ZM\Command\Server\ServerStopCommand;
@@ -28,29 +28,34 @@ use ZM\Exception\InitException;
 
 class ConsoleApplication extends Application
 {
-    private static $obj = null;
+    public const VERSION_ID = 436;
 
-    const VERSION_ID = 435;
-    const VERSION = "2.7.0-beta1";
+    public const VERSION = '2.7.0-beta2';
+
+    private static $obj;
 
     /**
      * @throws InitException
      */
-    public function __construct(string $name = 'UNKNOWN') {
-        if (self::$obj !== null) throw new InitException(zm_internal_errcode("E00069") . "Initializing another Application is not allowed!");
-        define("ZM_VERSION_ID", self::VERSION_ID);
-        define("ZM_VERSION", self::VERSION);
+    public function __construct(string $name = 'UNKNOWN')
+    {
+        if (self::$obj !== null) {
+            throw new InitException(zm_internal_errcode('E00069') . 'Initializing another Application is not allowed!');
+        }
+        define('ZM_VERSION_ID', self::VERSION_ID);
+        define('ZM_VERSION', self::VERSION);
         self::$obj = $this;
         parent::__construct($name, ZM_VERSION);
     }
 
     /**
-     * @param string $with_default_cmd
-     * @return ConsoleApplication
      * @throws InitException
      */
-    public function initEnv(string $with_default_cmd = ""): ConsoleApplication {
-        if (defined("WORKING_DIR")) throw new InitException();
+    public function initEnv(string $with_default_cmd = ''): ConsoleApplication
+    {
+        if (defined('WORKING_DIR')) {
+            throw new InitException();
+        }
 
         _zm_env_check();
 
@@ -61,22 +66,21 @@ class ConsoleApplication extends Application
         define('ZM_PROCESS_USER', 8);
         define('ZM_PROCESS_TASKWORKER', 16);
 
-        define("WORKING_DIR", getcwd());
-
+        define('WORKING_DIR', getcwd());
 
         if (!is_dir(_zm_pid_dir())) {
             @mkdir(_zm_pid_dir());
         }
 
-        if (Phar::running() !== "") {
+        if (Phar::running() !== '') {
             echo "* Running in phar mode.\n";
-            define("SOURCE_ROOT_DIR", Phar::running());
-            define("LOAD_MODE", is_dir(SOURCE_ROOT_DIR . "/src/ZM") ? 0 : 1);
-            define("FRAMEWORK_ROOT_DIR", LOAD_MODE == 1 ? (SOURCE_ROOT_DIR . "/vendor/zhamao/framework") : SOURCE_ROOT_DIR);
+            define('SOURCE_ROOT_DIR', Phar::running());
+            define('LOAD_MODE', is_dir(SOURCE_ROOT_DIR . '/src/ZM') ? 0 : 1);
+            define('FRAMEWORK_ROOT_DIR', LOAD_MODE == 1 ? (SOURCE_ROOT_DIR . '/vendor/zhamao/framework') : SOURCE_ROOT_DIR);
         } else {
-            define("SOURCE_ROOT_DIR", WORKING_DIR);
-            define("LOAD_MODE", is_dir(SOURCE_ROOT_DIR . "/src/ZM") ? 0 : 1);
-            define("FRAMEWORK_ROOT_DIR", realpath(__DIR__ . "/../../"));
+            define('SOURCE_ROOT_DIR', WORKING_DIR);
+            define('LOAD_MODE', is_dir(SOURCE_ROOT_DIR . '/src/ZM') ? 0 : 1);
+            define('FRAMEWORK_ROOT_DIR', realpath(__DIR__ . '/../../'));
         }
 
         $this->addCommands([
@@ -88,12 +92,12 @@ class ConsoleApplication extends Application
             new ServerStopCommand(),
             new ServerReloadCommand(),
             new PureHttpCommand(), //纯HTTP服务器指令
-            new SystemdGenerateCommand()
+            new SystemdGenerateCommand(),
         ]);
         if (LOAD_MODE === 1) {
             $this->add(new CheckConfigCommand());
         }
-        if (Phar::running() === "") {
+        if (Phar::running() === '') {
             $this->add(new BuildCommand());
             $this->add(new InitCommand());
             $this->add(new ModulePackCommand());
@@ -106,16 +110,13 @@ class ConsoleApplication extends Application
         return $this;
     }
 
-    /**
-     * @param InputInterface|null $input
-     * @param OutputInterface|null $output
-     * @return int
-     */
-    public function run(InputInterface $input = null, OutputInterface $output = null): int {
+    public function run(InputInterface $input = null, OutputInterface $output = null): int
+    {
         try {
             return parent::run($input, $output);
         } catch (Exception $e) {
-            die(zm_internal_errcode("E00005") . "{$e->getMessage()} at {$e->getFile()}({$e->getLine()})");
+            echo zm_internal_errcode('E00005') . "{$e->getMessage()} at {$e->getFile()}({$e->getLine()})" . PHP_EOL;
+            exit(1);
         }
     }
 }

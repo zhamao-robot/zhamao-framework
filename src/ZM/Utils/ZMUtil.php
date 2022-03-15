@@ -1,8 +1,8 @@
 <?php
 
+declare(strict_types=1);
 
 namespace ZM\Utils;
-
 
 use Exception;
 use Swoole\Process;
@@ -28,10 +28,15 @@ class ZMUtil
     /**
      * @throws Exception
      */
-    public static function stop() {
-        if (SpinLock::tryLock('_stop_signal') === false) return;
+    public static function stop()
+    {
+        if (SpinLock::tryLock('_stop_signal') === false) {
+            return;
+        }
         Console::warning(Console::setColor('Stopping server...', 'red'));
-        if (Console::getLevel() >= 4) Console::trace();
+        if (Console::getLevel() >= 4) {
+            Console::trace();
+        }
         ZMAtomic::get('stop_signal')->set(1);
         server()->shutdown();
     }
@@ -39,29 +44,31 @@ class ZMUtil
     /**
      * @throws Exception
      */
-    public static function reload() {
+    public static function reload()
+    {
         Process::kill(server()->master_pid, SIGUSR1);
     }
 
-    public static function getModInstance($class) {
+    public static function getModInstance($class)
+    {
         if (!isset(ZMBuf::$instance[$class])) {
             //Console::debug('Class instance $class not exist, so I created it.');
             return ZMBuf::$instance[$class] = new $class();
-        } else {
-            return ZMBuf::$instance[$class];
         }
+        return ZMBuf::$instance[$class];
     }
 
     /**
      * 在工作进程中返回可以通过reload重新加载的php文件列表
      * @return string[]|string[][]
      */
-    public static function getReloadableFiles(): array {
+    public static function getReloadableFiles(): array
+    {
         $array_map = [];
         foreach (array_diff(
-                     get_included_files(),
-                     Framework::$loaded_files
-                 ) as $key => $x) {
+            get_included_files(),
+            Framework::$loaded_files
+        ) as $key => $x) {
             $array_map[$key] = str_replace(DataProvider::getSourceRootDir() . '/', '', $x);
         }
         return $array_map;
@@ -71,11 +78,12 @@ class ZMUtil
      * 使用Psr-4标准获取目录下的所有类
      * @param $dir
      * @param $base_namespace
-     * @param null|mixed $rule
-     * @param bool $return_path_value
-     * @return String[]
+     * @param  null|mixed $rule
+     * @param  bool       $return_path_value
+     * @return string[]
      */
-    public static function getClassesPsr4($dir, $base_namespace, $rule = null, $return_path_value = false): array {
+    public static function getClassesPsr4($dir, $base_namespace, $rule = null, $return_path_value = false): array
+    {
         // 预先读取下composer的file列表
         $composer = json_decode(file_get_contents(DataProvider::getSourceRootDir() . '/composer.json'), true);
         $classes = [];
@@ -85,16 +93,30 @@ class ZMUtil
             $pathinfo = pathinfo($v);
             if (($pathinfo['extension'] ?? '') == 'php') {
                 if ($rule === null) { //规则未设置回调时候，使用默认的识别过滤规则
-                    if (substr(file_get_contents($dir . '/' . $v), 6, 6) == '#plain') continue;
-                    elseif (mb_substr($pathinfo["basename"], 0, 7) == 'global_' || mb_substr($pathinfo["basename"], 0, 7) == 'script_') continue;
-                    foreach (($composer['autoload']['files'] ?? []) as $fi) {
-                        if (md5_file(DataProvider::getSourceRootDir().'/'.$fi) == md5_file($dir.'/'.$v)) continue 2;
+                    /*if (substr(file_get_contents($dir . '/' . $v), 6, 6) == '#plain') {
+                        continue;
+                    }*/
+                    if (file_exists($dir . '/' . $pathinfo['basename'] . '.plain')) {
+                        continue;
                     }
-                } elseif (is_callable($rule) && !($rule($dir, $pathinfo))) continue;
+                    if (mb_substr($pathinfo['basename'], 0, 7) == 'global_' || mb_substr($pathinfo['basename'], 0, 7) == 'script_') {
+                        continue;
+                    }
+                    foreach (($composer['autoload']['files'] ?? []) as $fi) {
+                        if (md5_file(DataProvider::getSourceRootDir() . '/' . $fi) == md5_file($dir . '/' . $v)) {
+                            continue 2;
+                        }
+                    }
+                } elseif (is_callable($rule) && !($rule($dir, $pathinfo))) {
+                    continue;
+                }
                 $dirname = $pathinfo['dirname'] == '.' ? '' : (str_replace('/', '\\', $pathinfo['dirname']) . '\\');
                 $class_name = $base_namespace . '\\' . $dirname . $pathinfo['filename'];
-                if (is_string($return_path_value)) $classes[$class_name] = $return_path_value . "/" .$v;
-                else $classes[] = $class_name;
+                if (is_string($return_path_value)) {
+                    $classes[$class_name] = $return_path_value . '/' . $v;
+                } else {
+                    $classes[] = $class_name;
+                }
             }
         }
         return $classes;

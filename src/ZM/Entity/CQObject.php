@@ -1,18 +1,22 @@
 <?php
 
+declare(strict_types=1);
 
 namespace ZM\Entity;
-
 
 class CQObject
 {
     public $type;
+
     public $params;
+
     public $start;
+
     public $end;
 
-    public function __construct($type = "", $params = [], $start = 0, $end = 0) {
-        if ($type !== "") {
+    public function __construct($type = '', $params = [], $start = 0, $end = 0)
+    {
+        if ($type !== '') {
             $this->type = $type;
             $this->params = $params;
             $this->start = $start;
@@ -20,7 +24,8 @@ class CQObject
         }
     }
 
-    public static function fromArray($arr): CQObject {
-        return new CQObject($arr["type"], $arr["params"] ?? [], $arr["start"], $arr["end"]);
+    public static function fromArray($arr): CQObject
+    {
+        return new CQObject($arr['type'], $arr['params'] ?? [], $arr['start'], $arr['end']);
     }
 }

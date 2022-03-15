@@ -1,8 +1,8 @@
 <?php
 
+declare(strict_types=1);
 
 namespace ZM\MySQL;
-
 
 use Doctrine\DBAL\Driver as DoctrineDriver;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
@@ -12,29 +12,34 @@ use ZM\Console\Console;
 
 class MySQLDriver implements DoctrineDriver
 {
-    public function connect(array $params, $username = null, $password = null, array $driverOptions = []) {
-        Console::debug("Requiring new connection");
+    public function connect(array $params, $username = null, $password = null, array $driverOptions = [])
+    {
+        Console::debug('Requiring new connection');
         return new MySQLConnection();
     }
 
-    public function getDatabasePlatform(): MySqlPlatform {
+    public function getDatabasePlatform(): MySqlPlatform
+    {
         return new MySqlPlatform();
     }
 
-    public function getSchemaManager($conn) {
+    public function getSchemaManager($conn)
+    {
         return new MySqlSchemaManager($conn);
     }
 
-    public function getName() {
+    public function getName()
+    {
         return 'pdo_mysql_pool';
     }
 
-    public function getDatabase($conn) {
-        $params = ZMConfig::get("global", "mysql_config");
+    public function getDatabase($conn)
+    {
+        $params = ZMConfig::get('global', 'mysql_config');
 
         if (isset($params['dbname'])) {
             return $params['dbname'];
         }
-        return "";
+        return '';
     }
 }

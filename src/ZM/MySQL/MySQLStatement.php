@@ -1,8 +1,12 @@
-<?php /** @noinspection PhpComposerExtensionStubsInspection */
+<?php
 
+/**
+ * @noinspection PhpComposerExtensionStubsInspection
+ */
+
+declare(strict_types=1);
 
 namespace ZM\MySQL;
-
 
 use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\Driver\StatementIterator;
@@ -34,14 +38,17 @@ class MySQLStatement implements IteratorAggregate, Statement
 
     public function setFetchMode($fetchMode, $arg2 = null, $arg3 = [])
     {
-        if ($arg2 !== null && $arg3 !== [])
+        if ($arg2 !== null && $arg3 !== []) {
             return $this->statement->setFetchMode($fetchMode, $arg2, $arg3);
-        elseif ($arg2 !== null && $arg3 === [])
+        }
+        if ($arg2 !== null && $arg3 === []) {
             return $this->statement->setFetchMode($fetchMode, $arg2);
-        elseif ($arg2 === null && $arg3 !== [])
+        }
+        if ($arg2 === null && $arg3 !== []) {
             return $this->statement->setFetchMode($fetchMode, $arg2, $arg3);
-        else
-            return $this->statement->setFetchMode($fetchMode);
+        }
+
+        return $this->statement->setFetchMode($fetchMode);
     }
 
     public function fetch($fetchMode = PDO::FETCH_ASSOC, $cursorOrientation = PDO::FETCH_ORI_NEXT, $cursorOffset = 0)
@@ -51,12 +58,14 @@ class MySQLStatement implements IteratorAggregate, Statement
 
     public function fetchAll($fetchMode = PDO::FETCH_ASSOC, $fetchArgument = null, $ctorArgs = null)
     {
-        if ($fetchArgument === null && $ctorArgs === null)
+        if ($fetchArgument === null && $ctorArgs === null) {
             return $this->statement->fetchAll($fetchMode);
-        elseif ($fetchArgument !== null && $ctorArgs === null)
+        }
+        if ($fetchArgument !== null && $ctorArgs === null) {
             return $this->statement->fetchAll($fetchMode, $fetchArgument);
-        else
-            return $this->statement->fetchAll($fetchMode, $fetchArgument, $ctorArgs);
+        }
+
+        return $this->statement->fetchAll($fetchMode, $fetchArgument, $ctorArgs);
     }
 
     public function fetchColumn($columnIndex = 0)

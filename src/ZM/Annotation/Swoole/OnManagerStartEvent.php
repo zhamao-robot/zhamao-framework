@@ -2,16 +2,15 @@
 
 declare(strict_types=1);
 
-namespace ZM\Annotation\Http;
+namespace ZM\Annotation\Swoole;
 
 use Doctrine\Common\Annotations\Annotation\Target;
-use ZM\Annotation\AnnotationBase;
 
 /**
- * Class HandleAfter
  * @Annotation
  * @Target("METHOD")
+ * @since 2.7.0
  */
-class HandleAfter extends AnnotationBase
+class OnManagerStartEvent extends OnSwooleEventBase
 {
 }

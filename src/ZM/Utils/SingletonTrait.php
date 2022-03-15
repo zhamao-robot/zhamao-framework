@@ -1,24 +1,27 @@
-<?php /** @noinspection PhpUnused */
+<?php
 
+/** @noinspection PhpUnused */
+
+declare(strict_types=1);
 
 namespace ZM\Utils;
 
-
 trait SingletonTrait
 {
+    protected static $cached = [];
+
     /**
      * @var self
      */
     private static $instance;
 
-    protected static $cached = [];
-
     /**
      * @return self
      * @noinspection PhpMissingReturnTypeInspection
      */
-    public static function getInstance() {
-        if (null === self::$instance) {
+    public static function getInstance()
+    {
+        if (self::$instance === null) {
             self::$instance = new self();
         }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Module\Middleware;
 
 use Exception;
@@ -13,7 +15,6 @@ use ZM\Http\MiddlewareInterface;
 /**
  * Class TimerMiddleware
  * 示例中间件：用于统计路由函数运行时间用的
- * @package Module\Middleware
  * @MiddlewareClass("timer")
  */
 class TimerMiddleware implements MiddlewareInterface
@@ -22,9 +23,9 @@ class TimerMiddleware implements MiddlewareInterface
 
     /**
      * @HandleBefore()
-     * @return bool
      */
-    public function onBefore(): bool {
+    public function onBefore(): bool
+    {
         $this->starttime = microtime(true);
         return true;
     }
@@ -32,17 +33,18 @@ class TimerMiddleware implements MiddlewareInterface
     /**
      * @HandleAfter()
      */
-    public function onAfter() {
-        Console::info("Using " . round((microtime(true) - $this->starttime) * 1000, 3) . " ms.");
+    public function onAfter()
+    {
+        Console::info('Using ' . round((microtime(true) - $this->starttime) * 1000, 3) . ' ms.');
     }
 
     /**
      * @HandleException(\Exception::class)
-     * @param Exception $e
      * @throws Exception
      */
-    public function onException(Exception $e) {
-        Console::error("Using " . round((microtime(true) - $this->starttime) * 1000, 3) . " ms but an Exception occurred.");
+    public function onException(Exception $e)
+    {
+        Console::error('Using ' . round((microtime(true) - $this->starttime) * 1000, 3) . ' ms but an Exception occurred.');
         throw $e;
     }
 }
