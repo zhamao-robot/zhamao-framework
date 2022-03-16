@@ -56,7 +56,8 @@ src/
 	```json
 	{
 	    "name": "my-first-module",
-	    "description": "这个是一个示例模块打包教程"
+	    "description": "这个是一个示例模块打包教程",
+	    "version": "1.0.0"
 	}
 	```
 
