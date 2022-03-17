@@ -71,5 +71,6 @@
 | E00069 | 框架不能启动两个 ConsoleApplication 实例                     | 不要重复使用 `new ConsoleApplication()`。                    |
 | E00070 | 框架找不到 `zm_data` 目录                                    | 检查配置中指定的 `zm_data` 目录是否存在。                    |
 | E00071 | 框架找不到对应类型的 API 调用类                              | 检查 `getExtendedAPI($name)` 传入的 `$name` 是否正确                    |
+| E00072 | 上下文无法找到                                              | 检查上下文环境，如是否处于协程环境中
 | E99999 | 未知错误                                                     |                                                              |
 

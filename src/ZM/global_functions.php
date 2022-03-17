@@ -17,6 +17,7 @@ use ZM\Context\ContextInterface;
 use ZM\Event\EventManager;
 use ZM\Exception\RobotNotFoundException;
 use ZM\Exception\ZMException;
+use ZM\Exception\ZMKnownException;
 use ZM\Framework;
 use ZM\Store\LightCacheInside;
 use ZM\Store\ZMAtomic;
@@ -224,12 +225,18 @@ function set_coroutine_params($array)
     }
 }
 
-function context(): ?ContextInterface
+/**
+ * @throws ZMKnownException
+ */
+function context(): ContextInterface
 {
     return ctx();
 }
 
-function ctx(): ?ContextInterface
+/**
+ * @throws ZMKnownException
+ */
+function ctx(): ContextInterface
 {
     $cid = Co::getCid();
     $c_class = ZMConfig::get('global', 'context_class');
@@ -243,8 +250,7 @@ function ctx(): ?ContextInterface
             return ZMBuf::$context_class[$cid] ?? (ZMBuf::$context_class[$cid] = new $c_class($cid));
         }
     }
-
-    return null;
+    throw new ZMKnownException(zm_internal_errcode('E00072') . 'Unable to find context environment');
 }
 
 function onebot_target_id_name($message_type): string
