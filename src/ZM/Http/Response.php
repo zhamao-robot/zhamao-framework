@@ -56,50 +56,31 @@ class Response
 
     /**
      * @param $name
-     * @param $value
-     * @param $expires
-     * @param $path
-     * @param $domain
-     * @param $secure
-     * @param $httponly
-     * @param $samesite
+     * @param  mixed ...$params
      * @return mixed
      */
-    public function cookie($name, $value = null, $expires = null, $path = null, $domain = null, $secure = null, $httponly = null, $samesite = null)
+    public function cookie($name, ...$params)
     {
-        return $this->response->rawcookie($name, $value, $expires, $path, $domain, $secure, $httponly, $samesite);
+        return empty($params) ? $this->response->rawcookie($name) : $this->response->rawcookie($name, ...$params);
     }
 
     /**
-     * @param $name
-     * @param $value
-     * @param $expires
-     * @param $path
-     * @param $domain
-     * @param $secure
-     * @param $httponly
-     * @param $samesite
+     * @param  mixed ...$params
+     * @param  mixed $name
      * @return mixed
      */
-    public function setCookie($name, $value = null, $expires = null, $path = null, $domain = null, $secure = null, $httponly = null, $samesite = null)
+    public function setCookie($name, ...$params)
     {
-        return $this->response->setCookie($name, $value, $expires, $path, $domain, $secure, $httponly, $samesite);
+        return empty($params) ? $this->response->rawcookie($name) : $this->response->setCookie($name, ...$params);
     }
 
     /**
-     * @param $name
-     * @param $value
-     * @param $expires
-     * @param $path
-     * @param $domain
-     * @param $secure
-     * @param $httponly
-     * @param $samesite
+     * @param  mixed ...$params
      * @return mixed
      */
-    public function rawcookie($name, $value = null, $expires = null, $path = null, $domain = null, $secure = null, $httponly = null, $samesite = null)
+    public function rawcookie($name, ...$params)
     {
-        return $this->response->rawcookie($name, $value, $expires, $path, $domain, $secure, $httponly, $samesite);
+        return empty($params) ? $this->response->rawcookie($name) : $this->response->rawcookie($name, ...$params);
     }
 
     /**
@@ -107,11 +88,11 @@ class Response
      * @param $reason
      * @return mixed
      */
-    public function status($http_code, $reason = null)
+    public function status($http_code, ...$params)
     {
         $this->status_code = $http_code;
         if (!$this->is_end) {
-            return $this->response->status($http_code, $reason);
+            return empty($params) ? $this->response->status($http_code) : $this->response->status($http_code, ...$params);
         }
         return false;
     }
@@ -126,10 +107,10 @@ class Response
      * @param $reason
      * @return mixed
      */
-    public function setStatusCode($http_code, $reason = null)
+    public function setStatusCode($http_code, ...$params)
     {
         if (!$this->is_end) {
-            return $this->response->setStatusCode($http_code, $reason);
+            return empty($params) ? $this->response->status($http_code) : $this->response->status($http_code, ...$params);
         }
         return false;
     }
