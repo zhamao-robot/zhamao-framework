@@ -33,10 +33,10 @@
 public function chat()
 {
     // 替换掉机器人前缀，并获取消息内容
-    $msg = $this->getContext()->getMessage();
+    $msg = ctx()->getMessage();
     $msg = str_replace('机器人', '', $msg);
     if (empty(trim($msg))) {
-        $msg = $this->getContext()->getFullArg('怎么了？');
+        $msg = ctx()->getFullArg('怎么了？');
     }
 
     Console::info('正在获取智能聊天回复：' . $msg);
@@ -72,12 +72,12 @@ public function chat()
 public function changeAt(): bool
 {
     // 判断此条消息是否 AT 了机器人
-    if (MessageUtil::isAtMe($this->getContext()->getMessage(), $this->bot->getSelfId())) {
+    if (MessageUtil::isAtMe(ctx()->getMessage(), ctx()->getRobotId())) {
         // 将 AT 本身从消息中去掉
-        $msg = str_replace(CQ::at($this->bot->getSelfId()), '', $this->getContext()->getMessage());
-        $this->getContext()->setMessage('机器人' . trim($msg));
+        $msg = str_replace(CQ::at(ctx()->getRobotId()), '', ctx()->getMessage());
+        ctx()->setMessage('机器人' . trim($msg));
         // 调用智能聊天
-        $this->getContext()->reply($this->chat());
+        ctx()->reply($this->chat());
         return false;
     }
     return true;
