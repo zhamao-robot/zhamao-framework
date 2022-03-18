@@ -62,19 +62,14 @@ vendor/bin/start server
 ## 特点
 - 原生为多账号设计，支持多个机器人负载均衡
 - 使用 Swoole 多工作进程机制和协程加持，尽可能简单的情况下提升了性能
-- 灵活的注解事件绑定机制
+- 灵活的注解事件绑定机制，可兼容使用 PHP8 的 Attribute（>=2.7 可用）
 - 易用的上下文，模块内随处可用
-- 采用模块化编写，可自由搭配其他 composer 组件
+- 采用模块化编写，可自由搭配其他 composer 组件，也可单文件面向过程编写
 - 常驻内存，全局缓存变量随处使用，提供多种缓存方案
 - 自带 MySQL、Redis 等数据库连接池等数据库连接方案
 - 本身为 HTTP 服务器、WebSocket 服务器，可以构建属于自己的 HTTP API 接口
 - 静态文件服务器，可将前端合并到一起
 - 自带 PHP + Swoole 环境，无需手动编译安装，by [crazywhalecc/static-php-cli](https://github.com/crazywhalecc/static-php-cli)
-
-## 从 v1 升级
-炸毛框架 v2 相对 v1 版本改动了不少内容，其中包括框架底层机制、注解事件分发、调试、命名空间等变化，详情可查看上方文档。
-
-如果旧版框架使用过程中无问题且对新功能暂无需求，可以继续使用 v1 版本，后续也将维护安全类更新和修复致命 bug。
 
 ## 下载源码
 框架源码可直接克隆本仓库进行编辑，如果你在国内，访问 GitHub 和 clone 仓库比较慢，可以将 `github.com` 替换为 `fgit.zhamao.me` 进行加速。
@@ -93,12 +88,10 @@ vendor/bin/start server
 ### 支付宝
 ![支付宝二维码](https://cdn.jsdelivr.net/gh/zhamao-robot/zhamao-framework/resources/images/alipay_img.jpg)
 
-如果你对我们的周边感兴趣，我们还有炸毛机器人定制 logo 的雨伞，详情咨询作者 QQ，我们会作为您捐助了本项目！
-
 ## 关于
 框架和 SDK 是 炸毛机器人 项目的核心框架开源部分。炸毛机器人是作者写的一个高性能机器人，曾获全国计算机设计大赛一等奖。
 
-作者的炸毛机器人已从2018年初起稳定运行了**四年**，并且持续迭代。
+作者的炸毛机器人已从2018年初起稳定运行了**四年半**，并且持续迭代。
 
 欢迎随时在 HTTP-API 插件群里提问，当然更好的话可以加作者 QQ（[627577391](http://wpa.qq.com/msgrd?v=3&uin=627577391&site=qq&menu=yes)）或提交 Issue 进行疑难解答。
 
