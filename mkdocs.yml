@@ -16,11 +16,11 @@ theme:
     - navigation.tabs
     - navigation.sections
 extra_javascript:
-  - https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js
+  - javascripts/library/highlight.min.js
   - javascripts/config.js
 extra_css:
   - assets/css/extra.css
-  - https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/default.min.css
+  - assets/css/library/default.min.css
 plugins:
   - search:
       lang: ja
