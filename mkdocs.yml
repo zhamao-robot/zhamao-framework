@@ -39,7 +39,7 @@ extra:
   version:
     provider: mike
 
-copyright: 'Copyright &copy; 2019 - 2021 CrazyBot Team&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tx-switch">
+copyright: 'Copyright &copy; 2019 - 2022 CrazyBot Team&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tx-switch">
                  <button data-md-color-scheme="default"><code>默认模式</code></button>
                  <button data-md-color-scheme="slate"><code>暗黑模式</code></button>
                </span>
@@ -106,7 +106,7 @@ nav:
           - Console 终端: component/common/console.md
           - TaskWorker 管理: component/common/task-worker.md
           - Terminal 终端: component/common/remote-terminal.md
-          - EventTracer 事件追踪器: component/comon/event-tracer.md
+          - EventTracer 事件追踪器: component/common/event-tracer.md
       - HTTP 服务器工具类:
           - HTTP 和 WebSocket 客户端: component/http/zmrequest.md
           - HTTP 路由管理: component/http/route-manager.md
@@ -125,6 +125,7 @@ nav:
       - 开发实战教程:
           - 接入 WebSocket 客户端: advanced/connect-ws-client.md
           - 编写管理员才能触发的功能: advanced/example/admin.md
+          - 接入青云客聊天API: advanced/example/integrate-qingyunke-chatbot.md
   - FAQ:
       - FAQ: faq/FAQ.md
       - 从 v1 升级: faq/to-v2.md
