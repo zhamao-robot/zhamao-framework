@@ -106,7 +106,7 @@ nav:
           - Console 终端: component/common/console.md
           - TaskWorker 管理: component/common/task-worker.md
           - Terminal 终端: component/common/remote-terminal.md
-          - EventTracer 事件追踪器: component/comon/event-tracer.md
+          - EventTracer 事件追踪器: component/common/event-tracer.md
       - HTTP 服务器工具类:
           - HTTP 和 WebSocket 客户端: component/http/zmrequest.md
           - HTTP 路由管理: component/http/route-manager.md
