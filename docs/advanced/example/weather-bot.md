@@ -33,6 +33,21 @@ use ZM\Console\Console;
 class WeatherReport
 {
     /**
+     * 加载字典
+     *
+     * @OnStart(worker_id=-1)
+     *
+     * @return void
+     */
+    public function initDictionary(): void
+    {
+        // 分词以及词性分析需要载入字典到内存
+        ini_set('memory_limit', '600M');
+        Jieba::init(['dict' => 'small']);
+        Posseg::init();
+    }
+
+    /**
      * 查询天气
      *
      * @CQCommand(keyword="天气")
@@ -41,22 +56,12 @@ class WeatherReport
      */
     public function cmdQueryWeather(): string
     {
-        // 分词以及词性分析需要载入字典到内存
-        $original_memory_limit = ini_get('memory_limit');
-        ini_set('memory_limit', '600M');
-        // 此处为了节省内存选用了小词典，但部分词语可能无法正确识别
-        Jieba::init(['dict' => 'small']);
-        Posseg::init();
-
         // 分词并进行词性分析
         $seg_list = Posseg::cut(ctx()->getMessage());
         $tags = array_column($seg_list, 'tag');
         // 找出词性为 ns（地名）的单词
         $location_index = array_search('ns', $tags, true);
         $location = $seg_list[$location_index]['word'];
-
-        // 部分情况下此处无法正常限制内存，不影响正常使用
-        ini_set('memory_limit', $original_memory_limit);
 
         // 此处引入了本文作者自己写的天气库
         $w = new Weather();
