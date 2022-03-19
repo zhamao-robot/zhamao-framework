@@ -30,7 +30,10 @@ class EventTracer
     public static function getCurrentEventMiddlewares()
     {
         $current_event = self::getCurrentEvent();
-        if (!isset($current_event->class, $current_event->method)) {
+        if (empty($current_event->class)) {
+            return null;
+        }
+        if (empty($current_event->method)) {
             return null;
         }
         return EventManager::$middleware_map[$current_event->class][$current_event->method] ?? [];

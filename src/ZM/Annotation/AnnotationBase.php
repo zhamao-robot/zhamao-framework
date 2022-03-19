@@ -8,9 +8,9 @@ use Closure;
 
 abstract class AnnotationBase
 {
-    public $method;
+    public $method = '';
 
-    public $class;
+    public $class = '';
 
     public function __toString()
     {

@@ -39,7 +39,7 @@ class OnRequest implements SwooleEvent
 
         $dis1 = new EventDispatcher(OnRequestEvent::class);
         $dis1->setRuleFunction(function ($v) {
-            return eval('return ' . $v->getRule() . ';') ? true : false;
+            return (bool) eval('return ' . $v->getRule() . ';');
         });
 
         $dis = new EventDispatcher(OnSwooleEvent::class);
@@ -61,8 +61,7 @@ class OnRequest implements SwooleEvent
                 if ($result === true) {
                     ctx()->setCache('params', $params);
                     $dispatcher = new EventDispatcher(RequestMapping::class);
-                    $div = new RequestMapping();
-                    $div->route = $node['route'];
+                    $div = new RequestMapping($node['route']);
                     $div->params = $params;
                     $div->method = $node['method'];
                     $div->request_method = $node['request_method'];

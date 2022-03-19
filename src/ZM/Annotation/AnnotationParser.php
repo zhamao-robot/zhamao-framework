@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace ZM\Annotation;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Koriym\Attributes\AttributeReader;
+use Koriym\Attributes\DualReader;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
@@ -63,13 +65,12 @@ class AnnotationParser
         foreach ($this->path_list as $path) {
             Console::debug('parsing annotation in ' . $path[0] . ':' . $path[1]);
             $all_class = ZMUtil::getClassesPsr4($path[0], $path[1]);
-            $this->reader = new AnnotationReader();
+            $this->reader = new DualReader(new AnnotationReader(), new AttributeReader());
             foreach ($all_class as $v) {
                 Console::debug('正在检索 ' . $v);
                 $reflection_class = new ReflectionClass($v);
                 $methods = $reflection_class->getMethods(ReflectionMethod::IS_PUBLIC);
                 $class_annotations = $this->reader->getClassAnnotations($reflection_class);
-
                 // 这段为新加的:start
                 //这里将每个类里面所有的类注解、方法注解通通加到一颗大树上，后期解析
                 /*
@@ -133,8 +134,7 @@ class AnnotationParser
                             if (!isset($inserted[$v][$method_name])) {
                                 // 在这里在其他中间件前插入插入全局的中间件
                                 foreach ($middlewares as $middleware) {
-                                    $mid_class = new Middleware();
-                                    $mid_class->middleware = $middleware;
+                                    $mid_class = new Middleware($middleware);
                                     $mid_class->class = $v;
                                     $mid_class->method = $method_name;
                                     $this->middleware_map[$v][$method_name][] = $mid_class;

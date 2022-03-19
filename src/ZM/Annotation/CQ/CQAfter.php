@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ZM\Annotation\CQ;
 
+use Attribute;
+use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
 use Doctrine\Common\Annotations\Annotation\Target;
 use ZM\Annotation\AnnotationBase;
 use ZM\Annotation\Interfaces\Level;
@@ -11,8 +13,10 @@ use ZM\Annotation\Interfaces\Level;
 /**
  * Class CQAfter
  * @Annotation
+ * @NamedArgumentConstructor()
  * @Target("METHOD")
  */
+#[Attribute(Attribute::IS_REPEATABLE | Attribute::TARGET_METHOD)]
 class CQAfter extends AnnotationBase implements Level
 {
     /**
@@ -22,6 +26,12 @@ class CQAfter extends AnnotationBase implements Level
     public $cq_event;
 
     public $level = 20;
+
+    public function __construct($cq_event, $level = 20)
+    {
+        $this->cq_event = $cq_event;
+        $this->level = $level;
+    }
 
     /**
      * @return mixed

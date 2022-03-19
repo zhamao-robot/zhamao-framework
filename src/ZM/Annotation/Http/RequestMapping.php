@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ZM\Annotation\Http;
 
+use Attribute;
+use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
 use Doctrine\Common\Annotations\Annotation\Required;
 use Doctrine\Common\Annotations\Annotation\Target;
 use ZM\Annotation\AnnotationBase;
@@ -11,8 +13,10 @@ use ZM\Annotation\AnnotationBase;
 /**
  * Class RequestMapping
  * @Annotation
+ * @NamedArgumentConstructor()
  * @Target("METHOD")
  */
+#[Attribute(Attribute::IS_REPEATABLE | Attribute::TARGET_METHOD)]
 class RequestMapping extends AnnotationBase
 {
     /**
@@ -36,4 +40,12 @@ class RequestMapping extends AnnotationBase
      * @var array
      */
     public $params = [];
+
+    public function __construct($route, $name = '', $request_method = [RequestMethod::GET, RequestMethod::POST], $params = [])
+    {
+        $this->route = $route;
+        $this->name = $name;
+        $this->request_method = $request_method;
+        $this->params = $params;
+    }
 }

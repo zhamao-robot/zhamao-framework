@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ZM\Annotation\Swoole;
 
+use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
 use Doctrine\Common\Annotations\Annotation\Required;
 use Doctrine\Common\Annotations\Annotation\Target;
 use ZM\Annotation\AnnotationBase;
@@ -11,6 +12,7 @@ use ZM\Annotation\AnnotationBase;
 /**
  * Class SwooleHandler
  * @Annotation
+ * @NamedArgumentConstructor()
  * @Target("ALL")
  */
 class SwooleHandler extends AnnotationBase
@@ -20,4 +22,13 @@ class SwooleHandler extends AnnotationBase
      * @Required()
      */
     public $event;
+
+    /** @var string */
+    public $params = '';
+
+    public function __construct($event, $params = '')
+    {
+        $this->event = $event;
+        $this->params = $params;
+    }
 }

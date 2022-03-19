@@ -35,6 +35,7 @@ class AnnotationParserRegisterTest extends TestCase
     public function testAnnotation() {
         ob_start();
         $gen = $this->parser->generateAnnotationEvents();
+        //zm_dump($gen);
         $m = $gen[OnStart::class][0]->method;
         $class = $gen[OnStart::class][0]->class;
         $c = new $class();
@@ -43,12 +44,10 @@ class AnnotationParserRegisterTest extends TestCase
         } catch (Exception $e) {
         }
         $result = ob_get_clean();
-        echo $result;
         $this->assertStringContainsString("我开始了！", $result);
     }
 
     public function testAnnotation2() {
-
         foreach ($this->parser->generateAnnotationEvents() as $k => $v) {
             foreach ($v as $vs) {
                 $this->assertTrue($vs->method === null || $vs->method != '');
@@ -57,22 +56,9 @@ class AnnotationParserRegisterTest extends TestCase
         }
     }
 
-    public function testAnnotationMap() {
-        $map = $this->parser->getMiddlewareMap();
-        $this->assertContainsEquals("timer", $map[Hello::class]["timer"]);
-    }
-
     public function testMiddlewares() {
         $wares = $this->parser->getMiddlewares();
+        zm_dump($wares);
         $this->assertArrayHasKey("timer", $wares);
-    }
-
-    public function testReqMapping() {
-        $mapping = $this->parser->getReqMapping();
-        $this->assertEquals("index", $mapping["method"]);
-    }
-
-    public function testTracer() {
-
     }
 }

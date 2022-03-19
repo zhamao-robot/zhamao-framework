@@ -76,6 +76,7 @@ class Response
 
     /**
      * @param  mixed ...$params
+     * @param  mixed $name
      * @return mixed
      */
     public function rawcookie($name, ...$params)
