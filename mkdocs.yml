@@ -126,6 +126,7 @@ nav:
           - 接入 WebSocket 客户端: advanced/connect-ws-client.md
           - 编写管理员才能触发的功能: advanced/example/admin.md
           - 接入青云客聊天API: advanced/example/integrate-qingyunke-chatbot.md
+          - 开发天气机器人: advanced/example/weather-bot.md
   - FAQ:
       - FAQ: faq/FAQ.md
       - 从 v1 升级: faq/to-v2.md
