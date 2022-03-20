@@ -4,6 +4,68 @@
 
 同时此处将只使用 build 版本号进行区分。
 
+## build 447 (2022-3-20)
+
+- 发布 2.7.0 正式版
+
+## build 446 (2022-3-20)
+
+- 新增 `./zhamao server` 下的 `--no-state-check` 参数，关闭“启动框架前的运行状态检查”功能
+
+## build 445 (2022-3-20)
+
+- 新增配置项 `runtime`.`annotation_reader_ignore`：支持注解解析器忽略注解的自定义
+
+## build 444 (2022-3-20)
+
+- 更改 `extra`.`exclude_annotate` 为 `zm`.`exclude-annotation-path` 项
+
+## build 443 (2022-3-20)
+
+- 修复注释空格的样式
+
+## build 442 (2022-3-20)
+
+- 修复打包模块后 `files` 的 autoload 项不能被解压和引入的 Bug
+
+## build 441 (2022-3-20)
+
+- 修复打包模块时命名空间与实际不一致的 Bug
+
+## build 440 (2022-3-20)
+
+- 新增方法宏（Macroable）
+
+## build 439 (2022-3-19)
+
+- 新增 PHP 8 Attribute 与注解同时支持的特性
+
+## build 438 (2022-3-18)
+
+- 修复 Response 类在 PHP 8.1 环境下的报错
+
+## build 437 (2022-3-17)
+
+- 修复 `ctx()` 可能会返回 null 的 Bug
+
+## build 436 (2022-3-15)
+
+- 新增 PHPStan 和 PHP CS Fixer 并优化全局代码
+
+## build 435 (2022-3-13)
+
+- 优化分离 WorkerManager 与 ProcessManager 的职责
+- 新增 Ctrl+C 一次无法停止框架时多次 Ctrl+C 后可强行杀掉所有进程的功能
+- `./zhamao server:stop` 新增参数 `--force`，使用 `SIGKILL` 强行杀掉所有进程
+- 新增 AnnotationParser 对 `autoload-dev` 项中的 `psr-4` 默认检索条件
+- 新增框架启动状态检测功能，如果已经启动了同样目录的框架，则会报错
+- 新增“强制启用轮询模式启动热更新”功能（参数 `--polling-watch`）
+- 修复与 PHP 8.1 的兼容性
+- 对 DaemonCommand 进行优化，与 ServerCommand 效果相同
+- 修复 `autoload`.`psr-4` 不存在时报错的 Bug
+- 新增框架停止时 Worker 退出回显状态码
+- 新增 inotify 判断模式，如果使用 `--watch` 检测到没有安装 inotify，则自动使用轮询模式
+
 ## build 434 (2022-1-8)
 
 - 修复框架在 PHP 8.1 下运行时的一些问题
