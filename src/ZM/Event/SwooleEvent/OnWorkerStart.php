@@ -156,9 +156,10 @@ class OnWorkerStart implements SwooleEvent
         $parser = new AnnotationParser();
         $composer = json_decode(file_get_contents(DataProvider::getSourceRootDir() . '/composer.json'), true);
         $merge = array_merge($composer['autoload']['psr-4'] ?? [], $composer['autoload-dev']['psr-4'] ?? []);
+        $exclude_annotations = array_merge($composer['extra']['exclude_annotate'] ?? [], $composer['extra']['zm']['exclude-annotation-path'] ?? []);
         foreach ($merge as $k => $v) {
             if (is_dir(DataProvider::getSourceRootDir() . '/' . $v)) {
-                if (in_array(trim($k, '\\') . '\\', $composer['extra']['exclude_annotate'] ?? [])) {
+                if (in_array(trim($k, '\\') . '\\', $exclude_annotations)) {
                     continue;
                 }
                 if (trim($k, '\\') == 'ZM') {

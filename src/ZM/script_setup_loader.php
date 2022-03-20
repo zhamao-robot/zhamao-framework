@@ -20,13 +20,14 @@ try {
     $base_path = DataProvider::getSourceRootDir();
     $scan_paths = [];
     $composer = json_decode(file_get_contents($base_path . '/composer.json'), true);
+    $exclude_annotations = array_merge($composer['extra']['exclude_annotate'] ?? [], $composer['extra']['zm']['exclude-annotation-path'] ?? []);
     foreach (($composer['autoload']['psr-4'] ?? []) as $k => $v) {
-        if (is_dir($base_path . '/' . $v) && !in_array($v, $composer['extra']['exclude_annotate'] ?? [])) {
+        if (is_dir($base_path . '/' . $v) && !in_array($v, $exclude_annotations)) {
             $scan_paths[trim($k, '\\')] = $base_path . '/' . $v;
         }
     }
     foreach (($composer['autoload-dev']['psr-4'] ?? []) as $k => $v) {
-        if (is_dir($base_path . '/' . $v) && !in_array($v, $composer['extra']['exclude_annotate'] ?? [])) {
+        if (is_dir($base_path . '/' . $v) && !in_array($v, $exclude_annotations)) {
             $scan_paths[trim($k, '\\')] = $base_path . '/' . $v;
         }
     }

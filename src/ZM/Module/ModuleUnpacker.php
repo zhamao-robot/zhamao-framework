@@ -30,7 +30,8 @@ class ModuleUnpacker
 
     /**
      * 解包模块
-     * @param  bool                $ignore_depends
+     *
+     * @param  mixed               $ignore_depends
      * @throws ModulePackException
      * @throws ZMException
      */
@@ -61,7 +62,8 @@ class ModuleUnpacker
 
     /**
      * 检查模块依赖关系
-     * @param  bool                $ignore_depends
+     *
+     * @param  mixed               $ignore_depends
      * @throws ModulePackException
      * @throws ZMException
      */
@@ -125,8 +127,8 @@ class ModuleUnpacker
             throw new ModulePackException(zm_internal_errcode('E00068'));
         }
         $composer = json_decode(file_get_contents($composer_file), true);
-        if (isset($this->module_config['composer-extend-autoload'])) {
-            $autoload = $this->module_config['composer-extend-autoload'];
+        if (isset($this->module_config['unpack']['composer-autoload-items'])) {
+            $autoload = $this->module_config['unpack']['composer-autoload-items'];
             if (isset($autoload['psr-4'])) {
                 Console::info('Adding extended autoload psr-4 for composer');
                 $composer['autoload']['psr-4'] = isset($composer['autoload']['psr-4']) ? array_merge($composer['autoload']['psr-4'], $autoload['psr-4']) : $autoload['psr-4'];
@@ -136,6 +138,7 @@ class ModuleUnpacker
                 $composer['autoload']['files'] = isset($composer['autoload']['files']) ? array_merge($composer['autoload']['files'], $autoload['files']) : $autoload['files'];
             }
         }
+
         if (isset($this->module_config['composer-extend-require'])) {
             foreach ($this->module_config['composer-extend-require'] as $k => $v) {
                 Console::info('Adding extended required composer library: ' . $k);
