@@ -33,9 +33,20 @@ function test_composer_and_php() {
   return 0
 }
 
+if [ "$(uname -s)" != "Linux" ]; then
+  echo "Only support Linux!!!"
+  exit 1
+fi
+
+ZM_PHP_VERSION="7.4"
+if [ "$ZM_DOWN_PHP_VERSION" != "" ]; then
+  ZM_PHP_VERSION="$ZM_DOWN_PHP_VERSION"
+  echo "Using custom PHP version: $ZM_PHP_VERSION"
+fi
+
 mkdir "$(pwd)/runtime" >/dev/null 2>&1
 if [ ! -f "$(pwd)/runtime/php" ]; then
-  download_file "https://dl.zhamao.me/php-bin/down.php?php_ver=7.4&arch=$(uname -m)" "$(pwd)/runtime/php.tar.gz"
+  download_file "https://dl.zhamao.me/php-bin/down.php?php_ver=$ZM_PHP_VERSION&arch=$(uname -m)" "$(pwd)/runtime/php.tar.gz"
   if [ $? -ne 0 ]; then
     exit 1
   fi
