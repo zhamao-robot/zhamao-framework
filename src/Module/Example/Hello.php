@@ -216,4 +216,17 @@ class Hello
         Console::info('Unknown connection , I will close it.');
         server()->disconnect(ctx()->getConnection()->getFd());
     }
+
+    /**
+     * 输出帮助信息
+     *
+     * @CQCommand("帮助")
+     */
+    #[CQCommand('帮助')]
+    public function help(): string
+    {
+        $helps = MessageUtil::generateCommandHelp();
+        array_unshift($helps, '帮助：');
+        return implode("\n", $helps);
+    }
 }
