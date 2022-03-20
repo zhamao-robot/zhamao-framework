@@ -49,20 +49,22 @@ docker run -it --rm -v $(pwd):/app/ -p 20001:20001 zmbot/swoole vendor/bin/start
 
 ```verilog
 $ vendor/bin/start server
-host: 0.0.0.0       |   port: 20001
-log_level: 2        |   version: 2.0.0
-config: global.php  |   worker_num: 4
-working_dir: /app/zhamao-framework
- ______
-|__  / |__   __ _ _ __ ___   __ _  ___
-  / /| '_ \ / _` | '_ ` _ \ / _` |/ _ \
- / /_| | | | (_| | | | | | | (_| | (_) |
-/____|_| |_|\__,_|_| |_| |_|\__,_|\___/
+=================================================================
+ working_dir: /app/zhamao-framework-starter
+ listen: 0.0.0.0:20001         |  worker: 4 (auto)
+ environment: default          |  log_level: 2
+ version: 2.7.0                |  master_pid: 28449
+=================================================================
+   ______
+  |__  / |__   __ _ _ __ ___   __ _  ___
+    / /| '_ \ / _` | '_ ` _ \ / _` |/ _ \
+   / /_| | | | (_| | | | | | | (_| | (_) |
+  /____|_| |_|\__,_|_| |_| |_|\__,_|\___/
 
-[14:27:31] [S] [#3] Worker #3 已启动
-[14:27:31] [S] [#0] Worker #0 已启动
-[14:27:31] [S] [#2] Worker #2 已启动
-[14:27:31] [S] [#1] Worker #1 已启动
+[03-20 22:30:56] [S] [#1] Worker #1 started
+[03-20 22:30:56] [S] [#2] Worker #2 started
+[03-20 22:30:56] [S] [#3] Worker #3 started
+[03-20 22:30:56] [S] [#0] Worker #0 started
 ```
 
 单纯运行 炸毛框架 后，如果不部署或安装启动任何机器人客户端的话，仅仅相当于启动了一个 监听 20001 端口的WebSoket + HTTP 服务器。你可以通过浏览器访问：http://127.0.0.1:20001 ，或者你部署到了服务器后需要输入服务器地址。

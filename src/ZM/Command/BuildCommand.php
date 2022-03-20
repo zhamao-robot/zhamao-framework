@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ZM\Command;
 
+use ArrayIterator;
 use League\CLImate\CLImate;
 use Phar;
 use Symfony\Component\Console\Command\Command;
@@ -66,7 +67,6 @@ class BuildCommand extends Command
         @unlink($target_dir . $filename);
         $phar = new Phar($target_dir . $filename);
         $phar->startBuffering();
-        $climate = new CLImate();
 
         $all = DataProvider::scanDirFiles(DataProvider::getSourceRootDir(), true, true);
 
@@ -76,19 +76,29 @@ class BuildCommand extends Command
         });
 
         sort($all);
-        $progress = $climate->progress()->total(count($all));
 
         $archive_dir = DataProvider::getSourceRootDir();
-        foreach ($all as $k => $v) {
-            $phar->addFile($archive_dir . '/' . $v, $v);
-            $progress->current($k + 1, 'Adding ' . $v);
-        }
+        $map = [];
 
+        if (class_exists('\\League\\CLImate\\CLImate')) {
+            $climate = new CLImate();
+            $progress = $climate->progress()->total(count($all));
+        }
+        foreach ($all as $k => $v) {
+            $map[$v] = $archive_dir . '/' . $v;
+            if (isset($progress)) {
+                $progress->current($k + 1, 'Adding ' . $v);
+            }
+        }
+        $this->output->write('<info>Building...</info>');
+        $phar->buildFromIterator(new ArrayIterator($map));
         $phar->setStub(
             "#!/usr/bin/env php\n" .
             $phar->createDefaultStub(LOAD_MODE == 0 ? 'src/entry.php' : 'vendor/zhamao/framework/src/entry.php')
         );
         $phar->stopBuffering();
+        $this->output->writeln('');
         $this->output->writeln('Successfully built. Location: ' . $target_dir . "{$filename}");
+        $this->output->writeln('<info>You may use `chmod +x server.phar` to let phar executable with `./` command</info>');
     }
 }
