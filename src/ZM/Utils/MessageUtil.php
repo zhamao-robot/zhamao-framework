@@ -22,7 +22,7 @@ class MessageUtil
     /**
      * 下载消息中 CQ 码的所有图片，通过 url
      * @param $msg
-     * @param null $path
+     * @param  null        $path
      * @return array|false
      */
     public static function downloadCQImage($msg, $path = null)
