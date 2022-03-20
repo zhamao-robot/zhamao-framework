@@ -28,12 +28,12 @@ $config['crash_dir'] = $config['zm_data'] . 'crash/';
 /* 对应swoole的server->set参数 */
 $config['swoole'] = [
     'log_file' => $config['crash_dir'] . 'swoole_error.log',
-    //'worker_num' => swoole_cpu_num(), //如果你只有一个 OneBot 实例连接到框架并且代码没有复杂的CPU密集计算，则可把这里改为1使用全局变量
-    'dispatch_mode' => 2, //包分配原则，见 https://wiki.swoole.com/#/server/setting?id=dispatch_mode
+    // 'worker_num' => swoole_cpu_num(), //如果你只有一个 OneBot 实例连接到框架并且代码没有复杂的CPU密集计算，则可把这里改为1使用全局变量
+    'dispatch_mode' => 2, // 包分配原则，见 https://wiki.swoole.com/#/server/setting?id=dispatch_mode
     'max_coroutine' => 300000,
     'max_wait_time' => 5,
-    //'task_worker_num' => 4,
-    //'task_enable_coroutine' => true
+    // 'task_worker_num' => 4,
+    // 'task_enable_coroutine' => true
 ];
 
 /* 一些框架与框架运行时设置的调整 */
@@ -44,13 +44,19 @@ $config['runtime'] = [
     'reload_delay_time' => 800,
     'global_middleware_binding' => [],
     'save_console_log_file' => false, // 改为目标路径，则将 Console 输出的日志保存到文件
+    'annotation_reader_ignore' => [ // 设置注解解析器忽略的注解名或命名空间，防止解析到不该解析的
+        'name' => [
+            'mixin',
+        ],
+        'namespace' => [],
+    ],
 ];
 
 /* 轻量字符串缓存，默认开启 */
 $config['light_cache'] = [
-    'size' => 512,                       //最多允许储存的条数（需要2的倍数）
-    'max_strlen' => 32768,               //单行字符串最大长度（需要2的倍数）
-    'hash_conflict_proportion' => 0.6,   //Hash冲突率（越大越好，但是需要的内存更多）
+    'size' => 512,                       // 最多允许储存的条数（需要2的倍数）
+    'max_strlen' => 32768,               // 单行字符串最大长度（需要2的倍数）
+    'hash_conflict_proportion' => 0.6,   // Hash冲突率（越大越好，但是需要的内存更多）
     'persistence_path' => $config['zm_data'] . '_cache.json',
     'auto_save_interval' => 900,
 ];
@@ -102,7 +108,7 @@ $config['http_default_code_page'] = [
 
 /* zhamao-framework在框架启动时初始化的atomic们 */
 $config['init_atomics'] = [
-    //'custom_atomic_name' => 0, //自定义添加的Atomic
+    // 'custom_atomic_name' => 0, //自定义添加的Atomic
 ];
 
 /* 终端日志显示等级（0-4） */

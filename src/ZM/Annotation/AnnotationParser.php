@@ -65,6 +65,19 @@ class AnnotationParser
         foreach ($this->path_list as $path) {
             Console::debug('parsing annotation in ' . $path[0] . ':' . $path[1]);
             $all_class = ZMUtil::getClassesPsr4($path[0], $path[1]);
+
+            $conf = ZMConfig::get('global', 'runtime')['annotation_reader_ignore'] ?? [];
+            if (isset($conf['name']) && is_array($conf['name'])) {
+                foreach ($conf['name'] as $v) {
+                    AnnotationReader::addGlobalIgnoredName($v);
+                }
+            }
+            if (isset($conf['namespace']) && is_array($conf['namespace'])) {
+                foreach ($conf['namespace'] as $v) {
+                    AnnotationReader::addGlobalIgnoredNamespace($v);
+                }
+            }
+            AnnotationReader::addGlobalIgnoredName('mixin');
             $this->reader = new DualReader(new AnnotationReader(), new AttributeReader());
             foreach ($all_class as $v) {
                 Console::debug('正在检索 ' . $v);
