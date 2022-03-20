@@ -20,12 +20,18 @@ use ZM\Utils\DataProvider;
  */
 class ModuleManager
 {
+    public static function getComposer()
+    {
+        return json_decode(file_get_contents(DataProvider::getSourceRootDir() . '/composer.json'), true);
+    }
+
     /**
      * 扫描src目录下的所有已经被标注的模块
      * @throws ZMException
      */
     public static function getConfiguredModules(): array
     {
+        $composer = self::getComposer();
         $dir = DataProvider::getSourceRootDir() . '/src/';
         $ls = DataProvider::scanDirFiles($dir, true, true);
         $modules = [];
@@ -43,7 +49,18 @@ class ModuleManager
                     throw new ZMKnownException('E00052', '在/src/目录下不可以直接标记为模块(zm.json)，因为命名空间不能为根空间！');
                 }
                 $json['module-path'] = realpath($dir . '/' . $pathinfo['dirname']);
-                $json['namespace'] = str_replace('/', '\\', $pathinfo['dirname']);
+
+                $relative_path = str_replace(DataProvider::getSourceRootDir() . '/', '', $json['module-path']);
+                foreach (array_merge($composer['autoload']['psr-4'] ?? [], $composer['autoload-dev']['psr-4'] ?? []) as $ks => $vs) {
+                    if (strpos($relative_path, $vs) === 0) {
+                        $remain = trim(substr($relative_path, strlen($vs)), '/');
+                        $remain = str_replace('/', '\\', $remain);
+                        $json['namespace'] = $ks . $remain;
+                        break;
+                    }
+                }
+                // $json['namespace'] = str_replace('/', '\\', $pathinfo['dirname']);
+
                 if (isset($modules[$json['name']])) {
                     throw new ZMKnownException('E00053', '重名模块：' . $json['name']);
                 }

@@ -28,7 +28,7 @@ use ZM\Exception\InitException;
 
 class ConsoleApplication extends Application
 {
-    public const VERSION_ID = 440;
+    public const VERSION_ID = 441;
 
     public const VERSION = '2.7.0-beta4';
 
@@ -87,11 +87,11 @@ class ConsoleApplication extends Application
             new DaemonStatusCommand(),
             new DaemonReloadCommand(),
             new DaemonStopCommand(),
-            new RunServerCommand(), //运行主服务的指令控制器
+            new RunServerCommand(), // 运行主服务的指令控制器
             new ServerStatusCommand(),
             new ServerStopCommand(),
             new ServerReloadCommand(),
-            new PureHttpCommand(), //纯HTTP服务器指令
+            new PureHttpCommand(), // 纯HTTP服务器指令
             new SystemdGenerateCommand(),
         ]);
         if (LOAD_MODE === 1) {
