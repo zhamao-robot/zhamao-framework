@@ -28,7 +28,7 @@ function getClassPath($class_name)
 {
     $dir = str_replace('\\', '/', $class_name);
     $dir2 = DataProvider::getSourceRootDir() . '/src/' . $dir . '.php';
-    //echo "@@@".$dir2.PHP_EOL;
+    // echo "@@@".$dir2.PHP_EOL;
     $dir2 = str_replace('\\', '/', $dir2);
     if (file_exists($dir2)) {
         return $dir2;
@@ -66,7 +66,7 @@ function explodeMsg($msg, $ban_comma = false): array
 {
     $msg = str_replace(' ', "\n", trim($msg));
     if (!$ban_comma) {
-        //$msg = str_replace("，", "\n", $msg);
+        // $msg = str_replace("，", "\n", $msg);
         $msg = str_replace("\t", "\n", $msg);
     }
     $msgs = explode("\n", $msg);
@@ -128,7 +128,7 @@ function split_explode($del, $str, $divide_en = false): array
         }
     }
     $str = implode($del, $str);
-    //echo $str."\n";
+    // echo $str."\n";
     $ls = [];
     foreach (explode($del, $str) as $v) {
         if (trim($v) == '') {
@@ -136,7 +136,7 @@ function split_explode($del, $str, $divide_en = false): array
         }
         $ls[] = $v;
     }
-    //var_dump($ls);
+    // var_dump($ls);
     return $ls == [] ? [''] : $ls;
 }
 
@@ -150,7 +150,7 @@ function matchArgs($pattern, $context)
         $exp = explode('*', $pattern);
         $i = 0;
         foreach ($exp as $k => $v) {
-            //echo "[MATCH$k] " . $v . PHP_EOL;
+            // echo "[MATCH$k] " . $v . PHP_EOL;
             if ($v == '' && $k == 0) {
                 continue;
             }
@@ -159,14 +159,14 @@ function matchArgs($pattern, $context)
                 $v = '^EOL';
             }
             $cur_var = '';
-            //echo mb_substr($context, $i) . "|" . $v . PHP_EOL;
+            // echo mb_substr($context, $i) . "|" . $v . PHP_EOL;
             $ori = $i;
             while (($a = mb_substr($context, $i, mb_strlen($v))) != $v && $a != '') {
                 $cur_var .= mb_substr($context, $i, 1);
                 ++$i;
             }
             if ($i != $ori || $k == 1 || $k == count($exp) - 1) {
-                //echo $cur_var . PHP_EOL;
+                // echo $cur_var . PHP_EOL;
                 $result[] = $cur_var;
             }
             $i += mb_strlen($v);
@@ -194,11 +194,11 @@ function connectIs($type): bool
 function getAnnotations(): array
 {
     $s = debug_backtrace()[1];
-    //echo json_encode($s, 128|256);
+    // echo json_encode($s, 128|256);
     $list = [];
     foreach (EventManager::$events as $v) {
         foreach ($v as $vs) {
-            //echo get_class($vs).": ".$vs->class." => ".$vs->method.PHP_EOL;
+            // echo get_class($vs).": ".$vs->class." => ".$vs->method.PHP_EOL;
             if ($vs->class == $s['class'] && $vs->method == $s['function']) {
                 $list[get_class($vs)][] = $vs;
             }

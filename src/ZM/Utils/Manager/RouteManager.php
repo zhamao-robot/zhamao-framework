@@ -51,7 +51,7 @@ class RouteManager
         $route_name = ($tail === '' ? '' : '/') . $tail . '/{filename}';
         Console::debug('添加静态文件路由：' . $route_name);
         $route = new Route($route_name, ['_class' => RouteManager::class, '_method' => 'onStaticRoute']);
-        //echo $path.PHP_EOL;
+        // echo $path.PHP_EOL;
         LightCacheInside::set('static_route', $route->getPath(), $path);
 
         self::$routes->add(md5($route_name), $route);

@@ -77,7 +77,7 @@ class SignalListener
                 });
                 self::processKillerPrompt();
             }
-            //Console::verbose("Interrupted in worker");
+            // Console::verbose("Interrupted in worker");
             // do nothing
         });
     }

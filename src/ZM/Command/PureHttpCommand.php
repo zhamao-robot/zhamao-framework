@@ -73,7 +73,7 @@ class PureHttpCommand extends Command
                     'document_index' => $index,
                 ]
             );
-            //echo "\r" . Coroutine::stats()["coroutine_peak_num"];
+            // echo "\r" . Coroutine::stats()["coroutine_peak_num"];
         });
         $server->on('start', function ($server) {
             Process::signal(SIGINT, function () use ($server) {

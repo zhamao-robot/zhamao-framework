@@ -48,7 +48,7 @@ class AnnotationParser
     public function __construct()
     {
         $this->start_time = microtime(true);
-        //$this->loadAnnotationClasses();
+        // $this->loadAnnotationClasses();
         $this->req_mapping[0] = [
             'id' => 0,
             'pid' => -1,
@@ -72,7 +72,7 @@ class AnnotationParser
                 $methods = $reflection_class->getMethods(ReflectionMethod::IS_PUBLIC);
                 $class_annotations = $this->reader->getClassAnnotations($reflection_class);
                 // 这段为新加的:start
-                //这里将每个类里面所有的类注解、方法注解通通加到一颗大树上，后期解析
+                // 这里将每个类里面所有的类注解、方法注解通通加到一颗大树上，后期解析
                 /*
                 $annotation_map: {
                     Module\Example\Hello: {
@@ -100,7 +100,7 @@ class AnnotationParser
                 foreach ($this->annotation_map[$v]['class_annotations'] as $vs) {
                     $vs->class = $v;
 
-                    //预处理1：将适用于每一个函数的注解到类注解重新注解到每个函数下面
+                    // 预处理1：将适用于每一个函数的注解到类注解重新注解到每个函数下面
                     if ($vs instanceof ErgodicAnnotation) {
                         foreach (($this->annotation_map[$v]['methods'] ?? []) as $method) {
                             $copy = clone $vs;
@@ -109,13 +109,13 @@ class AnnotationParser
                         }
                     }
 
-                    //预处理2：处理 class 下面的注解
+                    // 预处理2：处理 class 下面的注解
                     if ($vs instanceof Closed) {
                         unset($this->annotation_map[$v]);
                         continue 2;
                     }
                     if ($vs instanceof MiddlewareClass) {
-                        //注册中间件本身的类，标记到 middlewares 属性中
+                        // 注册中间件本身的类，标记到 middlewares 属性中
                         Console::debug('正在注册中间件 ' . $reflection_class->getName());
                         $rs = $this->registerMiddleware($vs, $reflection_class);
                         $this->middlewares[$rs['name']] = $rs;
@@ -124,7 +124,7 @@ class AnnotationParser
 
                 $inserted = [];
 
-                //预处理3：处理每个函数上面的特殊注解，就是需要操作一些东西的
+                // 预处理3：处理每个函数上面的特殊注解，就是需要操作一些东西的
                 foreach (($this->annotation_map[$v]['methods_annotations'] ?? []) as $method_name => $methods_annotations) {
                     foreach ($methods_annotations as $method_anno) {
                         /* @var AnnotationBase $method_anno */
@@ -223,7 +223,7 @@ class AnnotationParser
     public function verifyMiddlewares()
     {
         if ((ZMConfig::get('global', 'runtime')['middleware_error_policy'] ?? 1) === 2) {
-            //我承认套三层foreach很不优雅，但是这个会很快的。
+            // 我承认套三层foreach很不优雅，但是这个会很快的。
             foreach ($this->middleware_map as $v) {
                 foreach ($v as $vs) {
                     foreach ($vs as $mid) {
@@ -241,7 +241,7 @@ class AnnotationParser
         return microtime(true) - $this->start_time;
     }
 
-    //private function below
+    // private function below
 
     private function registerMiddleware(MiddlewareClass $vs, ReflectionClass $reflection_class): array
     {

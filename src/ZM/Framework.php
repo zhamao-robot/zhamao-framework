@@ -97,7 +97,7 @@ class Framework
             exit(1);
         }
 
-        //定义常量
+        // 定义常量
         include_once 'global_defines.php';
 
         try {
@@ -144,9 +144,9 @@ class Framework
             $this->server_set['log_level'] = SWOOLE_LOG_DEBUG;
             $add_port = ZMConfig::get('global', 'remote_terminal')['status'] ?? false;
 
-            //if ($instant_mode) {
+            // if ($instant_mode) {
             $this->loadServerEvents();
-            //}
+            // }
 
             $this->parseCliArgs(self::$argv, $add_port);
 
@@ -288,7 +288,7 @@ class Framework
 
                 $port->on('close', function ($serv, $fd) {
                     ManagerGM::popConnect($fd);
-                    //echo "Client: Close.\n";
+                    // echo "Client: Close.\n";
                 });
             }
 
@@ -301,9 +301,9 @@ class Framework
             // 注册 Swoole Server 的事件
             $this->registerServerEvents();
             $r = ZMConfig::get('global', 'light_cache') ?? [
-                'size' => 512,                     //最多允许储存的条数（需要2的倍数）
-                'max_strlen' => 32768,               //单行字符串最大长度（需要2的倍数）
-                'hash_conflict_proportion' => 0.6,   //Hash冲突率（越大越好，但是需要的内存更多）
+                'size' => 512,                     // 最多允许储存的条数（需要2的倍数）
+                'max_strlen' => 32768,               // 单行字符串最大长度（需要2的倍数）
+                'hash_conflict_proportion' => 0.6,   // Hash冲突率（越大越好，但是需要的内存更多）
                 'persistence_path' => DataProvider::getDataFolder() . '_cache.json',
                 'auto_save_interval' => 900,
             ];
@@ -520,13 +520,13 @@ class Framework
             if (!isset($line_width[$current_line])) {
                 $line_width[$current_line] = $max_border - 2;
             }
-            //Console::info("行宽[$current_line]：".$line_width[$current_line]);
+            // Console::info("行宽[$current_line]：".$line_width[$current_line]);
             if ($max_border >= 57) { // 很宽的时候，一行能放两个短行
-                if ($line_width[$current_line] == ($max_border - 2)) { //空行
+                if ($line_width[$current_line] == ($max_border - 2)) { // 空行
                     self::writeNoDouble($k, $v, $line_data, $line_width, $current_line, $colorful, $max_border);
                 } else { // 不是空行，已经有东西了
                     $tmp_line = $k . ': ' . $v;
-                    //Console::info("[$current_line]即将插入后面的东西[".$tmp_line."]");
+                    // Console::info("[$current_line]即将插入后面的东西[".$tmp_line."]");
                     if (strlen($tmp_line) > $line_width[$current_line]) { // 地方不够，另起一行
                         $line_data[$current_line] = str_replace('|  ', '', $line_data[$current_line]);
                         ++$current_line;
@@ -725,8 +725,8 @@ class Framework
                         break;
                     case 'show-php-ver':
                     default:
-                        //Console::info("Calculating ".$x);
-                        //dump($y);
+                        // Console::info("Calculating ".$x);
+                        // dump($y);
                         break;
                 }
             }
@@ -742,8 +742,8 @@ class Framework
     private static function writeNoDouble($k, $v, &$line_data, &$line_width, &$current_line, $colorful, $max_border)
     {
         $tmp_line = $k . ': ' . $v;
-        //Console::info("写入[".$tmp_line."]");
-        if (strlen($tmp_line) > $line_width[$current_line]) { //输出的内容太多了，以至于一行都放不下一个，要折行
+        // Console::info("写入[".$tmp_line."]");
+        if (strlen($tmp_line) > $line_width[$current_line]) { // 输出的内容太多了，以至于一行都放不下一个，要折行
             $title_strlen = strlen($k . ': ');
             $content_len = $line_width[$current_line] - $title_strlen;
 
@@ -769,7 +769,7 @@ class Framework
                 ++$current_line;
             } while ($rest > $max_border - 2); // 循环，直到放完
         } else { // 不需要折行
-            //Console::info("不需要折行");
+            // Console::info("不需要折行");
             $line_data[$current_line] = ' ' . $k . ': ';
             if ($colorful) {
                 $line_data[$current_line] .= TermColor::color8(32);
@@ -781,10 +781,10 @@ class Framework
 
             if ($max_border >= 57) {
                 if (strlen($tmp_line) >= intval(($max_border - 2) / 2)) {  // 不需要折行，直接输出一个转下一行
-                    //Console::info("不需要折行，直接输出一个转下一行");
+                    // Console::info("不需要折行，直接输出一个转下一行");
                     ++$current_line;
                 } else {  // 输出很小，写到前面并分片
-                    //Console::info("输出很小，写到前面并分片");
+                    // Console::info("输出很小，写到前面并分片");
                     $space = intval($max_border / 2) - 2 - strlen($tmp_line);
                     $line_data[$current_line] .= str_pad('', $space);
                     $line_data[$current_line] .= '|  '; // 添加分片

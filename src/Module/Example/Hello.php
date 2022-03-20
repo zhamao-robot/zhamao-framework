@@ -34,9 +34,9 @@ class Hello
      * 默认的图片监听路由对应目录，如需要使用可取消下面的注释，把上面的 /* 换成 /**
      * @OnStart(-1)
      */
-    //public function onStart() {
+    // public function onStart() {
     //    \ZM\Http\RouteManager::addStaticFileRoute("/images/", \ZM\Utils\DataProvider::getWorkingDir()."/zm_data/images/");
-    //}
+    // }
 
     /**
      * 使用命令 .reload 发给机器人远程重载，注意将 user_id 换成你自己的 QQ
@@ -98,7 +98,7 @@ class Hello
         $api = ''; // 请在这里填入你的图灵机器人的apikey
         if ($api === '') {
             return false;
-        } //如果没有填入apikey则此功能关闭
+        } // 如果没有填入apikey则此功能关闭
         if (($this->_running_annotation ?? null) instanceof CQCommand) {
             $msg = ctx()->getFullArg('我在！有什么事吗？');
         } else {
@@ -109,7 +109,7 @@ class Hello
             return TuringAPI::getTuringMsg($msg, $user_id, $api);
         }
         QQBot::getInstance()->handle(ctx()->getData(), ctx()->getCache('level') + 1);
-        //执行嵌套消息，递归层级+1
+        // 执行嵌套消息，递归层级+1
         return true;
     }
 

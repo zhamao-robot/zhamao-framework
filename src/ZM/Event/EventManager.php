@@ -61,7 +61,7 @@ class EventManager
             if (server()->worker_id !== $vss->worker_id && $vss->worker_id != -1) {
                 return;
             }
-            //echo server()->worker_id.PHP_EOL;
+            // echo server()->worker_id.PHP_EOL;
             $plain_class = $vss->class;
             Console::debug('Added Middleware-based timer: ' . $plain_class . ' -> ' . $vss->method);
             Timer::tick($vss->tick_ms, function () use ($vss, $dispatcher) {

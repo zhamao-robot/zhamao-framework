@@ -19,14 +19,14 @@ class TuringAPI
     public static function getTuringMsg($msg, $user_id, $api)
     {
         $origin = $msg;
-        if (($cq = CQ::getCQ($msg)) !== null) {//如有CQ码则去除
+        if (($cq = CQ::getCQ($msg)) !== null) {// 如有CQ码则去除
             if ($cq['type'] == 'image') {
                 $url = $cq['params']['url'];
                 $msg = str_replace(mb_substr($msg, $cq['start'], $cq['end'] - $cq['start'] + 1), '', $msg);
             }
             $msg = trim($msg);
         }
-        //构建将要发送的json包给图灵
+        // 构建将要发送的json包给图灵
         $content = [
             'reqType' => 0,
             'userInfo' => [
@@ -64,11 +64,11 @@ class TuringAPI
                 return '哎呀，我刚才有点走神了，可能忘记你说什么了，可以重说一遍吗';
             }
             Console::error(zm_internal_errcode('E00038') . "图灵机器人发送错误！\n错误原始内容：" . $origin . "\n来自：" . $user_id . "\n错误信息：" . $status);
-            //echo json_encode($r, 128|256);
+            // echo json_encode($r, 128|256);
             return '哎呀，我刚才有点走神了，要不一会儿换一种问题试试？';
         }
         $result = $api_return['results'];
-        //Console::info(Console::setColor(json_encode($result, 128 | 256), "green"));
+        // Console::info(Console::setColor(json_encode($result, 128 | 256), "green"));
         $final = '';
         foreach ($result as $v) {
             switch ($v['resultType']) {

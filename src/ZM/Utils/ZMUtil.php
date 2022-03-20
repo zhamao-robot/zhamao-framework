@@ -52,7 +52,7 @@ class ZMUtil
     public static function getModInstance($class)
     {
         if (!isset(ZMBuf::$instance[$class])) {
-            //Console::debug('Class instance $class not exist, so I created it.');
+            // Console::debug('Class instance $class not exist, so I created it.');
             return ZMBuf::$instance[$class] = new $class();
         }
         return ZMBuf::$instance[$class];
@@ -92,7 +92,7 @@ class ZMUtil
         foreach ($files as $v) {
             $pathinfo = pathinfo($v);
             if (($pathinfo['extension'] ?? '') == 'php') {
-                if ($rule === null) { //规则未设置回调时候，使用默认的识别过滤规则
+                if ($rule === null) { // 规则未设置回调时候，使用默认的识别过滤规则
                     /*if (substr(file_get_contents($dir . '/' . $v), 6, 6) == '#plain') {
                         continue;
                     }*/

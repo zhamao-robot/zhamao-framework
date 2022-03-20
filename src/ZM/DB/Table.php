@@ -67,7 +67,7 @@ class Table
     public function statement()
     {
         $this->cache = [];
-        //TODO: 无返回的statement语句
+        // TODO: 无返回的statement语句
     }
 
     public function paintWhereSQL($rule, $operator)

@@ -19,15 +19,15 @@ use ZM\Utils\ZMUtil;
 
 class EventDispatcher
 {
-    public const STATUS_NORMAL = 0;            //正常结束
+    public const STATUS_NORMAL = 0;            // 正常结束
 
-    public const STATUS_INTERRUPTED = 1;       //被interrupt了，不管在什么地方
+    public const STATUS_INTERRUPTED = 1;       // 被interrupt了，不管在什么地方
 
-    public const STATUS_EXCEPTION = 2;         //执行过程中抛出了异常
+    public const STATUS_EXCEPTION = 2;         // 执行过程中抛出了异常
 
-    public const STATUS_BEFORE_FAILED = 3;     //中间件HandleBefore返回了false，所以不执行此方法
+    public const STATUS_BEFORE_FAILED = 3;     // 中间件HandleBefore返回了false，所以不执行此方法
 
-    public const STATUS_RULE_FAILED = 4;       //判断事件执行的规则函数判定为false，所以不执行此方法
+    public const STATUS_RULE_FAILED = 4;       // 判断事件执行的规则函数判定为false，所以不执行此方法
 
     /** @var int */
     public $status = self::STATUS_NORMAL;
@@ -133,7 +133,7 @@ class EventDispatcher
             if ($this->status === self::STATUS_RULE_FAILED) {
                 $this->status = self::STATUS_NORMAL;
             }
-            //TODO:没有过滤before的false，可能会导致一些问题，先观望一下
+            // TODO:没有过滤before的false，可能会导致一些问题，先观望一下
         } catch (InterruptException $e) {
             $this->store = $e->return_var;
             $this->status = self::STATUS_INTERRUPTED;
@@ -200,7 +200,7 @@ class EventDispatcher
                 }
                 $middleware_obj = EventManager::$middlewares[$middleware->middleware];
                 $before = $middleware_obj['class'];
-                //var_dump($middleware_obj);
+                // var_dump($middleware_obj);
                 $r[$k] = new $before();
                 $r[$k]->class = $q_c;
                 $r[$k]->method = $q_f;

@@ -47,16 +47,16 @@ class QQBot
             }
             set_coroutine_params(['data' => $data]);
             if (isset($data['post_type'])) {
-                //echo TermColor::ITALIC.json_encode($data, 128|256).TermColor::RESET.PHP_EOL;
+                // echo TermColor::ITALIC.json_encode($data, 128|256).TermColor::RESET.PHP_EOL;
                 ctx()->setCache('level', $level);
-                //Console::debug("Calling CQ Event from fd=" . ctx()->getConnection()->getFd());
+                // Console::debug("Calling CQ Event from fd=" . ctx()->getConnection()->getFd());
                 if ($data['post_type'] != 'meta_event') {
                     $r = $this->dispatchBeforeEvents($data, 'pre'); // before在这里执行，元事件不执行before为减少不必要的调试日志
                     if ($r->store === 'block') {
                         EventDispatcher::interrupt();
                     }
                 }
-                //Console::warning("最上数据包：".json_encode($data));
+                // Console::warning("最上数据包：".json_encode($data));
             }
             if (isset($data['echo']) || isset($data['post_type'])) {
                 if (CoMessage::resumeByWS()) {
@@ -134,10 +134,10 @@ class QQBot
      */
     private function dispatchEvents($data)
     {
-        //Console::warning("最xia数据包：".json_encode($data));
+        // Console::warning("最xia数据包：".json_encode($data));
         switch ($data['post_type']) {
             case 'message':
-                //分发CQCommand事件
+                // 分发CQCommand事件
                 $dispatcher = new EventDispatcher(CQCommand::class);
                 $dispatcher->setReturnFunction(function ($result) {
                     if (is_string($result)) {
@@ -170,7 +170,7 @@ class QQBot
                     }
                 }
 
-                //分发CQMessage事件
+                // 分发CQMessage事件
                 $msg_dispatcher = new EventDispatcher(CQMessage::class);
                 $msg_dispatcher->setRuleFunction(function ($v) {
                     return ($v->message == '' || ($v->message == ctx()->getStringMessage()))
@@ -187,12 +187,12 @@ class QQBot
                 $msg_dispatcher->dispatchEvents(ctx()->getMessage());
                 return;
             case 'meta_event':
-                //Console::success("当前数据包：".json_encode(ctx()->getData()));
+                // Console::success("当前数据包：".json_encode(ctx()->getData()));
                 $dispatcher = new EventDispatcher(CQMetaEvent::class);
                 $dispatcher->setRuleFunction(function (CQMetaEvent $v) {
                     return $v->meta_event_type == '' || ($v->meta_event_type != '' && $v->meta_event_type == ctx()->getData()['meta_event_type']);
                 });
-                //eval(BP);
+                // eval(BP);
                 $dispatcher->dispatchEvents(ctx()->getData());
                 return;
             case 'notice':

@@ -66,7 +66,7 @@ class OnRequest implements SwooleEvent
                     $div->method = $node['method'];
                     $div->request_method = $node['request_method'];
                     $div->class = $node['class'];
-                    //Console::success("正在执行路由：".$node["method"]);
+                    // Console::success("正在执行路由：".$node["method"]);
                     $dispatcher->dispatchEvent($div, null, $params, $request, $response);
                     if (is_string($dispatcher->store) && !$response->isEnd()) {
                         $response->end($dispatcher->store);
@@ -74,7 +74,7 @@ class OnRequest implements SwooleEvent
                 }
             }
             if (!$response->isEnd()) {
-                //Console::warning('返回了404');
+                // Console::warning('返回了404');
                 HttpUtil::responseCodePage($response, 404);
             }
         } catch (InterruptException $e) {

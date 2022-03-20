@@ -52,10 +52,10 @@ class OnMessage implements SwooleEvent
             return false;
         });
         try {
-            //$starttime = microtime(true);
+            // $starttime = microtime(true);
             $dispatcher1->dispatchEvents($conn);
             $dispatcher->dispatchEvents($conn);
-            //Console::success("Used ".round((microtime(true) - $starttime) * 1000, 3)." ms!");
+            // Console::success("Used ".round((microtime(true) - $starttime) * 1000, 3)." ms!");
         } catch (Exception $e) {
             $error_msg = $e->getMessage() . ' at ' . $e->getFile() . '(' . $e->getLine() . ')';
             Console::error(zm_internal_errcode('E00017') . 'Uncaught exception ' . get_class($e) . ' when calling "message": ' . $error_msg);

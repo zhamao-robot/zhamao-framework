@@ -27,7 +27,7 @@ class SpinLock
 
     public static function lock(string $key)
     {
-        while (($r = self::$kv_lock->incr($key, 'lock_num')) > 1) { //此资源已经被锁上了
+        while (($r = self::$kv_lock->incr($key, 'lock_num')) > 1) { // 此资源已经被锁上了
             if (Coroutine::getCid() != -1) {
                 System::sleep(self::$delay / 1000);
             } else {

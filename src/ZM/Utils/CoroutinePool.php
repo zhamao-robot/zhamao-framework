@@ -27,7 +27,7 @@ class CoroutinePool
         }
         go(function () use ($func, $name) {
             self::$cids[$name][] = Coroutine::getCid();
-            //Console::debug("正在执行协程，当前协程池中有 " . count(self::$cids[$name]) . " 个正在运行的协程: ".implode(", ", self::$cids[$name]));
+            // Console::debug("正在执行协程，当前协程池中有 " . count(self::$cids[$name]) . " 个正在运行的协程: ".implode(", ", self::$cids[$name]));
             $func();
             self::checkCids($name);
         });

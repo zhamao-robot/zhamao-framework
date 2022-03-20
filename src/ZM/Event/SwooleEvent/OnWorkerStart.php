@@ -66,7 +66,7 @@ class OnWorkerStart implements SwooleEvent
                     } elseif (!isset($error['type'])) {
                         return;
                     }
-                    //DataProvider::saveBuffer();
+                    // DataProvider::saveBuffer();
                     /* @var Server $server */
                     if (server() === null) {
                         $server->shutdown();
@@ -77,10 +77,10 @@ class OnWorkerStart implements SwooleEvent
 
                 Console::verbose("Worker #{$server->worker_id} starting");
                 Framework::$server = $server;
-                //ZMBuf::resetCache(); //清空变量缓存
-                //ZMBuf::set("wait_start", []); //添加队列，在workerStart运行完成前先让其他协程等待执行
+                // ZMBuf::resetCache(); //清空变量缓存
+                // ZMBuf::set("wait_start", []); //添加队列，在workerStart运行完成前先让其他协程等待执行
 
-                //TODO: 单独抽出来MySQL和Redis连接池
+                // TODO: 单独抽出来MySQL和Redis连接池
                 $this->initMySQLPool();
 
                 // 开箱即用的Redis
@@ -93,9 +93,9 @@ class OnWorkerStart implements SwooleEvent
                     }
                 }
 
-                $this->loadAnnotations(); //加载composer资源、phar外置包、注解解析注册等
+                $this->loadAnnotations(); // 加载composer资源、phar外置包、注解解析注册等
 
-                EventManager::registerTimerTick(); //启动计时器
+                EventManager::registerTimerTick(); // 启动计时器
                 set_coroutine_params(['server' => $server, 'worker_id' => $worker_id]);
                 $dispatcher = new EventDispatcher(OnStart::class);
                 $dispatcher->setRuleFunction(function ($v) {
@@ -151,7 +151,7 @@ class OnWorkerStart implements SwooleEvent
         if (Framework::$instant_mode) {
             goto skip;
         }
-        //加载各个模块的注解类，以及反射
+        // 加载各个模块的注解类，以及反射
         Console::debug('Mapping annotations');
         $parser = new AnnotationParser();
         $composer = json_decode(file_get_contents(DataProvider::getSourceRootDir() . '/composer.json'), true);
@@ -187,16 +187,16 @@ class OnWorkerStart implements SwooleEvent
         }
 
         $parser->registerMods();
-        EventManager::loadEventByParser($parser); //加载事件
+        EventManager::loadEventByParser($parser); // 加载事件
 
         skip:
-        //加载自定义的全局函数
+        // 加载自定义的全局函数
         Console::debug('Loading context class...');
         $context_class = ZMConfig::get('global', 'context_class');
         if (!is_a($context_class, ContextInterface::class, true)) {
             throw new ZMKnownException('E00032', 'Context class must implemented from ContextInterface!');
         }
-        //加载插件
+        // 加载插件
         $obb_onebot = ZMConfig::get('global', 'onebot') ??
             ZMConfig::get('global', 'modules')['onebot'] ??
             ['status' => true, 'single_bot_mode' => false, 'message_level' => 99999];
@@ -251,7 +251,7 @@ class OnWorkerStart implements SwooleEvent
         if (!empty($real_conf)) {
             Console::info('Connecting to MySQL pool');
             ob_start();
-            phpinfo(); //这个phpinfo是有用的，不能删除
+            phpinfo(); // 这个phpinfo是有用的，不能删除
             $str = ob_get_clean();
             $str = explode("\n", $str);
             foreach ($str as $v) {

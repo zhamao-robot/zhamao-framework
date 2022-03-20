@@ -123,7 +123,7 @@ class DB
             if ($result !== true) {
                 SqlPoolStorage::$sql_pool->putConnection(null);
                 throw new DBException("语句[{$line}]错误！" . $ps->errorInfo()[2]);
-                //echo json_encode(debug_backtrace(), 128 | 256);
+                // echo json_encode(debug_backtrace(), 128 | 256);
             }
             SqlPoolStorage::$sql_pool->putConnection($conn);
             return $ps->fetchAll($fetch_mode);

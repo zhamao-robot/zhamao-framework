@@ -91,7 +91,7 @@ class InitCommand extends Command
             $output->writeln('<info>Done!</info>');
             return 0;
         }
-        if (LOAD_MODE === 2) { //从phar启动的框架包，初始化的模式
+        if (LOAD_MODE === 2) { // 从phar启动的框架包，初始化的模式
             $phar_link = new Phar(__DIR__);
             $current_dir = pathinfo($phar_link->getPath())['dirname'];
             chdir($current_dir);

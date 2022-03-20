@@ -36,7 +36,7 @@ class ModulePackCommand extends Command
             exit(zm_internal_errcode('E00007') . 'Global config load failed: ' . ZMConfig::$last_error . "\nPlease init first!\nSee: https://github.com/zhamao-robot/zhamao-framework/issues/37\n");
         }
 
-        //定义常量
+        // 定义常量
         include_once DataProvider::getFrameworkRootDir() . '/src/ZM/global_defines.php';
 
         Console::init(
