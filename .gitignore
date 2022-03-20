@@ -13,6 +13,7 @@ composer.lock
 /runtime/
 /tmp/
 /temp/
+/site/
 
 # go-cqhttp快速安装启动相关（可能被废弃）
 /ext/go-cqhttp/data/
