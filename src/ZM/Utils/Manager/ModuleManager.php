@@ -111,6 +111,34 @@ class ModuleManager
         return $modules;
     }
 
+    public static function getComposerModules()
+    {
+        $vendor_file = DataProvider::getSourceRootDir() . '/vendor/composer/installed.json';
+        $obj = json_decode(file_get_contents($vendor_file), true);
+        if ($obj === null) {
+            return [];
+        }
+        $modules = [];
+        foreach ($obj['packages'] as $v) {
+            if (isset($v['extra']['zm']['module-path'])) {
+                if (is_array($v['extra']['zm']['module-path'])) {
+                    foreach ($v['extra']['zm']['module-path'] as $module_path) {
+                        $m = self::getComposerModuleInfo($v, $module_path);
+                        if ($m !== null) {
+                            $modules[$m['name']] = $m;
+                        }
+                    }
+                } elseif (is_string($v['extra']['zm']['module-path'])) {
+                    $m = self::getComposerModuleInfo($v, $v['extra']['zm']['module-path']);
+                    if ($m !== null) {
+                        $modules[$m['name']] = $m;
+                    }
+                }
+            }
+        }
+        return $modules;
+    }
+
     /**
      * 打包模块
      * @param $module
@@ -151,5 +179,39 @@ class ModuleManager
             Console::error($e->getMessage());
             return false;
         }
+    }
+
+    private static function getComposerModuleInfo($v, $module_path)
+    {
+        $module_root_path = realpath(DataProvider::getSourceRootDir() . '/vendor/composer/' . $v['install-path'] . '/' . $module_path);
+        if ($module_root_path === false) {
+            Console::warning(zm_internal_errcode('E00055') . '无法找到Composer发布的插件配置路径在包 `' . $v['name'] . '` 中！');
+            return null;
+        }
+        $json = json_decode(file_get_contents($module_root_path . '/zm.json'), true);
+        if ($json === null) {
+            Console::warning(zm_internal_errcode('E00054') . 'Composer包内无法正常读取 ' . $v['name'] . ' 的内的配置文件（zm.json）！');
+            return null;
+        }
+        if (!isset($json['name'])) {
+            return null;
+        }
+        $json['composer-name'] = $v['name'];
+        $json['module-root-path'] = realpath(DataProvider::getSourceRootDir() . '/vendor/composer/' . $v['install-path']);
+        $json['module-path'] = realpath($json['module-root-path'] . '/' . $module_path);
+        if (isset($v['autoload']['psr-4'])) {
+            foreach ($v['autoload']['psr-4'] as $ks => $vs) {
+                $vs = trim($vs, '/');
+                if (strpos($module_path, $vs) === 0) {
+                    $json['namespace'] = trim($ks . str_replace('/', '\\', trim(substr($module_path, strlen($vs)), '/')), '\\');
+                    break;
+                }
+            }
+        }
+        if (!isset($json['namespace'])) {
+            Console::warning(zm_internal_errcode('E00055') . '无法获取Composer发布的模块命名空间！');
+            return null;
+        }
+        return $json;
     }
 }

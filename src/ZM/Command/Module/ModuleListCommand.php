@@ -79,6 +79,25 @@ class ModuleListCommand extends Command
         if ($list === []) {
             echo Console::setColor('没有发现已打包且装载的模块！', 'yellow') . PHP_EOL;
         }
+
+        $list = ModuleManager::getComposerModules();
+        foreach ($list as $v) {
+            echo '[' . Console::setColor($v['name'], 'blue') . ']' . PHP_EOL;
+            $out_list = ['类型' => 'Composer库(composer)'];
+            $out_list['包名'] = $v['composer-name'];
+            $out_list['目录'] = str_replace(DataProvider::getSourceRootDir() . '/', '', $v['module-path']);
+            if (isset($v['version'])) {
+                $out_list['版本'] = $v['version'];
+            }
+            if (isset($v['description'])) {
+                $out_list['描述'] = $v['description'];
+            }
+            $out_list['命名空间'] = $v['namespace'];
+            $this->printList($out_list);
+        }
+        if ($list === []) {
+            echo Console::setColor('没有发现Composer模块！', 'yellow') . PHP_EOL;
+        }
         return 0;
     }
 

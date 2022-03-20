@@ -165,9 +165,6 @@ class OnWorkerStart implements SwooleEvent
                 if (trim($k, '\\') == 'ZM') {
                     continue;
                 }
-                if (\server()->worker_id == 0) {
-                    Console::verbose('Add ' . $v . ":{$k} to register path");
-                }
                 $parser->addRegisterPath(DataProvider::getSourceRootDir() . '/' . $v . '/', trim($k, '\\'));
             }
         }
@@ -185,6 +182,15 @@ class OnWorkerStart implements SwooleEvent
                 $func();
                 $parser->addRegisterPath('phar://' . $v['phar-path'] . '/' . $v['module-root-path'], $v['namespace']);
             }
+        }
+
+        // 检查所有的Composer模块，并加载注解
+        $list = ModuleManager::getComposerModules();
+        foreach ($list as $k => $v) {
+            if (\server()->worker_id === 0) {
+                Console::info('Loading composer module: ' . $k);
+            }
+            $parser->addRegisterPath($v['module-path'], $v['namespace']);
         }
 
         $parser->registerMods();

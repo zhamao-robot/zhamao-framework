@@ -24,6 +24,7 @@ use ZM\Console\Console;
 use ZM\Exception\AnnotationException;
 use ZM\Utils\Manager\RouteManager;
 use ZM\Utils\ZMUtil;
+use function server;
 
 class AnnotationParser
 {
@@ -211,6 +212,9 @@ class AnnotationParser
      */
     public function addRegisterPath($path, $indoor_name)
     {
+        if (server()->worker_id === 0) {
+            Console::verbose('Add register path: ' . $path . ' => ' . $indoor_name);
+        }
         $this->path_list[] = [$path, $indoor_name];
     }
 
