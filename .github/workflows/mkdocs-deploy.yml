@@ -1,4 +1,4 @@
-name: Docs Build
+name: MkDocs Auto Deploy
 on:
   push:
     branches:
