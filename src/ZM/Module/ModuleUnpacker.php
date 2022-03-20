@@ -172,9 +172,9 @@ class ModuleUnpacker
     private function copyLightCacheStore($override)
     {
         $r = ZMConfig::get('global', 'light_cache') ?? [
-            'size' => 512,                     //最多允许储存的条数（需要2的倍数）
-            'max_strlen' => 32768,               //单行字符串最大长度（需要2的倍数）
-            'hash_conflict_proportion' => 0.6,   //Hash冲突率（越大越好，但是需要的内存更多）
+            'size' => 512,                     // 最多允许储存的条数（需要2的倍数）
+            'max_strlen' => 32768,               // 单行字符串最大长度（需要2的倍数）
+            'hash_conflict_proportion' => 0.6,   // Hash冲突率（越大越好，但是需要的内存更多）
             'persistence_path' => DataProvider::getDataFolder() . '_cache.json',
             'auto_save_interval' => 900,
         ];

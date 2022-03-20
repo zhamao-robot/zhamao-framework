@@ -21,7 +21,7 @@ use ZM\Utils\ZMUtil;
  */
 class ModulePacker
 {
-    public const ZM_MODULE_PACKER_VERSION = '1.0';
+    public const ZM_MODULE_PACKER_VERSION = '1.1';
 
     /** @var array */
     private $module = [];
@@ -114,11 +114,11 @@ class ModulePacker
         $this->phar->startBuffering();
         Console::info('模块输出文件：' . $this->filename);
 
-        $this->addFiles();                  //添加文件
-        $this->addLightCacheStore();        //保存light-cache-store指定的项
-        $this->addModuleConfig();           //生成module-config.json
-        $this->addZMDataFiles();            //添加需要保存的zm_data下的目录或文件
-        $this->addEntry();                  //生成模块的入口文件module_entry.php
+        $this->addFiles();                  // 添加文件
+        $this->addLightCacheStore();        // 保存light-cache-store指定的项
+        $this->addModuleConfig();           // 生成module-config.json
+        $this->addZMDataFiles();            // 添加需要保存的zm_data下的目录或文件
+        $this->addEntry();                  // 生成模块的入口文件module_entry.php
 
         $this->phar->stopBuffering();
     }
@@ -142,7 +142,7 @@ class ModulePacker
         if ($pos === 0) {
             $path_value = substr($this->module['module-path'], strlen(DataProvider::getSourceRootDir() . '/'));
         } else {
-            throw new ModulePackException(zm_internal_errcode('E99999')); //未定义的错误
+            throw new ModulePackException(zm_internal_errcode('E99999')); // 未定义的错误
         }
         return ZMUtil::getClassesPsr4($this->module['module-path'], $this->module['namespace'], null, $path_value);
     }
@@ -158,7 +158,7 @@ class ModulePacker
             }
         }
         foreach (($composer['autoload']['files'] ?? []) as $v) {
-            if (strcmp($path, $v) === 0) {
+            if (strpos($v, $path) === 0) {
                 $item['files'][] = $v;
             }
         }
@@ -174,9 +174,9 @@ class ModulePacker
         if (isset($this->module['light-cache-store'])) {
             $store = [];
             $r = ZMConfig::get('global', 'light_cache') ?? [
-                'size' => 512,                     //最多允许储存的条数（需要2的倍数）
-                'max_strlen' => 32768,               //单行字符串最大长度（需要2的倍数）
-                'hash_conflict_proportion' => 0.6,   //Hash冲突率（越大越好，但是需要的内存更多）
+                'size' => 512,                     // 最多允许储存的条数（需要2的倍数）
+                'max_strlen' => 32768,               // 单行字符串最大长度（需要2的倍数）
+                'hash_conflict_proportion' => 0.6,   // Hash冲突率（越大越好，但是需要的内存更多）
                 'persistence_path' => DataProvider::getDataFolder() . '_cache.json',
                 'auto_save_interval' => 900,
             ];
@@ -202,7 +202,7 @@ class ModulePacker
             'module-packer-version' => self::ZM_MODULE_PACKER_VERSION,
             'module-root-path' => $this->getRelativePath($this->module['module-path']),
             'namespace' => $this->module['namespace'],
-            'autoload-psr-4' => $this->generatePharAutoload(),
+            'hotload-psr-4' => $this->generatePharAutoload(),
             'unpack' => [
                 'composer-autoload-items' => $this->getComposerAutoloadItems(),
                 'global-config-override' => $this->module['global-config-override'] ?? false,
@@ -210,6 +210,9 @@ class ModulePacker
             'allow-hotload' => $this->module['allow-hotload'] ?? false,
             'pack-time' => time(),
         ];
+        if (isset($stub_values['unpack']['composer-autoload-items']['files'])) {
+            $stub_values['hotload-files'] = $stub_values['unpack']['composer-autoload-items']['files'];
+        }
         $this->phar->addFromString('zmplugin.json', json_encode($stub_values, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
         $this->module_config = $stub_values;
     }
