@@ -1,21 +1,35 @@
-name: Coding Style Analysis
+name: Integration Test
 
 on:
-  - push
-  - pull_request
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+      - review_requested
 
 jobs:
-  analysis:
-    name: Coding Style Analysis
-    runs-on: "ubuntu-latest"
+  integration:
+    name: Integration Test (PHP ${{ matrix.php-versions }}) (OS ${{ matrix.operating-system }})
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      matrix:
+        operating-system: [ "ubuntu-latest", "macos-latest" ]
+        php-versions: [ "7.2", "7.3", "7.4", "8.0", "8.1" ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Setup PHP 7.2
+      - name: Setup PHP
         uses: "shivammathur/setup-php@v2"
         with:
-          php-version: "7.2"
+          php-version: ${{ matrix.php-versions }}
           extensions: swoole, posix, json
 
       - name: Setup problem matchers for PHP
