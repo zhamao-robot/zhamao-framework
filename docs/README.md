@@ -16,3 +16,25 @@ features:
 footer: |
   Apache-2.0 Licensed &nbsp;|&nbsp; Copyright © 2019-2022 Zhamao Developer Team &nbsp;|&nbsp; <a href="http://beian.miit.gov.cn">沪ICP备2021010446号-1</a>
 ---
+
+# 快速上手
+
+## 安装框架和环境
+
+此命令可一键以模板安装 `zhamao-framework` 和 `PHP` 独立环境到目录下，无需 root！（仅限 Linux）
+
+```bash
+mkdir my-app
+cd my-app
+bash -c "$(curl -fsSL https://api.zhamao.xin/go.sh)"
+```
+
+## 运行框架
+
+```bash
+./zhamao server
+```
+
+## 效果图
+
+![index_demo](/index_demo.png)
