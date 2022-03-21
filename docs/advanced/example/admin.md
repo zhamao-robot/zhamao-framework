@@ -87,14 +87,13 @@ class AdminMiddleware implements MiddlewareInterface
  */
 ```
 
-<chat-box>
-^ 假设我是管理员
-) 禁言 1234567 600
-( 禁言成功！
-^ 假设我不在管理员名单里
-) 禁言 1234567 900
-^ 机器人没有回复，因为中间件返回了 false，不继续执行
-</chat-box>
+<chat-box :my-chats="[
+    {type:0,content:'禁言 1234567 600'},
+    {type:1,content:'禁言成功！'},
+    {type:2,content:'假设我不在管理员名单里'},
+    {type:0,content:'禁言 1234567 900'},
+    {type:2,content:'机器人没有回复，因为中间件返回了 false，不继续执行'},
+]"></chat-box>
 
 而这时候有朋友又要问了，如果我有一系列管理员命令，假设都在一个叫 `AdminFunc.php` 的模块类里，我是不是还得一个一个地给注解事件写 `@Middleware("admin")` 呢？当然不需要！如果你这个类所有的注解事件都是机器人的聊天事件（`@CQCommand`，`@CQMessage`）的话，可以直接给类注解这个中间件，效果等同于给每一个函数写一次中间件注解。
 
@@ -120,112 +119,111 @@ class AdminFunc
 
 上面我们讲到了，中间件里面使用了 `LightCache` 轻量缓存来储存临时的管理员列表，那么我们将这部分的代码完善吧！
 
-=== "src/Module/Example/AdminFunc.php"
+**src/Module/Example/AdminFunc.php**
 
-	```php
-	<?php
+```php
+<?php
 
-    namespace Module\Example;
+namespace Module\Example;
 
-    use ZM\Annotation\CQ\CQCommand;
-    use ZM\Annotation\Http\Middleware;
-    use ZM\API\CQ;
+use ZM\Annotation\CQ\CQCommand;
+use ZM\Annotation\Http\Middleware;
+use ZM\API\CQ;
+
+/**
+ * Class AdminFunc
+ * @package Module\Example
+ * @Middleware("admin")
+ */
+class AdminFunc
+{
+    /**
+     * @CQCommand(match="禁言",message_type="group")
+     */
+    public function banSomeone() {
+        $r1 = ctx()->getNextArg("请输入禁言的人或at他");
+        $r2 = ctx()->getFullArg("请输入禁言的时间（秒）");
+        $cq = CQ::getCQ($r1);
+        if ($cq !== null) {
+            if ($cq["type"] != "at") return "请at或者输入正确的QQ号！";
+            $r1 = $cq["params"]["qq"];
+        }
+        // 群内禁言用户
+        ctx()->getRobot()->setGroupBan(ctx()->getGroupId(), $r1, $r2);
+        return "禁言成功！";
+    }
 
     /**
-     * Class AdminFunc
-     * @package Module\Example
+     * @CQCommand(match="解除禁言",message_type="group")
+     */
+    public function unbanSomeone() {
+        $r1 = ctx()->getNextArg("请输入禁言的人或at他");
+        $cq = CQ::getCQ($r1);
+        if ($cq !== null) {
+            if ($cq["type"] != "at") return "请at或者输入正确的QQ号！";
+            $r1 = $cq["params"]["qq"];
+        }
+        // 群内禁言用户
+        ctx()->getRobot()->setGroupBan(ctx()->getGroupId(), $r1, 0);
+        return "解除禁言成功！";
+    }
+}
+```
+
+**src/Module/Example/AdminManager.php**
+
+```php
+<?php
+
+namespace Module\Example;
+
+use ZM\Annotation\CQ\CQCommand;
+use ZM\Annotation\Http\Middleware;
+use ZM\Annotation\Swoole\OnStart;
+use ZM\Store\LightCache;
+use ZM\Store\Lock\SpinLock;
+
+class AdminManager
+{
+    /**
+     * @OnStart()
+     */
+    public function onStart() {
+        if (!LightCache::isset("admin_list")) { //一次性代码，首次执行才会执行if
+            LightCache::set("admin_list", [ // 框架启动时初始化管理员列表
+                "123456",
+                "234567"
+            ], -2); // 这里用 -2 的原因是将这一列表持久化保存，避免关闭框架后丢失
+        }
+    }
+
+    /**
+     * @CQCommand(match="添加管理员")
      * @Middleware("admin")
      */
-    class AdminFunc
-    {
-        /**
-         * @CQCommand(match="禁言",message_type="group")
-         */
-        public function banSomeone() {
-            $r1 = ctx()->getNextArg("请输入禁言的人或at他");
-            $r2 = ctx()->getFullArg("请输入禁言的时间（秒）");
-            $cq = CQ::getCQ($r1);
-            if ($cq !== null) {
-                if ($cq["type"] != "at") return "请at或者输入正确的QQ号！";
-                $r1 = $cq["params"]["qq"];
-            }
-            // 群内禁言用户
-            ctx()->getRobot()->setGroupBan(ctx()->getGroupId(), $r1, $r2);
-            return "禁言成功！";
-        }
-
-        /**
-         * @CQCommand(match="解除禁言",message_type="group")
-         */
-        public function unbanSomeone() {
-            $r1 = ctx()->getNextArg("请输入禁言的人或at他");
-            $cq = CQ::getCQ($r1);
-            if ($cq !== null) {
-                if ($cq["type"] != "at") return "请at或者输入正确的QQ号！";
-                $r1 = $cq["params"]["qq"];
-            }
-            // 群内禁言用户
-            ctx()->getRobot()->setGroupBan(ctx()->getGroupId(), $r1, 0);
-            return "解除禁言成功！";
-        }
+    public function addAdmin() { //只有管理员才能添加管理员
+        $qq = ctx()->getNextArg("请输入要添加管理员的QQ(qq号码，不可at）");
+        SpinLock::lock("admin_list");        //如果是多进程模式的话需要加锁
+        $ls = LightCache::get("admin_list");
+        if (!in_array($qq, $ls)) $ls[] = $qq;
+        LightCache::set("admin_list", $ls, -2);
+        SpinLock::unlock("admin_list");      //如果是多进程模式的话需要加锁
+        return "成功添加 $qq 到管理员列表！";
     }
-    ```
+}
+```
 
-=== "src/Module/Example/AdminManager.php"
-
-	```php
-	<?php
-
-    namespace Module\Example;
-
-    use ZM\Annotation\CQ\CQCommand;
-    use ZM\Annotation\Http\Middleware;
-    use ZM\Annotation\Swoole\OnStart;
-    use ZM\Store\LightCache;
-    use ZM\Store\Lock\SpinLock;
-
-    class AdminManager
-    {
-        /**
-         * @OnStart()
-         */
-        public function onStart() {
-            if (!LightCache::isset("admin_list")) { //一次性代码，首次执行才会执行if
-                LightCache::set("admin_list", [ // 框架启动时初始化管理员列表
-                    "123456",
-                    "234567"
-                ], -2); // 这里用 -2 的原因是将这一列表持久化保存，避免关闭框架后丢失
-            }
-        }
-
-        /**
-         * @CQCommand(match="添加管理员")
-         * @Middleware("admin")
-         */
-        public function addAdmin() { //只有管理员才能添加管理员
-            $qq = ctx()->getNextArg("请输入要添加管理员的QQ(qq号码，不可at）");
-            SpinLock::lock("admin_list");        //如果是多进程模式的话需要加锁
-            $ls = LightCache::get("admin_list");
-            if (!in_array($qq, $ls)) $ls[] = $qq;
-            LightCache::set("admin_list", $ls, -2);
-            SpinLock::unlock("admin_list");      //如果是多进程模式的话需要加锁
-            return "成功添加 $qq 到管理员列表！";
-        }
-    }
-	```
-	
-<chat-box>
-^ 现在我是 123456
-) 禁言 13579 60
-( 禁言成功！
-) 解除禁言 13579
-( 解除禁言成功！
-) 添加管理员 98765
-( 成功添加 98765 到管理员列表！
-^ 现在我是98765
-) 禁言 13579
-( 请输入禁言的时间（秒）
-) 120
-( 禁言成功！
-</chat-box>
-
+<chat-box :my-chats="[
+    {type:2,content:'现在我是 123456'},
+    {type:0,content:'禁言 13579 60'},
+    {type:1,content:'禁言成功！'},
+    {type:0,content:'解除禁言 13579'},
+    {type:1,content:'解除禁言成功！'},
+    {type:0,content:'添加管理员 98765'},
+    {type:1,content:'成功添加 98765 到管理员列表！'},
+    {type:2,content:'现在我是98765'},
+    {type:0,content:'禁言 13579'},
+    {type:1,content:'请输入禁言的时间（秒）'},
+    {type:0,content:'120'},
+    {type:1,content:'禁言成功！'},
+]"></chat-box>

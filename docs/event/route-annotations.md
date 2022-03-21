@@ -2,9 +2,11 @@
 
 炸毛框架提供了一个简易但是高效易用的 HTTP 路由注解，你可以使用路由功能来开发任何 Web 应用微服务、API 接口、中间件等。
 
-!!! quote "开发提示"
+::: tip 开发提示
 
-	本章节涉及的路由和控制器概念可能和其他传统框架有一些出入，而且炸毛框架非绝对根据 PSR 标准进行开发，目的是使用上一些常见的东西尽可能地灵活和不啰嗦。
+本章节涉及的路由和控制器概念可能和其他传统框架有一些出入，而且炸毛框架非绝对根据 PSR 标准进行开发，目的是使用上一些常见的东西尽可能地灵活和不啰嗦。
+
+:::
 
 ## 控制器和路由
 
@@ -62,50 +64,54 @@ public function testName($param) {
 } 
 ```
 
-
-
 ### 路由示例
 
-=== "代码"
-	```php
-	<?php
-	namespace Module\Example;
-	
-	use ZM\Annotation\Http\Controller;
-	use ZM\Annotation\Http\RequestMapping;
+代码
+
+```php
+<?php
+namespace Module\Example;
+
+use ZM\Annotation\Http\Controller;
+use ZM\Annotation\Http\RequestMapping;
+/**
+ * @Controller("/api")
+ */
+class Hello {
 	/**
-	 * @Controller("/api")
+	 * @RequestMapping("/index")
 	 */
-	class Hello {
-	    /**
-	     * @RequestMapping("/index")
-	     */
-	    public function index(){
-	        ctx()->getResponse()->end("This is API index page"); // 使用上下文获取响应对象
-	    }
-	  	/**
-	  	 * @RequestMapping("/ping")
-	  	 */
-	    public function ping(){
-	        return "pong"; // 直接返回字符串
-	    }
+	public function index(){
+		ctx()->getResponse()->end("This is API index page"); // 使用上下文获取响应对象
 	}
-	```
+	/**
+	 * @RequestMapping("/ping")
+	 */
+	public function ping(){
+		return "pong"; // 直接返回字符串
+	}
+}
+```
 
-=== "效果"
+效果
 
-	!!! example "效果描述"
-		当访问浏览器的 `http://localhost:20001/api/index` 时，浏览器会返回 `This is API index page`，当访问 `/api/ping` 的 url 时，浏览器会返回 `pong`。
-		
-		```
-		/            -> 无任何路由
-		/api/index   -> Hello->index
-		/api/ping    -> Hello->ping
-		```
+::: tip 效果描述
 
-!!! tip "提示"
+当访问浏览器的 `http://localhost:20001/api/index` 时，浏览器会返回 `This is API index page`，当访问 `/api/ping` 的 url 时，浏览器会返回 `pong`。
 
-	当 `@Controller` 为 `/` 的时候，效果和不写是一样的，`@RequestMapping` 为 `/` 或 `/index/inside` 等多级路由也是可以的。
+```
+/            -> 无任何路由
+/api/index   -> Hello->index
+/api/ping    -> Hello->ping
+```
+
+:::
+
+::: tip 提示
+
+当 `@Controller` 为 `/` 的时候，效果和不写是一样的，`@RequestMapping` 为 `/` 或 `/index/inside` 等多级路由也是可以的。
+
+:::
 
 ### 绑定参数
 
@@ -126,46 +132,46 @@ public function index($arg) {
 
 ### 示例
 
-=== "获取 GET"
+#### 获取 GET
 
-	```php
-	/**
-	 * @RequestMapping("/testUrl")
-	 */
-	public function testUrl() {
-	  $get = ctx()->getRequest()->get;
-	  if(isset($get["name"])) return "hello, ".$get["name"];
-	  else return "Unknown name!!";
-	}
-	```
+```php
+/**
+ * @RequestMapping("/testUrl")
+ */
+public function testUrl() {
+  $get = ctx()->getRequest()->get;
+  if(isset($get["name"])) return "hello, ".$get["name"];
+  else return "Unknown name!!";
+}
+```
 
-=== "获取 POST（x-www-form-urlencoded）"
+#### 获取 POST（x-www-form-urlencoded）
 
-	```php
-	/**
-	 * @RequestMapping("/testUrl")
-	 */
-	public function testUrl() {
-	  $post = ctx()->getRequest()->post;
-	  if(isset($post["name"])) return "hello, ".$post["name"];
-	  else return "Unknown name!!";
-	}
-	```
+```php
+/**
+ * @RequestMapping("/testUrl")
+ */
+public function testUrl() {
+  $post = ctx()->getRequest()->post;
+  if(isset($post["name"])) return "hello, ".$post["name"];
+  else return "Unknown name!!";
+}
+```
 
-=== "获取 JSON POST"
+#### 获取 JSON POST
 
-	```php
-	/**
-	 * @RequestMapping("/testUrl")
-	 */
-	public function testUrl() {
-	  $post = ctx()->getRequest()->rawContent();
-	  $json = json_decode($post, true);
-	  if ($json === null) return "Invalid json data!";
-	  if(isset($json["name"])) return "hello, ".$json["name"];
-	  else return "Unknown name!!";
-	}
-	```
+```php
+/**
+ * @RequestMapping("/testUrl")
+ */
+public function testUrl() {
+  $post = ctx()->getRequest()->rawContent();
+  $json = json_decode($post, true);
+  if ($json === null) return "Invalid json data!";
+  if(isset($json["name"])) return "hello, ".$json["name"];
+  else return "Unknown name!!";
+}
+```
 
 ## 设置路由请求方式
 

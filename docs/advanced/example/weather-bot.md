@@ -3,20 +3,24 @@
 本文将基于 [`jieba-php`](https://github.com/fukuball/jieba-php) 中文分词库以及 [魅族天气 API](https://github.com/shichunlei/-Api/blob/master/MeizuWeather.md) 开发一个天气查询机器人。
 
 ## 结果演示
+
 ![圖片](https://user-images.githubusercontent.com/31698606/159122016-61ba9696-5786-4561-b371-827d9f1d01aa.png)
 尾部的随机表情并非本教程的一部分。
 
 ## 逻辑编写
 
-[`jieba-php`](https://github.com/fukuball/jieba-php) 是目前比较好用的中文分词库，虽然最近的维护并不活跃，但已足够我们的需求：
+[jieba-php](https://github.com/fukuball/jieba-php) 是目前比较好用的中文分词库，虽然最近的维护并不活跃，但已足够我们的需求：
+
 ```shell
 composer require fukuball/jieba-php:dev-master
 ```
 
 以下代码使用了本文作者自行编写的天气查询库，需要进行引入：
+
 ```shell
 composer require sunxyw/weather
 ```
+
 您也可以将以下代码自行改写为直接调用魅族天气 API，详情请参阅[魅族天气 API 文档](https://github.com/shichunlei/-Api/blob/master/MeizuWeather.md)。
 
 ```php
@@ -107,6 +111,3 @@ EOF;
     }
 }
 ```
-
-
-

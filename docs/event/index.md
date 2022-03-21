@@ -65,6 +65,3 @@ class Hello {
 EventDispatcher::interrupt();
 EventDispatcher::interrupt($data); // 也可以带返回值，自定义注解事件时有用。
 ```
-
-
-

@@ -1,4 +1,4 @@
-# MessageUtil 消息处理工具类
+# 消息处理工具类 - MessageUtil
 
 类定义：`\ZM\Utils\MessageUtil`
 
@@ -81,9 +81,11 @@ MessageUtil::isAtMe("[CQ:at,qq=123456789]另一个朋友你好","123456"); // fa
 
 返回：数组，切分后的。
 
-!!! tip "为什么不直接使用 explode 呢"
+::: tip 为什么不直接使用 explode 呢
 
-	因为 `explode()` 只会简单粗暴的切割字符串，假设用户输入的消息中两个词中间有多个空格，则会有空的词出现。例如 `你好     我是一个长空格`。此函数会将多个空格当作一个空格来对待。
+因为 `explode()` 只会简单粗暴的切割字符串，假设用户输入的消息中两个词中间有多个空格，则会有空的词出现。例如 `你好     我是一个长空格`。此函数会将多个空格当作一个空格来对待。
+
+:::
 
 ```php
 MessageUtil::splitCommand("你好 我是傻瓜\n我是傻瓜二号"); // ["你好","我是傻瓜","我是傻瓜二号"]
@@ -123,10 +125,10 @@ public function onStart() {
 }
 ```
 
-<chat-box>
-) 炸毛不聪明
-( 其实还是很聪明的！
-</chat-box>
+<chat-box :my-chats="[
+    {type:0,content:'炸毛不聪明'},
+    {type:1,content:'其实还是很聪明的！'},
+]"></chat-box>
 
 ### strToArray()
 

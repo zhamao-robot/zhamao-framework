@@ -44,7 +44,6 @@ docker run -it --rm -v $(pwd):/app/ -p 20001:20001 zmbot/swoole vendor/bin/start
 docker run -it --rm -v $(pwd):/app/ -p 20001:20001 zmbot/swoole vendor/bin/start server
 ```
 
-
 启动后你会看到和下方类似的初始化内容，表明启动成功了
 
 ```verilog

@@ -81,14 +81,14 @@ public function storeAfterRemove() {
 }
 ```
 
-<chat-box>
-) store
-( OK！
-) storeAfterRemove
-( 内容存在！
-^ 等待 30 秒
-( 内容不存在！
-</chat-box>
+<chat-box :my-chats="[
+    {type:0,content:'store'},
+    {type:1,content:'OK！'},
+    {type:0,content:'storeAfterRemove'},
+    {type:1,content:'内容存在！'},
+    {type:2,content:'等待 30 秒'},
+    {type:1,content:'内容不存在！'},
+]"></chat-box>
 
 ### LightCache::update()
 
@@ -218,14 +218,14 @@ public function getStore() {
 }
 ```
 
-<chat-box>
-^ 我在 2021-01-05 15:21:00 发送这条消息
-) getStore
-( 2021-01-05 15:20:00
-^ 这时我用 Ctrl+C 停止框架，过一会儿再启动
-) getStore
-( 存储时间：2021-01-05 15:20:00
-</chat-box>
+<chat-box :my-chats="[
+{type:2,content:'我在 2021-01-05 15:21:00 发送这条消息'},
+{type:0,content:'getStore'},
+{type:1,content:'2021-01-05 15:20:00'},
+{type:2,content:'这时我用 Ctrl+C 停止框架，过一会儿再启动'},
+{type:0,content:'getStore'},
+{type:1,content:'存储时间：2021-01-05 15:20:00'},
+]"></chat-box>
 
 ### 数据加锁
 
@@ -250,10 +250,11 @@ public function test() {
 
 在运行完测试后，通过 `LightCache::get("web_count")`，获取到的数你会发现不是 200000。怎么回事呢？请自行翻阅多进程开发相关的书籍哦！（或者简单理解为，有一些情况下，进程 1 执行到了 `if-else` 语句，另一个进程也执行到了这里，两次在代码层面加的数是相同的，则虽然请求了两次，但是后执行 set 的那个进程又覆盖了前一个进程执行的值，导致最终结果加了 1 而不是 2）
 
-!!! note "提示"
+::: tip 提示
 
-	同样的场景，使用 ZMAtomic 就不需要使用锁了。Atomic 是一句话：`add(1)` 立即加值的。而 LightCache 需要加锁的情况一般都是 `get->改值->set` 这样的代码。
+同样的场景，使用 ZMAtomic 就不需要使用锁了。Atomic 是一句话：`add(1)` 立即加值的。而 LightCache 需要加锁的情况一般都是 `get->改值->set` 这样的代码。
 
+:::
 
 解决这一问题，就需要用到锁。这种情况下，我们首先考虑的是自旋锁，框架也因此内置了一个方便使用的自旋锁组件。详见下一章：自旋锁。
 
@@ -271,13 +272,13 @@ public function test() {
 
 ### WorkerCache 跨进程大缓存
 
-WorkerCache 和 LightCache 几乎完全不同，WorkerCache 存储的方式说白了就是 PHP 的静态变量，不过框架支持使用封装好的进程间通信进行跨进程读取。但由于需要设置一个存储变量的进程，所以配置文件必须先指定要将数据存到哪个 Worker/TaskWorker 进程中。关于框架内多进程的说明，请见 [进阶 - 多进程 Hack](/advanced/multi-process/)。
+WorkerCache 和 LightCache 几乎完全不同，WorkerCache 存储的方式说白了就是 PHP 的静态变量，不过框架支持使用封装好的进程间通信进行跨进程读取。但由于需要设置一个存储变量的进程，所以配置文件必须先指定要将数据存到哪个 Worker/TaskWorker 进程中。关于框架内多进程的说明，请见 [进阶 - 多进程 Hack](/advanced/multi-process)。
 
 定义：`ZM\Store\WorkerCache`。
 
 #### 配置
 
-见 [基本配置](/guide/basic-config/)。
+见 [基本配置](/guide/basic-config)。
 
 #### WorkerCache::get()
 
@@ -342,12 +343,11 @@ class Hello {
 }
 ```
 
-<chat-box>
-) set_store hello world
-( 成功！
-) get_store hello
-( world
-) get_store foo
-( 内容不存在！
-</chat-box>
-
+<chat-box :my-chats="[
+{type:0,content:'set_store hello world'},
+{type:1,content:'成功！'},
+{type:0,content:'get_store hello'},
+{type:1,content:'world'},
+{type:0,content:'get_store foo'},
+{type:1,content:'内容不存在！'},
+]"></chat-box>

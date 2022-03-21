@@ -6,7 +6,7 @@
 
 框架默认使用脚手架构建好后，目录结构大致为下面这样：
 
-```bash
+```
 zhamao-framework-starter/
 ├── config/                 # 项目的配置文件文件夹，如 global.php
 ├── src/                    # 项目的主要源码目录
@@ -28,20 +28,28 @@ namespace Module\<your-module-dir>;
 class ModuleA {}
 ```
 
-!!! fail "警告"
-	如果没有遵守上方的类和文件命名规则的话（文件名、文件夹名和命名空间的统一性），在加载框架时就会报错，无法找到对应的类。因为框架的注解解析依赖于 Composer 中 psr-4 规则的自动加载。
+::: danger 警告
+
+如果没有遵守上方的类和文件命名规则的话（文件名、文件夹名和命名空间的统一性），在加载框架时就会报错，无法找到对应的类。因为框架的注解解析依赖于 Composer 中 psr-4 规则的自动加载。
+
+:::
 
 ## 创建模块
+
 ### 标准形式
+
 我们这里以 `Entertain` 娱乐模块的创建为例，新建一个内有 `Dice.php` 掷骰子功能的模块，目录结构如下，在 `Module/` 下新建文件夹 `Entertain/`，再在此子目录下新建 `Dice.php` 文件。
-```bash
+
+```
 zhamao-framework-starter/
 └── src/
     └── Module/
         └── Entertain/
             └── Dice.php
 ```
+
 新建的 PHP 文件按照如下方式编写：
+
 ```php
 <?php
 namespace Module\Entertain;
@@ -55,7 +63,7 @@ class Dice {
 
 如果你只开发很简单的一些功能，如一个 PHP 文件就可以实现的，可以少去创建模块文件夹的一步，直接将 `.php` 文件新建到 `Module/` 文件夹下，这时此文件的命名空间需要更正为 `namespace Module;` 即可，而文件夹结构也更加简单：
 
-```bash
+```
 zhamao-framework-starter/
 └── src/
     └── Module/
@@ -64,5 +72,4 @@ zhamao-framework-starter/
 
 ### Composer 外部引入形式
 
-（暂未支持，敬请期待）
-
+（暂未支持，敬请期待，TODO：已经支持了，但缺少文档编写）

@@ -64,4 +64,3 @@ array:31 [
 ```
 
 > 为什么不能重载所有文件？因为框架是多进程模型，而重载相当于只重新启动了一次 Worker 进程，Manager 和 Master 进程未重启，所以被 Manager、Master 进程已经加载的 PHP 文件无法使用 reload 命令重新加载。详见 [进阶 - 进程间隔离](/advanced/multi-process/#_5)。
-

@@ -1,4 +1,4 @@
-# CQ 码（多媒体消息）
+# 多媒体消息 - CQ码
 
 消息中的多媒体内容使用 CQ 码来表示，形如 `[CQ:face,id=178]`。其中，`[CQ:]` 是固定格式；`face` 是「功能名」，除了 `face` 还有许多不同的功能名；`id=178` 是「参数」，某些功能不需要参数，而另一些需要多个参数，当有多个参数时，参数间使用逗号分隔。
 
@@ -14,11 +14,13 @@
 
 更多 CQ 码功能请参考 [消息段类型](https://github.com/howmanybots/onebot/blob/master/v11/specs/message/segment.md)。
 
-!!! warning "注意"
+::: warning 注意
 
-	CQ 码中不应有多余的空格，例如不应该使用 `[CQ:face, id=178]`。
+CQ 码中不应有多余的空格，例如不应该使用 `[CQ:face, id=178]`。
 	
-	CQ 码的参数值可以包含空格、换行、除 `[],&` 之外的特殊符号等。在解析时，应直接取 `[CQ:` 后、第一个 `,` 或 `]` 前的部分为功能名，第一个 `,` 之后到 `]` 之间的部分为参数，按 `,` 分割后，每个部分第一个 `=` 前的内容为参数名，之后的部分为参数值。例如 `[CQ:share,title=标题中有=等号,url=http://baidu.com]` 中，功能名为 `share`，`title` 参数值为 `标题中有=等号`，`url` 参数值为 `http://baidu.com`。
+CQ 码的参数值可以包含空格、换行、除 `[],&` 之外的特殊符号等。在解析时，应直接取 `[CQ:` 后、第一个 `,` 或 `]` 前的部分为功能名，第一个 `,` 之后到 `]` 之间的部分为参数，按 `,` 分割后，每个部分第一个 `=` 前的内容为参数名，之后的部分为参数值。例如 `[CQ:share,title=标题中有=等号,url=http://baidu.com]` 中，功能名为 `share`，`title` 参数值为 `标题中有=等号`，`url` 参数值为 `http://baidu.com`。
+
+:::
 
 ## 转义
 
@@ -69,12 +71,12 @@ class Hello {
 }
 ```
 
-效果
+效果：
 
-<chat-box>
-) 发送图片
-[ https://zhamao.xin/file/hello.jpg
-</chat-box>
+<chat-box :my-chats="[
+	{type:0,content:'发送图片'},
+	{type:3,content:'https://zhamao.xin/file/hello.jpg'}
+]"></chat-box>
 
 ## CQ 码操作
 
@@ -191,15 +193,17 @@ public function faceTest() {
 }
 ```
 
-<chat-box>
-) 打盹
-( 正在打盹...
-[ https://docs-v1.zhamao.xin/face/8.gif
-</chat-box>
+<chat-box :my-chats="[
+	{type:0,content:'打盹'},
+	{type:1,content:'正在打盹...'},
+	{type:3,content:'https://docs-v1.zhamao.xin/face/8.gif'},
+]"></chat-box>
 
-!!! note "提示"
-	对于不断更新的 QQ 版本下，可能会持续扩充新的 QQ 表情，如果上表没有新的表情的话，也可以使用消息接收的方式，让机器人收到表情后解析出来对应的 id 然后再发送。
+::: tip 提示
 
+对于不断更新的 QQ 版本下，可能会持续扩充新的 QQ 表情，如果上表没有新的表情的话，也可以使用消息接收的方式，让机器人收到表情后解析出来对应的 id 然后再发送。
+
+:::
 
 ### CQ::image() - 发送图片
 
@@ -221,7 +225,11 @@ public function faceTest() {
 
 - 绝对路径，例如 `file:///root/imagetest/1.png`，格式使用 [`file` URI](https://tools.ietf.org/html/rfc8089)
 - 网络 URL，例如 `http://i1.piimg.com/567571/fdd6e7b6d93f1ef0.jpg`
-- Base64 编码，例如 `base64://iVBORw0KGgoAAAANSUhEUgAAABQAAAAVCAIAAADJt1n/AAAAKElEQVQ4EWPk5+RmIBcwkasRpG9UM4mhNxpgowFGMARGEwnBIEJVAAAdBgBNAZf+QAAAAABJRU5ErkJggg==`
+- Base64 编码，例如
+
+```
+base64://iVBORw0KGgoAAAANSUhEUgAAABQAAAAVCAIAAADJt1n/AAAAKElEQVQ4EWPk5+RmIBcwkasRpG9UM4mhNxpgowFGMARGEwnBIEJVAAAdBgBNAZf+QAAAAABJRU5ErkJggg==
+```
 
 ### CQ::record() - 发送语音
 
@@ -250,10 +258,10 @@ public function say() {
 }
 ```
 
-<chat-box>
-) 说你好
-( [语音消息，点击收听]  2'' )))
-</chat-box>
+<chat-box :my-chats="[
+	{type:0,content:'说你好'},
+	{type:1,content:'[语音消息，点击收听]  2\'\' )))'},
+]"></chat-box>
 
 >  此 CQ 码只能用于单独一条文本消息中，如果混有其他字符串，则会吞掉其他字符串内容。
 
@@ -274,10 +282,10 @@ public function atTest() {
 }
 ```
 
-<chat-box>
-) at测试
-( @鲸鱼 你好啊！
-</chat-box>
+<chat-box :my-chats="[
+	{type:0,content:'at测试'},
+	{type:1,content:'@鲸鱼 你好啊！'},
+]"></chat-box>
 
 ### CQ::video() - 发送短视频
 
@@ -346,9 +354,11 @@ public function atTest() {
 
 匿名发消息。需要在允许匿名发消息的群里发。
 
-!!! tip "提示"
+::: tip 提示
 
-	当收到匿名消息时，需要通过 [消息事件的群消息](https://github.com/howmanybots/onebot/blob/master/v11/specs/event/message.md#群消息) 的 `anonymous` 字段判断。
+当收到匿名消息时，需要通过 [消息事件的群消息](https://github.com/howmanybots/onebot/blob/master/v11/specs/event/message.md#群消息) 的 `anonymous` 字段判断。
+
+:::
 
 定义：`CQ::anonymous($ignore = 1)`
 
@@ -515,9 +525,11 @@ public function xmlTest() {
 
 其中 `$resid` 是面向 go-cqhttp 扩展的参数，默认不填为 0，走小程序通道，填了走富文本通道发送。
 
-!!! tip "提示"
+::: tip 提示
 
-	因为某些众所周知的原因，XML 和 JSON 的返回不提供实例，有兴趣的可以自行研究如何编写，文档不含任何相关教程。
+因为某些众所周知的原因，XML 和 JSON 的返回不提供实例，有兴趣的可以自行研究如何编写，文档不含任何相关教程。
+
+:::
 
 ### CQ::_custom() - 扩展自定义 CQ 码
 
@@ -536,4 +548,3 @@ public function xmlTest() {
 CQ::_custom("at",["qq" => "123456","qwe" => "asd"]);
 // 返回：[CQ:at,qq=123456,qwe=asd]
 ```
-

@@ -36,14 +36,16 @@ src/
 
 - 含义：模块的描述。
 
-??? note "点我查看编写实例："
+::: tip 编写实例
 
-	```json
-	{
-	    "name": "my-first-module",
-	    "description": "这个是一个示例模块打包教程"
-	}
-	```
+```json
+{
+	"name": "my-first-module",
+	"description": "这个是一个示例模块打包教程"
+}
+```
+
+:::
 
 #### - version
 
@@ -52,14 +54,17 @@ src/
 
 版本处理方式和 Composer 基本一致，建议使用三段式，也就是 `大版本.小版本.补丁版本`。关于三段式版本的描述和规范，见 [到底三段式版本号是什么？](https://www.chrisyue.com/what-the-hell-are-semver-and-the-difference-between-composer-version-control-sign-tilde-and-caret.html)。
 
-??? note "点我查看编写实例："
-	```json
-	{
-	    "name": "my-first-module",
-	    "description": "这个是一个示例模块打包教程",
-	    "version": "1.0.0"
-	}
-	```
+::: tip 编写实例
+
+```json
+{
+	"name": "my-first-module",
+	"description": "这个是一个示例模块打包教程",
+	"version": "1.0.0"
+}
+```
+
+:::
 
 #### - depends
 
@@ -68,17 +73,20 @@ src/
 
 此处用作模块的依赖检测，假设模块 `foo` 依赖模块 `bar` 的 1.x 版本但是不兼容 `bar` 的 2.x 版本，可以像 Composer 的 `require` 一样编写版本依赖：`^1.0`。也可以使用 `~`、`>=`、`*` 这些与 Composer 包管理相同逻辑的版本依赖关系，详见 [Composer - 包版本](https://docs.phpcomposer.com/01-basic-usage.html#Package-Versions)。
 
-??? note "点我查看编写实例："
-	```json
-	{
-	    "name": "foo",
-	    "description": "这个是一个示例模块打包教程",
-	    "depends": {
-	        "bar": "^1.0",
-	        "bsr": "*"
-	    }
+::: tip 编写实例
+
+```json
+{
+	"name": "foo",
+	"description": "这个是一个示例模块打包教程",
+	"depends": {
+		"bar": "^1.0",
+		"bsr": "*"
 	}
-	```
+}
+```
+
+:::
 
 #### - light-cache-store
 
@@ -89,16 +97,19 @@ src/
 
 我们假设在项目模块中使用到了 `group-status` 这一个 LightCache，那么只需要写 `light-cache-store` 配置项，在模块打包时就会将持久化的数据也打包到 phar 模块包内。
 
-??? note "点我查看编写实例："
-	```json
-	{
-	    "name": "foo",
-	    "description": "这个是一个示例模块打包教程",
-	    "light-cache-store": [
-	        "group-status"
-	    ]
-	}
-	```
+::: tip 编写实例
+
+```json
+{
+	"name": "foo",
+	"description": "这个是一个示例模块打包教程",
+	"light-cache-store": [
+		"group-status"
+	]
+}
+```
+
+:::
 
 #### - global-config-override
 
@@ -109,14 +120,17 @@ src/
 
 如果是 false，那么和不指定此参数效果是一样的，无需用户修改 global.php。
 
-??? note "点我查看编写实例："
-	```json
-	{
-	    "name": "foo",
-	    "description": "这个是一个示例模块打包教程",
-	    "global-config-override": "请将 static_file_server 的 status 改为 true"
-	}
-	```
+::: tip 编写实例
+
+```json
+{
+	"name": "foo",
+	"description": "这个是一个示例模块打包教程",
+	"global-config-override": "请将 static_file_server 的 status 改为 true"
+}
+```
+
+:::
 
 #### - allow-hotload
 
@@ -125,17 +139,23 @@ src/
 
 当此项为 true 时，可以将模块包直接放入 `zm_data/modules` 文件夹下，然后将 `global.php` 中的 `module_loader` 项中的 `enable_hotload` 改为 true，启动框架即可加载。
 
-??? note "点我查看编写实例："
-	```json
-	{
-	    "name": "foo",
-	    "description": "这个是一个示例模块打包教程",
-	    "allow-hotload": true
-	}
-	```
+::: tip 编写实例
 
-!!! warning "注意"
-	如果使用允许热加载，那么模块包中的配置最好不要有 `global-config-override` 和 `light-cache-store`，以此来达到最正确的效果，一般热加载更适合 Library（库）类型的模块。
+```json
+{
+	"name": "foo",
+	"description": "这个是一个示例模块打包教程",
+	"allow-hotload": true
+}
+```
+
+:::
+
+::: warning 注意
+
+如果使用允许热加载，那么模块包中的配置最好不要有 `global-config-override` 和 `light-cache-store`，以此来达到最正确的效果，一般热加载更适合 Library（库）类型的模块。
+
+:::
 
 #### - zm-data-store
 
@@ -146,17 +166,20 @@ src/
 
 我们假设要打包一个 `{zm_data 目录}/config/` 目录及其目录下的文件，和一个 `main.png` 文件，下方是实例。
 
-??? note "点我查看编写实例："
-	```json
-	{
-	    "name": "foo",
-	    "description": "这个是一个示例模块打包教程",
-	    "zm-data-store": [
-	        "config/",
-	        "main.png"
-	    ]
-	}
-	```
+::: tip 编写实例
+
+```json
+{
+	"name": "foo",
+	"description": "这个是一个示例模块打包教程",
+	"zm-data-store": [
+		"config/",
+		"main.png"
+	]
+}
+```
+
+:::
 
 在打包时框架会自动添加这些文件到 phar 插件包内，到解包时，会自动将这些文件释放到对应框架的 `zm_data` 目录下。
 
@@ -221,7 +244,6 @@ $ ./zhamao module:pack foo
 - crash/swoole_error.log
 - 必要的框架热加载以及解包需要的配置信息
 
-
 ## 打包命令
 
 ```bash
@@ -240,4 +262,3 @@ $ ./zhamao module:pack foo
 ```
 
 通过此命令可以查看模块相关的信息，如未打包但已配置的模块信息等。
-

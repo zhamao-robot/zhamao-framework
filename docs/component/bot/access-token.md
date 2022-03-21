@@ -1,4 +1,4 @@
-# Token 验证
+# 接入安全验证 - Token
 
 为了保障安全，框架支持给接入的 WebSocket 连接验证 Token，如果不设置 Token 同时又将框架的端口暴露在公网将会非常危险。
 
@@ -27,9 +27,9 @@
 
 go-cqhttp 的配置段：
 
-```hjson
-  // 访问密钥, 强烈推荐在公网的服务器设置
-  access_token: "emhhbWFvLXJvYm90"
+```
+// 访问密钥, 强烈推荐在公网的服务器设置
+access_token: "emhhbWFvLXJvYm90"
 ```
 
 框架的配置文件配置段：
