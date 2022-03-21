@@ -52,10 +52,11 @@ vendor/bin/start server --log-debug # 以 debug 等级启动框架
 
 输出 warning 级别的 log。
 
-!!! warning 注意
+::: warning 注意
 
-	框架内出现的用户态异常，比如无法发送 API、无法连接数据库等错误，都是 warning 错误，不会导致框架崩溃或功能错误的异常情况建议都使用 warning 输出而不是 error。
+框架内出现的用户态异常，比如无法发送 API、无法连接数据库等错误，都是 warning 错误，不会导致框架崩溃或功能错误的异常情况建议都使用 warning 输出而不是 error。
 
+:::
 
 ### Console::info()
 
@@ -100,9 +101,11 @@ $str = Console::setColor("I am gold color.", "gold");
 
 炸毛框架支持从终端输入命令来进行一些操作，例如重启框架、停止框架、执行函数等。
 
-!!! warning 注意
+::: warning 注意
 
-	在 Docker、systemd、daemon 状态下启动的框架会自动关闭终端等待输入，交互不可用。
+在 Docker、systemd、daemon 状态下启动的框架会自动关闭终端等待输入，交互不可用。
+
+:::
 
 ### reload
 
@@ -174,4 +177,3 @@ vendor/bin/start server --log-theme={主题名}
 vendor/bin/start server --log-theme=white-term # 如果用的是白色终端，这个主题更友好
 vendor/bin/start server --log-theme=no-color   # 如果不想让 log 带有任何颜色，使用无色主题
 ```
-

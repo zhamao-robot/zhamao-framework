@@ -23,4 +23,3 @@
 ```php
 TaskManager::runTask("heavy_task", 100, "param1", "param2");
 ```
-

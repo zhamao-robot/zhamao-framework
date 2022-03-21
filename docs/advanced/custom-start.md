@@ -5,8 +5,10 @@
 从前面的几章中，我们了解到框架有多种下载到本地的方式。
 
 - Composer 依赖模式
-- Starter 从模板创建模式
+- Starter 从模板创建模式（等同于 Composer 模式）
 - 源码模式
+- Phar Composer 依赖模式
+- Phar 源码模式
 
 ### Composer 依赖模式
 

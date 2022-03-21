@@ -4,10 +4,11 @@
 
 命名空间：`use ZM\Requests\ZMRequest;`
 
-!!! warning "注意"
+::: warning 注意
 
-	在使用 Swoole 4.6.0 以下（不包含）的版本时，最好使用 Swoole 官方推荐的 Saber 或者 ZMRequest 这个轻量的 HTTP 请求客户端，不要使用 curl_exec，因为在老版本的 Swoole 上对 curl 的协程 Hook 支持不是很完善。
+在使用 Swoole 4.6.0 以下（不包含）的版本时，最好使用 Swoole 官方推荐的 Saber 或者 ZMRequest 这个轻量的 HTTP 请求客户端，不要使用 curl_exec，因为在老版本的 Swoole 上对 curl 的协程 Hook 支持不是很完善。
 
+:::
 
 ## ZMRequest::get()
 
@@ -262,11 +263,12 @@ $a->onClose(function($client){
 
 返回值：`true|false`，当为 `true` 时代表握手成功，此时可以在回调里愉快地收发消息了。如果为 `false` 表明握手失败。
 
-!!! warning "注意"
+::: warning 注意
 
-	这里由于是协程转异步，所以不能确定 `upgrade()` 和 `onMessage()` 哪个先会被触发（一般情况下如果服务器不是立刻响应回包信息，总是会先返回 `upgrade()` 的结果。
+这里由于是协程转异步，所以不能确定 `upgrade()` 和 `onMessage()` 哪个先会被触发（一般情况下如果服务器不是立刻响应回包信息，总是会先返回 `upgrade()` 的结果。
+
+:::
 
 ## 设置参数
 
 见：[Swoole - HTTP 客户端](http://wiki.swoole.com/#/coroutine_client/http_client?id=set)
-

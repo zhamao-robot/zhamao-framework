@@ -101,7 +101,8 @@ $r = file_get_contents(working_dir() . "/composer.json");
 file_put_contents("/tmp/test.txt", "hello world");
 ```
 
-!!! warning "注意"
+::: warning 注意
 
-	在默认的情况里，框架的根目录均为可写可读的，在读写文件时务必要注意目录的位置和权限。使用 `working_dir()` 获取目录后面需要加 `/` 再追加自己的文件名或子目录名。
+在默认的情况里，框架的根目录均为可写可读的，在读写文件时务必要注意目录的位置和权限。使用 `working_dir()` 获取目录后面需要加 `/` 再追加自己的文件名或子目录名。
 
+:::

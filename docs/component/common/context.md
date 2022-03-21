@@ -40,31 +40,33 @@ public function hello() {
 
 可以使用的事件：所有 **getFrame()** 可以使用的，`@OnOpenEvent()`，`@OnCloseEvent()`
 
-!!! tip "提示"
+::: tip 提示
 
-	值得注意的是，由于机器人客户端和炸毛框架的连接是通过 WebSocket 进行的，而 WebSocket 是长连接，所以同一个机器人一次连接下收发消息所用的连接是同一个，所以 Fd 也是相同的。同理，炸毛框架的内部来区分多个机器人也是通过这一 Fd 进行判定的。
+值得注意的是，由于机器人客户端和炸毛框架的连接是通过 WebSocket 进行的，而 WebSocket 是长连接，所以同一个机器人一次连接下收发消息所用的连接是同一个，所以 Fd 也是相同的。同理，炸毛框架的内部来区分多个机器人也是通过这一 Fd 进行判定的。
 
-=== "代码"
+:::
 
-    ```php
-    /**
-     * @CQCommand("测试fd")
-     */
-    public function testfd() {
-        ctx()->reply("当前机器人连接的fd是：".ctx()->getFd()."，机器人QQ是：".ctx()->getRobotId());
-    }
-    ```
+代码
 
-=== "效果"
+```php
+/**
+ * @CQCommand("测试fd")
+ */
+public function testfd() {
+    ctx()->reply("当前机器人连接的fd是：".ctx()->getFd()."，机器人QQ是：".ctx()->getRobotId());
+}
+```
 
-    <chat-box>
-    ^ 假设我们和连接55555的机器人的私聊
-    ) 测试fd
-    ( 当前机器人连接的fd是：1，机器人QQ是：55555
-    ^ 假设切到了另一个机器人（66666）的私聊
-    ) 测试fd
-    ( 当前机器人连接的fd是：2，机器人QQ是：66666
-    </chat-box>
+效果
+
+<chat-box :my-chats="[
+    {type:2,content:'假设我们和连接55555的机器人的私聊'},
+    {type:0,content:'测试fd'},
+    {type:1,content:'当前机器人连接的fd是：1，机器人QQ是：55555'},
+    {type:2,content:'假设切到了另一个机器人（66666）的私聊'},
+    {type:0,content:'测试fd'},
+    {type:1,content:'当前机器人连接的fd是：2，机器人QQ是：66666'},
+]"></chat-box>
 
 ## getData() - 获取事件完整数据
 
@@ -82,11 +84,11 @@ public function onMessage() {
 }
 ```
 
-<chat-box>
-^ 假设我是QQ为123456的用户，私聊发消息
-) 哈咯！！
-( 消息类型是：private
-</chat-box>
+<chat-box :my-chats="[
+{type:2,content:'假设我是QQ为123456的用户，私聊发消息'},
+{type:0,content:'哈咯！！'},
+{type:1,content:'消息类型是：private'},
+]"></chat-box>
 
 ## getRequest() - HTTP 请求对象
 
@@ -132,10 +134,10 @@ public function ping() {
 ctx()->getRobot()->sendPrivateMsg(123456, "发送私聊消息");
 ```
 
-<chat-box>
-^ 正在和机器人聊天
-( 发送私聊消息
-</chat-box>
+<chat-box :my-chats="[
+{type:2,content:'正在和机器人聊天'},
+{type:1,content:'发送私聊消息'},
+]"></chat-box>
 
 ## getMessage() - 获取消息
 
@@ -143,24 +145,26 @@ ctx()->getRobot()->sendPrivateMsg(123456, "发送私聊消息");
 
 可以使用的事件：`@CQCommand()`，`@CQMessage`，`@CQBefore("message")`，`@CQAfter("message")`
 
-=== "代码"
-    ```php
-    /**
-     * @CQMessage(group_id=33333)
-     */
-    public function groupRepeat() {
-        ctx()->reply(ctx()->getMessage());
-    }
-    ```
+代码
 
-=== "效果"
-    <chat-box>
-    ^ 现在在群33333内，机器人已经成了复读机
-    ) 来世还做复读机！！！
-    ( 来世还做复读机！！！
-    ) 你不许复读！
-    ( 你不许复读！
-    </chat-box>
+```php
+/**
+ * @CQMessage(group_id=33333)
+ */
+public function groupRepeat() {
+    ctx()->reply(ctx()->getMessage());
+}
+```
+
+效果
+
+<chat-box :my-chats="[
+{type:2,content:'现在在群33333内，机器人已经成了复读机'},
+{type:0,content:'来世还做复读机！！！'},
+{type:1,content:'来世还做复读机！！！'},
+{type:0,content:'你不许复读！'},
+{type:1,content:'你不许复读！'},
+]"></chat-box>
 
 ## getUserId() - 获取用户 QQ 号
 
@@ -275,16 +279,16 @@ function yourName(){
 }
 ```
 
-<chat-box>
-) 自我介绍
-( 你叫啥名字呀？
-) jerry
-( 好的，可爱的机器人记住你叫 jerry 啦！以后多聊天哦！
-) 自我介绍
-( 你叫啥名字呀？
-^ 10分钟没理机器人
-( 你都10分钟不理我了，嘤嘤嘤
-</chat-box>
+<chat-box :my-chats="[
+{type:0,content:'自我介绍'},
+{type:1,content:'你叫啥名字呀？'},
+{type:0,content:'jerry'},
+{type:1,content:'好的，可爱的机器人记住你叫 jerry 啦！以后多聊天哦！'},
+{type:0,content:'自我介绍'},
+{type:1,content:'你叫啥名字呀？'},
+{type:2,content:'10分钟没理机器人'},
+{type:1,content:'你都10分钟不理我了，嘤嘤嘤'},
+]"></chat-box>
 
 ## getArgs() - 自动获取参数
 
@@ -316,12 +320,12 @@ public function argTest1() {
 }
 ```
 
-<chat-box>
-) test
-( 请输入你要传入的参数内容
-) test2
-( 参数内容：test2
-</chat-box>
+<chat-box :my-chats="[
+{type:0,content:'test'},
+{type:1,content:'请输入你要传入的参数内容'},
+{type:0,content:'test2'},
+{type:1,content:'参数内容：test2'},
+]"></chat-box>
 
 `getArgs()` 也有三层封装，在使用过程中避免麻烦的话，推荐使用下面这几种 `get*Arg()` 方式。
 
@@ -341,14 +345,14 @@ public function argTest1() {
 }
 ```
 
-<chat-box>
-) test abc def argtest
-( 参数内容：abc def argtest
-) test
-( 请输入你要传入的参数内容
-) abc def
-( 参数内容：abc def
-</chat-box>
+<chat-box :my-chats="[
+{type:0,content:'test abc def argtest'},
+{type:1,content:'参数内容：abc def argtest'},
+{type:0,content:'test'},
+{type:1,content:'请输入你要传入的参数内容'},
+{type:0,content:'abc def'},
+{type:1,content:'参数内容：abc def'},
+]"></chat-box>
 
 ## getNextArg()
 
@@ -364,14 +368,14 @@ public function argTest1() {
 }
 ```
 
-<chat-box>
-) test abc def argtest
-( 参数内容：abc
-) test
-( 请输入你要传入的参数内容
-) abc
-( 参数内容：abc
-</chat-box>
+<chat-box :my-chats="[
+{type:0,content:'test abc def argtest'},
+{type:1,content:'参数内容：abc'},
+{type:0,content:'test'},
+{type:1,content:'请输入你要传入的参数内容'},
+{type:0,content:'abc'},
+{type:1,content:'参数内容：abc'},
+]"></chat-box>
 
 ## getNumArg()
 
@@ -389,14 +393,14 @@ public function argTest1() {
 }
 ```
 
-<chat-box>
-) test abc 334 argtest
-( 数字参数内容：334
-) test abc
-( 请输入你要传入的数字内容
-) 998
-( 参数内容：998
-</chat-box>
+<chat-box :my-chats="[
+{type:0,content:'test abc 334 argtest'},
+{type:1,content:'数字参数内容：334'},
+{type:0,content:'test abc'},
+{type:1,content:'请输入你要传入的参数内容'},
+{type:0,content:'998'},
+{type:1,content:'参数内容：998'},
+]"></chat-box>
 
 ## copy()
 
@@ -418,8 +422,7 @@ public function argTest1() {
 }
 ```
 
-<chat-box>
-) test abc 334 argtest
-( 参数内容：abc, 334, argtest
-</chat-box>
-
+<chat-box :my-chats="[
+{type:0,content:'test abc 334 argtest'},
+{type:1,content:'参数内容：abc, 334, argtest'},
+]"></chat-box>

@@ -1,4 +1,4 @@
-# 单例类（SingletonTrait）
+# 单例类 - SingletonTrait
 
 单例类，顾名思义，就是让用户声明的类拥有单例的特性，而这一组件引入的方式也最直接。它是一个 PHP 的 `trait`。
 

@@ -27,3 +27,8 @@ composer.lock
 
 # Git Hook 的相关锁文件
 cghooks.lock
+
+# Vuepress 相关文件
+/node_modules/
+/docs/.vuepress/dist/
+package-lock.json

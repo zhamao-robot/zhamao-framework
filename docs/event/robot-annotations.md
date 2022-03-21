@@ -4,9 +4,11 @@ QQ 机器人事件是指 CQHTTP 插件发来的 Event 事件，被框架处理�
 
 为了便于开发，这里的注解类对应 CQHTTP 插件返回的 `post_type` 类型，对号入座即可。
 
-!!! tip "提示"
+::: tip 提示
 
-	在使用注解绑定事件过程中，如果无 **必需** 参数，可一个参数也不写，效果就是此事件任何情况下都会调用此方法。例如：`@CQMessage()` 
+在使用注解绑定事件过程中，如果无 **必需** 参数，可一个参数也不写，效果就是此事件任何情况下都会调用此方法。例如：`@CQMessage()` 
+
+:::
 
 事件是用户需要从 OneBot 被动接收的数据，有以下几个大类：
 
@@ -61,39 +63,39 @@ QQ 收到消息后触发的事件对应注解。
 - 在用户 QQ 为 `123456` 的用户私聊给机器人发消息后机器人回复内容。
 - 用户发送文字为 `hello` 时返回 `你好啊，xxx` 的消息。
 
-===  "代码"
+代码
 
-	```php
-	<?php
-	namespace Module\Example;
-	
-	use ZM\Annotation\CQ\CQMessage;
-	
-	class Hello {
-	    /**
-	     * @CQMessage(message_type="private",user_id=123456)
-	     */
-	  	public function test() {
-	        return "你和机器人私聊发送了这些文本：".ctx()->getMessage();
-	    }
-	    /**
-	     * @CQMessage(message="hello")
-	     */
-	    public function hello() {
-	        return "你好啊，".ctx()->getUserId();
-	    }
+```php
+<?php
+namespace Module\Example;
+
+use ZM\Annotation\CQ\CQMessage;
+
+class Hello {
+	/**
+	 * @CQMessage(message_type="private",user_id=123456)
+	 */
+	public function test() {
+		return "你和机器人私聊发送了这些文本：".ctx()->getMessage();
 	}
-	```
+	/**
+	 * @CQMessage(message="hello")
+	 */
+	public function hello() {
+		return "你好啊，".ctx()->getUserId();
+	}
+}
+```
 
-=== "效果"
+效果
 
-	<chat-box>
-	) 假设我是私聊机器人
-	( 你和机器人私聊发送了这些文本：假设我是私聊机器人
-	^ 假设我现在切到群里，在群里发hello
-	) hello
-	( 你好啊，123456
-	</chat-box>
+<chat-box :my-chats="[
+	{type:0,content:'假设我是私聊机器人'},
+	{type:1,content:'你和机器人私聊发送了这些文本：假设我是私聊机器人'},
+	{type:2,content:'假设我现在切到群里，在群里发hello'},
+	{type:0,content:'hello'},
+	{type:1,content:'你好啊，123456'},
+]"></chat-box>
 
 ## CQCommand()
 
@@ -125,11 +127,13 @@ QQ 收到消息后触发的事件对应注解。
 | group_id     | `int64` 或 `string`                   | 限定消息发送来源群 ID，同 `@CQMessage`                 | 空   |
 | level        | `int`                                 | 事件优先级（越大越靠前）                               | 20   |
 
-!!! warning "注意"
+::: warning 注意
 
-	在 `@CQCommand` 注解事件中，从 `match` 到 `keyword` 六个参数中，必须且只能定义一个，`alias` 目前只能和 `match` 参数同时使用；
-	
-	框架内部对于同一条消息事件，优先处理 `@CQCommand` 注解事件，如果未匹配到任何注解事件，则才会继续执行 `@CQMessage` 注解事件。
+在 `@CQCommand` 注解事件中，从 `match` 到 `keyword` 六个参数中，必须且只能定义一个，`alias` 目前只能和 `match` 参数同时使用；
+
+框架内部对于同一条消息事件，优先处理 `@CQCommand` 注解事件，如果未匹配到任何注解事件，则才会继续执行 `@CQMessage` 注解事件。
+
+:::
 
 - 参数 `match` 匹配模式是：遇到空格、换行就会切分，比如 `点歌 xxx yyy` 会被分割为 `[点歌,xxx,yyy]`，然后抽取第一个词做为命令去匹配，剩下的为参数。
 - 参数 `pattern` 匹配模式是：\* 号位置变成参数，比如 `从*到*的随机数`，我们输入 `从1到9的随机数`，成功匹配，参数列表：`[1,9]`。
@@ -141,52 +145,54 @@ QQ 收到消息后触发的事件对应注解。
 
 我们以参数 `match` 写一个简单的 demo：
 
-=== "代码"
-	```php
-	<?php
-	namespace Module\Example;
+代码
 
-	use ZM\Annotation\CQ\CQCommand;
-	
-	class Hello {
-	    /**
-	     * @CQCommand(match="疫情",alias={"COVID"})
-	     */
-	    public function virus(){
-	        $city = ctx()->getNextArg("请输入城市名称");
-	        return "城市 ".$city." 的疫情状况如下："."{这里假装是疫情接口返回的数据}";
-	    }
-	    /**
-	     * 如果选择使用 match 参数的话，可以省略 `match=`
-	     * @CQCommand("掷硬币")
-	     */
-	    public function randChoice() {
-	        return "你看到的是：" . (mt_rand(0,1) ? "正面" : "反面");
-	    }
-	    /**
-	     * @CQCommand(pattern="*把*翻译成*")
-	     */
-	    public function translate() {
-	        ctx()->getNextArg(); // 为什么需要单独调用一次呢？看下面例子就知道啦
-	        $text = ctx()->getNextArg(); // 获取第二个星号匹配的内容
-	        $target = ctx()->getNextArg(); // 获取第三个星号匹配的内容
-	        // 这里 FakeTranslateAPI 是假设我们对接了一个翻译的 API，开发时请替换为自己的接口。
-	        return "翻译结果：" . FakeTranslateAPI::translate($text, $target);
-	    }
+```php
+<?php
+namespace Module\Example;
+
+use ZM\Annotation\CQ\CQCommand;
+
+class Hello {
+	/**
+	 * @CQCommand(match="疫情",alias={"COVID"})
+	 */
+	public function virus(){
+		$city = ctx()->getNextArg("请输入城市名称");
+		return "城市 ".$city." 的疫情状况如下："."{这里假装是疫情接口返回的数据}";
 	}
-	```
-=== "效果"
+	/**
+	 * 如果选择使用 match 参数的话，可以省略 `match=`
+	 * @CQCommand("掷硬币")
+	 */
+	public function randChoice() {
+		return "你看到的是：" . (mt_rand(0,1) ? "正面" : "反面");
+	}
+	/**
+	 * @CQCommand(pattern="*把*翻译成*")
+	 */
+	public function translate() {
+		ctx()->getNextArg(); // 为什么需要单独调用一次呢？看下面例子就知道啦
+		$text = ctx()->getNextArg(); // 获取第二个星号匹配的内容
+		$target = ctx()->getNextArg(); // 获取第三个星号匹配的内容
+		// 这里 FakeTranslateAPI 是假设我们对接了一个翻译的 API，开发时请替换为自己的接口。
+		return "翻译结果：" . FakeTranslateAPI::translate($text, $target);
+	}
+}
+```
 
-	<chat-box>
-	) 疫情 北京
-	( 城市 北京 的疫情状况如下：blablablabla
-	) COVID 香港
-	( 城市 香港 的疫情状况如下：blablablabla
-	) 掷硬币
-	( 你看到的是：正面
-	) 我想把我爱你翻译成英语
-	( 翻译结果：I love you!
-	</chat-box>
+效果
+
+<chat-box :my-chats="[
+{type:0,content:'疫情 北京'},
+{type:1,content:'城市 北京 的疫情状况如下：blablablabla'},
+{type:0,content:'COVID 香港'},
+{type:1,content:'城市 香港 的疫情状况如下：blablablabla'},
+{type:0,content:'掷硬币'},
+{type:1,content:'你看到的是：正面'},
+{type:0,content:'我想把我爱你翻译成英语'},
+{type:1,content:'翻译结果：I love you!'},
+]"></chat-box>
 
 ## CQNotice()
 
@@ -292,49 +298,52 @@ TODO：先放着，有时间再更。
 
 ### 用法
 
-=== "代码"
+代码
 
-	```php
-	<?php
-	namespace Module\Example;
-	
-	use ZM\Annotation\CQ\CQBefore;
-	use ZM\Annotation\CQ\CQMessage;
-	class Test {
-	    /**
-	     * @CQBefore("message")
-	     */
-	    public function filter(){
-	        // 可用于敏感词，如政治相关的词语不响应其他模块
-	        if(mb_strpos(ctx()->getMessage(), "谷歌") !== false) return false;
-	        else return true;
-	    }
-	    /**
-	     * @CQCommand("百科")
-	     */
-	    public function wiki() {
-	        $content = ctx()->getNextArg("请说你要查百科的内容");
-	        // 这里假设你对接了一个查百科的接口
-	        return "已搜到匹配 $content 的如下结果：".FakeAPI::searchWiki($content);
-	    }
+```php
+<?php
+namespace Module\Example;
+
+use ZM\Annotation\CQ\CQBefore;
+use ZM\Annotation\CQ\CQMessage;
+class Test {
+	/**
+	 * @CQBefore("message")
+	 */
+	public function filter(){
+		// 可用于敏感词，如政治相关的词语不响应其他模块
+		if(mb_strpos(ctx()->getMessage(), "谷歌") !== false) return false;
+		else return true;
 	}
-	```
+	/**
+	 * @CQCommand("百科")
+	 */
+	public function wiki() {
+		$content = ctx()->getNextArg("请说你要查百科的内容");
+		// 这里假设你对接了一个查百科的接口
+		return "已搜到匹配 $content 的如下结果：".FakeAPI::searchWiki($content);
+	}
+}
+```
 
-=== "效果"
+效果
 
-	<chat-box>
-	) 百科 北京
-	( 已搜到匹配 北京 的如下结果：blablabla
-	) 百科 谷歌被封
-	^ 机器人没有任何回复
+<chat-box :my-chats="[
+{type:0,content:'百科 北京'},
+{type:1,content:'已搜到匹配 北京 的如下结果：blablabla'},
+{type:0,content:'百科 谷歌被封'},
+{type:2,content:'机器人没有任何回复'},
+]"></chat-box>
 
-!!! warning "注意"
+::: warning 注意
 
-	在设置了 `level` 参数后，如果设置了多个 `@CQBefore` 监听事件函数，更高 `level` 的事件函数返回了 `false`，则低 `level` 的绑定函数不会执行，所有 `@CQMessage` 绑定的事件也不会执行。
-	
-	你也可以使用 `@CQBefore` 做一些消息的转发和过滤。比如你想去除用户发来的文字中的 emoji、图片等 CQ 码，只保留文本。
-	
-	使用 `ctx()->waitMessage()` 时等待用户输入下一条消息功能和 CQBefore 配合过滤消息时需注意，见 [FAQ - CQBefore 过滤不了 waitMessage](/FAQ/wait-message-cqbefore/)
+在设置了 `level` 参数后，如果设置了多个 `@CQBefore` 监听事件函数，更高 `level` 的事件函数返回了 `false`，则低 `level` 的绑定函数不会执行，所有 `@CQMessage` 绑定的事件也不会执行。
+
+你也可以使用 `@CQBefore` 做一些消息的转发和过滤。比如你想去除用户发来的文字中的 emoji、图片等 CQ 码，只保留文本。
+
+使用 `ctx()->waitMessage()` 时等待用户输入下一条消息功能和 CQBefore 配合过滤消息时需注意，见 [FAQ - CQBefore 过滤不了 waitMessage](/FAQ/wait-message-cqbefore/)
+
+:::
 
 ## CQAfter()
 

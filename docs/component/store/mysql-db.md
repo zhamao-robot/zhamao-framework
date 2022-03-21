@@ -1,8 +1,10 @@
 # MySQL 数据库（旧版组件）
 
-!!! warning "注意"
+::: warning 注意
 
-	此 MySQL 组件为旧版 MySQL 查询器组件，为了统一和提升对未来独立组件的兼容性，现转变为使用 `doctrine/dbal` 和 `doctrine/orm` 库来实现查询器，请转到 [MySQL 查询器]()。
+此 MySQL 组件为旧版 MySQL 查询器组件，为了统一和提升对未来独立组件的兼容性，现转变为使用 `doctrine/dbal` 和 `doctrine/orm` 库来实现查询器，请转到 [MySQL 查询器]()。
+
+:::
 
 ## 配置
 
@@ -77,8 +79,6 @@ foreach($r as $k => $v) {
 DB::table("admin")->where("name", "fake_admin")->count();
 //SELECT count(*) FROM admin WHERE name = 'fake_admin'
 ```
-
-
 
 ## 直接执行 SQL 
 

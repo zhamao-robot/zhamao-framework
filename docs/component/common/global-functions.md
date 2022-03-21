@@ -8,35 +8,35 @@
 
 根据加载的用户编写的代码类名来获取类所在的文件路径。
 
-=== "src/Module/Example/Hello.php"
+**src/Module/Example/Hello.php**
 
-	```php
-	<?php
-	namespace Module\Example;
-	class Hello {  ...  }
-	```
+```php
+<?php
+namespace Module\Example;
+class Hello {  ...  }
+```
 
-=== "src/Module/Example/Start.php"
+**src/Module/Example/Start.php**
 
-	```php
-	<?php
-	namespace Module\Example;
-	use ZM\Annotation\Swoole\OnStart;
-	class Start {
-		/**
-		 * @OnStart()
-		 */
-		public function onStart() {
-			Console::info("Path: ".getClassPath(Hello::class));
-		}
-	}
-	```
+```php
+<?php
+namespace Module\Example;
+use ZM\Annotation\Swoole\OnStart;
+class Start {
+    /**
+     * @OnStart()
+     */
+    public function onStart() {
+        Console::info("Path: ".getClassPath(Hello::class));
+    }
+}
+```
 
-=== "输出结果"
+**输出结果**
 
-	```
-	[11:12:02] [I] [#0] Path: /mnt/d/project/zhamao-framework/src/Module/Example/Hello.ph
-	```
+```
+[11:12:02] [I] [#0] Path: /mnt/d/project/zhamao-framework/src/Module/Example/Hello.ph
+```
 
 ## explodeMsg()
 
@@ -289,7 +289,7 @@ zm_dump($pass);
 
 定义：`zm_config($name, $key = null)`。
 
-有关 ZMConfig 模块的说明，见 [指南 - 基本配置](/guide/basic-config/)。
+有关 ZMConfig 模块的说明，见 [指南 - 基本配置](/guide/basic-config)。
 
 ```php
 zm_config("global"); //等同于 ZMConfig::get("global");
@@ -321,4 +321,3 @@ zm_config("global", "swoole"); //等同于 ZMConfig::get("global", "swoole");
 ## zm_verbose()
 
 同 `Console::verbose($msg)`。
-

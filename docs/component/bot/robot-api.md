@@ -1,4 +1,4 @@
-# 机器人 API（OneBotV11）
+# 机器人动作 - V11
 
 OneBotV11 类是封装好的 OneBot 标准的 API 接口调用类，可以在机器人连接后通过连接或者机器人 QQ 号获取对象并调用接口（如发送群消息、获取群列表等操作）。
 
@@ -111,8 +111,9 @@ $obj = $bot->sendGroupMsg("234567", "你好");
 echo json_encode($obj, 128|256);
 ```
 
+输出结果
+
 ```json
-// 输出结果
 {
     "status": "ok",
     "retcode": 0,
@@ -161,21 +162,18 @@ vardump($result["retcode"]); //如果成功撤回，输出 int(0)
 | ------------ | -------------- | ------- |
 | `message_id` | number (int32) | 消息 ID |
 
-例子
+代码
 
-=== "代码"
+```php
+$bot = OneBotV11::get(123456); // 123456是你的机器人QQ
+$bot->sendPrivateMsg("627577391", "你好啊！你好你好！");
+```
 
-	```php
-	$bot = OneBotV11::get(123456); // 123456是你的机器人QQ
-	$bot->sendPrivateMsg("627577391", "你好啊！你好你好！");
-	```
+效果
 
-=== "效果"
-
-	<chat-box>
-	( 你好啊！你好你好！
-	</chat-box>
-
+<chat-box :my-chats="[
+    {type:1,content:'你好啊！你好你好！'}
+]"></chat-box>
 
 ### sendGroupMsg()
 
@@ -621,10 +619,11 @@ vardump($result["retcode"]); //如果成功撤回，输出 int(0)
 
 获取 Cookies。
 
-!!! warning "注意"
+::: warning 注意
 
-	目前开源的 mirai 为底层的机器人客户端均不支持获取 Cookies 和 CSRF Token，包括 go-cqhttp。
+目前开源的 mirai 为底层的机器人客户端均不支持获取 Cookies 和 CSRF Token，包括 go-cqhttp。
 
+:::
 
 参数
 
@@ -780,9 +779,11 @@ vardump($result["retcode"]); //如果成功撤回，输出 int(0)
 
 唯一一个参数做保留，用于选择不同客户端，目前仅支持 `go-cqhttp`，所以缺省也默认为 `go-cqhttp`。
 
-!!! warning "注意"
+::: warning 注意
 
-    由于不同版本的扩展 API 变化可能会很大，改动较多，炸毛框架不会将对应扩展方法写入文档，具体调用情况可根据 IDE 自动补全中的文档或对应类的注释查看。
+由于不同版本的扩展 API 变化可能会很大，改动较多，炸毛框架不会将对应扩展方法写入文档，具体调用情况可根据 IDE 自动补全中的文档或对应类的注释查看。
+
+:::
 
 ### callExtendedAPI() （扩充 API）
 
@@ -805,4 +806,3 @@ $result = $bot->callExtendedAPI("get_group_root_files", ["group_id" => 123456]);
 var_dump($result["data"]); 
 // 输出群文件列表
 ```
-

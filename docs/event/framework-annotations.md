@@ -328,7 +328,7 @@ class Hello {
 
 ## 示例3（接收 WS 客户端发来的数据）
 
-见 [接入 WebSocket 客户端](/advanced/connect-ws-client/)。
+见 [接入 WebSocket 客户端](/advanced/connect-ws-client)。
 
 ## 示例4（使用 OnStart 给所有 Worker 进程写入缓存提速）
 
@@ -359,8 +359,7 @@ class Hello {
         },
         "key": "C",
         "answer_type": 0
-    },
-    .....
+    }
 }
 ```
 
@@ -411,10 +410,10 @@ class Hello {
 
 聊天效果：
 
-<chat-box>
-) 找题 1
-( 题目名称：法律与其他社会规范的区别在于（ ）。\nA. 是调整人们行为的规范\nB. 有约束力\nC. 由国家强制力保证执行\nD. 规定制裁措施\n正确答案：C
-</chat-box>
+<chat-box :my-chats="[
+    {type:0,content:'找题 1'},
+    {type:1,content:'题目名称：法律与其他社会规范的区别在于（ ）。\nA. 是调整人们行为的规范\nB. 有约束力\nC. 由国家强制力保证执行\nD. 规定制裁措施\n正确答案：C'},
+]"></chat-box>
 
 ## 示例5（创建每分钟自动执行的爬虫）
 
@@ -431,3 +430,4 @@ public function onCrawl() {
 ## 示例6（创建一个远程终端命令并调试框架）
 
 > 开个坑，以后填。（__填坑标记__）
+> 

@@ -2,7 +2,7 @@
 
 ## 什么是 OneBot
 
-OneBot 是一个聊天机器人应用接口标准，详情戳[这里](https://github.com/howmanybots/onebot)。
+OneBot 是一个聊天机器人应用接口标准，详情戳 [这里](https://github.com/howmanybots/onebot)。
 
 ## OneBot 实现选择
 

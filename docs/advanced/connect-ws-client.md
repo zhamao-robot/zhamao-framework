@@ -11,9 +11,11 @@
 
 以上两种方式，`Header` 方式比 `GET` 方式优先级要高，如果两者均没有指定，框架会将此连接当作 `default` 类型接入。
 
-!!! note "提示"
+::: tip 提示
 
-	对于对接 OneBot 标准的机器人客户端，只要符合 OneBot 标准，即 `X-Client-Role` 会自动带上 `universal`、`qq` 等字样，就会自动标记为 `qq` 类型。
+对于对接 OneBot 标准的机器人客户端，只要符合 OneBot 标准，即 `X-Client-Role` 会自动带上 `universal`、`qq` 等字样，就会自动标记为 `qq` 类型。
+
+:::
 
 ## 逻辑编写
 
@@ -140,4 +142,3 @@ public function onMessage() {
 ```php
 server()->close($conn->getFd());
 ```
-
