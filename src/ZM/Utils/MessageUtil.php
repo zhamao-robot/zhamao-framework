@@ -99,7 +99,7 @@ class MessageUtil
      */
     public static function splitCommand($msg): array
     {
-        $word = explodeMsg(str_replace("\r", '', $msg));
+        $word = explode_msg(str_replace("\r", '', $msg));
         if (empty($word)) {
             $word = [''];
         }
@@ -160,7 +160,7 @@ class MessageUtil
                     break;
                 }
                 if ($v->pattern != '') {
-                    $match = matchArgs($v->pattern, $msg);
+                    $match = match_args($v->pattern, $msg);
                     if ($match !== false) {
                         $matched->match = $match;
                         $matched->object = $v;

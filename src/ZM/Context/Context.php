@@ -216,8 +216,8 @@ class Context implements ContextInterface
      * @param  string                   $prompt
      * @param  int                      $timeout
      * @param  string                   $timeout_prompt
-     * @throws InvalidArgumentException
      * @throws WaitTimeoutException
+     * @throws InvalidArgumentException
      * @return string
      * @noinspection PhpMissingReturnTypeInspection
      */
@@ -233,7 +233,7 @@ class Context implements ContextInterface
         }
 
         try {
-            $r = CoMessage::yieldByWS($this->getData(), ['user_id', 'self_id', 'message_type', onebot_target_id_name($this->getMessageType())], $timeout);
+            $r = CoMessage::yieldByWS($this->getData(), ['user_id', 'self_id', 'message_type', get_onebot_target_id_name($this->getMessageType())], $timeout);
         } catch (Exception $e) {
             $r = false;
         }
@@ -249,8 +249,8 @@ class Context implements ContextInterface
     /**
      * @param $mode
      * @param $prompt_msg
-     * @throws InvalidArgumentException
      * @throws WaitTimeoutException
+     * @throws InvalidArgumentException
      * @return mixed|string
      */
     public function getArgs($mode, $prompt_msg)
@@ -276,15 +276,15 @@ class Context implements ContextInterface
                     ctx()->setCache('match', $arg);
                     return $a;
                 }
-                    return $this->waitMessage($prompt_msg);
+                return $this->waitMessage($prompt_msg);
         }
         throw new InvalidArgumentException();
     }
 
     /**
      * @param  string                   $prompt_msg
-     * @throws InvalidArgumentException
      * @throws WaitTimeoutException
+     * @throws InvalidArgumentException
      * @return int|mixed|string
      */
     public function getNextArg($prompt_msg = '')
@@ -294,8 +294,8 @@ class Context implements ContextInterface
 
     /**
      * @param  string                   $prompt_msg
-     * @throws InvalidArgumentException
      * @throws WaitTimeoutException
+     * @throws InvalidArgumentException
      * @return int|mixed|string
      */
     public function getFullArg($prompt_msg = '')
@@ -305,8 +305,8 @@ class Context implements ContextInterface
 
     /**
      * @param  string                   $prompt_msg
-     * @throws InvalidArgumentException
      * @throws WaitTimeoutException
+     * @throws InvalidArgumentException
      * @return int|mixed|string
      */
     public function getNumArg($prompt_msg = '')
