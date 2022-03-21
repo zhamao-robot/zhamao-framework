@@ -9,6 +9,7 @@ use Swoole\Coroutine\System;
 use Swoole\WebSocket\Server;
 use Symfony\Component\VarDumper\VarDumper;
 use ZM\API\OneBotV11;
+use ZM\API\ZMRobot;
 use ZM\Config\ZMConfig;
 use ZM\ConnectionManager\ManagerGM;
 use ZM\Console\Console;
@@ -16,7 +17,6 @@ use ZM\Context\Context;
 use ZM\Context\ContextInterface;
 use ZM\Event\EventManager;
 use ZM\Exception\RobotNotFoundException;
-use ZM\Exception\ZMException;
 use ZM\Exception\ZMKnownException;
 use ZM\Framework;
 use ZM\Store\LightCacheInside;
@@ -24,14 +24,16 @@ use ZM\Store\ZMAtomic;
 use ZM\Store\ZMBuf;
 use ZM\Utils\DataProvider;
 
-function getClassPath($class_name)
+/**
+ * 获取类路径
+ */
+function get_class_path(string $class_name): ?string
 {
     $dir = str_replace('\\', '/', $class_name);
-    $dir2 = DataProvider::getSourceRootDir() . '/src/' . $dir . '.php';
-    // echo "@@@".$dir2.PHP_EOL;
-    $dir2 = str_replace('\\', '/', $dir2);
-    if (file_exists($dir2)) {
-        return $dir2;
+    $dir = DataProvider::getSourceRootDir() . '/src/' . $dir . '.php';
+    $dir = str_replace('\\', '/', $dir);
+    if (file_exists($dir)) {
+        return $dir;
     }
     return null;
 }
@@ -45,10 +47,10 @@ function _zm_env_check()
     if (!extension_loaded('swoole')) {
         exit(zm_internal_errcode('E00001') . "Can not find swoole extension.\n");
     }
-    if (version_compare(SWOOLE_VERSION, '4.5.0') == -1) {
+    if (version_compare(SWOOLE_VERSION, '4.5.0') === -1) {
         exit(zm_internal_errcode('E00002') . 'You must install swoole version >= 4.5.0 !');
     }
-    if (version_compare(PHP_VERSION, '7.2') == -1) {
+    if (version_compare(PHP_VERSION, '7.2') === -1) {
         exit(zm_internal_errcode('E00003') . 'PHP >= 7.2 required.');
     }
     if (version_compare(SWOOLE_VERSION, '4.6.7') < 0 && !extension_loaded('pcntl')) {
@@ -58,21 +60,20 @@ function _zm_env_check()
 }
 
 /**
- * 使用自己定义的万（san）能分割函数
- * @param $msg
- * @param bool $ban_comma
+ * 分割消息字符串
+ *
+ * @param array $includes 需要进行切割的字符串，默认包含空格及制表符（\t)
  */
-function explodeMsg($msg, $ban_comma = false): array
+function explode_msg(string $msg, array $includes = [' ', "\t"]): array
 {
-    $msg = str_replace(' ', "\n", trim($msg));
-    if (!$ban_comma) {
-        // $msg = str_replace("，", "\n", $msg);
-        $msg = str_replace("\t", "\n", $msg);
+    $msg = trim($msg);
+    foreach ($includes as $v) {
+        $msg = str_replace($v, "\n", $msg);
     }
-    $msgs = explode("\n", $msg);
+    $msg_seg = explode("\n", $msg);
     $ls = [];
-    foreach ($msgs as $v) {
-        if (trim($v) == '') {
+    foreach ($msg_seg as $v) {
+        if (empty(trim($v))) {
             continue;
         }
         $ls[] = trim($v);
@@ -80,93 +81,99 @@ function explodeMsg($msg, $ban_comma = false): array
     return $ls;
 }
 
-/** @noinspection PhpUnused */
-function unicode_decode($str)
+/**
+ * 解码Unicode字符串
+ */
+function unicode_decode(string $str): ?string
 {
-    return preg_replace_callback('/\\\\u([0-9a-f]{4})/i', function ($matches) {
+    return preg_replace_callback('/\\\\u([0-9a-f]{4})/i', static function ($matches) {
         return mb_convert_encoding(pack('H*', $matches[1]), 'UTF-8', 'UCS-2BE');
     }, $str);
 }
 
-function matchPattern($pattern, $context): bool
+/**
+ * 格式匹配
+ */
+function match_pattern(string $pattern, string $subject): bool
 {
-    if (mb_substr($pattern, 0, 1) == '' && mb_substr($context, 0, 1) == '') {
+    if (mb_strpos($pattern, '') === 0 && mb_strpos($subject, '') === 0) {
         return true;
     }
-    if (mb_substr($pattern, 0, 1) == '*' && mb_substr($pattern, 1, 1) != '' && mb_substr($context, 0, 1) == '') {
+    if (mb_strpos($pattern, '*') === 0 && mb_substr($pattern, 1, 1) !== '' && mb_strpos($subject, '') === 0) {
         return false;
     }
-    if (mb_substr($pattern, 0, 1) == mb_substr($context, 0, 1)) {
-        return matchPattern(mb_substr($pattern, 1), mb_substr($context, 1));
+    if (mb_strpos($pattern, mb_substr($subject, 0, 1)) === 0) {
+        return match_pattern(mb_substr($pattern, 1), mb_substr($subject, 1));
     }
-    if (mb_substr($pattern, 0, 1) == '*') {
-        return matchPattern(mb_substr($pattern, 1), $context) || matchPattern($pattern, mb_substr($context, 1));
+    if (mb_strpos($pattern, '*') === 0) {
+        return match_pattern(mb_substr($pattern, 1), $subject) || match_pattern($pattern, mb_substr($subject, 1));
     }
     return false;
 }
 
-function split_explode($del, $str, $divide_en = false): array
+function split_explode(string $del, string $string, bool $divide_en = false): array
 {
-    $str = explode($del, $str);
-    for ($i = 0; $i < mb_strlen($str[0]); ++$i) {
+    $str = explode($del, $string);
+    for ($i = 0, $i_max = mb_strlen($str[0]); $i < $i_max; ++$i) {
         if (
             is_numeric(mb_substr($str[0], $i, 1))
             && (
                 !is_numeric(mb_substr($str[0], $i - 1, 1))
-                && mb_substr($str[0], $i - 1, 1) != ' '
+                && mb_substr($str[0], $i - 1, 1) !== ' '
                 && ctype_alpha(mb_substr($str[0], $i - 1, 1)) === false
             )
         ) {
             $str[0] = mb_substr($str[0], 0, $i) . ' ' . mb_substr($str[0], $i);
         } elseif (
             $divide_en
+            && mb_substr($str[0], $i - 1, 1) !== ' '
             && ctype_alnum(mb_substr($str[0], $i, 1))
             && !ctype_alnum(mb_substr($str[0], $i - 1, 1))
-            && mb_substr($str[0], $i - 1, 1) != ' '
         ) {
             $str[0] = mb_substr($str[0], 0, $i) . ' ' . mb_substr($str[0], $i);
         }
     }
     $str = implode($del, $str);
-    // echo $str."\n";
+
     $ls = [];
     foreach (explode($del, $str) as $v) {
-        if (trim($v) == '') {
+        if (empty(trim($v))) {
             continue;
         }
         $ls[] = $v;
     }
-    // var_dump($ls);
-    return $ls == [] ? [''] : $ls;
+    return $ls ?: [''];
 }
 
-function matchArgs($pattern, $context)
+/**
+ * 匹配参数
+ *
+ * @return array|false 成功时返回匹配到的参数数组，失败时返回false
+ */
+function match_args(string $pattern, string $subject)
 {
     $result = [];
-    if (matchPattern($pattern, $context)) {
+    if (match_pattern($pattern, $subject)) {
         if (mb_strpos($pattern, '*') === false) {
             return [];
         }
         $exp = explode('*', $pattern);
         $i = 0;
         foreach ($exp as $k => $v) {
-            // echo "[MATCH$k] " . $v . PHP_EOL;
-            if ($v == '' && $k == 0) {
+            if (empty($v) && $k === 0) {
                 continue;
             }
-            if ($v == '' && $k == count($exp) - 1) {
-                $context = $context . '^EOL';
+            if (empty($v) && $k === count($exp) - 1) {
+                $subject .= '^EOL';
                 $v = '^EOL';
             }
             $cur_var = '';
-            // echo mb_substr($context, $i) . "|" . $v . PHP_EOL;
             $ori = $i;
-            while (($a = mb_substr($context, $i, mb_strlen($v))) != $v && $a != '') {
-                $cur_var .= mb_substr($context, $i, 1);
+            while (($a = mb_substr($subject, $i, mb_strlen($v))) !== $v && !empty($a)) {
+                $cur_var .= mb_substr($subject, $i, 1);
                 ++$i;
             }
-            if ($i != $ori || $k == 1 || $k == count($exp) - 1) {
-                // echo $cur_var . PHP_EOL;
+            if ($i !== $ori || $k === 1 || $k === count($exp) - 1) {
                 $result[] = $cur_var;
             }
             $i += mb_strlen($v);
@@ -176,30 +183,27 @@ function matchArgs($pattern, $context)
     return false;
 }
 
-function connectIsQQ(): bool
+/**
+ * 判断当前连接类型是否为传入的$type
+ *
+ * @param  string           $type 连接类型
+ * @throws ZMKnownException
+ */
+function current_connection_is(string $type): bool
 {
-    return ctx()->getConnection()->getName() == 'qq';
+    return ctx()->getConnection()->getName() === $type;
 }
 
-function connectIsDefault(): bool
-{
-    return ctx()->getConnection()->getName() == 'default';
-}
-
-function connectIs($type): bool
-{
-    return ctx()->getConnection()->getName() == $type;
-}
-
-function getAnnotations(): array
+/**
+ * 获取触发当前方法的注解
+ */
+function get_annotations(): array
 {
     $s = debug_backtrace()[1];
-    // echo json_encode($s, 128|256);
     $list = [];
     foreach (EventManager::$events as $v) {
         foreach ($v as $vs) {
-            // echo get_class($vs).": ".$vs->class." => ".$vs->method.PHP_EOL;
-            if ($vs->class == $s['class'] && $vs->method == $s['function']) {
+            if ($vs->class === $s['class'] && $vs->method === $s['function']) {
                 $list[get_class($vs)][] = $vs;
             }
         }
@@ -207,16 +211,19 @@ function getAnnotations(): array
     return $list;
 }
 
-function set_coroutine_params($array)
+/**
+ * 设置协程参数
+ */
+function set_coroutine_params(array $params): void
 {
     $cid = Co::getCid();
-    if ($cid == -1) {
+    if ($cid === -1) {
         exit(zm_internal_errcode('E00061') . 'Cannot set coroutine params at none coroutine mode.');
     }
     if (isset(Context::$context[$cid])) {
-        Context::$context[$cid] = array_merge(Context::$context[$cid], $array);
+        Context::$context[$cid] = array_merge(Context::$context[$cid], $params);
     } else {
-        Context::$context[$cid] = $array;
+        Context::$context[$cid] = $params;
     }
     foreach (Context::$context as $c => $v) {
         if (!Co::exists($c)) {
@@ -226,6 +233,8 @@ function set_coroutine_params($array)
 }
 
 /**
+ * 获取当前上下文
+ *
  * @throws ZMKnownException
  */
 function context(): ContextInterface
@@ -234,6 +243,8 @@ function context(): ContextInterface
 }
 
 /**
+ * 获取当前上下文
+ *
  * @throws ZMKnownException
  */
 function ctx(): ContextInterface
@@ -244,8 +255,8 @@ function ctx(): ContextInterface
         return ZMBuf::$context_class[$cid] ?? (ZMBuf::$context_class[$cid] = new $c_class($cid));
     }
     Console::debug("未找到当前协程的上下文({$cid})，正在找父进程的上下文");
-    while (($pcid = Co::getPcid($cid)) !== -1) {
-        $cid = $pcid;
+    while (($parent_cid = Co::getPcid($cid)) !== -1) {
+        $cid = $parent_cid;
         if (isset(Context::$context[$cid])) {
             return ZMBuf::$context_class[$cid] ?? (ZMBuf::$context_class[$cid] = new $c_class($cid));
         }
@@ -253,49 +264,120 @@ function ctx(): ContextInterface
     throw new ZMKnownException(zm_internal_errcode('E00072') . 'Unable to find context environment');
 }
 
-function onebot_target_id_name($message_type): string
+/**
+ * 根据消息类型获取对应的OneBot目标名称
+ *
+ * @return string 如传入的消息类型不被支持，将默认返回`user_id`
+ */
+function get_onebot_target_id_name(string $message_type): string
 {
-    return $message_type == 'group' ? 'group_id' : 'user_id';
-}
-
-function zm_sleep($s = 1): bool
-{
-    if (Coroutine::getCid() != -1) {
-        System::sleep($s);
-    } else {
-        usleep($s * 1000 * 1000);
+    switch ($message_type) {
+        case 'group':
+            return 'group_id';
+        case 'discuss':
+            return 'discuss_id';
+        case 'private':
+        default:
+            return 'user_id';
     }
-    return true;
 }
 
-function zm_exec($cmd): array
+/**
+ * 协程休眠
+ *
+ * 与 {@link sleep()} 一致，只是增加了协程支持
+ *
+ * @since 2.7.3 此函数不再返回 true
+ */
+function zm_sleep(int $seconds = 1): void
 {
-    return System::exec($cmd);
+    if (Coroutine::getCid() !== -1) {
+        System::sleep($seconds);
+    } else {
+        usleep($seconds * 1000 * 1000);
+    }
 }
 
-function zm_cid()
+/**
+ * 协程执行命令
+ *
+ * 与 {@link exec()} 一致，只是增加了协程支持
+ *
+ * @return array{code: int, signal: int, output: string}
+ */
+function zm_exec(string $command): array
+{
+    return System::exec($command);
+}
+
+/**
+ * 获取当前协程ID
+ *
+ * 与 {@link Co::getCid()} 一致
+ */
+function zm_cid(): int
 {
     return Co::getCid();
 }
 
+/**
+ * 挂起当前协程
+ *
+ * 与 {@link Co::yield()} 一致
+ */
 function zm_yield()
 {
     Co::yield();
 }
 
+/**
+ * 恢复并继续执行指定协程
+ *
+ * 与 {@link Co::resume()} 一致
+ */
 function zm_resume(int $cid)
 {
     Co::resume($cid);
 }
 
-function zm_timer_after($ms, callable $callable)
+/**
+ * 指定延迟后执行函数
+ *
+ * @param int $delay 延迟时间，单位毫秒ms
+ */
+function run_later(callable $runnable, int $delay)
 {
-    Swoole\Timer::after($ms, function () use ($callable) {
-        call_with_catch($callable);
+    Swoole\Timer::after($delay, static function () use ($runnable) {
+        call_with_catch($runnable);
     });
 }
 
-function call_with_catch($callable)
+/**
+ * 重复在指定时间间隔后执行函数
+ *
+ * @param  int       $interval 间隔时间，单位毫秒ms
+ * @return false|int 定时器ID，失败返回false
+ */
+function run_repeating(callable $runnable, int $interval)
+{
+    if (zm_cid() === -1) {
+        return go(static function () use ($interval, $runnable) {
+            Console::debug('Adding extra timer tick of ' . $interval . ' ms');
+            Swoole\Timer::tick($interval, static function () use ($runnable) {
+                call_with_catch($runnable);
+            });
+        });
+    }
+
+    return Swoole\Timer::tick($interval, static function () use ($runnable) {
+        call_with_catch($runnable);
+    });
+}
+
+/**
+ * 执行函数并记录异常
+ */
+function call_with_catch(callable $callable): void
 {
     try {
         $callable();
@@ -310,32 +392,19 @@ function call_with_catch($callable)
     }
 }
 
-function zm_timer_tick($ms, callable $callable)
+/**
+ * 生成消息的哈希值
+ */
+function hash_message(array $message): string
 {
-    if (zm_cid() === -1) {
-        return go(function () use ($ms, $callable) {
-            Console::debug('Adding extra timer tick of ' . $ms . ' ms');
-            Swoole\Timer::tick($ms, function () use ($callable) {
-                call_with_catch($callable);
-            });
-        });
-    } else {
-        return Swoole\Timer::tick($ms, function () use ($callable) {
-            call_with_catch($callable);
-        });
-    }
+    return md5($message['user_id'] . '^' . $message['self_id'] . '^' . $message['message_type'] . '^' . ($message[$message['message_type'] . '_id'] ?? $message['user_id']));
 }
 
-function zm_go(callable $callable)
-{
-    call_with_catch($callable);
-}
-
-function zm_data_hash($v): string
-{
-    return md5($v['user_id'] . '^' . $v['self_id'] . '^' . $v['message_type'] . '^' . ($v[$v['message_type'] . '_id'] ?? $v['user_id']));
-}
-
+/**
+ * 获取 Swoole Server 实例
+ *
+ * 与 {@link Framework::$server} 一致
+ */
 function server(): ?Server
 {
     return Framework::$server;
@@ -343,6 +412,7 @@ function server(): ?Server
 
 /**
  * 获取缓存当前框架pid的临时目录
+ * @internal
  */
 function _zm_pid_dir(): string
 {
@@ -354,18 +424,21 @@ function _zm_pid_dir(): string
 }
 
 /**
+ * 获取 ZMRobot 实例
+ *
+ * 随机返回一个 ZMRobot 实例，效果等同于 {@link ZMRobot::getRandom()}。
+ *
+ * 在单机器人模式下，会直接返回该机器人实例。
  * @throws RobotNotFoundException
- * @throws ZMException
- * @return OneBotV11
  */
-function bot()
+function bot(): ZMRobot
 {
-    if (($conn = LightCacheInside::get('connect', 'conn_fd')) == -2) {
+    if (($conn = LightCacheInside::get('connect', 'conn_fd')) === -2) {
         return OneBotV11::getRandom();
     }
-    if ($conn != -1) {
+    if ($conn !== -1) {
         if (($obj = ManagerGM::get($conn)) !== null) {
-            return new OneBotV11($obj);
+            return new ZMRobot($obj);
         }
         throw new RobotNotFoundException('单机器人连接模式可能连接了多个机器人！');
     }
@@ -373,10 +446,9 @@ function bot()
 }
 
 /**
- * 获取同类型所有连接的文件描述符 ID
- * @author 854854321
+ * 获取指定连接类型的文件描述符ID
  */
-function getAllFdByConnectType(string $type = 'default'): array
+function get_all_fd_of_type(string $type = 'default'): array
 {
     $fds = [];
     foreach (ManagerGM::getAllByName($type) as $obj) {
@@ -385,12 +457,20 @@ function getAllFdByConnectType(string $type = 'default'): array
     return $fds;
 }
 
-function zm_atomic($name): ?Atomic
+/**
+ * 获取原子计数器
+ *
+ * 与 {@link ZMAtomic::get()} 一致
+ */
+function zm_atomic(string $name): ?Atomic
 {
     return ZMAtomic::get($name);
 }
 
-function uuidgen($uppercase = false): string
+/**
+ * 生成 UUID
+ */
+function uuidgen(bool $uppercase = false): string
 {
     try {
         $data = random_bytes(16);
@@ -403,11 +483,24 @@ function uuidgen($uppercase = false): string
         vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
 }
 
-function working_dir()
+/**
+ * 获取框架运行的工作目录
+ *
+ * @example 例如你是从 /root/framework-starter/ 目录启动的框架，vendor/bin/start server，那么 working_dir() 返回的就是 /root/framework-starter。
+ */
+function working_dir(): string
 {
     return WORKING_DIR;
 }
 
+/**
+ * 更漂亮地输出变量值
+ *
+ * 可替代 {@link var_dump()}
+ *
+ * @param  mixed       $var
+ * @return array|mixed 返回传入的变量，传入多个变量则会返回数组
+ */
 function zm_dump($var, ...$moreVars)
 {
     VarDumper::dump($var);
@@ -416,56 +509,246 @@ function zm_dump($var, ...$moreVars)
         VarDumper::dump($v);
     }
 
-    if (1 < func_num_args()) {
+    if (func_num_args() > 1) {
         return func_get_args();
     }
 
     return $var;
 }
 
-function zm_info($obj)
+/**
+ * 输出info日志
+ *
+ * 与 {@link Console::info()} 一致
+ *
+ * @param $obj
+ */
+function zm_info($obj): void
 {
     Console::info($obj);
 }
 
-function zm_warning($obj)
+/**
+ * 输出warning日志
+ *
+ * 与 {@link Console::warning()} 一致
+ *
+ * @param $obj
+ */
+function zm_warning($obj): void
 {
     Console::warning($obj);
 }
 
-function zm_success($obj)
+/**
+ * 输出success日志
+ *
+ * 与 {@link Console::success()} 一致
+ *
+ * @param $obj
+ */
+function zm_success($obj): void
 {
     Console::success($obj);
 }
 
-function zm_debug($obj)
+/**
+ * 输出debug日志
+ *
+ * 与 {@link Console::debug()} 一致
+ *
+ * @param $obj
+ */
+function zm_debug($obj): void
 {
     Console::debug($obj);
 }
 
-function zm_verbose($obj)
+/**
+ * 输出verbose日志
+ *
+ * 与 {@link Console::verbose()} 一致
+ *
+ * @param $obj
+ */
+function zm_verbose($obj): void
 {
     Console::verbose($obj);
 }
 
-function zm_error($obj)
+/**
+ * 输出error日志
+ *
+ * 与 {@link Console::error()} 一致
+ *
+ * @param $obj
+ */
+function zm_error($obj): void
 {
     Console::error($obj);
 }
 
-function zm_config($name, $key = null)
+/**
+ * 获取配置项
+ *
+ * 与 {@link ZMConfig::get()} 一致
+ *
+ * @return mixed
+ */
+function zm_config(string $name, ?string $key = null)
 {
     return ZMConfig::get($name, $key);
 }
 
-function quick_reply_closure($reply)
+/**
+ * 生成快速回复闭包
+ *
+ * @param $reply
+ */
+function quick_reply_closure($reply): Closure
 {
-    return function () use ($reply) {
+    return static function () use ($reply) {
         return $reply;
     };
 }
 
+/**
+ * 获取内部错误码
+ *
+ * @param $code
+ */
 function zm_internal_errcode($code): string
 {
     return "[ErrCode:{$code}] ";
+}
+
+/**
+ * 以下为废弃的函数，将于未来移除
+ */
+
+/**
+ * @deprecated 已废弃，请使用 {@link get_all_fd_of_type()}
+ */
+function getAllFdByConnectType(string $type = 'default'): array
+{
+    return get_all_fd_of_type($type);
+}
+
+/**
+ * @param mixed $class_name
+ * @deprecated 已废弃，请使用 {@link get_class_path()}
+ */
+function getClassPath($class_name): ?string
+{
+    return get_class_path($class_name);
+}
+
+/**
+ * @param mixed $msg
+ * @param mixed $ban_comma
+ * @deprecated 已废弃，请使用 {@link explode_msg()}，参数有变
+ */
+function explodeMsg($msg, $ban_comma = false): array
+{
+    if ($ban_comma) {
+        return explode_msg($msg, [' ']);
+    }
+
+    return explode_msg($msg);
+}
+
+/**
+ * @deprecated 已废弃，请使用 {@link current_connection_is()}
+ */
+function connectIsQQ(): bool
+{
+    return current_connection_is('qq');
+}
+
+/**
+ * @deprecated 已废弃，请使用 {@link current_connection_is()}
+ */
+function connectIsDefault(): bool
+{
+    return current_connection_is('default');
+}
+
+/**
+ * @param mixed $type
+ * @deprecated 已废弃，请使用 {@link current_connection_is()}
+ */
+function connectIs($type): bool
+{
+    return current_connection_is($type);
+}
+
+/**
+ * @deprecated 已废弃，请使用 {@link get_annotations()}
+ */
+function getAnnotations(): array
+{
+    return get_annotations();
+}
+
+/**
+ * @param mixed $pattern
+ * @param mixed $context
+ * @deprecated 已废弃，请使用 {@link match_args()}
+ */
+function matchArgs($pattern, $context)
+{
+    return match_args($pattern, $context);
+}
+
+/**
+ * @param mixed $pattern
+ * @param mixed $context
+ * @deprecated 已废弃，请使用 {@link match_pattern()}
+ */
+function matchPattern($pattern, $context): bool
+{
+    return match_pattern($pattern, $context);
+}
+
+/**
+ * @param mixed $message_type
+ * @deprecated 已废弃，请使用 {@link get_onebot_target_id_name()}
+ */
+function onebot_target_id_name(string $message_type): string
+{
+    return get_onebot_target_id_name($message_type);
+}
+
+/**
+ * @param mixed $ms
+ * @deprecated 已废弃，请使用 {@link run_repeating()}
+ */
+function zm_timer_tick($ms, callable $callable)
+{
+    return run_repeating($callable, $ms);
+}
+
+/**
+ * @deprecated 已废弃，请直接使用 {@link call_with_catch()}
+ */
+function zm_go(callable $callable)
+{
+    call_with_catch($callable);
+}
+
+/**
+ * @param mixed $v
+ * @deprecated 已废弃，请使用 {@link hash_message()}
+ */
+function zm_data_hash($v): string
+{
+    return hash_message($v);
+}
+
+/**
+ * @deprecated 已废弃，请使用 {@link run_later()}
+ */
+function zm_timer_after(int $ms, callable $callable)
+{
+    run_later($callable, $ms);
 }
