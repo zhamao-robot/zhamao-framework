@@ -345,7 +345,7 @@ function zm_resume(int $cid)
  *
  * @param int $delay 延迟时间，单位毫秒ms
  */
-function run_later(callable $runnable, int $delay)
+function zm_timer_after(int $delay, callable $runnable)
 {
     Swoole\Timer::after($delay, static function () use ($runnable) {
         call_with_catch($runnable);
@@ -358,7 +358,7 @@ function run_later(callable $runnable, int $delay)
  * @param  int       $interval 间隔时间，单位毫秒ms
  * @return false|int 定时器ID，失败返回false
  */
-function run_repeating(callable $runnable, int $interval)
+function zm_timer_tick(int $interval, callable $runnable)
 {
     if (zm_cid() === -1) {
         return go(static function () use ($interval, $runnable) {
@@ -720,15 +720,6 @@ function onebot_target_id_name(string $message_type): string
 }
 
 /**
- * @param mixed $ms
- * @deprecated 已废弃，请使用 {@link run_repeating()}
- */
-function zm_timer_tick($ms, callable $callable)
-{
-    return run_repeating($callable, $ms);
-}
-
-/**
  * @deprecated 已废弃，请直接使用 {@link call_with_catch()}
  */
 function zm_go(callable $callable)
@@ -743,12 +734,4 @@ function zm_go(callable $callable)
 function zm_data_hash($v): string
 {
     return hash_message($v);
-}
-
-/**
- * @deprecated 已废弃，请使用 {@link run_later()}
- */
-function zm_timer_after(int $ms, callable $callable)
-{
-    run_later($callable, $ms);
 }

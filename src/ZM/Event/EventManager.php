@@ -83,9 +83,9 @@ class EventManager
         }
         $conf = ZMConfig::get('global', 'worker_cache') ?? ['worker' => 0];
         if (server()->worker_id == $conf['worker']) {
-            run_repeating(static function () {
+            zm_timer_tick(ZMConfig::get('global', 'light_cache')['auto_save_interval'] * 1000, static function () {
                 LightCache::savePersistence();
-            }, ZMConfig::get('global', 'light_cache')['auto_save_interval'] * 1000);
+            });
         }
     }
 }
