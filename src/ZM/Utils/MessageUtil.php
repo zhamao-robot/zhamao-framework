@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace ZM\Utils;
 
 use Exception;
+use ReflectionException;
+use ReflectionMethod;
 use ZM\Annotation\CQ\CQCommand;
 use ZM\API\CQ;
 use ZM\Config\ZMConfig;
@@ -12,6 +14,7 @@ use ZM\Console\Console;
 use ZM\Entity\MatchResult;
 use ZM\Event\EventManager;
 use ZM\Requests\ZMRequest;
+use ZM\Store\WorkerCache;
 use ZM\Utils\Manager\WorkerManager;
 
 class MessageUtil
@@ -241,5 +244,73 @@ class MessageUtil
             }
         }
         return $str;
+    }
+
+    /**
+     * 根据注解树生成命令列表、帮助
+     *
+     * @return array 帮助信息，每个元素对应一个命令的帮助信息，格式为：命令名（其他触发条件）：命令描述
+     */
+    public static function generateCommandHelp(): array
+    {
+        try {
+            if ($cache = WorkerCache::get('command_help')) {
+                return $cache;
+            }
+        } catch (Exception $e) {
+            // 不做任何处理，尝试重新生成
+        }
+        $helps = [];
+        foreach (EventManager::$events[CQCommand::class] as $annotation) {
+            if ($annotation instanceof CQCommand) {
+                try {
+                    $reflection = new ReflectionMethod($annotation->class, $annotation->method);
+                } catch (ReflectionException $e) {
+                    Console::warning('注解解析错误：' . $e->getMessage());
+                    continue;
+                }
+                $doc = $reflection->getDocComment();
+                if ($doc) {
+                    // 匹配出不以@开头，且后接中文或任意非空格字符，并以换行符结尾的字符串，也就是命令描述
+                    preg_match_all('/\*\s((?!@)[\x{4e00}-\x{9fa5}\S]+)(\r\n|\r|\n)/u', $doc, $matches);
+                    // 多行描述用分号分隔
+                    $help = implode('；', $matches[1]);
+                    if (empty($help)) {
+                        Console::warning('命令 ' . $annotation->class . '::' . $annotation->method . ' 没有描述！');
+                        $help = '无描述';
+                    }
+                } else {
+                    Console::warning('命令 ' . $annotation->class . '::' . $annotation->method . ' 没有描述！');
+                    $help = '无描述';
+                }
+
+                // 可以触发命令的参数
+                $possible_keys = [
+                    'match' => '%s',
+                    'pattern' => '符合”%s“',
+                    'regex' => '匹配“%s”',
+                    'start_with' => '以”%s“开头',
+                    'end_with' => '以”%s“结尾',
+                    'keyword' => '包含“%s”',
+                    'alias' => '%s',
+                ];
+                $command_seg = [];
+                foreach ($possible_keys as $key => $help_format) {
+                    // 如果定义了该参数，则添加到帮助信息中
+                    if (isset($annotation->{$key}) && !empty($annotation->{$key})) {
+                        $command_seg[] = sprintf($help_format, $annotation->{$key});
+                    }
+                }
+                // 第一个触发参数为主命令名
+                $command = array_shift($command_seg);
+                if (count($command_seg) > 0) {
+                    $command .= '（' . implode('，', $command_seg) . '）';
+                }
+                $helps[] = sprintf('%s：%s', $command, $help);
+            }
+        }
+        // 放到跨进程缓存以供取用
+        WorkerCache::set('command_helps', $helps);
+        return $helps;
     }
 }
