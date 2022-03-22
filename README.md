@@ -49,7 +49,7 @@ public function index() {
 如果你是初学者，可以直接使用以下脚本部署 PHP 环境和安装框架的脚手架：
 
 ```bash
-# 新建一个自己喜欢名字的文件夹，运行一键安装脚本 (仅限 x86_64 和 arch64 平台)
+# 新建一个自己喜欢名字的文件夹，运行一键安装脚本 (仅限 x86-64(AMD64) 和 AArch64(ARM64) 平台)
 mkdir zhamao-app/
 cd zhamao-app/
 # 默认安装的 PHP 版本为 7.4，如需使用其他版本，请设置环境变量 ZM_DOWN_PHP_VERSION 为对应的 PHP 版本，例如：
@@ -110,7 +110,7 @@ bash -c "$(curl -fsSL https://api.zhamao.xin/go.sh)"
 
 作者的炸毛机器人已从2018年初起稳定运行了**四年半**，并且持续迭代。
 
-欢迎随时在 HTTP-API 插件群里提问，当然更好的话可以加 作者 QQ （[627577391](http://wpa.qq.com/msgrd?v=3&uin=627577391&site=qq&menu=yes)）
+欢迎随时在 HTTP-API 插件群里提问，当然更好的话可以加作者 QQ（[627577391](http://wpa.qq.com/msgrd?v=3&uin=627577391&site=qq&menu=yes)）
 或提交 [Issue](https://github.com/zhamao-robot/zhamao-framework/issues/new/choose) 进行疑难解答。
 
 本项目在更新内容时，请及时关注 GitHub 动态，更新前请将自己的模块代码做好备份。
