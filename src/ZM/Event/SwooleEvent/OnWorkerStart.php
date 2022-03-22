@@ -170,7 +170,6 @@ class OnWorkerStart implements SwooleEvent
         }
 
         // 检查是否允许热加载phar模块，允许的话将遍历phar内的文件
-        zm_dump(ZMConfig::get('global', 'module_loader.enable_hotload'));
         $plugin_enable_hotload = ZMConfig::get('global', 'module_loader')['enable_hotload'] ?? false;
         if ($plugin_enable_hotload) {
             $list = ModuleManager::getPackedModules();
