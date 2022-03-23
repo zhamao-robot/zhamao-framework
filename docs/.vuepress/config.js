@@ -81,7 +81,8 @@ module.exports = {
                         'bot/cqcode',
                         'bot/message-util',
                         'bot/access-token',
-                        'bot/turing-api'
+                        'bot/turing-api',
+                        'bot/help-generator.md',
                     ]
                 },
                 {
