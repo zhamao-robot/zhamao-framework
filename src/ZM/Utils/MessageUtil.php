@@ -298,7 +298,13 @@ class MessageUtil
                 foreach ($possible_keys as $key => $help_format) {
                     // 如果定义了该参数，则添加到帮助信息中
                     if (isset($annotation->{$key}) && !empty($annotation->{$key})) {
-                        $command_seg[] = sprintf($help_format, $annotation->{$key});
+                        if (is_iterable($annotation->{$key})) {
+                            foreach ($annotation->{$key} as $item) {
+                                $command_seg[] = sprintf($help_format, $item);
+                            }
+                        } else {
+                            $command_seg[] = sprintf($help_format, $annotation->{$key});
+                        }
                     }
                 }
                 // 第一个触发参数为主命令名
