@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ZM\Annotation\Swoole;
 
+use Attribute;
 use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
 use Doctrine\Common\Annotations\Annotation\Required;
 use Doctrine\Common\Annotations\Annotation\Target;
@@ -15,6 +16,7 @@ use ZM\Annotation\AnnotationBase;
  * @NamedArgumentConstructor()
  * @Target("ALL")
  */
+#[Attribute(Attribute::TARGET_ALL)]
 class SwooleHandler extends AnnotationBase
 {
     /**
