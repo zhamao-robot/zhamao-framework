@@ -1,0 +1,30 @@
+name: Build
+
+on:
+  pull_request:
+    branches:
+      - master
+    types:
+      - closed
+    paths:
+      - 'src/**.php'
+
+jobs:
+  incremental-build-number:
+    if: github.event.pull_request.merged == true
+    name: Incremental Build Number
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Increment build number
+        run: sed -i -r 's/(.*)(\VERSION_ID\s=\s)([0-9]+)(.*)/echo "\1\2$((\3+1))\4"/ge' src/ZM/ConsoleApplication.php
+
+      - name: Commit change
+        run: |
+          git config --global user.name 'Github Build Bot'
+          git config --global user.email 'noreply@github.com'
+          git add src/ZM/ConsoleApplication.php
+          git commit -m "increment build number"
+          git push
