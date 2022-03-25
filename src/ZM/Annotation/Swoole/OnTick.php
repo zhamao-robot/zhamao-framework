@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ZM\Annotation\Swoole;
 
+use Attribute;
 use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
 use Doctrine\Common\Annotations\Annotation\Required;
 use Doctrine\Common\Annotations\Annotation\Target;
@@ -16,6 +17,7 @@ use ZM\Annotation\AnnotationBase;
  * @Target("METHOD")
  * @since 1.2
  */
+#[Attribute(Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE)]
 class OnTick extends AnnotationBase
 {
     /**
