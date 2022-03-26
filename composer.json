@@ -38,6 +38,7 @@
         "ext-json": "*",
         "ext-posix": "*",
         "doctrine/dbal": "^2.13.1",
+        "dragonmantank/cron-expression": "^3.3",
         "jelix/version": "^2.0",
         "koriym/attributes": "^1.0",
         "psy/psysh": "^0.11.2",

@@ -95,7 +95,7 @@ class SignalListener
                     $name = explode('.', $file);
                     if (end($name) == 'pid' && $name[0] !== 'manager') {
                         $pid = file_get_contents($file_path . '/' . $file);
-                        Process::kill($pid, SIGKILL);
+                        Process::kill((int) $pid, SIGKILL);
                     }
                     unlink($file_path . '/' . $file);
                 }

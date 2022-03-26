@@ -33,7 +33,7 @@ class ServerStopCommand extends DaemonCommand
                 $name = explode('.', $file);
                 if (end($name) == 'pid') {
                     $pid = file_get_contents($file_path . '/' . $file);
-                    Process::kill($pid, SIGKILL);
+                    Process::kill((int) $pid, SIGKILL);
                 } elseif ($file === 'master.json') {
                     $json = json_decode(file_get_contents($file_path . '/' . $file), true);
                     Process::kill($json['pid'], SIGKILL);
