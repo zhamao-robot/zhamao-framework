@@ -14,6 +14,7 @@ use ZM\Command\CheckConfigCommand;
 use ZM\Command\Daemon\DaemonReloadCommand;
 use ZM\Command\Daemon\DaemonStatusCommand;
 use ZM\Command\Daemon\DaemonStopCommand;
+use ZM\Command\Generate\APIDocsGenerateCommand;
 use ZM\Command\Generate\SystemdGenerateCommand;
 use ZM\Command\InitCommand;
 use ZM\Command\Module\ModuleListCommand;
@@ -93,6 +94,7 @@ class ConsoleApplication extends Application
             new ServerReloadCommand(),
             new PureHttpCommand(), // 纯HTTP服务器指令
             new SystemdGenerateCommand(),
+            new APIDocsGenerateCommand(),
         ]);
         if (LOAD_MODE === 1) {
             $this->add(new CheckConfigCommand());

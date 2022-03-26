@@ -80,6 +80,7 @@
     "require-dev": {
         "brainmaestro/composer-git-hooks": "^2.8",
         "friendsofphp/php-cs-fixer": "^3.2 != 3.7.0",
+        "jasny/phpdoc-parser": "^1.0",
         "phpstan/phpstan": "^1.1",
         "phpunit/phpunit": "^8.5 || ^9.0",
         "swoole/ide-helper": "^4.5"
