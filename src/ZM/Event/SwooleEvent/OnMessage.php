@@ -31,11 +31,8 @@ class OnMessage implements SwooleEvent
         $conn = ManagerGM::get($frame->fd);
         set_coroutine_params(['server' => $server, 'frame' => $frame, 'connection' => $conn]);
         $dispatcher1 = new EventDispatcher(OnMessageEvent::class);
-        $dispatcher1->setRuleFunction(function ($v) {
-            if ($v->getRule() == '') {
-                return true;
-            }
-            return eval('return ' . $v->getRule() . ';');
+        $dispatcher1->setRuleFunction(function ($v) use ($conn) {
+            return $v->connect_type === $conn->getName() && ($v->getRule() === '' || eval('return ' . $v->getRule() . ';'));
         });
 
         $dispatcher = new EventDispatcher(OnSwooleEvent::class);
