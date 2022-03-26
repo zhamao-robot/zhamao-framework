@@ -4,6 +4,23 @@
 
 同时此处将只使用 build 版本号进行区分。
 
+## build 453 (2022-3-25)
+
+- 新增 property 注解用于 IDE 识别
+
+## build 452 (2022-3-25)
+
+- 修复 OnSetup 注解无法使用 Attribute 解析的 Bug
+- 修复 HelpGenerator 的 Alias 不工作的 Bug
+
+## build 451 (2022-3-21)
+
+- 重构全局函数，统一函数命名，并补全注释
+
+## build 450 (2022-3-21)
+
+- 新增命令帮助生成器
+
 ## build 449 (2022-3-21)
 
 - 新增 Composer 模块加载和分发模式
