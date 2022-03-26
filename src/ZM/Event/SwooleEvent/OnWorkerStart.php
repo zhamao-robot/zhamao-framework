@@ -35,6 +35,7 @@ use ZM\Store\LightCacheInside;
 use ZM\Store\MySQL\SqlPoolStorage;
 use ZM\Store\Redis\ZMRedisPool;
 use ZM\Utils\DataProvider;
+use ZM\Utils\Manager\CronManager;
 use ZM\Utils\Manager\ModuleManager;
 use ZM\Utils\SignalListener;
 
@@ -94,8 +95,9 @@ class OnWorkerStart implements SwooleEvent
                 }
 
                 $this->loadAnnotations(); // 加载composer资源、phar外置包、注解解析注册等
-
+                CronManager::initCronTasks(); // 初始化定时任务
                 EventManager::registerTimerTick(); // 启动计时器
+
                 set_coroutine_params(['server' => $server, 'worker_id' => $worker_id]);
                 $dispatcher = new EventDispatcher(OnStart::class);
                 $dispatcher->setRuleFunction(function ($v) {
