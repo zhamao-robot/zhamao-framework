@@ -97,9 +97,14 @@ class APIDocsGenerateCommand extends Command
             $path = ltrim($path, DataProvider::getSourceRootDir() . '/');
             $class = str_replace(['.php', 'src/', '/'], ['', '', '\\'], $path);
             $output->writeln('正在解析类：' . $class);
-            $metas[$class] = $this->getClassMetas($class, $parser);
+            $meta = $this->getClassMetas($class, $parser);
+            // 忽略不包含任何方法的类
+            if (empty($meta)) {
+                continue;
+            }
+            $metas[$class] = $meta;
             ++$class_count;
-            $method_count += count($metas[$class]);
+            $method_count += count($meta);
         }
 
         $markdown = [];
@@ -125,25 +130,25 @@ class APIDocsGenerateCommand extends Command
             file_put_contents($file, $text);
         }
 
-        // 生成目录
-        $template = <<<'EOT'
-module.exports = [
-  {
-    title: '类',
-    collapsable: false,
-    sidebarDepth: 1,
-    children: %s,
-  }
-];
-EOT;
         $children = array_keys($markdown);
-        // 转换为 JS 数组格式
-        $children = '[' . implode(',', array_map(static function ($child) {
-            return '\'' . str_replace('\\', '/', $child) . '\'';
-        }, $children)) . ']';
-        $text = sprintf($template, $children);
+        $children = str_replace('\\', '/', $children);
+        $class_tree = [];
+        foreach ($children as $child) {
+            $parent = dirname($child);
+            $class_tree[$parent][] = $child;
+        }
+        ksort($class_tree);
+        $config = 'module.exports = [';
+        foreach ($class_tree as $parent => $children) {
+            $encode = json_encode($this->generateSidebarConfig($parent, $children));
+            $encode = str_replace('\/', '/', $encode);
+            $config .= $encode . ',';
+        }
+        $config = rtrim($config, ',');
+        $config .= ']';
+
         $file = DataProvider::getSourceRootDir() . '/docs/.vuepress/api.js';
-        file_put_contents($file, $text);
+        file_put_contents($file, $config);
 
         if (count($this->warnings)) {
             $this->output->writeln('<comment>生成过程中发现 ' . count($this->warnings) . ' 次警告</comment>');
@@ -174,6 +179,14 @@ EOT;
         } catch (\ReflectionException $e) {
             $this->output->writeln('<error>' . $e->getMessage() . '</error>');
             return [];
+        }
+
+        // 省略注解类
+        if (PHP_VERSION_ID >= 80000) {
+            $doc = $class->getDocComment();
+            if ($doc && strpos($doc, '@Annotation') !== false) {
+                return [];
+            }
         }
 
         $metas = [];
@@ -297,6 +310,15 @@ EOT;
         $markdown .= '| ' . $meta['return']['type'] . ' | ' . $meta['return']['description'] . ' |' . "\n";
 
         return $markdown;
+    }
+
+    private function generateSidebarConfig(string $title, array $items): array
+    {
+        return [
+            'title' => $title,
+            'collapsable' => true,
+            'children' => $items,
+        ];
     }
 
     private function warning(string $message): void

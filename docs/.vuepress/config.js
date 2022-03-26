@@ -1,3 +1,5 @@
+const apiConfig = require('./api');
+
 module.exports = {
   title: '炸毛框架',
   description: '一个聊天机器人 + Web 框架',
@@ -162,7 +164,7 @@ module.exports = {
           ]
         },
       ],
-      '/api/': require('./api.js'),
+      '/api/': apiConfig,
       '/faq/': [
         '',
         'to-v2',
