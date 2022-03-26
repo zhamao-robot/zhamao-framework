@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Module\Example;
 
+use Module\Model\Product;
 use ZM\Annotation\CQ\CQBefore;
 use ZM\Annotation\CQ\CQCommand;
 use ZM\Annotation\CQ\CQMessage;
@@ -12,11 +13,13 @@ use ZM\Annotation\Http\RequestMapping;
 use ZM\Annotation\Swoole\OnCloseEvent;
 use ZM\Annotation\Swoole\OnOpenEvent;
 use ZM\Annotation\Swoole\OnRequestEvent;
+use ZM\Annotation\Swoole\OnStart;
 use ZM\API\CQ;
 use ZM\API\OneBotV11;
 use ZM\API\TuringAPI;
 use ZM\ConnectionManager\ConnectionObject;
 use ZM\Console\Console;
+use ZM\DB\SwooleEntityManager;
 use ZM\Event\EventDispatcher;
 use ZM\Exception\InterruptException;
 use ZM\Module\QQBot;
@@ -228,5 +231,17 @@ class Hello
         $helps = MessageUtil::generateCommandHelp();
         array_unshift($helps, '帮助：');
         return implode("\n", $helps);
+    }
+
+    #[OnStart(worker_id: -1)]
+    public function test(): void
+    {
+        Console::info('hi');
+        $m = new SwooleEntityManager();
+        $p = new Product();
+        $p->setName('Good Product');
+        $m->persist($p);
+        $m->flush();
+        Console::info('Created: ' . $p->getId());
     }
 }
