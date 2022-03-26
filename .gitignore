@@ -32,3 +32,7 @@ cghooks.lock
 /node_modules/
 /docs/.vuepress/dist/
 package-lock.json
+
+# API 文档
+/docs/api
+/docs/.vuepress/api.js

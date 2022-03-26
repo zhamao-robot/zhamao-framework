@@ -26,6 +26,16 @@ class APIDocsGenerateCommand extends Command
     private $output;
 
     /**
+     * @var array
+     */
+    private $errors = [];
+
+    /**
+     * @var array
+     */
+    private $warnings = [];
+
+    /**
      * Configures the current command.
      */
     protected function configure(): void
@@ -50,7 +60,7 @@ class APIDocsGenerateCommand extends Command
         $this->output = $output;
 
         // 获取源码目录的文件遍历器
-        $fs = new \RecursiveDirectoryIterator(DataProvider::getSourceRootDir() . '/src/ZM/Utils', FilesystemIterator::SKIP_DOTS);
+        $fs = new \RecursiveDirectoryIterator(DataProvider::getSourceRootDir() . '/src/ZM', FilesystemIterator::SKIP_DOTS);
 
         // 初始化文档解析器
         $parser = new PhpdocParser(PhpDocumentor::tags()->with([
@@ -58,18 +68,38 @@ class APIDocsGenerateCommand extends Command
         ]));
 
         $metas = [];
+        $class_count = 0;
+        $method_count = 0;
 
         // 遍历类并将元数据添加至数组中
-        foreach ($fs as $file) {
+        foreach (new \RecursiveIteratorIterator($fs) as $file) {
             if (!$file->isFile()) {
                 continue;
             }
             $path = $file->getPathname();
+
+            // 过滤不包含类的文件
+            $tokens = token_get_all(file_get_contents($path));
+            $found = false;
+            foreach ($tokens as $token) {
+                if (!is_array($token)) {
+                    continue;
+                }
+                if ($token[0] === T_CLASS) {
+                    $found = true;
+                }
+            }
+            if (!$found) {
+                continue;
+            }
+
             // 获取完整类名
             $path = ltrim($path, DataProvider::getSourceRootDir() . '/');
             $class = str_replace(['.php', 'src/', '/'], ['', '', '\\'], $path);
             $output->writeln('正在解析类：' . $class);
             $metas[$class] = $this->getClassMetas($class, $parser);
+            ++$class_count;
+            $method_count += count($metas[$class]);
         }
 
         $markdown = [];
@@ -115,7 +145,18 @@ EOT;
         $file = DataProvider::getSourceRootDir() . '/docs/.vuepress/api.js';
         file_put_contents($file, $text);
 
+        if (count($this->warnings)) {
+            $this->output->writeln('<comment>生成过程中发现 ' . count($this->warnings) . ' 次警告</comment>');
+        }
+        if (count($this->errors)) {
+            $output->writeln('<error>生成过程中发现错误：</error>');
+            foreach ($this->errors as $error) {
+                $output->writeln('<error>' . $error . '</error>');
+            }
+        }
+
         $output->writeln('<info>API 文档生成完毕</info>');
+        $output->writeln(sprintf('<info>共生成 %d 个类，共 %d 个方法</info>', $class_count, $method_count));
 
         return self::SUCCESS;
     }
@@ -139,18 +180,29 @@ EOT;
 
         // 遍历类方法
         foreach ($class->getMethods() as $method) {
+            if ($method->getDeclaringClass()->getName() !== $class_name) {
+                continue;
+            }
+
             $this->output->writeln('  正在解析方法：' . $method->getName());
 
             // 获取方法的注释并解析
             $doc = $method->getDocComment();
             if (!$doc) {
-                $this->output->writeln('<comment>No doc found</comment>');
+                $this->warning('找不到文档：' . $class_name . '::' . $method->getName());
                 continue;
             }
-            $meta = $parser->parse($doc);
+            try {
+                $meta = $parser->parse($doc);
+            } catch (\Exception $e) {
+                $this->error('解析失败：' . $class_name . '::' . $method->getName() . '，' . $e->getMessage());
+                continue;
+            }
             // 少数情况解析后会带有 */，需要去除
             array_walk_recursive($meta, static function (&$item) {
-                $item = trim(str_replace('*/', '', $item));
+                if (is_string($item)) {
+                    $item = trim(str_replace('*/', '', $item));
+                }
             });
 
             // 对比反射方法获取的参数和注释声明的参数
@@ -245,5 +297,17 @@ EOT;
         $markdown .= '| ' . $meta['return']['type'] . ' | ' . $meta['return']['description'] . ' |' . "\n";
 
         return $markdown;
+    }
+
+    private function warning(string $message): void
+    {
+        $this->output->writeln('<comment>' . $message . '</comment>');
+        $this->warnings[] = $message;
+    }
+
+    private function error(string $message): void
+    {
+        $this->output->writeln('<error>' . $message . '</error>');
+        $this->errors[] = $message;
     }
 }
