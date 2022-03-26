@@ -96,10 +96,10 @@ function unicode_decode(string $str): ?string
  */
 function match_pattern(string $pattern, string $subject): bool
 {
-    if (mb_strpos($pattern, '') === 0 && mb_strpos($subject, '') === 0) {
+    if (empty($pattern) && empty($subject)) {
         return true;
     }
-    if (mb_strpos($pattern, '*') === 0 && mb_substr($pattern, 1, 1) !== '' && mb_strpos($subject, '') === 0) {
+    if (mb_strpos($pattern, '*') === 0 && mb_substr($pattern, 1, 1) !== '' && empty($subject)) {
         return false;
     }
     if (mb_strpos($pattern, mb_substr($subject, 0, 1)) === 0) {
