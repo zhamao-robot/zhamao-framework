@@ -165,6 +165,32 @@ public function onThrowing(?Exception $e) {
 
 `ctx()` 为获取当前协程空间绑定的 `request` 和 `response` 对象。
 
+## 中间件参数
+
+中间件也可以接收额外的参数。例如，你需要在执行对应操作前验证对方是否具有指定的权限，你可以建立一个 `EnsureUserHasPermission` 中间件，并接收权限名称作为参数。
+
+中间件参数可以在中间件中使用 `$this->middleware->params` 获取：
+
+```php
+#[MiddlewareClass('has_permission')]
+class EnsureUserHasPermission implement MiddlewareInterface
+{
+    #[OnBefore]
+    public function handle()
+    {
+        return $user->hasPermission($this->middleware->params[0]);
+    }
+}
+```
+
+你可以直接在中间件注解中向中间件传递参数：
+
+```php
+#[Middleware('has_permission', ['can_execute_command'])]
+public function doSomething()
+{
+```
+
 ## 中间件加载错误处理策略
 
 中间件在某些情况下可能会产生普通 PHP 异常以外的异常，不能被框架的正常错误流程捕获，所以这里额外说明了中间件异常处理的几种策略。
