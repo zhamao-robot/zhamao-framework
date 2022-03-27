@@ -212,10 +212,10 @@ class OnWorkerStart implements SwooleEvent
         if ($obb_onebot['status']) {
             Console::debug('OneBot support enabled, listening OneBot event(3).');
             $obj = new OnMessageEvent();
+            $obj->connect_type = 'qq';
             $obj->class = QQBot::class;
             $obj->method = 'handleByEvent';
             $obj->level = $obb_onebot['message_level'] ?? 99;
-            $obj->rule = 'connectIsQQ()';
             EventManager::addEvent(OnMessageEvent::class, $obj);
             if ($obb_onebot['single_bot_mode']) {
                 LightCacheInside::set('connect', 'conn_fd', -1);
