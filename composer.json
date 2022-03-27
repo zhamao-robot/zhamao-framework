@@ -31,7 +31,7 @@
     "bin": [
         "bin/start",
         "bin/phpunit-swoole",
-        "bin/watcher"
+        "bin/gendoc"
     ],
     "require": {
         "php": "^7.2 || ^7.3 || ^7.4 || ^8.0 || ^8.1",
