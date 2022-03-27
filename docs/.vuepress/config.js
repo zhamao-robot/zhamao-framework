@@ -31,6 +31,7 @@ module.exports = {
             { text: '事件和注解', link: '/event/' },
             { text: '组件', link: '/component/' },
             { text: '进阶', link: '/advanced/' },
+            { text: 'API', link: '/api/' },
             { text: 'FAQ', link: '/faq/' },
             { text: '更新日志', link: '/update/v2/' },
             { text: '炸毛框架 v1', link: 'https://docs-v1.zhamao.xin/' }
