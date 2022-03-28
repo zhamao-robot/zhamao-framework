@@ -163,6 +163,6 @@ class DataProvider
      */
     public static function isRelativePath($path)
     {
-        return strlen($path) > 0 && $path[0] === '/';
+        return strlen($path) > 0 && $path[0] !== '/';
     }
 }
