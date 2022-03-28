@@ -40,9 +40,42 @@ require $root . '/vendor/autoload.php';
 
 sleep(1);
 
-go(static function () {
-    PHPUnit\TextUI\Command::main(false);
-    Swoole\Process::wait();
-});
+const ZM_VERSION_ID = \ZM\ConsoleApplication::VERSION_ID;
+const ZM_VERSION = \ZM\ConsoleApplication::VERSION;
+
+// 模拟define
+const ZM_PROCESS_MASTER = 1;
+const ZM_PROCESS_MANAGER = 2;
+const ZM_PROCESS_WORKER = 4;
+const ZM_PROCESS_USER = 8;
+const ZM_PROCESS_TASKWORKER = 16;
+
+define('FRAMEWORK_ROOT_DIR', dirname(__DIR__) . '/');
+define('WORKING_DIR', getcwd());
+const SOURCE_ROOT_DIR = WORKING_DIR;
+define('LOAD_MODE', is_dir(SOURCE_ROOT_DIR . '/src/ZM') ? 0 : 1);
+chdir(__DIR__ . '/../');
+
+$framework = new \ZM\Framework([
+    'log-debug' => true,
+    'disable-safe-exit' => false,
+    'worker-num' => 1,
+]);
+$framework::$server->addProcess(new \Swoole\Process(static function () use ($root, $framework) {
+    try {
+        require_once $root . '/tests/bootstrap.php';
+        PHPUnit\TextUI\Command::main(false);
+        Swoole\Process::wait();
+    } catch (Throwable) {
+
+    } finally {
+        zm_atomic('server_is_stopped')->set(1);
+        \Swoole\Process::kill(getmypid(), SIGKILL);
+        $framework::$server->stop();
+        $framework::$server->shutdown();
+        trigger_error('PHPUnit test process exit');
+    }
+}, null, null, true));
+$framework->start();
 
 Swoole\Event::wait();
