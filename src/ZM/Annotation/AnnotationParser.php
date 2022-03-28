@@ -82,6 +82,7 @@ class AnnotationParser
             $this->reader = new DualReader(new AnnotationReader(), new AttributeReader());
             foreach ($all_class as $v) {
                 Console::debug('正在检索 ' . $v);
+
                 $reflection_class = new ReflectionClass($v);
                 $methods = $reflection_class->getMethods(ReflectionMethod::IS_PUBLIC);
                 $class_annotations = $this->reader->getClassAnnotations($reflection_class);
