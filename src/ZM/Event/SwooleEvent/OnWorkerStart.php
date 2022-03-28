@@ -161,7 +161,7 @@ class OnWorkerStart implements SwooleEvent
         $exclude_annotations = array_merge($composer['extra']['exclude_annotate'] ?? [], $composer['extra']['zm']['exclude-annotation-path'] ?? []);
         foreach ($merge as $k => $v) {
             if (is_dir(DataProvider::getSourceRootDir() . '/' . $v)) {
-                if (in_array(trim($k, '\\') . '\\', $exclude_annotations)) {
+                if (in_array($v, $exclude_annotations)) {
                     continue;
                 }
                 if (trim($k, '\\') == 'ZM') {
