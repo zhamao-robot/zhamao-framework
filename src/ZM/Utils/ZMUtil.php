@@ -26,9 +26,10 @@ use function substr;
 class ZMUtil
 {
     /**
+     * @param  mixed     $error_exit
      * @throws Exception
      */
-    public static function stop()
+    public static function stop($error_exit = false)
     {
         if (SpinLock::tryLock('_stop_signal') === false) {
             return;
@@ -37,7 +38,7 @@ class ZMUtil
         if (Console::getLevel() >= 4) {
             Console::trace();
         }
-        ZMAtomic::get('stop_signal')->set(1);
+        ZMAtomic::get('stop_signal')->set($error_exit ? 2 : 1);
         server()->shutdown();
     }
 
