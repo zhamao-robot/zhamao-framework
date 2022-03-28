@@ -59,7 +59,7 @@ require PHPUNIT_COMPOSER_INSTALL;
 $starttime = microtime(true);
 go(function () {
     try {
-        require_once __DIR__.'/../test/bootstrap.php';
+        require_once __DIR__ . '/../tests/bootstrap.php';
         PHPUnit\TextUI\Command::main(false);
     } catch (Exception $e) {
         echo $e->getMessage() . PHP_EOL;
