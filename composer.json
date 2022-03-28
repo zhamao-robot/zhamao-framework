@@ -1,96 +1,96 @@
 {
-  "name": "zhamao/framework",
-  "description": "High performance chat robot and web server development framework",
-  "license": "Apache-2.0",
-  "authors": [
-    {
-      "name": "jerry",
-      "email": "admin@zhamao.me"
-    }
-  ],
-  "require": {
-    "php": "^7.2 || ^7.3 || ^7.4 || ^8.0 || ^8.1",
-    "ext-json": "*",
-    "ext-posix": "*",
-    "doctrine/dbal": "^2.13.1",
-    "dragonmantank/cron-expression": "^3.3",
-    "jelix/version": "^2.0",
-    "koriym/attributes": "^1.0",
-    "psy/psysh": "^0.11.2",
-    "symfony/console": "~5.0 || ~4.0 || ~3.0",
-    "symfony/polyfill-ctype": "^1.19",
-    "symfony/polyfill-mbstring": "^1.19",
-    "symfony/polyfill-php80": "^1.16",
-    "symfony/routing": "~5.0 || ~4.0 || ~3.0",
-    "zhamao/config": "^1.0",
-    "zhamao/connection-manager": "^1.0",
-    "zhamao/console": "^1.0",
-    "zhamao/request": "^1.1"
-  },
-  "require-dev": {
-    "brainmaestro/composer-git-hooks": "^2.8",
-    "friendsofphp/php-cs-fixer": "^3.2 != 3.7.0",
-    "phpstan/phpstan": "^1.1",
-    "phpunit/phpunit": "^8.5 || ^9.0",
-    "roave/security-advisories": "dev-latest",
-    "swoole/ide-helper": "^4.5"
-  },
-  "suggest": {
-    "ext-ctype": "Use C/C++ extension instead of polyfill will be more efficient",
-    "ext-mbstring": "Use C/C++ extension instead of polyfill will be more efficient",
-    "ext-pdo_mysql": "If you use mysql in framework, you will need this extension",
-    "ext-redis": "If you use Redis in framework, you will need this extension",
-    "league/climate": "Display columns and status in terminal"
-  },
-  "minimum-stability": "stable",
-  "prefer-stable": true,
-  "autoload": {
-    "psr-4": {
-      "ZM\\": "src/ZM"
-    },
-    "files": [
-      "src/ZM/global_functions.php"
-    ]
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "Module\\": "src/Module",
-      "Custom\\": "src/Custom"
-    }
-  },
-  "bin": [
-    "bin/gendoc",
-    "bin/phpunit-swoole",
-    "bin/start"
-  ],
-  "config": {
-    "optimize-autoloader": true,
-    "sort-packages": true
-  },
-  "extra": {
-    "hooks": {
-      "post-merge": "composer install",
-      "pre-commit": [
-        "echo committing as $(git config user.name)",
-        "./vendor/bin/php-cs-fixer fix --dry-run --diff ./src"
-      ],
-      "pre-push": [
-        "./vendor/bin/php-cs-fixer fix --dry-run --diff ./src",
-        "composer analyse"
-      ]
-    },
-    "zm": {
-      "exclude-annotation-path": [
-        "src/ZM"
-      ]
-    }
-  },
-  "scripts": {
-    "post-install-cmd": [
-      "[ $COMPOSER_DEV_MODE -eq 0 ] || vendor/bin/cghooks add"
+    "name": "zhamao/framework",
+    "description": "High performance chat robot and web server development framework",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "jerry",
+            "email": "admin@zhamao.me"
+        }
     ],
-    "analyse": "phpstan analyse --memory-limit 300M -l 0 ./src",
-    "cs-fix": "php-cs-fixer fix $1",
-    "test": "bin/phpunit-swoole"
-  }
+    "require": {
+        "php": "^7.2 || ^7.3 || ^7.4 || ^8.0 || ^8.1",
+        "ext-json": "*",
+        "ext-posix": "*",
+        "doctrine/dbal": "^2.13.1",
+        "dragonmantank/cron-expression": "^3.3",
+        "jelix/version": "^2.0",
+        "koriym/attributes": "^1.0",
+        "psy/psysh": "^0.11.2",
+        "symfony/console": "~5.0 || ~4.0 || ~3.0",
+        "symfony/polyfill-ctype": "^1.19",
+        "symfony/polyfill-mbstring": "^1.19",
+        "symfony/polyfill-php80": "^1.16",
+        "symfony/routing": "~5.0 || ~4.0 || ~3.0",
+        "zhamao/config": "^1.0",
+        "zhamao/connection-manager": "^1.0",
+        "zhamao/console": "^1.0",
+        "zhamao/request": "^1.1"
+    },
+    "require-dev": {
+        "brainmaestro/composer-git-hooks": "^2.8",
+        "friendsofphp/php-cs-fixer": "^3.2 != 3.7.0",
+        "phpstan/phpstan": "^1.1",
+        "phpunit/phpunit": "^8.5 || ^9.0",
+        "roave/security-advisories": "dev-latest",
+        "swoole/ide-helper": "^4.5"
+    },
+    "suggest": {
+        "ext-ctype": "Use C/C++ extension instead of polyfill will be more efficient",
+        "ext-mbstring": "Use C/C++ extension instead of polyfill will be more efficient",
+        "ext-pdo_mysql": "If you use mysql in framework, you will need this extension",
+        "ext-redis": "If you use Redis in framework, you will need this extension",
+        "league/climate": "Display columns and status in terminal"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "autoload": {
+        "psr-4": {
+            "ZM\\": "src/ZM"
+        },
+        "files": [
+            "src/ZM/global_functions.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Module\\": "src/Module",
+            "Custom\\": "src/Custom"
+        }
+    },
+    "bin": [
+        "bin/gendoc",
+        "bin/phpunit-swoole",
+        "bin/start"
+    ],
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "extra": {
+        "hooks": {
+            "post-merge": "composer install",
+            "pre-commit": [
+                "echo committing as $(git config user.name)",
+                "./vendor/bin/php-cs-fixer fix --dry-run --diff ./src"
+            ],
+            "pre-push": [
+                "./vendor/bin/php-cs-fixer fix --dry-run --diff ./src",
+                "composer analyse"
+            ]
+        },
+        "zm": {
+            "exclude-annotation-path": [
+                "src/ZM"
+            ]
+        }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "[ $COMPOSER_DEV_MODE -eq 0 ] || vendor/bin/cghooks add"
+        ],
+        "analyse": "phpstan analyse --memory-limit 300M -l 0 ./src",
+        "cs-fix": "php-cs-fixer fix $1",
+        "test": "bin/phpunit-swoole"
+    }
 }
