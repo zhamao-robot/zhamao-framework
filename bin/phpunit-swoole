@@ -2,11 +2,14 @@
 <?php
 /** For Swoole coroutine tests */
 
+use ZM\Command\RunServerCommand;
+use ZM\Store\ZMAtomic;
+
 $root = dirname(__DIR__);
 
 co::set([
     'log_level' => SWOOLE_LOG_INFO,
-    'trace_flags' => 0
+    'trace_flags' => 0,
 ]);
 
 /*
@@ -29,7 +32,7 @@ if (PHP_VERSION_ID <= 70100) {
         )
     );
 
-    die(1);
+    exit(1);
 }
 
 if (!ini_get('date.timezone')) {
@@ -37,8 +40,6 @@ if (!ini_get('date.timezone')) {
 }
 
 require $root . '/vendor/autoload.php';
-
-sleep(1);
 
 const ZM_VERSION_ID = \ZM\ConsoleApplication::VERSION_ID;
 const ZM_VERSION = \ZM\ConsoleApplication::VERSION;
@@ -50,32 +51,37 @@ const ZM_PROCESS_WORKER = 4;
 const ZM_PROCESS_USER = 8;
 const ZM_PROCESS_TASKWORKER = 16;
 
-define('FRAMEWORK_ROOT_DIR', dirname(__DIR__) . '/');
-define('WORKING_DIR', getcwd());
+define('FRAMEWORK_ROOT_DIR', $root);
+define('WORKING_DIR', $root);
 const SOURCE_ROOT_DIR = WORKING_DIR;
 define('LOAD_MODE', is_dir(SOURCE_ROOT_DIR . '/src/ZM') ? 0 : 1);
 chdir(__DIR__ . '/../');
 
-$framework = new \ZM\Framework([
-    'log-debug' => true,
-    'disable-safe-exit' => false,
-    'worker-num' => 1,
-]);
-$framework::$server->addProcess(new \Swoole\Process(static function () use ($root, $framework) {
+$options = array_map(function ($x) {
+    return $x->getDefault();
+}, RunServerCommand::exportDefinition()->getOptions());
+$options['disable-safe-exit'] = true;
+$options['worker-num'] = 1;
+$options['private-mode'] = true;
+$options['log-error'] = true;
+\ZM\Console\Console::setLevel(0);
+$framework = new \ZM\Framework($options);
+$start = new \ZM\Annotation\Swoole\OnStart();
+$start->method = function () {
     try {
-        require_once $root . '/tests/bootstrap.php';
-        PHPUnit\TextUI\Command::main(false);
-        Swoole\Process::wait();
-    } catch (Throwable) {
-
+        \ZM\Console\Console::setLevel(4);
+        $retcode = PHPUnit\TextUI\Command::main(false);
+        \ZM\Console\Console::setLevel(0);
+    } catch (\Throwable $e) {
     } finally {
-        zm_atomic('server_is_stopped')->set(1);
-        \Swoole\Process::kill(getmypid(), SIGKILL);
-        $framework::$server->stop();
-        $framework::$server->shutdown();
-        trigger_error('PHPUnit test process exit');
+        \ZM\Utils\ZMUtil::stop(($retcode ?? 1) !== 0);
     }
-}, null, null, true));
+};
+\ZM\Event\EventManager::addEvent(\ZM\Annotation\Swoole\OnStart::class, $start);
+
 $framework->start();
 
 Swoole\Event::wait();
+if (ZMAtomic::get('stop_signal')->get() === 2) {
+    exit(1);
+}
