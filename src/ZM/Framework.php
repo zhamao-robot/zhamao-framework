@@ -144,9 +144,9 @@ class Framework
             $this->server_set['log_level'] = SWOOLE_LOG_DEBUG;
             $add_port = ZMConfig::get('global', 'remote_terminal')['status'] ?? false;
 
-            // if ($instant_mode) {
-            $this->loadServerEvents();
-            // }
+            if (!$instant_mode) {
+                $this->loadServerEvents();
+            }
 
             $this->parseCliArgs(self::$argv, $add_port);
 
@@ -205,7 +205,9 @@ class Framework
                 $out['terminal'] = $conf['host'] . ':' . $conf['port'];
             }
 
-            self::printProps($out, $tty_width, $args['log-theme'] === null);
+            if (!self::$argv['private-mode']) {
+                self::printProps($out, $tty_width, $args['log-theme'] === null);
+            }
             if ($args['preview'] ?? false) {
                 exit();
             }
@@ -294,7 +296,9 @@ class Framework
 
             self::$server->set($this->server_set);
             Console::setServer(self::$server);
-            self::printMotd($tty_width);
+            if (!self::$argv['private-mode']) {
+                self::printMotd($tty_width);
+            }
 
             global $asd;
             $asd = get_included_files();
