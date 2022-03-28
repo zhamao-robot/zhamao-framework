@@ -82,7 +82,8 @@
         },
         "zm": {
             "exclude-annotation-path": [
-                "src/ZM"
+                "src/ZM",
+                "tests"
             ]
         }
     },
