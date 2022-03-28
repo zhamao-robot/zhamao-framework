@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit backupGlobals="false"
+<phpunit bootstrap="./tests/bootstrap.php"
+         backupGlobals="false"
          backupStaticAttributes="false"
          colors="true"
          convertDeprecationsToExceptions="true"
@@ -9,6 +10,8 @@
          processIsolation="false"
          stopOnError="false"
          stopOnFailure="false"
+         testdox="true"
+         verbose="true"
 >
     <testsuites>
         <testsuite name="Zhamao Framework Test Suite">

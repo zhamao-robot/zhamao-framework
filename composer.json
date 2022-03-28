@@ -90,6 +90,7 @@
       "[ $COMPOSER_DEV_MODE -eq 0 ] || vendor/bin/cghooks add"
     ],
     "analyse": "phpstan analyse --memory-limit 300M -l 0 ./src",
-    "cs-fix": "php-cs-fixer fix $1"
+    "cs-fix": "php-cs-fixer fix $1",
+    "test": "bin/phpunit-swoole"
   }
 }
