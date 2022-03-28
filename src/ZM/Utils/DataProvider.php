@@ -63,7 +63,9 @@ class DataProvider
     public static function getDataFolder(string $second = '')
     {
         if ($second !== '') {
-            @mkdir(ZM_DATA . $second);
+            if (!is_dir(ZM_DATA . $second)) {
+                @mkdir(ZM_DATA . $second);
+            }
             if (!is_dir(ZM_DATA . $second)) {
                 return false;
             }
