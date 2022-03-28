@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\ZM\Utils;
 
-use ZM\Utils\DataProvider;
 use PHPUnit\Framework\TestCase;
+use ZM\Utils\DataProvider;
 
+/**
+ * @internal
+ */
 class DataProviderTest extends TestCase
 {
     public function testGetSourceRootDir(): void
