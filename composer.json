@@ -1,37 +1,12 @@
 {
     "name": "zhamao/framework",
     "description": "High performance chat robot and web server development framework",
-    "minimum-stability": "stable",
     "license": "Apache-2.0",
-    "extra": {
-        "zm": {
-            "exclude-annotation-path": [
-                "src/ZM"
-            ]
-        },
-        "hooks": {
-            "post-merge": "composer install",
-            "pre-commit": [
-                "echo committing as $(git config user.name)",
-                "./vendor/bin/php-cs-fixer fix --dry-run --diff ./src"
-            ],
-            "pre-push": [
-                "./vendor/bin/php-cs-fixer fix --dry-run --diff ./src",
-                "composer analyse"
-            ]
-        }
-    },
     "authors": [
         {
             "name": "jerry",
             "email": "admin@zhamao.me"
         }
-    ],
-    "prefer-stable": true,
-    "bin": [
-        "bin/start",
-        "bin/phpunit-swoole",
-        "bin/gendoc"
     ],
     "require": {
         "php": "^7.2 || ^7.3 || ^7.4 || ^8.0 || ^8.1",
@@ -52,6 +27,14 @@
         "zhamao/console": "^1.0",
         "zhamao/request": "^1.1"
     },
+    "require-dev": {
+        "brainmaestro/composer-git-hooks": "^2.8",
+        "friendsofphp/php-cs-fixer": "^3.2 != 3.7.0",
+        "phpstan/phpstan": "^1.1",
+        "phpunit/phpunit": "^8.5 || ^9.0",
+        "roave/security-advisories": "dev-latest",
+        "swoole/ide-helper": "^4.5"
+    },
     "suggest": {
         "ext-ctype": "Use C/C++ extension instead of polyfill will be more efficient",
         "ext-mbstring": "Use C/C++ extension instead of polyfill will be more efficient",
@@ -59,6 +42,8 @@
         "ext-redis": "If you use Redis in framework, you will need this extension",
         "league/climate": "Display columns and status in terminal"
     },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
     "autoload": {
         "psr-4": {
             "ZM\\": "src/ZM"
@@ -73,22 +58,39 @@
             "Custom\\": "src/Custom"
         }
     },
+    "bin": [
+        "bin/gendoc",
+        "bin/phpunit-swoole",
+        "bin/start"
+    ],
     "config": {
         "optimize-autoloader": true,
         "sort-packages": true
     },
-    "require-dev": {
-        "brainmaestro/composer-git-hooks": "^2.8",
-        "friendsofphp/php-cs-fixer": "^3.2 != 3.7.0",
-        "phpstan/phpstan": "^1.1",
-        "phpunit/phpunit": "^8.5 || ^9.0",
-        "swoole/ide-helper": "^4.5"
+    "extra": {
+        "hooks": {
+            "post-merge": "composer install",
+            "pre-commit": [
+                "echo committing as $(git config user.name)",
+                "./vendor/bin/php-cs-fixer fix --dry-run --diff ./src"
+            ],
+            "pre-push": [
+                "./vendor/bin/php-cs-fixer fix --dry-run --diff ./src",
+                "composer analyse"
+            ]
+        },
+        "zm": {
+            "exclude-annotation-path": [
+                "src/ZM"
+            ]
+        }
     },
     "scripts": {
         "post-install-cmd": [
             "[ $COMPOSER_DEV_MODE -eq 0 ] || vendor/bin/cghooks add"
         ],
         "analyse": "phpstan analyse --memory-limit 300M -l 0 ./src",
-        "cs-fix": "php-cs-fixer fix $1"
+        "cs-fix": "php-cs-fixer fix $1",
+        "test": "bin/phpunit-swoole"
     }
 }

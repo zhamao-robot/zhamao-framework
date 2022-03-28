@@ -1,69 +1,48 @@
 #!/usr/bin/env php
 <?php
-/**
- * Copyright: Swlib
- * Author: Twosee <twose@qq.com>
- * Date: 2018/4/14 下午10:58
- */
+/** For Swoole coroutine tests */
 
-use Swoole\Coroutine;
+$root = dirname(__DIR__);
 
-Coroutine::set([
+co::set([
     'log_level' => SWOOLE_LOG_INFO,
     'trace_flags' => 0
 ]);
+
+/*
+ * This file is part of PHPUnit.
+ *
+ * (c) Sebastian Bergmann <sebastian@phpunit.de>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+if (PHP_VERSION_ID <= 70100) {
+    fwrite(
+        STDERR,
+        sprintf(
+            'This version of PHPUnit is supported on PHP 7.1 and above.' . PHP_EOL .
+            'You are using PHP %s (%s).' . PHP_EOL,
+            PHP_VERSION,
+            PHP_BINARY
+        )
+    );
+
+    die(1);
+}
 
 if (!ini_get('date.timezone')) {
     ini_set('date.timezone', 'Asia/Shanghai');
 }
 
-foreach ([
-             __DIR__ . '/../../../autoload.php',
-             __DIR__ . '/../../autoload.php',
-             __DIR__ . '/../vendor/autoload.php',
-             __DIR__ . '/vendor/autoload.php'
-         ] as $file
-) {
-    if (file_exists($file)) {
-        define('PHPUNIT_COMPOSER_INSTALL', $file);
-        break;
-    }
-}
+require $root . '/vendor/autoload.php';
 
-if (!defined('PHPUNIT_COMPOSER_INSTALL')) {
-    fwrite(
-        STDERR,
-        'You need to set up the project dependencies using Composer:' . PHP_EOL . PHP_EOL .
-        '        composer install' . PHP_EOL . PHP_EOL .
-        'You can learn all about Composer on https://getcomposer.org/.' . PHP_EOL
-    );
+sleep(1);
 
-    die(1);
-} else {
-    if (array_reverse(explode('/', __DIR__))[0] ?? '' === 'test') {
-        $vendor_dir = dirname(PHPUNIT_COMPOSER_INSTALL);
-        $bin_unit = "{$vendor_dir}/bin/phpunit";
-        $unit_uint = "{$vendor_dir}/phpunit/phpunit/phpunit";
-        if (file_exists($bin_unit)) {
-            @unlink($bin_unit);
-            @symlink(__FILE__, $bin_unit);
-        }
-        if (file_exists($unit_uint)) {
-            @unlink($unit_uint);
-            @symlink(__FILE__, $unit_uint);
-        }
-    }
-}
-/** @noinspection PhpIncludeInspection */
-require PHPUNIT_COMPOSER_INSTALL;
-$starttime = microtime(true);
-go(function () {
-    try {
-        require_once __DIR__.'/../test/bootstrap.php';
-        PHPUnit\TextUI\Command::main(false);
-    } catch (Exception $e) {
-        echo $e->getMessage() . PHP_EOL;
-    }
+go(static function () {
+    PHPUnit\TextUI\Command::main(false);
+    Swoole\Process::wait();
 });
+
 Swoole\Event::wait();
-echo "Took " . round(microtime(true) - $starttime, 4) . "s\n";

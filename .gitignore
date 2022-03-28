@@ -1,21 +1,23 @@
-.idea/
-/src/test/
-/src/webconsole/config/
-/vendor/
+### Zhamao Framework ###
 /zm_data/
-composer.lock
 /resources/server.phar
 /distribute/
-/bin/.phpunit.result.cache
 /resources/zhamao.service
-.phpunit.result.cache
-.daemon_pid
 /runtime/
 /tmp/
 /temp/
 /site/
 
-# go-cqhttp快速安装启动相关（可能被废弃）
+# 进程锁文件
+.daemon_pid
+.zm_worker_*.pid
+
+### Composer ###
+composer.phar
+/vendor/
+composer.lock
+
+### Go CQHTTP ###
 /ext/go-cqhttp/data/
 /ext/go-cqhttp/logs/
 /ext/go-cqhttp/config.hjson
@@ -23,12 +25,53 @@ composer.lock
 /ext/go-cqhttp/go-cqhttp
 /ext/go-cqhttp/session.token
 
-.zm_worker_*.pid
+### Git ###
+# 备份文件
+*.orig
 
-# Git Hook 的相关锁文件
+# 解决 Merge 冲突时可能会自动生成的文件
+*.BACKUP.*
+*.BASE.*
+*.LOCAL.*
+*.REMOTE.*
+*_BACKUP_*.txt
+*_BASE_*.txt
+*_LOCAL_*.txt
+*_REMOTE_*.txt
+
+# Git Hooks
 cghooks.lock
 
-# Vuepress 相关文件
+### VuePress ###
 /node_modules/
 /docs/.vuepress/dist/
 package-lock.json
+
+### PHPUnit ###
+
+# 生成的文件
+/bin/.phpunit.result.cache
+.phpunit.result.cache
+.phpunit.cache
+
+# 本地配置
+/phpunit.xml
+
+# 构建目录
+/build/
+
+### PhpStorm ###
+# 兼容 PHPStorm 及其他 Jetbrains IDE
+
+# 除了代码格式配置和运行配置之外的所有文件
+.idea/*
+
+!.idea/codeStyles
+!.idea/runConfigurations
+
+### Phive ###
+/.phive/
+/tools/
+
+### ASDF ###
+/.tool-version
