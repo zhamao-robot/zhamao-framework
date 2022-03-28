@@ -43,7 +43,7 @@ class EventManager
      */
     public static function loadEventByParser(AnnotationParser $parser)
     {
-        self::$events = $parser->generateAnnotationEvents();
+        self::$events = array_merge(self::$events, $parser->generateAnnotationEvents());
         self::$middlewares = $parser->getMiddlewares();
         self::$middleware_map = $parser->getMiddlewareMap();
         self::$req_mapping = $parser->getReqMapping();
