@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ZM\Tests\ZM\Utils;
+namespace Tests\ZM\Utils;
 
 use PHPUnit\Framework\TestCase;
 use ZM\Annotation\CQ\CQCommand;
@@ -147,6 +147,7 @@ class MessageUtilTest extends TestCase
     public function providerTestSplitCommand(): array
     {
         return [
+            'empty' => ['', ['']],
             'spaced' => ['hello world', ['hello', 'world']],
             'multiline' => ["hello\nworld", ['hello', 'world']],
             'many spaces' => ['hello    world', ['hello', 'world']],

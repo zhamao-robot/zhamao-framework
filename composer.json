@@ -56,7 +56,7 @@
         "psr-4": {
             "Module\\": "src/Module",
             "Custom\\": "src/Custom",
-            "ZM\\Tests\\": "tests"
+            "Tests\\": "tests"
         }
     },
     "bin": [
