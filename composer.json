@@ -55,7 +55,8 @@
     "autoload-dev": {
         "psr-4": {
             "Module\\": "src/Module",
-            "Custom\\": "src/Custom"
+            "Custom\\": "src/Custom",
+            "ZM\\Tests\\": "tests"
         }
     },
     "bin": [
@@ -91,6 +92,6 @@
         ],
         "analyse": "phpstan analyse --memory-limit 300M -l 0 ./src",
         "cs-fix": "php-cs-fixer fix $1",
-        "test": "bin/phpunit-swoole"
+        "test": "bin/phpunit-swoole --no-coverage"
     }
 }
