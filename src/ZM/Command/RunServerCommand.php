@@ -47,6 +47,7 @@ class RunServerCommand extends Command
             new InputOption('force-load-module', null, InputOption::VALUE_OPTIONAL, '强制打包状态下加载模块（使用英文逗号分割多个）'),
             new InputOption('polling-watch', null, null, '强制启用轮询模式监听'),
             new InputOption('no-state-check', null, null, '关闭启动前框架运行状态检查'),
+            new InputOption('private-mode', null, null, '启动时隐藏MOTD和敏感信息'),
         ]);
         $this->setDescription('Run zhamao-framework | 启动框架');
         $this->setHelp('直接运行可以启动');
