@@ -12,25 +12,20 @@ use ZM\Utils\MessageUtil;
 
 /**
  * @internal
- * @coversNothing
  */
 class MessageUtilTest extends TestCase
 {
     public function testAddShortCommand(): void
     {
-        // 此处需要进行 Worker 间通信，无法测试
-//        EventManager::$events[CQCommand::class] = [];
-//        MessageUtil::addShortCommand('test', 'test');
-//        $this->assertCount(1, EventManager::$events[CQCommand::class]);
-        $this->assertTrue(true);
+        EventManager::$events[CQCommand::class] = [];
+        MessageUtil::addShortCommand('test', 'test');
+        $this->assertCount(1, EventManager::$events[CQCommand::class]);
     }
 
     /**
      * @dataProvider providerTestContainsImage
-     * @param mixed $msg
-     * @param mixed $expected
      */
-    public function testContainsImage($msg, $expected): void
+    public function testContainsImage(string $msg, bool $expected): void
     {
         $this->assertEquals($expected, MessageUtil::containsImage($msg));
     }
@@ -61,10 +56,8 @@ class MessageUtilTest extends TestCase
 
     /**
      * @dataProvider providerTestArrayToStr
-     * @param mixed $array
-     * @param mixed $expected
      */
-    public function testArrayToStr($array, $expected): void
+    public function testArrayToStr(array $array, string $expected): void
     {
         $this->assertEquals($expected, MessageUtil::arrayToStr($array));
     }
@@ -94,10 +87,8 @@ class MessageUtilTest extends TestCase
 
     /**
      * @dataProvider providerTestIsAtMe
-     * @param mixed $msg
-     * @param mixed $expected
      */
-    public function testIsAtMe($msg, $expected): void
+    public function testIsAtMe(string $msg, bool $expected): void
     {
         $this->assertEquals($expected, MessageUtil::isAtMe($msg, 123456789));
     }
@@ -125,10 +116,8 @@ class MessageUtilTest extends TestCase
 
     /**
      * @dataProvider providerTestStrToArray
-     * @param mixed $str
-     * @param mixed $expected
      */
-    public function testStrToArray($str, $expected): void
+    public function testStrToArray(string $str, array $expected): void
     {
         $this->assertEquals($expected, MessageUtil::strToArray($str));
     }
@@ -150,10 +139,8 @@ class MessageUtilTest extends TestCase
 
     /**
      * @dataProvider providerTestSplitCommand
-     * @param mixed $msg
-     * @param mixed $expected
      */
-    public function testSplitCommand($msg, $expected): void
+    public function testSplitCommand(string $msg, array $expected): void
     {
         $this->assertEquals($expected, MessageUtil::splitCommand($msg));
     }

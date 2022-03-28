@@ -65,11 +65,11 @@ return (new PhpCsFixer\Config())
         'standardize_not_equals' => true,
         'multiline_comment_opening_closing' => true,
         'phpdoc_summary' => false,
+        'php_unit_test_class_requires_covers' => false,
     ])
     ->setFinder(
         PhpCsFixer\Finder::create()
-            ->exclude('vendor')
-            ->exclude('docs')
             ->in(__DIR__ . '/src')
+            ->in(__DIR__ . '/tests')
     )
     ->setUsingCache(false);
