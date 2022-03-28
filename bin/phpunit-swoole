@@ -33,7 +33,7 @@ if (PHP_VERSION_ID <= 70100) {
 }
 
 if (!ini_get('date.timezone')) {
-    ini_set('date.timezone', 'UTC');
+    ini_set('date.timezone', 'Asia/Shanghai');
 }
 
 require $root . '/vendor/autoload.php';
