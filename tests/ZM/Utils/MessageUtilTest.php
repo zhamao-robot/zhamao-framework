@@ -10,6 +10,10 @@ use ZM\Event\EventManager;
 use ZM\Utils\DataProvider;
 use ZM\Utils\MessageUtil;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 class MessageUtilTest extends TestCase
 {
     public function testAddShortCommand(): void
@@ -23,6 +27,8 @@ class MessageUtilTest extends TestCase
 
     /**
      * @dataProvider providerTestContainsImage
+     * @param mixed $msg
+     * @param mixed $expected
      */
     public function testContainsImage($msg, $expected): void
     {
@@ -37,7 +43,7 @@ class MessageUtilTest extends TestCase
             'image only' => ['[CQ:image,file=123456.jpg]', true],
             'image' => ['hello world![CQ:image,file=123456.jpg]', true],
             'two image' => ['hello world![CQ:image,file=123456.jpg][CQ:image,file=123456.jpg]', true],
-//            'malformed image' => ['[CQ:image,file=]', false],
+            // 'malformed image' => ['[CQ:image,file=]', false],
         ];
     }
 
@@ -55,6 +61,8 @@ class MessageUtilTest extends TestCase
 
     /**
      * @dataProvider providerTestArrayToStr
+     * @param mixed $array
+     * @param mixed $expected
      */
     public function testArrayToStr($array, $expected): void
     {
@@ -86,6 +94,8 @@ class MessageUtilTest extends TestCase
 
     /**
      * @dataProvider providerTestIsAtMe
+     * @param mixed $msg
+     * @param mixed $expected
      */
     public function testIsAtMe($msg, $expected): void
     {
@@ -115,6 +125,8 @@ class MessageUtilTest extends TestCase
 
     /**
      * @dataProvider providerTestStrToArray
+     * @param mixed $str
+     * @param mixed $expected
      */
     public function testStrToArray($str, $expected): void
     {
@@ -138,6 +150,8 @@ class MessageUtilTest extends TestCase
 
     /**
      * @dataProvider providerTestSplitCommand
+     * @param mixed $msg
+     * @param mixed $expected
      */
     public function testSplitCommand($msg, $expected): void
     {
@@ -158,7 +172,9 @@ class MessageUtilTest extends TestCase
 
     public function testDownloadCQImage(): void
     {
-        @unlink(DataProvider::getDataFolder('images') . '/test.jpg');
+        if (file_exists(DataProvider::getDataFolder('images') . '/test.jpg')) {
+            unlink(DataProvider::getDataFolder('images') . '/test.jpg');
+        }
         $msg = '[CQ:image,file=test.jpg,url=https://zhamao.xin/file/hello.jpg]';
         $result = MessageUtil::downloadCQImage($msg);
         $this->assertIsArray($result);

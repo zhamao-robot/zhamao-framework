@@ -59,10 +59,9 @@ class DataProviderTest extends TestCase
 
     public function testIsRelativePath(): void
     {
-        $this->assertTrue(true);
-//        $this->assertTrue(DataProvider::isRelativePath('./'));
-//        $this->assertTrue(DataProvider::isRelativePath('../'));
-//        $this->assertFalse(DataProvider::isRelativePath('/'));
-//        $this->assertFalse(DataProvider::isRelativePath('test.php'));
+        $this->assertTrue(DataProvider::isRelativePath('./'));
+        $this->assertTrue(DataProvider::isRelativePath('../'));
+        $this->assertFalse(DataProvider::isRelativePath('/'));
+        $this->assertTrue(DataProvider::isRelativePath('test.php'));
     }
 }
