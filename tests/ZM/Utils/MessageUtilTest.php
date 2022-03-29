@@ -6,6 +6,7 @@ namespace Tests\ZM\Utils;
 
 use PHPUnit\Framework\TestCase;
 use ZM\Annotation\CQ\CQCommand;
+use ZM\API\CQ;
 use ZM\Event\EventManager;
 use ZM\Utils\DataProvider;
 use ZM\Utils\MessageUtil;
@@ -44,14 +45,13 @@ class MessageUtilTest extends TestCase
 
     public function testGenerateCommandHelp(): void
     {
-        // 因为内部使用了 WorkerCache，而我们暂时无法模拟 WorkerCache，所以此处无法进行测试
-//        EventManager::$events[CQCommand::class] = [
-//            new CQCommand('测试命令'),
-//            new CQCommand('测试命令2', '执行命令*'),
-//        ];
-//        $help = MessageUtil::generateCommandHelp();
-//        $this->assertEquals('测试命令', $help[0]);
-        $this->assertTrue(true);
+        EventManager::$events[CQCommand::class] = [];
+        $cmd = new CQCommand('测试命令');
+        $cmd->class = self::class;
+        $cmd->method = __FUNCTION__;
+        EventManager::addEvent(CQCommand::class, $cmd);
+        $help = MessageUtil::generateCommandHelp();
+        $this->assertEquals('测试命令：无描述', $help[0]);
     }
 
     /**
