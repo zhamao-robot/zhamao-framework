@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 namespace Tests\ZM\Utils;
 
+use PHPUnit\Framework\TestCase;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 use Symfony\Component\Routing\RouteCollection;
 use ZM\Annotation\Http\RequestMapping;
 use ZM\Annotation\Http\RequestMethod;
 use ZM\Utils\HttpUtil;
-use PHPUnit\Framework\TestCase;
 use ZM\Utils\Manager\RouteManager;
 
+/**
+ * @internal
+ */
 class HttpUtilTest extends TestCase
 {
     /**
