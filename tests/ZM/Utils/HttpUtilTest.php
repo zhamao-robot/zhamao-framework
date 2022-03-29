@@ -61,7 +61,7 @@ class HttpUtilTest extends TestCase
             new RequestMapping('/test', 'test', RequestMethod::GET),
             __FUNCTION__,
             __CLASS__,
-            [],
+            []
         );
         $r = new Request();
         $r->server['request_uri'] = '/test';
@@ -71,7 +71,7 @@ class HttpUtilTest extends TestCase
             null,
             '/test',
             $node,
-            $params,
+            $params
         ));
     }
 }
