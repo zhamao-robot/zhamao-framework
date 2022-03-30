@@ -73,10 +73,10 @@
             "post-merge": "composer install",
             "pre-commit": [
                 "echo committing as $(git config user.name)",
-                "./vendor/bin/php-cs-fixer fix --dry-run --diff ./src"
+                "composer cs-fix -- --diff"
             ],
             "pre-push": [
-                "./vendor/bin/php-cs-fixer fix --dry-run --diff ./src",
+                "composer cs-fix -- --dry-run --diff",
                 "composer analyse"
             ]
         },
@@ -91,8 +91,8 @@
         "post-install-cmd": [
             "[ $COMPOSER_DEV_MODE -eq 0 ] || vendor/bin/cghooks add"
         ],
-        "analyse": "phpstan analyse --memory-limit 300M -l 0 ./src",
-        "cs-fix": "php-cs-fixer fix $1",
+        "analyse": "phpstan analyse --memory-limit 300M",
+        "cs-fix": "php-cs-fixer fix",
         "test": "bin/phpunit-swoole --no-coverage"
     }
 }
