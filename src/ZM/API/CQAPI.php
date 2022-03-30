@@ -13,7 +13,7 @@ use ZM\Utils\CoMessage;
 
 trait CQAPI
 {
-    /** @var null|Closure */
+    /** @var null|Closure 过滤用的 */
     private static $filter;
 
     public function __call($name, $arguments)
@@ -33,12 +33,6 @@ trait CQAPI
         return $func_name . $postfix;
     }
 
-    /**
-     * @param $connection
-     * @param $reply
-     * @param |null $function
-     * @return array|bool
-     */
     private function processAPI($connection, $reply, $function = null)
     {
         if (is_callable(self::$filter)) {
@@ -57,7 +51,7 @@ trait CQAPI
 
     private function processWebsocketAPI($connection, $reply, $function = false)
     {
-        $api_id = ZMAtomic::get('wait_msg_id')->add(1);
+        $api_id = ZMAtomic::get('wait_msg_id')->add();
         $reply['echo'] = $api_id;
         if (server()->push($connection->getFd(), json_encode($reply))) {
             if ($function === true) {
@@ -89,14 +83,10 @@ trait CQAPI
         return false;
     }
 
-    /**
-     * @param $connection
-     * @param $reply
-     * @param null $function
-     * @noinspection PhpUnusedParameterInspection
-     */
     private function processHttpAPI($connection, $reply, $function = null): bool
     {
+        unset($connection, $reply, $function);
+        // TODO: HTTP方式处理API的代码还没写
         return false;
     }
 }
