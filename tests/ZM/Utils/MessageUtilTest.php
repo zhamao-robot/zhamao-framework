@@ -162,7 +162,7 @@ class MessageUtilTest extends TestCase
         if (file_exists(DataProvider::getDataFolder('images') . '/test.jpg')) {
             unlink(DataProvider::getDataFolder('images') . '/test.jpg');
         }
-        $msg = '[CQ:image,file=test.jpg,url=https://zhamao.xin/file/hello.jpg]';
+        $msg = '[CQ:image,file=test.jpg,url=http://zhamao.xin/file/hello.jpg]';
         $result = MessageUtil::downloadCQImage($msg);
         $this->assertIsArray($result);
         $this->assertCount(1, $result);
