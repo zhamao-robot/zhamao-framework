@@ -17,11 +17,22 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        
+      - name: Generate API Docs
+        run: bin/gendoc
+        
+      - name: Commit api docs
+        run: |
+          git config --global user.name 'Github Build Bot'
+          git config --global user.email 'noreply@github.com'
+          git add docs
+          git commit -m "update api docs"
+          git push
 
       - name: Increment build number
         run: sed -i -r 's/(.*)(\VERSION_ID\s=\s)([0-9]+)(.*)/echo "\1\2$((\3+1))\4"/ge' src/ZM/ConsoleApplication.php
 
-      - name: Commit change
+      - name: Commit build number
         run: |
           git config --global user.name 'Github Build Bot'
           git config --global user.email 'noreply@github.com'
