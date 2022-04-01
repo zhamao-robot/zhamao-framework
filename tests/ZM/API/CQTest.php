@@ -12,24 +12,44 @@ use ZM\API\CQ;
  */
 class CQTest extends TestCase
 {
-    public function testShare()
+    /**
+     * @dataProvider providerShare
+     * @param mixed $url
+     * @param mixed $title
+     * @param mixed $content
+     * @param mixed $image
+     * @param mixed $expected
+     */
+    public function testShare($url, $title, $content, $image, $expected)
     {
-        $this->assertEquals(
-            '[CQ:share,url=https://www.baidu.com,title=hello,content=world,image=https://www.baidu.com/img/bd_logo1.png]',
-            CQ::share('https://www.baidu.com', 'hello', 'world', 'https://www.baidu.com/img/bd_logo1.png')
-        );
-        $this->assertEquals(
-            '[CQ:share,url=https://www.baidu.com,title=123]',
-            CQ::share('https://www.baidu.com', '123')
-        );
-        $this->assertEquals(
-            '[CQ:share,url=https://www.baidu.com,title=123,content=456]',
-            CQ::share('https://www.baidu.com', '123', '456')
-        );
-        $this->assertEquals(
-            '[CQ:share,url=https://www.baidu.com,title=123,content=456,image=https://www.baidu.com/img/bd_logo1.png]',
-            CQ::share('https://www.baidu.com', '123', '456', 'https://www.baidu.com/img/bd_logo1.png')
-        );
+        $this->assertEquals($expected, CQ::share($url, $title, $content, $image));
+    }
+
+    public function providerShare(): array
+    {
+        return [
+            'all' => [
+                'https://www.baidu.com',
+                'hello',
+                'world',
+                'https://www.baidu.com/img/bd_logo1.png',
+                '[CQ:share,url=https://www.baidu.com,title=hello,content=world,image=https://www.baidu.com/img/bd_logo1.png]',
+            ],
+            'url title' => [
+                'https://www.baidu.com',
+                '123',
+                null,
+                null,
+                '[CQ:share,url=https://www.baidu.com,title=123]',
+            ],
+            'url title content' => [
+                'https://www.baidu.com',
+                '123',
+                '456',
+                null,
+                '[CQ:share,url=https://www.baidu.com,title=123,content=456]',
+            ],
+        ];
     }
 
     public function testShake()
@@ -72,16 +92,52 @@ class CQTest extends TestCase
         $this->assertEquals('hello&#91;&#93;,', CQ::escape('hello[],'));
     }
 
-    public function testMusic()
+    /**
+     * @dataProvider providerMusic
+     * @param mixed $data
+     * @param mixed $expected
+     */
+    public function testMusic($data, $expected)
     {
-        $this->assertEquals('[CQ:music,type=qq,id=123456789]', CQ::music('qq', '123456789'));
-        $this->assertEquals('[CQ:music,type=163,id=123456789]', CQ::music('163', '123456789'));
-        $this->assertEquals('[CQ:music,type=xiami,id=123456789]', CQ::music('xiami', '123456789'));
-        $this->assertEquals(' ', CQ::music('custom', '123456789'));
-        $this->assertEquals('[CQ:music,type=custom,url=123456789,audio=test,title=test1]', CQ::music('custom', '123456789', 'test', 'test1'));
-        $this->assertEquals('[CQ:music,type=custom,url=123456789,audio=test,title=test1,content=test2]', CQ::music('custom', '123456789', 'test', 'test1', 'test2'));
-        $this->assertEquals('[CQ:music,type=custom,url=123456789,audio=test,title=test1,content=test2,image=test3]', CQ::music('custom', '123456789', 'test', 'test1', 'test2', 'test3'));
-        $this->assertEquals(' ', CQ::music('custom test', '123456789', 'test', 'test1', 'test2', 'test3'));
+        $this->assertEquals($expected, CQ::music(...$data));
+    }
+
+    public function providerMusic(): array
+    {
+        return [
+            'music qq' => [
+                ['qq', '123456789'],
+                '[CQ:music,type=qq,id=123456789]',
+            ],
+            'music 163' => [
+                ['163', '123456789'],
+                '[CQ:music,type=163,id=123456789]',
+            ],
+            'music xiami' => [
+                ['xiami', '123456789'],
+                '[CQ:music,type=xiami,id=123456789]',
+            ],
+            'music custom' => [
+                ['custom', '123456789'],
+                ' ',
+            ],
+            'music custom url audio title' => [
+                ['custom', '123456789', 'test', 'test1'],
+                '[CQ:music,type=custom,url=123456789,audio=test,title=test1]',
+            ],
+            'music custom url audio title content' => [
+                ['custom', '123456789', 'test', 'test1', 'test2'],
+                '[CQ:music,type=custom,url=123456789,audio=test,title=test1,content=test2]',
+            ],
+            'music custom url audio title content image' => [
+                ['custom', '123456789', 'test', 'test1', 'test2', 'test3'],
+                '[CQ:music,type=custom,url=123456789,audio=test,title=test1,content=test2,image=test3]',
+            ],
+            'music custom test' => [
+                ['custom test', '123456789', 'test', 'test1', 'test2', 'test3'],
+                ' ',
+            ],
+        ];
     }
 
     public function testPoke()
@@ -114,11 +170,23 @@ class CQTest extends TestCase
         $this->assertEquals('hello[],', CQ::decode('hello&#91;&#93;,'));
     }
 
-    public function testRemoveCQ()
+    /**
+     * @dataProvider providerRemoveCQ
+     * @param mixed $msg
+     * @param mixed $expected
+     */
+    public function testRemoveCQ($msg, $expected)
     {
-        $this->assertEquals('hello,', CQ::removeCQ('hello[CQ:at,qq=123456789],'));
-        $this->assertEquals('hello[CQ:at,qq=123456789,', CQ::removeCQ('hello[CQ:at,qq=123456789,'));
-        $this->assertEquals('hello', CQ::removeCQ('[CQ:dice]hello[CQ:at,qq=123456789]'));
+        $this->assertEquals($expected, CQ::removeCQ($msg));
+    }
+
+    public function providerRemoveCQ(): array
+    {
+        return [
+            'remove cq 1' => ['hello[CQ:at,qq=123456789],', 'hello,'],
+            'remove cq 2' => ['hello[CQ:at,qq=123456789,', 'hello[CQ:at,qq=123456789,'],
+            'remove cq 3' => ['[CQ:dice]hello[CQ:at,qq=123456789]', 'hello'],
+        ];
     }
 
     public function testGetAllCQ()
@@ -141,23 +209,33 @@ class CQTest extends TestCase
         ], $array);
     }
 
-    public function testGetCQ()
+    /**
+     * @dataProvider providerGetCQ
+     */
+    public function testGetCQ($cq, $expected)
     {
-        $this->assertEquals([
-            'type' => 'dice',
-            'start' => 0,
-            'end' => 8,
-        ], CQ::getCQ('[CQ:dice]'));
-        $this->assertEquals([
-            'type' => 'at',
-            'params' => [
-                'qq' => '123456789',
-            ],
-            'start' => 0,
-            'end' => 19,
-        ], CQ::getCQ('[CQ:at,qq=123456789]'));
-        $this->assertNull(CQ::getCQ('[CQ:at,qq=123456789'));
-        $this->assertNull(CQ::getCQ('[CQ;at,qq=123456789]'));
+        $this->assertEquals($expected, CQ::getCQ($cq));
+    }
+
+    public function providerGetCQ(): array
+    {
+        return [
+            'one dice' => ['[CQ:dice]', [
+                'type' => 'dice',
+                'start' => 0,
+                'end' => 8,
+            ]],
+            'one at' => ['[CQ:at,qq=123456789]', [
+                'type' => 'at',
+                'params' => [
+                    'qq' => '123456789',
+                ],
+                'start' => 0,
+                'end' => 19,
+            ]],
+            'invalid cq 1' => ['[CQ:at,qq=123456789', null],
+            'invalid cq 2' => ['[CQ;at,qq=123456789]', null],
+        ];
     }
 
     public function testImage()
