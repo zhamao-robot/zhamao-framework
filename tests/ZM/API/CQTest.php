@@ -211,6 +211,8 @@ class CQTest extends TestCase
 
     /**
      * @dataProvider providerGetCQ
+     * @param mixed $cq
+     * @param mixed $expected
      */
     public function testGetCQ($cq, $expected)
     {
