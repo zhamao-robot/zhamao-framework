@@ -15,6 +15,7 @@ public function signalMaster(Swoole\Server $server): mixed
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | server | Swoole\Server |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -55,6 +56,7 @@ public function signalWorker(mixed $worker_id, Swoole\Server $server): mixed
 | -------- | ---- | ----------- |
 | worker_id | mixed |  |
 | server | Swoole\Server |  |
+
 ### 返回
 
 | 类型 | 描述 |

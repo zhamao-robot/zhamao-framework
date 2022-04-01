@@ -17,6 +17,7 @@ public function getTuringMsg(mixed $msg, mixed $user_id, mixed $api): string
 | msg | mixed |  |
 | user_id | mixed |  |
 | api | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |

@@ -15,6 +15,7 @@ public function loadEventByParser(ZM\Annotation\AnnotationParser $parser): mixed
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | parser | ZM\Annotation\AnnotationParser |  |
+
 ### 返回
 
 | 类型 | 描述 |

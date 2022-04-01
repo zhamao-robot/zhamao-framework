@@ -3,12 +3,18 @@
 ## stop
 
 ```php
-public function stop(): mixed
+public function stop(mixed $error_exit): mixed
 ```
 
 ### 描述
 
 作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| error_exit | mixed |  |
 
 ### 返回
 
@@ -69,6 +75,7 @@ public function getClassesPsr4(mixed $dir, mixed $base_namespace, null|mixed $ru
 | base_namespace | mixed |  |
 | rule | null|mixed |  |
 | return_path_value | bool |  |
+
 ### 返回
 
 | 类型 | 描述 |

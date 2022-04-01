@@ -32,6 +32,7 @@ public function packModule(mixed $module): bool
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | module | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -55,6 +56,7 @@ public function unpackModule(mixed $module, array $options): array|false
 | -------- | ---- | ----------- |
 | module | mixed |  |
 | options | array |  |
+
 ### 返回
 
 | 类型 | 描述 |

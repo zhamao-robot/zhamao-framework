@@ -15,6 +15,7 @@ DeleteBody constructor.
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | table | ZM\DB\Table |  |
+
 ### 返回
 
 | 类型 | 描述 |

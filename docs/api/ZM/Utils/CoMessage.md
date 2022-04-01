@@ -17,6 +17,7 @@ public function yieldByWS(int $timeout, array $hang, array $compare): mixed
 | timeout | int |  |
 | hang | array |  |
 | compare | array |  |
+
 ### 返回
 
 | 类型 | 描述 |

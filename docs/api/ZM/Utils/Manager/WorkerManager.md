@@ -16,6 +16,7 @@ Worker 进程间通信触发的动作类型函数
 | -------- | ---- | ----------- |
 | src_worker_id | mixed |  |
 | data | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -40,6 +41,7 @@ public function sendActionToWorker(mixed $worker_id, mixed $action, mixed $data)
 | worker_id | mixed |  |
 | action | mixed |  |
 | data | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |

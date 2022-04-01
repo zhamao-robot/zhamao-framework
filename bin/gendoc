@@ -5,7 +5,6 @@
  * 决定是否忽略该类
  *
  * @param ReflectionClass $class 准备生成的类的反射类
- * @return bool
  */
 function should_ignore_class(ReflectionClass $class): bool
 {
@@ -70,7 +69,7 @@ if (file_exists($root . '/vendor/jasny/phpdoc-parser/composer.json')) {
     foreach ($composers as $composer) {
         if (check_composer_executable($composer)) {
             echo '正在使用 ' . $composer . ' 安装 PHPDoc 解析库，请稍候...' . PHP_EOL;
-            passthru("$composer require --quiet jasny/phpdoc-parser", $exit_code);
+            passthru("{$composer} require --quiet jasny/phpdoc-parser", $exit_code);
             if ($exit_code === 0) {
                 $phpdoc_package_temp_installed = true;
                 break;
@@ -231,7 +230,7 @@ function get_class_metas(string $class_name, PhpdocParser $parser): array
  * 将方法的元数据转换为 Markdown 格式
  *
  * @param string $method 方法名
- * @param array $meta 元数据
+ * @param array  $meta   元数据
  */
 function convert_meta_to_markdown(string $method, array $meta): string
 {
@@ -264,6 +263,7 @@ function convert_meta_to_markdown(string $method, array $meta): string
         foreach ($meta['params'] as $param_name => $param_meta) {
             $markdown .= '| ' . $param_name . ' | ' . $param_meta['type'] . ' | ' . $param_meta['description'] . ' |' . "\n";
         }
+        $markdown .= "\n";
     }
 
     // 返回值

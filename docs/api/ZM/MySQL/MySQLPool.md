@@ -32,6 +32,7 @@ public function putConnection(PDO|PDOProxy $connection): mixed
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | connection | PDO|PDOProxy |  |
+
 ### 返回
 
 | 类型 | 描述 |

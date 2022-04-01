@@ -15,6 +15,7 @@ public function executeCommand(string $cmd): bool
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | cmd | string |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -88,6 +89,7 @@ public function call(mixed $it): mixed
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | it | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -110,6 +112,7 @@ public function level(mixed $it): mixed
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | it | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -132,6 +135,7 @@ public function bc(mixed $it): mixed
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | it | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -154,6 +158,7 @@ public function echoI(mixed $it): mixed
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | it | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |

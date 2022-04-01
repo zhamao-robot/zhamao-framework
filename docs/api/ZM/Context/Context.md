@@ -50,6 +50,7 @@ only can used by cq->message event function
 | -------- | ---- | ----------- |
 | msg | mixed |  |
 | yield | bool |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -73,6 +74,7 @@ public function finalReply(mixed $msg, bool $yield): mixed
 | -------- | ---- | ----------- |
 | msg | mixed |  |
 | yield | bool |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -97,6 +99,7 @@ public function waitMessage(string $prompt, int $timeout, string $timeout_prompt
 | prompt | string |  |
 | timeout | int |  |
 | timeout_prompt | string |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -120,6 +123,7 @@ public function getArgs(mixed $mode, mixed $prompt_msg): mixed|string
 | -------- | ---- | ----------- |
 | mode | mixed |  |
 | prompt_msg | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -142,6 +146,7 @@ public function getNextArg(string $prompt_msg): int|mixed|string
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | prompt_msg | string |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -164,6 +169,7 @@ public function getFullArg(string $prompt_msg): int|mixed|string
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | prompt_msg | string |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -186,6 +192,7 @@ public function getNumArg(string $prompt_msg): int|mixed|string
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | prompt_msg | string |  |
+
 ### 返回
 
 | 类型 | 描述 |

@@ -16,6 +16,7 @@ public function handle(mixed $data, int $level): mixed
 | -------- | ---- | ----------- |
 | data | mixed |  |
 | level | int |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -39,6 +40,7 @@ public function dispatchBeforeEvents(mixed $data, mixed $time): ZM\Event\EventDi
 | -------- | ---- | ----------- |
 | data | mixed |  |
 | time | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -61,6 +63,7 @@ public function dispatchEvents(mixed $data): mixed
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | data | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -83,6 +86,7 @@ public function dispatchAPIResponse(mixed $req): mixed
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | req | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |

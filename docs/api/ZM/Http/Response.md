@@ -34,6 +34,7 @@ public function status(mixed $http_code, mixed $reason, mixed $params): mixed
 | http_code | mixed |  |
 | reason | mixed |  |
 | params | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -58,6 +59,7 @@ public function setStatusCode(mixed $http_code, mixed $reason, mixed $params): m
 | http_code | mixed |  |
 | reason | mixed |  |
 | params | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -82,6 +84,7 @@ public function header(mixed $key, mixed $value, mixed $ucwords): mixed
 | key | mixed |  |
 | value | mixed |  |
 | ucwords | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -106,6 +109,7 @@ public function setHeader(mixed $key, mixed $value, mixed $ucwords): mixed
 | key | mixed |  |
 | value | mixed |  |
 | ucwords | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -129,6 +133,7 @@ public function trailer(mixed $key, mixed $value): mixed
 | -------- | ---- | ----------- |
 | key | mixed |  |
 | value | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -168,6 +173,7 @@ public function write(mixed $content): mixed
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | content | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -190,6 +196,7 @@ public function end(mixed $content): mixed
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | content | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -214,6 +221,7 @@ public function sendfile(mixed $filename, mixed $offset, mixed $length): mixed
 | filename | mixed |  |
 | offset | mixed |  |
 | length | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -237,6 +245,7 @@ public function redirect(mixed $location, mixed $http_code): mixed
 | -------- | ---- | ----------- |
 | location | mixed |  |
 | http_code | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -276,6 +285,7 @@ public function create(mixed $fd): mixed
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | fd | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -317,6 +327,7 @@ public function push(mixed $data, null $opcode, null $flags): mixed
 | data | mixed |  |
 | opcode | null |  |
 | flags | null |  |
+
 ### 返回
 
 | 类型 | 描述 |

@@ -50,6 +50,7 @@ public function addRegisterPath(mixed $path, mixed $indoor_name): mixed
 | -------- | ---- | ----------- |
 | path | mixed |  |
 | indoor_name | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -74,6 +75,7 @@ public function sortByLevel(mixed $events, string $class_name, string $prefix): 
 | events | mixed |  |
 | class_name | string |  |
 | prefix | string |  |
+
 ### 返回
 
 | 类型 | 描述 |

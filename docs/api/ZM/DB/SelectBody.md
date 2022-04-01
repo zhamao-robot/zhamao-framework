@@ -49,6 +49,7 @@ public function fetchAll(int $fetch_mode): mixed
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | fetch_mode | int |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -88,6 +89,7 @@ public function value(null $key): null|mixed
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | key | null |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -110,6 +112,7 @@ public function execute(int $fetch_mode): mixed
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | fetch_mode | int |  |
+
 ### 返回
 
 | 类型 | 描述 |

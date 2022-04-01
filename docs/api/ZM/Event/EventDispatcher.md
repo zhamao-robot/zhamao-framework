@@ -15,6 +15,7 @@ public function interrupt(mixed $return_var): mixed
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | return_var | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
