@@ -1,4 +1,4 @@
-name: Build
+name: Increment Build Number
 
 on:
   pull_request:
