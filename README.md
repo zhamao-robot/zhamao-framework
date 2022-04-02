@@ -9,7 +9,7 @@
   </a>
 
   <a href="https://github.com/zhamao-robot/zhamao-framework/actions">
-    <img src="https://img.shields.io/github/workflow/status/zhamao-robot/zhamao-framework/Integration%20and%20Style%20Test?label=Build&style=flat-square" alt="Integration Test">
+    <img src="https://img.shields.io/github/workflow/status/zhamao-robot/zhamao-framework/Integration%20and%20Style%20Test?label=Test&style=flat-square" alt="Integration Test">
   </a>
 
   <a href="https://packagist.org/packages/zhamao/framework">
