@@ -44,7 +44,7 @@ class UpdateBody
             $msg[] = $k . ' = ?';
             $arr[] = $v;
         }
-        if (($msg ?? []) == []) {
+        if ($msg == []) {
             throw new DbException('update value sets can not be empty!');
         }
         $line = 'UPDATE ' . $this->table->getTableName() . ' SET ' . implode(', ', $msg);
