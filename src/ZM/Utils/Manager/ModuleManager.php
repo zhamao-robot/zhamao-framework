@@ -170,7 +170,7 @@ class ModuleManager
     /**
      * 解包模块
      * @param  array|Iterator $module 模块信息
-     * @return array|false    返回截包的信息或false
+     * @return array|false    返回解包的信息或false
      */
     public static function unpackModule($module, array $options = [])
     {
