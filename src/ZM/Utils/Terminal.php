@@ -31,7 +31,7 @@ class Terminal
         if (self::$default_commands === false) {
             self::init();
         }
-        $it = explodeMsg($cmd);
+        $it = explode_msg($cmd);
         $dispatcher = new EventDispatcher(TerminalCommand::class);
         $dispatcher->setRuleFunction(function ($v) use ($it) {
             /* @var TerminalCommand $v */
@@ -105,22 +105,22 @@ class Terminal
 
     /**
      * @TerminalCommand(command="status",description="显示Swoole Server运行状态（需要安装league/climate组件）")
-     * @noinspection PhpFullyQualifiedNameUsageInspection
      */
     public function status()
     {
-        if (!class_exists('\\League\\CLImate\\CLImate')) {
-            Console::warning('你还没有安装 league/climate 组件，无法使用此功能！');
+        if (class_exists('\\League\\CLImate\\CLImate')) {
+            $class = '\\League\\CLImate\\CLImate';
+            $climate = new $class();
+            $climate->output->addDefault('buffer');
+
+            $objs = server()->stats();
+            $climate->columns($objs);
+            $obj = $climate->output->get('buffer')->get();
+            $climate->output->get('buffer')->clean();
+            echo $obj;
             return;
         }
-        $climate = new \League\CLImate\CLImate();
-        $climate->output->addDefault('buffer');
-
-        $objs = server()->stats();
-        $climate->columns($objs);
-        $obj = $climate->output->get('buffer')->get();
-        $climate->output->get('buffer')->clean();
-        echo $obj;
+        Console::warning('你还没有安装 league/climate 组件，无法使用此功能！');
     }
 
     /**
@@ -139,9 +139,8 @@ class Terminal
 
     /**
      * @TerminalCommand(command="call",description="用于执行不需要参数的动态函数，比如 `call \Module\Example\Hello hitokoto`")
-     * @param $it
      */
-    public function call($it)
+    public function call(array $it)
     {
         $class_name = $it[1];
         $function_name = $it[2];
@@ -154,9 +153,8 @@ class Terminal
 
     /**
      * @TerminalCommand(command="level",description="设置log等级，例如 `level 0|1|2|3|4`")
-     * @param $it
      */
-    public function level($it)
+    public function level(array $it)
     {
         $level = intval(is_numeric($it[1] ?? 99) ? ($it[1] ?? 99) : 99);
         if ($level > 4 || $level < 0) {
@@ -168,9 +166,8 @@ class Terminal
 
     /**
      * @TerminalCommand(command="bc",description="eval执行代码，但输入必须是将代码base64之后的，如 `bc em1faW5mbygn5L2g5aW9Jyk7`")
-     * @param $it
      */
-    public function bc($it)
+    public function bc(array $it)
     {
         $code = base64_decode($it[1] ?? '', true);
         try {
@@ -181,9 +178,8 @@ class Terminal
 
     /**
      * @TerminalCommand(command="echo",description="输出内容，用法：`echo hello`")
-     * @param $it
      */
-    public function echoI($it)
+    public function echoI(array $it)
     {
         Console::info($it[1]);
     }

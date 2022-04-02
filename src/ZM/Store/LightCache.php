@@ -24,11 +24,11 @@ class LightCache
     private static $config = [];
 
     /**
-     * @param $config
+     * @param  array      $config 配置
      * @throws Exception
-     * @return bool|mixed
+     * @return bool|mixed 返回失败（false）或创建SwooleTable成功结果
      */
-    public static function init($config)
+    public static function init(array $config)
     {
         self::$config = $config;
         self::$kv_table = new Table($config['size'], $config['hash_conflict_proportion']);
@@ -169,7 +169,7 @@ class LightCache
     }
 
     /**
-     * @param $value
+     * @param  mixed       $value
      * @throws ZMException
      * @return bool
      */

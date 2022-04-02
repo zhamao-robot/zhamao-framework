@@ -51,8 +51,7 @@ class OnManagerStart implements SwooleEvent
             if (Framework::$argv['watch']) {
                 if (extension_loaded('inotify')) {
                     Console::info('Enabled File watcher, framework will reload automatically.');
-                    /* @noinspection PhpUndefinedFieldInspection */
-                    Framework::$server->inotify = $fd = inotify_init();
+                    $fd = inotify_init();
                     $this->addWatcher(DataProvider::getSourceRootDir() . '/src', $fd);
                     Event::add($fd, function () use ($fd) {
                         $r = inotify_read($fd);

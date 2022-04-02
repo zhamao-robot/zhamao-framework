@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ZM\Context;
 
 use Exception;
+use Stringable;
 use Swoole\Coroutine;
 use Swoole\Http\Request;
 use Swoole\WebSocket\Frame;
@@ -18,6 +19,7 @@ use ZM\Event\EventDispatcher;
 use ZM\Exception\InterruptException;
 use ZM\Exception\InvalidArgumentException;
 use ZM\Exception\WaitTimeoutException;
+use ZM\Exception\ZMKnownException;
 use ZM\Http\Response;
 use ZM\Utils\CoMessage;
 use ZM\Utils\MessageUtil;
@@ -168,9 +170,9 @@ class Context implements ContextInterface
 
     /**
      * only can used by cq->message event function
-     * @param $msg
-     * @param  bool       $yield
-     * @return array|bool
+     * @param  array|string $msg   要回复的消息
+     * @param  bool         $yield 是否协程挂起（true），是否绑定异步事件（Closure）
+     * @return array|bool   返回API调用结果
      */
     public function reply($msg, $yield = false)
     {
@@ -199,9 +201,9 @@ class Context implements ContextInterface
     }
 
     /**
-     * @param $msg
-     * @param  bool               $yield
-     * @throws InterruptException
+     * @param  array|string       $msg   要回复的消息
+     * @param  bool               $yield 是否协程挂起（true），是否绑定异步事件（Closure）
+     * @throws InterruptException 阻止消息被后续插件处理
      */
     public function finalReply($msg, $yield = false)
     {
@@ -218,8 +220,7 @@ class Context implements ContextInterface
      * @param  string                   $timeout_prompt
      * @throws WaitTimeoutException
      * @throws InvalidArgumentException
-     * @return string
-     * @noinspection PhpMissingReturnTypeInspection
+     * @return string                   返回用户输入的内容
      */
     public function waitMessage($prompt = '', $timeout = 600, $timeout_prompt = '')
     {
@@ -247,10 +248,12 @@ class Context implements ContextInterface
     }
 
     /**
-     * @param $mode
-     * @param $prompt_msg
-     * @throws WaitTimeoutException
+     * 根据选定的模式获取消息参数
+     * @param  int|string               $mode       获取的模式
+     * @param  string|Stringable        $prompt_msg 提示语回复
      * @throws InvalidArgumentException
+     * @throws ZMKnownException
+     * @throws WaitTimeoutException
      * @return mixed|string
      */
     public function getArgs($mode, $prompt_msg)
@@ -282,10 +285,12 @@ class Context implements ContextInterface
     }
 
     /**
-     * @param  string                   $prompt_msg
-     * @throws WaitTimeoutException
+     * 获取下一个参数
+     * @param  string                   $prompt_msg 提示语回复
      * @throws InvalidArgumentException
-     * @return int|mixed|string
+     * @throws ZMKnownException
+     * @throws WaitTimeoutException
+     * @return int|mixed|string         返回获取的参数
      */
     public function getNextArg($prompt_msg = '')
     {
@@ -293,10 +298,12 @@ class Context implements ContextInterface
     }
 
     /**
-     * @param  string                   $prompt_msg
-     * @throws WaitTimeoutException
+     * 获取接下来所有的消息当成一个完整的参数（包含空格）
+     * @param  string                   $prompt_msg 提示语回复
      * @throws InvalidArgumentException
-     * @return int|mixed|string
+     * @throws ZMKnownException
+     * @throws WaitTimeoutException
+     * @return int|mixed|string         返回获取的参数
      */
     public function getFullArg($prompt_msg = '')
     {
@@ -304,18 +311,23 @@ class Context implements ContextInterface
     }
 
     /**
-     * @param  string                   $prompt_msg
-     * @throws WaitTimeoutException
+     * 获取下一个数字类型的参数
+     * @param  string                   $prompt_msg 提示语回复
      * @throws InvalidArgumentException
-     * @return int|mixed|string
+     * @throws ZMKnownException
+     * @throws WaitTimeoutException
+     * @return int|mixed|string         返回获取的参数
      */
     public function getNumArg($prompt_msg = '')
     {
         return $this->getArgs(ZM_MATCH_NUMBER, $prompt_msg);
     }
 
-    /** @noinspection PhpMissingReturnTypeInspection */
-    public function cloneFromParent()
+    /**
+     * @throws ZMKnownException
+     * @return ContextInterface 返回上下文
+     */
+    public function cloneFromParent(): ContextInterface
     {
         set_coroutine_params(self::$context[Coroutine::getPcid()] ?? self::$context[$this->cid]);
         return context();

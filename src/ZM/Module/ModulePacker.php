@@ -57,9 +57,9 @@ class ModulePacker
 
     /**
      * 设置输出文件夹
-     * @param $path
+     * @param string $path 输出路径
      */
-    public function setOutputPath($path)
+    public function setOutputPath(string $path)
     {
         $this->output_path = $path;
         if (!is_dir($path)) {

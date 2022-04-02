@@ -170,10 +170,10 @@ class Hello
     /**
      * 使用自定义参数的路由参数
      * @RequestMapping("/whoami/{name}")
-     * @param $param
-     * @return string
+     * @param  array  $param 参数
+     * @return string 返回的 HTML Body
      */
-    public function paramGet($param)
+    public function paramGet(array $param = []): string
     {
         return 'Hello, ' . $param['name'];
     }
@@ -181,7 +181,7 @@ class Hello
     /**
      * 在机器人连接后向终端输出信息
      * @OnOpenEvent("qq")
-     * @param $conn
+     * @param ConnectionObject $conn WebSocket 连接对象
      */
     public function onConnect(ConnectionObject $conn)
     {

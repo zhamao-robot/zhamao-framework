@@ -38,8 +38,7 @@ class LightCacheInside
     }
 
     /**
-     * @param  array|int|string $value
-     * @return mixed
+     * @param array|int|string $value
      */
     public static function set(string $table, string $key, $value): bool
     {
@@ -58,13 +57,10 @@ class LightCacheInside
     }
 
     /**
-     * @param $name
-     * @param $size
-     * @param $str_size
-     * @param  int         $conflict_proportion
+     * @param  float|int   $conflict_proportion
      * @throws ZMException
      */
-    private static function createTable($name, $size, $str_size, $conflict_proportion = 0)
+    private static function createTable(string $name, int $size, int $str_size, $conflict_proportion = 0)
     {
         self::$kv_table[$name] = new Table($size, $conflict_proportion);
         self::$kv_table[$name]->column('value', Table::TYPE_STRING, $str_size);

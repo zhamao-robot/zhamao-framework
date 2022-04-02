@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ZM\Utils\Manager;
 
+use Iterator;
 use ZM\Config\ZMConfig;
 use ZM\Console\Console;
 use ZM\Exception\ModulePackException;
@@ -168,8 +169,8 @@ class ModuleManager
 
     /**
      * 解包模块
-     * @param $module
-     * @return array|false
+     * @param  array|Iterator $module 模块信息
+     * @return array|false    返回截包的信息或false
      */
     public static function unpackModule($module, array $options = [])
     {

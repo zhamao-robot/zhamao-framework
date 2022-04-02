@@ -38,7 +38,7 @@ class OnTask extends AnnotationBase implements Rule
     }
 
     /**
-     * @return mixed
+     * @return string 返回规则语句
      */
     public function getRule(): string
     {

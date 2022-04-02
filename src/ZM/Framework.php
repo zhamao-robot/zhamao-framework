@@ -659,10 +659,10 @@ class Framework
 
     /**
      * 解析命令行的 $argv 参数们
-     * @param $args
-     * @param $add_port
+     * @param array       $args     命令行参数
+     * @param bool|string $add_port 是否添加端口号
      */
-    private function parseCliArgs($args, &$add_port)
+    private function parseCliArgs(array $args, &$add_port)
     {
         $coroutine_mode = true;
         global $terminal_id;

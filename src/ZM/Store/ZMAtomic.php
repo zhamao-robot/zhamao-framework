@@ -12,10 +12,7 @@ class ZMAtomic
     /** @var Atomic[] */
     public static $atomics;
 
-    /**
-     * @param $name
-     */
-    public static function get($name): ?Atomic
+    public static function get(string $name): ?Atomic
     {
         return self::$atomics[$name] ?? null;
     }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ZM\Utils;
 
 use Exception;
+use Iterator;
 use ReflectionException;
 use ReflectionMethod;
 use ZM\Annotation\CQ\CQCommand;
@@ -21,8 +22,9 @@ class MessageUtil
 {
     /**
      * 下载消息中 CQ 码的所有图片，通过 url
-     * @param $msg
-     * @return array|false
+     * @param  array|string $msg  消息或消息数组
+     * @param  null|string  $path 保存路径
+     * @return array|false  返回图片信息或失败返回false
      */
     public static function downloadCQImage($msg, ?string $path = null)
     {
@@ -54,7 +56,7 @@ class MessageUtil
 
     /**
      * 检查消息中是否含有图片 CQ 码
-     * @param $msg
+     * @param array|string $msg 消息或消息数组
      */
     public static function containsImage($msg): bool
     {
@@ -77,9 +79,10 @@ class MessageUtil
      * type == 0 : 返回图片的 base64 CQ 码
      * type == 1 : 返回图片的 file://路径 CQ 码（路径必须为绝对路径）
      * type == 2 : 返回图片的 http://xxx CQ 码（默认为 /images/ 路径就是文件对应所在的目录）
-     * @param $file
+     * @param string $file 文件数据
+     * @param int    $type 文件类型（0，1，2可选，默认为0）
      */
-    public static function getImageCQFromLocal($file, int $type = 0): string
+    public static function getImageCQFromLocal(string $file, int $type = 0): string
     {
         switch ($type) {
             case 0:
@@ -95,10 +98,10 @@ class MessageUtil
 
     /**
      * 分割字符，将用户消息通过空格或换行分割为数组
-     * @param $msg
+     * @param  string         $msg 消息内容
      * @return array|string[]
      */
-    public static function splitCommand($msg): array
+    public static function splitCommand(string $msg): array
     {
         $word = explode_msg(str_replace("\r", '', $msg));
         if (empty($word)) {
@@ -116,8 +119,9 @@ class MessageUtil
     }
 
     /**
-     * @param $msg
-     * @param $obj
+     * 根据CQCommand的规则匹配消息，获取是否匹配到对应的注解事件
+     * @param array|string   $msg 消息内容
+     * @param array|Iterator $obj 数据对象
      */
     public static function matchCommand($msg, $obj): MatchResult
     {
@@ -182,10 +186,11 @@ class MessageUtil
     }
 
     /**
-     * @param $command
+     * @param  string    $command 命令内容
+     * @param  string    $reply   回复内容
      * @throws Exception
      */
-    public static function addShortCommand($command, string $reply)
+    public static function addShortCommand(string $command, string $reply)
     {
         for ($i = 0; $i < ZM_WORKER_NUM; ++$i) {
             WorkerManager::sendActionToWorker($i, 'add_short_command', [$command, $reply]);
@@ -194,10 +199,12 @@ class MessageUtil
 
     /**
      * 字符串转数组
-     * @param $msg
-     * @param false $trim_text
+     * @param  string $msg          消息内容
+     * @param  bool   $ignore_space 是否忽略空行
+     * @param  bool   $trim_text    是否去除空格
+     * @return array  返回数组
      */
-    public static function strToArray($msg, bool $ignore_space = true, bool $trim_text = false): array
+    public static function strToArray(string $msg, bool $ignore_space = true, bool $trim_text = false): array
     {
         $arr = [];
         while (($rear = mb_strstr($msg, '[CQ:')) !== false && ($end = mb_strstr($rear, ']', true)) !== false) {

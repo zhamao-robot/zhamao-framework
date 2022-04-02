@@ -63,7 +63,7 @@ class SignalListener
 
     /**
      * 监听Worker/TaskWorker进程的Ctrl+C
-     * @param $worker_id
+     * @param int|string $worker_id 当前进程的ID
      */
     public static function signalWorker(Server $server, $worker_id)
     {

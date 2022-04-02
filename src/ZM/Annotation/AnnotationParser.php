@@ -116,7 +116,7 @@ class AnnotationParser
                     $vs->class = $v;
 
                     // 预处理1：将适用于每一个函数的注解到类注解重新注解到每个函数下面
-                    if ($vs instanceof ErgodicAnnotation) {
+                    if (($vs instanceof ErgodicAnnotation) && ($vs instanceof AnnotationBase)) {
                         foreach (($this->annotation_map[$v]['methods'] ?? []) as $method) {
                             $copy = clone $vs;
                             $copy->method = $method->getName();
@@ -208,10 +208,10 @@ class AnnotationParser
     }
 
     /**
-     * @param $path
-     * @param $indoor_name
+     * @param string $path        注册解析注解的路径
+     * @param string $indoor_name 起始命名空间的名称
      */
-    public function addRegisterPath($path, $indoor_name)
+    public function addRegisterPath(string $path, string $indoor_name)
     {
         if (server()->worker_id === 0) {
             Console::verbose('Add register path: ' . $path . ' => ' . $indoor_name);
@@ -220,10 +220,12 @@ class AnnotationParser
     }
 
     /**
-     * @param $events
+     * @param array  $events     需要排序的
+     * @param string $class_name 排序的类名
+     * @param string $prefix     前缀
      * @internal 用于 level 排序
      */
-    public function sortByLevel(&$events, string $class_name, string $prefix = '')
+    public function sortByLevel(array &$events, string $class_name, string $prefix = '')
     {
         if (is_a($class_name, Level::class, true)) {
             $class_name .= $prefix;
