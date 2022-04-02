@@ -2,7 +2,7 @@ const apiConfig = require('./api')
 
 module.exports = {
     title: '炸毛框架',
-    description: '一个聊天机器人 + Web 框架',
+    description: '一个高性能聊天机器人 + Web 框架',
     theme: 'antdocs',
     markdown: {
         lineNumbers: true
