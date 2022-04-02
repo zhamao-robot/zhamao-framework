@@ -11,10 +11,10 @@ class CQ
 {
     /**
      * at一下QQ用户（仅在QQ群支持at全体）
-     * @param $qq
-     * @return string
+     * @param  int|string $qq 用户QQ号/ID号
+     * @return string     CQ码
      */
-    public static function at($qq)
+    public static function at($qq): string
     {
         if (is_numeric($qq) || $qq === 'all') {
             return '[CQ:at,qq=' . $qq . ']';
@@ -25,10 +25,10 @@ class CQ
 
     /**
      * 发送QQ原生表情
-     * @param $id
-     * @return string
+     * @param  int|string $id 表情ID
+     * @return string     CQ码
      */
-    public static function face($id)
+    public static function face($id): string
     {
         if (is_numeric($id)) {
             return '[CQ:face,id=' . $id . ']';
@@ -39,10 +39,14 @@ class CQ
 
     /**
      * 发送图片
-     * @param $file
-     * @return string
+     * @param  string $file    文件的路径、URL或者base64编码的图片数据
+     * @param  bool   $cache   是否缓存（默认为true）
+     * @param  bool   $flash   是否闪照（默认为false）
+     * @param  bool   $proxy   是否使用代理（默认为true）
+     * @param  int    $timeout 超时时间（默认不超时）
+     * @return string CQ码
      */
-    public static function image($file, bool $cache = true, bool $flash = false, bool $proxy = true, int $timeout = -1)
+    public static function image(string $file, bool $cache = true, bool $flash = false, bool $proxy = true, int $timeout = -1): string
     {
         return
             '[CQ:image,file=' . self::encode($file, true) .
@@ -55,15 +59,19 @@ class CQ
 
     /**
      * 发送语音
-     * @param $file
-     * @return string
+     * @param  string $file    文件的路径、URL或者base64编码的语音数据
+     * @param  bool   $magic   是否加特技（默认为false）
+     * @param  bool   $cache   是否缓存（默认为true）
+     * @param  bool   $proxy   是否使用代理（默认为true）
+     * @param  int    $timeout 超时时间（默认不超时）
+     * @return string CQ码
      */
-    public static function record($file, bool $magic = false, bool $cache = true, bool $proxy = true, int $timeout = -1)
+    public static function record(string $file, bool $magic = false, bool $cache = true, bool $proxy = true, int $timeout = -1): string
     {
         return
             '[CQ:record,file=' . self::encode($file, true) .
-            (!$cache ? ',cache=0' : '') .
             ($magic ? ',magic=1' : '') .
+            (!$cache ? ',cache=0' : '') .
             (!$proxy ? ',proxy=false' : '') .
             ($timeout != -1 ? (',timeout=' . $timeout) : '') .
             ']';
@@ -71,10 +79,13 @@ class CQ
 
     /**
      * 发送短视频
-     * @param $file
-     * @return string
+     * @param  string $file    文件的路径、URL或者base64编码的短视频数据
+     * @param  bool   $cache   是否缓存（默认为true）
+     * @param  bool   $proxy   是否使用代理（默认为true）
+     * @param  int    $timeout 超时时间（默认不超时）
+     * @return string CQ码
      */
-    public static function video($file, bool $cache = true, bool $proxy = true, int $timeout = -1)
+    public static function video(string $file, bool $cache = true, bool $proxy = true, int $timeout = -1): string
     {
         return
             '[CQ:video,file=' . self::encode($file, true) .
@@ -86,60 +97,62 @@ class CQ
 
     /**
      * 发送投掷骰子（只能在单条回复中单独使用）
-     * @return string
+     * @return string CQ码
      */
-    public static function rps()
+    public static function rps(): string
     {
         return '[CQ:rps]';
     }
 
     /**
      * 发送掷骰子表情（只能在单条回复中单独使用）
-     * @return string
+     * @return string CQ码
      */
-    public static function dice()
+    public static function dice(): string
     {
         return '[CQ:dice]';
     }
 
     /**
      * 戳一戳（原窗口抖动，仅支持好友消息使用）
-     * @return string
+     * @return string CQ码
      */
-    public static function shake()
+    public static function shake(): string
     {
         return '[CQ:shake]';
     }
 
     /**
      * 发送新的戳一戳
-     * @param $type
-     * @param $id
-     * @return string
+     * @param  int|string $type 焯一戳类型
+     * @param  int|string $id   戳一戳ID号
+     * @param  string     $name 戳一戳名称（可选）
+     * @return string     CQ码
      */
-    public static function poke($type, $id, string $name = '')
+    public static function poke($type, $id, string $name = ''): string
     {
         return "[CQ:poke,type={$type},id={$id}" . ($name != '' ? (',name=' . self::encode($name, true)) : '') . ']';
     }
 
     /**
      * 发送匿名消息
-     * @return string
+     * @param  int    $ignore 是否忽略错误（默认为1，0表示不忽略错误）
+     * @return string CQ码
      */
-    public static function anonymous(int $ignore = 1)
+    public static function anonymous(int $ignore = 1): string
     {
         return '[CQ:anonymous' . ($ignore != 1 ? ',ignore=0' : '') . ']';
     }
 
     /**
      * 发送链接分享（只能在单条回复中单独使用）
-     * @param $url
-     * @param $title
-     * @param  null   $content
-     * @param  null   $image
-     * @return string
+     * @param  string      $url     分享地址
+     * @param  string      $title   标题
+     * @param  null|string $content 卡片内容（可选）
+     * @param  null|string $image   卡片图片（可选）
+     * @return string      CQ码
      */
-    public static function share($url, $title, $content = null, $image = null)
+    public static function share(string $url, string $title, ?string $content = null, ?string $image = null): string
     {
         if ($content === null) {
             $c = '';
@@ -156,26 +169,28 @@ class CQ
 
     /**
      * 发送好友或群推荐名片
-     * @param $type
-     * @param $id
-     * @return string
+     * @param  string     $type 名片类型
+     * @param  int|string $id   好友或群ID
+     * @return string     CQ码
      */
-    public static function contact($type, $id)
+    public static function contact(string $type, $id): string
     {
         return "[CQ:contact,type={$type},id={$id}]";
     }
 
     /**
      * 发送位置
-     * @param $lat
-     * @param $lon
-     * @return string
+     * @param  float|string $lat     纬度
+     * @param  float|string $lon     经度
+     * @param  string       $title   标题（可选）
+     * @param  string       $content 卡片内容（可选）
+     * @return string       CQ码
      */
-    public static function location($lat, $lon, string $title = '', string $content = '')
+    public static function location($lat, $lon, string $title = '', string $content = ''): string
     {
         return '[CQ:location' .
-            ',lat=' . self::encode($lat, true) .
-            ',lon=' . self::encode($lon, true) .
+            ',lat=' . self::encode((string) $lat, true) .
+            ',lon=' . self::encode((string) $lon, true) .
             ($title != '' ? (',title=' . self::encode($title, true)) : '') .
             ($content != '' ? (',content=' . self::encode($content, true)) : '') .
             ']';
@@ -183,23 +198,18 @@ class CQ
 
     /**
      * 发送音乐分享（只能在单条回复中单独使用）
+     *
      * qq、163、xiami为内置分享，需要先通过搜索功能获取id后使用
-     * custom为自定义分享
-     * 当为自定义分享时：
-     *  $id_or_url 为音乐卡片点进去打开的链接（一般是音乐介绍界面啦什么的）
-     *  $audio 为音乐（如mp3文件）的HTTP链接地址（不可为空）
-     *  $title 为音乐卡片的标题，建议12字以内（不可为空）
-     *  $content 为音乐卡片的简介（可忽略）
-     *  $image 为音乐卡片的图片链接地址（可忽略）
-     * @param $type
-     * @param $id_or_url
-     * @param  null   $audio
-     * @param  null   $title
-     * @param  null   $content
-     * @param  null   $image
-     * @return string
+     *
+     * @param  string      $type      分享类型（仅限 `qq`、`163`、`xiami` 或 `custom`）
+     * @param  int|string  $id_or_url 当分享类型不是 `custom` 时，表示的是分享音乐的ID（需要先通过搜索功能获取id后使用），反之表示的是音乐卡片点入的链接
+     * @param  null|string $audio     当分享类型是 `custom` 时，表示为音乐（如mp3文件）的HTTP链接地址（不可为空）
+     * @param  null|string $title     当分享类型是 `custom` 时，表示为音乐卡片的标题，建议12字以内（不可为空）
+     * @param  null|string $content   当分享类型是 `custom` 时，表示为音乐卡片的简介（可忽略）
+     * @param  null|string $image     当分享类型是 `custom` 时，表示为音乐卡片的图片链接地址（可忽略）
+     * @return string      CQ码
      */
-    public static function music($type, $id_or_url, $audio = null, $title = null, $content = null, $image = null)
+    public static function music(string $type, $id_or_url, ?string $audio = null, ?string $title = null, ?string $content = null, ?string $image = null): string
     {
         switch ($type) {
             case 'qq':
@@ -231,27 +241,60 @@ class CQ
         }
     }
 
-    public static function forward($id)
+    /**
+     * 合并转发消息
+     * @param  int|string $id 合并转发ID, 需要通过 `/get_forward_msg` API获取转发的具体内容
+     * @return string     CQ码
+     */
+    public static function forward($id): string
     {
-        return '[CQ:forward,id=' . self::encode($id) . ']';
+        return '[CQ:forward,id=' . self::encode((string) $id) . ']';
     }
 
-    public static function node($user_id, $nickname, $content)
+    /**
+     * 合并转发消息节点
+     * 特殊说明: 需要使用单独的API /send_group_forward_msg 发送, 并且由于消息段较为复杂, 仅支持Array形式入参。
+     * 如果引用消息和自定义消息同时出现, 实际查看顺序将取消息段顺序。
+     * 另外按 CQHTTP 文档说明, data 应全为字符串, 但由于需要接收message 类型的消息, 所以 仅限此Type的content字段 支持Array套娃
+     * @deprecated 这个不推荐使用，因为 go-cqhttp 官方没有对其提供CQ码模式相关支持，仅支持Array模式发送
+     * @param  int|string $user_id  转发消息id
+     * @param  string     $nickname 发送者显示名字
+     * @param  string     $content  具体消息
+     * @return string     CQ码
+     */
+    public static function node($user_id, string $nickname, string $content): string
     {
         return "[CQ:node,user_id={$user_id},nickname=" . self::encode($nickname, true) . ',content=' . self::encode($content, true) . ']';
     }
 
-    public static function xml($data)
+    /**
+     * XML消息
+     * @param  string $data xml内容, xml中的value部分
+     * @return string CQ码
+     */
+    public static function xml(string $data): string
     {
         return '[CQ:xml,data=' . self::encode($data, true) . ']';
     }
 
-    public static function json($data, $resid = 0)
+    /**
+     * JSON消息
+     * @param  string $data  json内容
+     * @param  int    $resid 0为走小程序通道，其他值为富文本通道（默认为0）
+     * @return string CQ码
+     */
+    public static function json(string $data, int $resid = 0): string
     {
-        return '[CQ:json,data=' . self::encode($data, true) . ',resid=' . intval($resid) . ']';
+        return '[CQ:json,data=' . self::encode($data, true) . ',resid=' . $resid . ']';
     }
 
-    public static function _custom(string $type_name, $params)
+    /**
+     * 返回一个自定义扩展的CQ码（支持自定义类型和参数）
+     * @param  string $type_name CQ码类型名称
+     * @param  array  $params    参数
+     * @return string CQ码
+     */
+    public static function _custom(string $type_name, array $params): string
     {
         $code = '[CQ:' . $type_name;
         foreach ($params as $k => $v) {
@@ -263,10 +306,11 @@ class CQ
 
     /**
      * 反转义字符串中的CQ码敏感符号
-     * @param mixed $msg
-     * @param mixed $is_content
+     * @param  string $msg        字符串
+     * @param  bool   $is_content 如果是解码CQ码本体内容，则为false（默认），如果是参数内的字符串，则为true
+     * @return string 转义后的CQ码
      */
-    public static function decode($msg, $is_content = false)
+    public static function decode(string $msg, bool $is_content = false): string
     {
         $msg = str_replace(['&amp;', '&#91;', '&#93;'], ['&', '[', ']'], $msg);
         if ($is_content) {
@@ -275,7 +319,12 @@ class CQ
         return $msg;
     }
 
-    public static function replace($str)
+    /**
+     * 简单反转义替换CQ码的方括号
+     * @param  string $str 字符串
+     * @return string 字符串
+     */
+    public static function replace(string $str): string
     {
         $str = str_replace('{{', '[', $str);
         return str_replace('}}', ']', $str);
@@ -283,10 +332,11 @@ class CQ
 
     /**
      * 转义CQ码的特殊字符，同encode
-     * @param mixed $msg
-     * @param mixed $is_content
+     * @param  string $msg        字符串
+     * @param  bool   $is_content 如果是转义CQ码本体内容，则为false（默认），如果是参数内的字符串，则为true
+     * @return string 转义后的CQ码
      */
-    public static function escape($msg, $is_content = false)
+    public static function escape(string $msg, bool $is_content = false): string
     {
         $msg = str_replace(['&', '[', ']'], ['&amp;', '&#91;', '&#93;'], $msg);
         if ($is_content) {
@@ -297,10 +347,11 @@ class CQ
 
     /**
      * 转义CQ码的特殊字符
-     * @param mixed $msg
-     * @param mixed $is_content
+     * @param  string $msg        字符串
+     * @param  bool   $is_content 如果是转义CQ码本体内容，则为false（默认），如果是参数内的字符串，则为true
+     * @return string 转义后的CQ码
      */
-    public static function encode($msg, $is_content = false)
+    public static function encode(string $msg, bool $is_content = false): string
     {
         $msg = str_replace(['&', '[', ']'], ['&amp;', '&#91;', '&#93;'], $msg);
         if ($is_content) {
@@ -311,10 +362,10 @@ class CQ
 
     /**
      * 移除消息中所有的CQ码并返回移除CQ码后的消息
-     * @param $msg
-     * @return string
+     * @param  string $msg 消息
+     * @return string 消息内容
      */
-    public static function removeCQ($msg)
+    public static function removeCQ(string $msg): string
     {
         $final = '';
         $last_end = 0;
@@ -328,10 +379,11 @@ class CQ
 
     /**
      * 获取消息中第一个CQ码
-     * @param mixed $msg
-     * @param mixed $is_object
+     * @param  string         $msg       消息内容
+     * @param  bool           $is_object 是否以对象形式返回，如果为False的话，返回数组形式（默认为false）
+     * @return array|CQObject 返回的CQ码（数组或对象）
      */
-    public static function getCQ($msg, $is_object = false)
+    public static function getCQ(string $msg, bool $is_object = false)
     {
         if (($head = mb_strpos($msg, '[CQ:')) !== false) {
             $key_offset = mb_substr($msg, $head);
@@ -356,10 +408,11 @@ class CQ
 
     /**
      * 获取消息中所有的CQ码
-     * @param mixed $msg
-     * @param mixed $is_object
+     * @param  string           $msg       消息内容
+     * @param  bool             $is_object 是否以对象形式返回，如果为False的话，返回数组形式（默认为false）
+     * @return array|CQObject[] 返回的CQ码们（数组或对象）
      */
-    public static function getAllCQ($msg, $is_object = false)
+    public static function getAllCQ(string $msg, bool $is_object = false): array
     {
         $cqs = [];
         $offset = 0;

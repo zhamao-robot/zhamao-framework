@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\ZM\Utils;
 
 use PHPUnit\Framework\TestCase;
+use Throwable;
 use ZM\Annotation\CQ\CQCommand;
 use ZM\API\CQ;
 use ZM\Event\EventManager;
@@ -157,16 +158,27 @@ class MessageUtilTest extends TestCase
         ];
     }
 
+    /**
+     * @throws Throwable
+     */
     public function testDownloadCQImage(): void
     {
         if (file_exists(DataProvider::getDataFolder('images') . '/test.jpg')) {
             unlink(DataProvider::getDataFolder('images') . '/test.jpg');
         }
         $msg = '[CQ:image,file=test.jpg,url=https://zhamao.xin/file/hello.jpg]';
-        $result = MessageUtil::downloadCQImage($msg);
-        $this->assertIsArray($result);
-        $this->assertCount(1, $result);
-        $this->assertFileExists(DataProvider::getDataFolder('images') . '/test.jpg');
-        unlink(DataProvider::getDataFolder('images') . '/test.jpg');
+
+        try {
+            $result = MessageUtil::downloadCQImage($msg);
+            $this->assertIsArray($result);
+            $this->assertCount(1, $result);
+            $this->assertFileExists(DataProvider::getDataFolder('images') . '/test.jpg');
+            unlink(DataProvider::getDataFolder('images') . '/test.jpg');
+        } catch (Throwable $e) {
+            if (strpos($e->getMessage(), 'enable-openssl') !== false) {
+                $this->markTestSkipped('OpenSSL is not enabled');
+            }
+            throw $e;
+        }
     }
 }
