@@ -145,10 +145,11 @@ class EventDispatcher
 
     /**
      * @param  mixed               $v
-     * @param  null                $rule_func
+     * @param  null|mixed          $rule_func
      * @param  mixed               ...$params
      * @throws InterruptException
      * @throws AnnotationException
+     * @throws Error
      * @return bool
      * @noinspection PhpMissingReturnTypeInspection
      */

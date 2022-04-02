@@ -1,7 +1,6 @@
 <?php
 
 /**
- * @noinspection PhpPropertyOnlyWrittenInspection
  * @noinspection PhpUnusedParameterInspection
  * @noinspection PhpComposerExtensionStubsInspection
  */
@@ -34,7 +33,12 @@ class OnManagerStart implements SwooleEvent
 {
     private static $last_hash = '';
 
-    private static $watch = -1;
+    private static $watch_tick_id = -1;
+
+    public static function getWatchTickId(): int
+    {
+        return self::$watch_tick_id;
+    }
 
     public function onCall(Server $server)
     {
@@ -65,7 +69,7 @@ class OnManagerStart implements SwooleEvent
                 }
             }
             if (Framework::$argv['polling-watch']) {
-                self::$watch = swoole_timer_tick(3000, function () use ($server) {
+                self::$watch_tick_id = swoole_timer_tick(3000, function () use ($server) {
                     $data = (DataProvider::scanDirFiles(DataProvider::getSourceRootDir() . '/src/'));
                     $hash = md5('');
                     foreach ($data as $file) {

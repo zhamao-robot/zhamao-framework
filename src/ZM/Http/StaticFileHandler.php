@@ -19,17 +19,16 @@ class StaticFileHandler
             if (strpos($full_path, $path) !== 0) {
                 $response->status(403);
                 $response->end('403 Forbidden');
-                return true;
+                return;
             }
             if (is_file($full_path)) {
                 $exp = strtolower(pathinfo($full_path)['extension'] ?? 'unknown');
                 $response->setHeader('Content-Type', ZMConfig::get('file_header')[$exp] ?? 'application/octet-stream');
                 $response->end(file_get_contents($full_path));
-                return true;
+                return;
             }
         }
         $response->status(404);
         $response->end(HttpUtil::getHttpCodePage(404));
-        return true;
     }
 }

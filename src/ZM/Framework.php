@@ -447,7 +447,7 @@ class Framework
     }
 
     /**
-     * @param  null             $id_or_name
+     * @param  null|int|string  $id_or_name
      * @throws ZMKnownException
      * @internal
      */

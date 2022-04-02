@@ -47,7 +47,7 @@ class SelectBody
     }
 
     /**
-     * @param  int         $fetch_mode
+     * @param  mixed       $fetch_mode
      * @throws DbException
      */
     public function fetchAll($fetch_mode = ZM_DEFAULT_FETCH_MODE)
@@ -66,7 +66,7 @@ class SelectBody
     }
 
     /**
-     * @param  null        $key
+     * @param  null|mixed  $key
      * @throws DbException
      * @return null|mixed
      */
@@ -83,10 +83,9 @@ class SelectBody
     }
 
     /**
-     * @param  int         $fetch_mode
      * @throws DbException
      */
-    public function execute($fetch_mode = ZM_DEFAULT_FETCH_MODE)
+    public function execute(int $fetch_mode = ZM_DEFAULT_FETCH_MODE)
     {
         $str = $this->queryPrepare();
         $this->result = DB::rawQuery($str[0], $str[1], $fetch_mode);

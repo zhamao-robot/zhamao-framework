@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace ZM\Event\SwooleEvent;
 
-use Error;
-use Exception;
 use Swoole\Coroutine;
 use Swoole\WebSocket\Frame;
+use Throwable;
 use ZM\Annotation\Swoole\OnMessageEvent;
 use ZM\Annotation\Swoole\OnSwooleEvent;
 use ZM\Annotation\Swoole\SwooleHandler;
@@ -53,11 +52,7 @@ class OnMessage implements SwooleEvent
             $dispatcher1->dispatchEvents($conn);
             $dispatcher->dispatchEvents($conn);
             // Console::success("Used ".round((microtime(true) - $starttime) * 1000, 3)." ms!");
-        } catch (Exception $e) {
-            $error_msg = $e->getMessage() . ' at ' . $e->getFile() . '(' . $e->getLine() . ')';
-            Console::error(zm_internal_errcode('E00017') . 'Uncaught exception ' . get_class($e) . ' when calling "message": ' . $error_msg);
-            Console::trace();
-        } catch (Error $e) {
+        } catch (Throwable $e) {
             $error_msg = $e->getMessage() . ' at ' . $e->getFile() . '(' . $e->getLine() . ')';
             Console::error(zm_internal_errcode('E00017') . 'Uncaught ' . get_class($e) . ' when calling "message": ' . $error_msg);
             Console::trace();

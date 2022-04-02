@@ -1,8 +1,10 @@
 parameters:
   reportUnmatchedIgnoredErrors: false
-  level: 2
+  level: 4
   paths:
     - ./src/
   ignoreErrors:
     - '#Used constant OS_TYPE_(LINUX|WINDOWS) not found#'
     - '#Constant .* not found#'
+  dynamicConstantNames:
+    - SWOOLE_VERSION

@@ -9,8 +9,6 @@ declare(strict_types=1);
 namespace ZM\DB;
 
 use PDOException;
-use PDOStatement;
-use Swoole\Database\PDOStatementProxy;
 use ZM\Console\Console;
 use ZM\Exception\DbException;
 use ZM\MySQL\MySQLManager;
@@ -101,11 +99,6 @@ class DB
             if ($ps === false) {
                 SqlPoolStorage::$sql_pool->putConnection(null);
                 throw new DbException('SQL语句查询错误，' . $line . '，错误信息：' . $conn->errorInfo()[2]);
-            }
-            if (!($ps instanceof PDOStatement) && !($ps instanceof PDOStatementProxy)) {
-                var_dump($ps);
-                SqlPoolStorage::$sql_pool->putConnection(null);
-                throw new DbException('语句查询错误！返回的不是 PDOStatement' . $line);
             }
             if ($params == []) {
                 $result = $ps->execute();

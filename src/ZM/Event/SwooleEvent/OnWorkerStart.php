@@ -13,7 +13,7 @@ use ReflectionException;
 use Swoole\Coroutine;
 use Swoole\Database\PDOConfig;
 use Swoole\Process;
-use Swoole\Server;
+use Swoole\WebSocket\Server;
 use ZM\Annotation\AnnotationParser;
 use ZM\Annotation\Swoole\OnMessageEvent;
 use ZM\Annotation\Swoole\OnStart;
@@ -68,12 +68,7 @@ class OnWorkerStart implements SwooleEvent
                         return;
                     }
                     // DataProvider::saveBuffer();
-                    /* @var Server $server */
-                    if (server() === null) {
-                        $server->shutdown();
-                    } else {
-                        server()->shutdown();
-                    }
+                    $server->shutdown();
                 });
 
                 Console::verbose("Worker #{$server->worker_id} starting");

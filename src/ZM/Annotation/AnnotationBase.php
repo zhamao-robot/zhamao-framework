@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace ZM\Annotation;
 
+use ArrayIterator;
 use Closure;
+use IteratorAggregate;
+use Traversable;
 
-abstract class AnnotationBase
+abstract class AnnotationBase implements IteratorAggregate
 {
     public $method = '';
 
@@ -34,5 +37,10 @@ abstract class AnnotationBase
             }
         }
         return $str;
+    }
+
+    public function getIterator(): Traversable
+    {
+        return new ArrayIterator($this);
     }
 }

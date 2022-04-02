@@ -409,7 +409,7 @@ function hash_message(array $message): string
  *
  * 与 {@link Framework::$server} 一致
  */
-function server(): ?Server
+function server(): Server
 {
     return Framework::$server;
 }
