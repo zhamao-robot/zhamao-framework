@@ -14,7 +14,7 @@ class TaskManager
      * @param  string      $task_name 任务名称
      * @param  int         $timeout   超时时间
      * @param  mixed       ...$params 传递参数
-     * @return false|mixed 执行结果（如果执行失败返回false，否则为其他任意值）
+     * @return false|mixed 执行结果（如果执行失败返回false，否则为执行结果）
      */
     public static function runTask(string $task_name, int $timeout = -1, ...$params)
     {
