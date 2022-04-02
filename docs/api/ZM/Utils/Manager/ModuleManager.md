@@ -20,7 +20,7 @@ public function getConfiguredModules(): array
 ## packModule
 
 ```php
-public function packModule(mixed $module): bool
+public function packModule(array $module, string $target): bool
 ```
 
 ### 描述
@@ -31,7 +31,8 @@ public function packModule(mixed $module): bool
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| module | mixed |  |
+| module | array | 模块信息 |
+| target | string | 目标路径 |
 
 ### 返回
 

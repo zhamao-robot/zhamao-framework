@@ -3,7 +3,7 @@
 ## yieldByWS
 
 ```php
-public function yieldByWS(int $timeout, array $hang, array $compare): mixed
+public function yieldByWS(array $hang, array $compare, int $timeout): mixed
 ```
 
 ### 描述
@@ -14,9 +14,9 @@ public function yieldByWS(int $timeout, array $hang, array $compare): mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| timeout | int |  |
 | hang | array |  |
 | compare | array |  |
+| timeout | int |  |
 
 ### 返回
 

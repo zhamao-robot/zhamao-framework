@@ -3,24 +3,24 @@
 ## get
 
 ```php
-public function get(int|string $robot_id): ZMRobot
+public function get(mixed $robot_id): ZMRobot
 ```
 
 ### 描述
 
-获取机器人Action/API实例
+作者很懒，什么也没有说
 
 ### 参数
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| robot_id | int|string | 机器人ID |
+| robot_id | mixed |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| ZMRobot | 机器人实例 |
+| ZMRobot |  |
 
 
 ## getRandom
@@ -31,13 +31,13 @@ public function getRandom(): ZMRobot
 
 ### 描述
 
-随机获取一个连接到框架的机器人实例
+作者很懒，什么也没有说
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| ZMRobot | 机器人实例 |
+| ZMRobot |  |
 
 
 ## getAllRobot
@@ -48,65 +48,19 @@ public function getAllRobot(): ZMRobot[]
 
 ### 描述
 
-获取所有机器人实例
+作者很懒，什么也没有说
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| ZMRobot[] | 机器人实例们 |
-
-
-## setCallback
-
-```php
-public function setCallback(bool|Closure $callback): OneBotV11
-```
-
-### 描述
-
-设置回调或启用协程等待API回包
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| callback | bool|Closure | 是否开启协程或设置异步回调函数，如果为true，则协程等待结果，如果为false，则异步执行并不等待结果，如果为回调函数，则异步执行且调用回调 |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| OneBotV11 | 返回本身 |
-
-
-## setPrefix
-
-```php
-public function setPrefix(int $prefix): OneBotV11
-```
-
-### 描述
-
-设置API调用类型后缀
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| prefix | int | 设置后缀类型，API_NORMAL为不加后缀，API_ASYNC为异步调用，API_RATE_LIMITED为加后缀并且限制调用频率 |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| OneBotV11 | 返回本身 |
+| ZMRobot[] |  |
 
 
 ## sendPrivateMsg
 
 ```php
-public function sendPrivateMsg(int|string $user_id, string $message, bool $auto_escape): array|bool
+public function sendPrivateMsg(mixed $user_id, mixed $message, bool $auto_escape): null|array|bool
 ```
 
 ### 描述
@@ -117,15 +71,15 @@ public function sendPrivateMsg(int|string $user_id, string $message, bool $auto_
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| user_id | int|string | 用户ID |
-| message | string | 消息内容 |
-| auto_escape | bool | 是否自动转义（默认为false） |
+| user_id | mixed |  |
+| message | mixed |  |
+| auto_escape | bool |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
+| null|array|bool |  |
 
 
 ## sendGroupMsg

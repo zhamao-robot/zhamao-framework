@@ -3,7 +3,7 @@
 ## downloadCQImage
 
 ```php
-public function downloadCQImage(mixed $msg, null $path): array|false
+public function downloadCQImage(mixed $msg, string $path): array|false
 ```
 
 ### 描述
@@ -15,7 +15,7 @@ public function downloadCQImage(mixed $msg, null $path): array|false
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | msg | mixed |  |
-| path | null |  |
+| path | string |  |
 
 ### 返回
 
