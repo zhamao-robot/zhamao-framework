@@ -63,9 +63,9 @@ class SignalListener
 
     /**
      * 监听Worker/TaskWorker进程的Ctrl+C
-     * @param int|string $worker_id 当前进程的ID
+     * @param int $worker_id 当前进程的ID
      */
-    public static function signalWorker(Server $server, $worker_id)
+    public static function signalWorker(Server $server, int $worker_id)
     {
         Console::debug('Listening Worker #' . $worker_id . ' SIGINT');
         Process::signal(SIGINT, function () use ($server) {
