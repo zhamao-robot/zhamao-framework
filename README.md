@@ -3,14 +3,42 @@
   <h2>炸毛框架</h2>
   炸毛框架 (zhamao-framework) 是一个协程高性能的聊天机器人 + Web 服务器开发框架<br><br>
 
-[![作者QQ](https://img.shields.io/badge/作者QQ-627577391-orange.svg)](http://wpa.qq.com/msgrd?v=3&uin=627577391&site=qq&menu=yes)
-[![zhamao License](https://img.shields.io/hexpm/l/plug.svg?maxAge=2592000)](https://github.com/zhamao-robot/zhamao-framework/blob/master/LICENSE)
-[![Latest Stable Version](http://img.shields.io/packagist/v/zhamao/framework.svg)](https://packagist.org/packages/zhamao/framework)
-[![Banner](https://img.shields.io/badge/OneBot-v11-success)](https://github.com/howmanybots/onebot)
-![Integration Test](https://github.com/zhamao-robot/zhamao-framework/actions/workflows/integration-test.yml/badge.svg)
+<p align="center">
+  <a href="https://onebot.dev/">
+    <img src="https://img.shields.io/badge/OneBot-11-black?style=flat-square" alt="OneBot">
+  </a>
 
-[![注解数量](https://img.shields.io/github/search/zhamao-robot/zhamao-framework/AnnotationBase.svg)](https://github.com/zhamao-robot/zhamao-framework/search?q=AnnotationBase)
-[![TODO 数量](https://img.shields.io/github/search/zhamao-robot/zhamao-framework/TODO.svg)](https://github.com/zhamao-robot/zhamao-framework/search?q=TODO)
+  <a href="https://github.com/zhamao-robot/zhamao-framework/actions">
+    <img src="https://img.shields.io/github/workflow/status/zhamao-robot/zhamao-framework/Integration%20and%20Style%20Test?label=Build&style=flat-square" alt="Integration Test">
+  </a>
+
+  <a href="https://packagist.org/packages/zhamao/framework">
+    <img src="https://img.shields.io/packagist/dt/zhamao/framework?label=Downloads&style=flat-square" alt="下载数">
+  </a>
+
+  <a href="https://github.com/zhamao-robot/zhamao-framework/releases">
+    <img src="https://img.shields.io/packagist/v/zhamao/framework?include_prereleases&label=Release&style=flat-square" alt="最新版本">
+  </a>
+
+  <a href="https://github.com/zhamao-robot/zhamao-framework/blob/master/LICENSE">
+    <img src="https://img.shields.io/github/license/zhamao-robot/zhamao-framework?label=License&style=flat-square" alt="开源协议">
+  </a>
+
+  <a href="https://wpa.qq.com/msgrd?v=3&uin=627577391&site=qq&menu=yes">
+    <img src="https://img.shields.io/badge/作者QQ-627577391-orange?style=flat-square" alt="作者QQ">
+  </a>
+
+  <br>
+  <br>
+
+  <a href="https://github.com/zhamao-robot/zhamao-framework/search?q=AnnotationBase">
+    <img src="https://img.shields.io/github/search/zhamao-robot/zhamao-framework/AnnotationBase?label=Annotations&style=flat-square" alt="注解数量">
+  </a>
+
+  <a href="https://github.com/zhamao-robot/zhamao-framework/search?q=TODO">
+    <img src="https://img.shields.io/github/search/zhamao-robot/zhamao-framework/TODO?label=TODO&style=flat-square" alt="TODO">
+  </a>
+</p>
 
 </div>
 
