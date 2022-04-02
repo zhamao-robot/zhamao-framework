@@ -58,9 +58,9 @@ class MySQLWrapper
     /**
      * wrapper method
      */
-    public function setAutoCommit(bool $autoCommit)
+    public function setAutoCommit(bool $auto_commit)
     {
-        $this->connection->setAutoCommit($autoCommit);
+        $this->connection->setAutoCommit($auto_commit);
     }
 
     /**
