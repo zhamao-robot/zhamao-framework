@@ -15,6 +15,7 @@ public function __construct(array $module): mixed
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | module | array |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -37,6 +38,7 @@ public function setOutputPath(mixed $path): mixed
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | path | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -59,6 +61,7 @@ public function setOverride(bool $override): mixed
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | override | bool |  |
+
 ### 返回
 
 | 类型 | 描述 |

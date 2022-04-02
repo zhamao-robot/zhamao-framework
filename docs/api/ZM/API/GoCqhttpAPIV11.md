@@ -15,7 +15,7 @@ public function getGuildServiceProfile(): array|bool
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## getGuildList
@@ -32,13 +32,13 @@ public function getGuildList(): array|bool
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## getGuildMetaByGuest
 
 ```php
-public function getGuildMetaByGuest(mixed $guild_id): array|bool
+public function getGuildMetaByGuest(int|string $guild_id): array|bool
 ```
 
 ### 描述
@@ -49,18 +49,19 @@ public function getGuildMetaByGuest(mixed $guild_id): array|bool
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| guild_id | mixed |  |
+| guild_id | int|string | 频道ID |
+
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## getGuildChannelList
 
 ```php
-public function getGuildChannelList(mixed $guild_id, false $no_cache): array|bool
+public function getGuildChannelList(int|string $guild_id, false $no_cache): array|bool
 ```
 
 ### 描述
@@ -71,19 +72,20 @@ public function getGuildChannelList(mixed $guild_id, false $no_cache): array|boo
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| guild_id | mixed |  |
-| no_cache | false |  |
+| guild_id | int|string | 频道ID |
+| no_cache | false | 禁用缓存（默认为false） |
+
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## getGuildMembers
 
 ```php
-public function getGuildMembers(mixed $guild_id): array|bool
+public function getGuildMembers(int|string $guild_id): array|bool
 ```
 
 ### 描述
@@ -94,18 +96,19 @@ public function getGuildMembers(mixed $guild_id): array|bool
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| guild_id | mixed |  |
+| guild_id | int|string | 频道ID |
+
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## sendGuildChannelMsg
 
 ```php
-public function sendGuildChannelMsg(mixed $guild_id, mixed $channel_id, mixed $message): array|bool
+public function sendGuildChannelMsg(int|string $guild_id, int|string $channel_id, string $message): array|bool
 ```
 
 ### 描述
@@ -116,59 +119,12 @@ public function sendGuildChannelMsg(mixed $guild_id, mixed $channel_id, mixed $m
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| guild_id | mixed |  |
-| channel_id | mixed |  |
-| message | mixed |  |
+| guild_id | int|string | 频道ID |
+| channel_id | int|string | 子频道ID |
+| message | string | 信息内容 |
+
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| array|bool |  |
-
-
-## processAPI
-
-```php
-public function processAPI(mixed $connection, mixed $reply, |null $function): array|bool
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| connection | mixed |  |
-| reply | mixed |  |
-| function | |null |  |
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| array|bool |  |
-
-
-## processHttpAPI
-
-```php
-public function processHttpAPI(mixed $connection, mixed $reply, null $function): bool
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| connection | mixed |  |
-| reply | mixed |  |
-| function | null |  |
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |

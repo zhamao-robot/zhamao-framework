@@ -16,6 +16,7 @@ InsertBody constructor.
 | -------- | ---- | ----------- |
 | row | mixed |  |
 | table | ZM\DB\Table |  |
+
 ### 返回
 
 | 类型 | 描述 |

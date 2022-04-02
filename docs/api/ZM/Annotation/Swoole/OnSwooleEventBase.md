@@ -15,6 +15,7 @@ public function setLevel(int $level): mixed
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | level | int |  |
+
 ### 返回
 
 | 类型 | 描述 |

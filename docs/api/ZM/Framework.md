@@ -17,6 +17,7 @@ public function saveProcessState(int|string $pid, int $type, array $data): mixed
 | pid | int|string |  |
 | type | int |  |
 | data | array |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -40,6 +41,7 @@ public function getProcessState(mixed $id_or_name, int $type): false|int|mixed
 | -------- | ---- | ----------- |
 | id_or_name | mixed |  |
 | type | int |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -63,6 +65,7 @@ public function removeProcessState(null $id_or_name, int $type): mixed
 | -------- | ---- | ----------- |
 | id_or_name | null |  |
 | type | int |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -120,6 +123,7 @@ public function parseCliArgs(mixed $args, mixed $add_port): mixed
 | -------- | ---- | ----------- |
 | args | mixed |  |
 | add_port | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |

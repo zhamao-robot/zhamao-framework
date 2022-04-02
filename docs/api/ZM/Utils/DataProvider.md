@@ -100,6 +100,7 @@ public function getDataFolder(string $second): null|array|false|mixed|string
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | second | string |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -123,6 +124,7 @@ public function saveToJson(mixed $filename, mixed $file_array): false|int
 | -------- | ---- | ----------- |
 | filename | mixed |  |
 | file_array | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -145,6 +147,7 @@ public function loadFromJson(mixed $filename): null|mixed
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | filename | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -169,6 +172,7 @@ public function scanDirFiles(mixed $dir, bool|string $relative, bool $recursive)
 | dir | mixed |  |
 | relative | bool|string |  |
 | recursive | bool |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -191,6 +195,7 @@ public function isRelativePath(mixed $path): bool
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | path | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |

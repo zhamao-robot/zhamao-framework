@@ -17,6 +17,7 @@ public function check(mixed $remote, mixed $local, Symfony\Component\Console\Out
 | remote | mixed |  |
 | local | mixed |  |
 | out | Symfony\Component\Console\Output\OutputInterface |  |
+
 ### 返回
 
 | 类型 | 描述 |

@@ -16,6 +16,7 @@ public function onCall(Swoole\Server $server, Swoole\Server\Task $task): mixed
 | -------- | ---- | ----------- |
 | server | Swoole\Server |  |
 | task | Swoole\Server\Task |  |
+
 ### 返回
 
 | 类型 | 描述 |

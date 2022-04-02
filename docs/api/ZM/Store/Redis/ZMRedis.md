@@ -32,6 +32,7 @@ public function call(callable $callable): mixed
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | callable | callable |  |
+
 ### 返回
 
 | 类型 | 描述 |

@@ -17,11 +17,45 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        
+      - name: Setup PHP
+        uses: "shivammathur/setup-php@v2"
+        with:
+          php-version: '8.1'
+          extensions: swoole, posix, json
+
+      - name: Setup problem matchers for PHP
+        run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
+        
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install Composer Dependencies
+        run: "composer install --prefer-dist --no-progress --optimize-autoloader"
+        
+      - name: Generate API Docs
+        run: bin/gendoc
+        
+      - name: Commit api docs
+        run: |
+          git config --global user.name 'Github Build Bot'
+          git config --global user.email 'noreply@github.com'
+          git add docs
+          git commit -m "update api docs"
+          git push
 
       - name: Increment build number
         run: sed -i -r 's/(.*)(\VERSION_ID\s=\s)([0-9]+)(.*)/echo "\1\2$((\3+1))\4"/ge' src/ZM/ConsoleApplication.php
 
-      - name: Commit change
+      - name: Commit build number
         run: |
           BUILD_ID=$(cat src/ZM/ConsoleApplication.php | grep "VERSION_ID = " | sed 's/[^0-9]//g')
           git config --global user.name 'Github Build Bot'

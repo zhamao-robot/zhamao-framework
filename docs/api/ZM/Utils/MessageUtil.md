@@ -16,6 +16,7 @@ public function downloadCQImage(mixed $msg, null $path): array|false
 | -------- | ---- | ----------- |
 | msg | mixed |  |
 | path | null |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -38,6 +39,7 @@ public function containsImage(mixed $msg): bool
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | msg | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -64,6 +66,7 @@ type == 2 : 返回图片的 http://xxx CQ 码（默认为 /images/ 路径就是�
 | -------- | ---- | ----------- |
 | file | mixed |  |
 | type | int |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -86,6 +89,7 @@ public function splitCommand(mixed $msg): array|string[]
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | msg | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -109,6 +113,7 @@ public function matchCommand(mixed $msg, mixed $obj): ZM\Entity\MatchResult
 | -------- | ---- | ----------- |
 | msg | mixed |  |
 | obj | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -132,6 +137,7 @@ public function addShortCommand(mixed $command, string $reply): mixed
 | -------- | ---- | ----------- |
 | command | mixed |  |
 | reply | string |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -156,6 +162,7 @@ public function strToArray(mixed $msg, false $trim_text, bool $ignore_space): ar
 | msg | mixed |  |
 | trim_text | false |  |
 | ignore_space | bool |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -179,6 +186,7 @@ public function arrayToStr(array $array): string
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | array | array |  |
+
 ### 返回
 
 | 类型 | 描述 |

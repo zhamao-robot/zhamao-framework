@@ -3,23 +3,24 @@
 ## get
 
 ```php
-public function get(mixed $robot_id): ZMRobot
+public function get(int|string $robot_id): ZMRobot
 ```
 
 ### 描述
 
-作者很懒，什么也没有说
+获取机器人Action/API实例
 
 ### 参数
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| robot_id | mixed |  |
+| robot_id | int|string | 机器人ID |
+
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| ZMRobot |  |
+| ZMRobot | 机器人实例 |
 
 
 ## getRandom
@@ -30,13 +31,13 @@ public function getRandom(): ZMRobot
 
 ### 描述
 
-作者很懒，什么也没有说
+随机获取一个连接到框架的机器人实例
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| ZMRobot |  |
+| ZMRobot | 机器人实例 |
 
 
 ## getAllRobot
@@ -47,19 +48,65 @@ public function getAllRobot(): ZMRobot[]
 
 ### 描述
 
-作者很懒，什么也没有说
+获取所有机器人实例
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| ZMRobot[] |  |
+| ZMRobot[] | 机器人实例们 |
+
+
+## setCallback
+
+```php
+public function setCallback(bool|Closure $callback): OneBotV11
+```
+
+### 描述
+
+设置回调或启用协程等待API回包
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| callback | bool|Closure | 是否开启协程或设置异步回调函数，如果为true，则协程等待结果，如果为false，则异步执行并不等待结果，如果为回调函数，则异步执行且调用回调 |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| OneBotV11 | 返回本身 |
+
+
+## setPrefix
+
+```php
+public function setPrefix(int $prefix): OneBotV11
+```
+
+### 描述
+
+设置API调用类型后缀
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| prefix | int | 设置后缀类型，API_NORMAL为不加后缀，API_ASYNC为异步调用，API_RATE_LIMITED为加后缀并且限制调用频率 |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| OneBotV11 | 返回本身 |
 
 
 ## sendPrivateMsg
 
 ```php
-public function sendPrivateMsg(mixed $user_id, mixed $message, bool $auto_escape): null|array|bool
+public function sendPrivateMsg(int|string $user_id, string $message, bool $auto_escape): array|bool
 ```
 
 ### 描述
@@ -70,14 +117,15 @@ public function sendPrivateMsg(mixed $user_id, mixed $message, bool $auto_escape
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| user_id | mixed |  |
-| message | mixed |  |
-| auto_escape | bool |  |
+| user_id | int|string | 用户ID |
+| message | string | 消息内容 |
+| auto_escape | bool | 是否自动转义（默认为false） |
+
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## sendGroupMsg
@@ -97,6 +145,7 @@ public function sendGroupMsg(mixed $group_id, mixed $message, bool $auto_escape)
 | group_id | mixed |  |
 | message | mixed |  |
 | auto_escape | bool |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -122,6 +171,7 @@ public function sendMsg(mixed $message_type, mixed $target_id, mixed $message, b
 | target_id | mixed |  |
 | message | mixed |  |
 | auto_escape | bool |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -144,6 +194,7 @@ public function deleteMsg(mixed $message_id): null|array|bool
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | message_id | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -166,6 +217,7 @@ public function getMsg(mixed $message_id): null|array|bool
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | message_id | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -188,6 +240,7 @@ public function getForwardMsg(mixed $id): null|array|bool
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | id | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -211,6 +264,7 @@ public function sendLike(mixed $user_id, int $times): null|array|bool
 | -------- | ---- | ----------- |
 | user_id | mixed |  |
 | times | int |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -235,6 +289,7 @@ public function setGroupKick(mixed $group_id, mixed $user_id, bool $reject_add_r
 | group_id | mixed |  |
 | user_id | mixed |  |
 | reject_add_request | bool |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -259,6 +314,7 @@ public function setGroupBan(mixed $group_id, mixed $user_id, int $duration): nul
 | group_id | mixed |  |
 | user_id | mixed |  |
 | duration | int |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -283,6 +339,7 @@ public function setGroupAnonymousBan(mixed $group_id, mixed $anonymous_or_flag, 
 | group_id | mixed |  |
 | anonymous_or_flag | mixed |  |
 | duration | int |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -306,6 +363,7 @@ public function setGroupWholeBan(mixed $group_id, bool $enable): null|array|bool
 | -------- | ---- | ----------- |
 | group_id | mixed |  |
 | enable | bool |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -330,6 +388,7 @@ public function setGroupAdmin(mixed $group_id, mixed $user_id, bool $enable): nu
 | group_id | mixed |  |
 | user_id | mixed |  |
 | enable | bool |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -353,6 +412,7 @@ public function setGroupAnonymous(mixed $group_id, bool $enable): null|array|boo
 | -------- | ---- | ----------- |
 | group_id | mixed |  |
 | enable | bool |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -377,6 +437,7 @@ public function setGroupCard(mixed $group_id, mixed $user_id, string $card): nul
 | group_id | mixed |  |
 | user_id | mixed |  |
 | card | string |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -400,6 +461,7 @@ public function setGroupName(mixed $group_id, mixed $group_name): null|array|boo
 | -------- | ---- | ----------- |
 | group_id | mixed |  |
 | group_name | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -423,6 +485,7 @@ public function setGroupLeave(mixed $group_id, bool $is_dismiss): null|array|boo
 | -------- | ---- | ----------- |
 | group_id | mixed |  |
 | is_dismiss | bool |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -448,6 +511,7 @@ public function setGroupSpecialTitle(mixed $group_id, mixed $user_id, string $sp
 | user_id | mixed |  |
 | special_title | string |  |
 | duration | int |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -472,6 +536,7 @@ public function setFriendAddRequest(mixed $flag, bool $approve, string $remark):
 | flag | mixed |  |
 | approve | bool |  |
 | remark | string |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -497,6 +562,7 @@ public function setGroupAddRequest(mixed $flag, mixed $sub_type, bool $approve, 
 | sub_type | mixed |  |
 | approve | bool |  |
 | reason | string |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -537,6 +603,7 @@ public function getStrangerInfo(mixed $user_id, bool $no_cache): null|array|bool
 | -------- | ---- | ----------- |
 | user_id | mixed |  |
 | no_cache | bool |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -577,6 +644,7 @@ public function getGroupInfo(mixed $group_id, bool $no_cache): null|array|bool
 | -------- | ---- | ----------- |
 | group_id | mixed |  |
 | no_cache | bool |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -618,6 +686,7 @@ public function getGroupMemberInfo(mixed $group_id, mixed $user_id, bool $no_cac
 | group_id | mixed |  |
 | user_id | mixed |  |
 | no_cache | bool |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -640,6 +709,7 @@ public function getGroupMemberList(mixed $group_id): null|array|bool
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | group_id | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -663,6 +733,7 @@ public function getGroupHonorInfo(mixed $group_id, mixed $type): null|array|bool
 | -------- | ---- | ----------- |
 | group_id | mixed |  |
 | type | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -702,6 +773,7 @@ public function getCredentials(string $domain): null|array|bool
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | domain | string |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -725,6 +797,7 @@ public function getRecord(mixed $file, mixed $out_format): null|array|bool
 | -------- | ---- | ----------- |
 | file | mixed |  |
 | out_format | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -747,6 +820,7 @@ public function getImage(mixed $file): null|array|bool
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | file | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -837,6 +911,7 @@ public function setRestart(int $delay): null|array|bool
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | delay | int |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -877,56 +952,9 @@ public function getExtendedAPI(string $package_name): mixed
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | package_name | string |  |
+
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
 | mixed |  |
-
-
-## processAPI
-
-```php
-public function processAPI(mixed $connection, mixed $reply, |null $function): array|bool
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| connection | mixed |  |
-| reply | mixed |  |
-| function | |null |  |
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| array|bool |  |
-
-
-## processHttpAPI
-
-```php
-public function processHttpAPI(mixed $connection, mixed $reply, null $function): bool
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| connection | mixed |  |
-| reply | mixed |  |
-| function | null |  |
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| bool |  |

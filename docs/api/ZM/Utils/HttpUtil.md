@@ -19,6 +19,7 @@ public function parseUri(mixed $request, mixed $response, mixed $uri, mixed $nod
 | uri | mixed |  |
 | node | mixed |  |
 | params | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -43,6 +44,7 @@ public function handleStaticPage(mixed $uri, Response|\Swoole\Http\Response $res
 | uri | mixed |  |
 | response | Response|\Swoole\Http\Response |  |
 | settings | array |  |
+
 ### 返回
 
 | 类型 | 描述 |

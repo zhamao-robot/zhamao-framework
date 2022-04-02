@@ -15,6 +15,7 @@ public function initTableList(mixed $db_name): mixed
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | db_name | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -37,6 +38,7 @@ public function table(mixed $table_name): ZM\DB\Table
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | table_name | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -59,6 +61,7 @@ public function statement(mixed $line): mixed
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | line | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -81,6 +84,7 @@ public function unprepared(mixed $line): bool
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | line | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |

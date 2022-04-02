@@ -66,6 +66,7 @@ wrapper method
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | autoCommit | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -90,6 +91,7 @@ wrapper method
 | query | string |  |
 | params | array |  |
 | types | array |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -114,6 +116,7 @@ wrapper method
 | query | string |  |
 | params | array |  |
 | types | array |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -138,6 +141,7 @@ public function fetchOne(string $query, array $params, array $types): false|mixe
 | query | string |  |
 | params | array |  |
 | types | array |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -179,6 +183,7 @@ public function delete(mixed $table, array $criteria, array $types): int
 | table | mixed |  |
 | criteria | array |  |
 | types | array |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -201,6 +206,7 @@ wrapper method
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | level | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -243,6 +249,7 @@ wrapper method
 | data | array |  |
 | criteria | array |  |
 | types | array |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -267,6 +274,7 @@ wrapper method
 | table | mixed |  |
 | data | array |  |
 | types | array |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -289,6 +297,7 @@ wrapper method
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | str | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -312,6 +321,7 @@ wrapper method
 | -------- | ---- | ----------- |
 | value | mixed |  |
 | type | int |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -336,6 +346,7 @@ wrapper method
 | query | string |  |
 | params | array |  |
 | types | array |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -360,6 +371,7 @@ wrapper method
 | query | string |  |
 | params | array |  |
 | types | array |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -384,6 +396,7 @@ wrapper method
 | query | string |  |
 | params | array |  |
 | types | array |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -408,6 +421,7 @@ wrapper method
 | query | string |  |
 | params | array |  |
 | types | array |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -432,6 +446,7 @@ wrapper method
 | query | string |  |
 | params | array |  |
 | types | array |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -456,6 +471,7 @@ wrapper method
 | query | string |  |
 | params | array |  |
 | types | array |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -480,6 +496,7 @@ wrapper method
 | query | string |  |
 | params | array |  |
 | types | array |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -504,6 +521,7 @@ wrapper method
 | query | string |  |
 | params | array |  |
 | types | array |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -528,6 +546,7 @@ wrapper method
 | query | string |  |
 | params | array |  |
 | types | array |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -552,6 +571,7 @@ wrapper method
 | query | string |  |
 | params | array |  |
 | types | array |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -577,6 +597,7 @@ wrapper method
 | types | array |  |
 | params | array |  |
 | qcp | Doctrine\DBAL\Cache\QueryCacheProfile |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -602,6 +623,7 @@ wrapper method
 | params | mixed |  |
 | types | mixed |  |
 | qcp | Doctrine\DBAL\Cache\QueryCacheProfile |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -626,6 +648,7 @@ wrapper method
 | sql | mixed |  |
 | params | array |  |
 | types | array |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -665,6 +688,7 @@ wrapper method
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | name | null |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -687,6 +711,7 @@ overwrite method to $this->connection->transactional()
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | func | Closure |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -709,6 +734,7 @@ wrapper method
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | nestTransactionsWithSavepoints | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -799,6 +825,7 @@ wrapper method
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | savepoint | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -821,6 +848,7 @@ wrapper method
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | savepoint | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -843,6 +871,7 @@ wrapper method
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | savepoint | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |

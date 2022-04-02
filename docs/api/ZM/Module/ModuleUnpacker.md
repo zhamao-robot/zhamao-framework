@@ -18,6 +18,7 @@ public function unpack(mixed $ignore_depends, bool $override_light_cache, bool $
 | override_light_cache | bool |  |
 | override_data_files | bool |  |
 | override_source | bool |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -57,6 +58,7 @@ public function checkDepends(mixed $ignore_depends): mixed
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | ignore_depends | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -113,6 +115,7 @@ public function copyZMDataStore(mixed $override_data): mixed
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | override_data | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |

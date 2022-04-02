@@ -16,6 +16,7 @@ public function get(string $table, string $key): null|mixed
 | -------- | ---- | ----------- |
 | table | string |  |
 | key | string |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -40,6 +41,7 @@ public function set(array|int|string $value, string $table, string $key): mixed
 | value | array|int|string |  |
 | table | string |  |
 | key | string |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -65,6 +67,7 @@ public function createTable(mixed $name, mixed $size, mixed $str_size, int $conf
 | size | mixed |  |
 | str_size | mixed |  |
 | conflict_proportion | int |  |
+
 ### 返回
 
 | 类型 | 描述 |

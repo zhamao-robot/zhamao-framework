@@ -15,6 +15,7 @@ public function init(mixed $config): bool|mixed
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | config | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -37,6 +38,7 @@ public function get(string $key): null|mixed
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | key | string |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -59,6 +61,7 @@ public function getExpire(string $key): null|mixed
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | key | string |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -81,6 +84,7 @@ public function getExpireTS(string $key): null|mixed
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | key | string |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -105,6 +109,7 @@ public function set(array|int|string $value, string $key, int $expire): bool
 | value | array|int|string |  |
 | key | string |  |
 | expire | int |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -128,6 +133,7 @@ public function update(mixed $value, string $key): bool
 | -------- | ---- | ----------- |
 | value | mixed |  |
 | key | string |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -150,6 +156,7 @@ public function isset(string $key): bool
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | key | string |  |
+
 ### 返回
 
 | 类型 | 描述 |

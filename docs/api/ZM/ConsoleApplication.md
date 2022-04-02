@@ -15,6 +15,7 @@ public function __construct(string $name): mixed
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | name | string |  |
+
 ### 返回
 
 | 类型 | 描述 |
@@ -37,6 +38,7 @@ public function initEnv(string $with_default_cmd): ZM\ConsoleApplication
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | with_default_cmd | string |  |
+
 ### 返回
 
 | 类型 | 描述 |

@@ -15,6 +15,7 @@ public function get(mixed $name): Swoole\Atomic
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | name | mixed |  |
+
 ### 返回
 
 | 类型 | 描述 |
