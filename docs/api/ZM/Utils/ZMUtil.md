@@ -60,7 +60,7 @@ public function getReloadableFiles(): string[]|string[][]
 ## getClassesPsr4
 
 ```php
-public function getClassesPsr4(string $dir, string $base_namespace, null|mixed $rule, bool $return_path_value): string[]
+public function getClassesPsr4(string $dir, string $base_namespace, null|mixed $rule, bool|string $return_path_value): string[]
 ```
 
 ### 描述
@@ -74,7 +74,7 @@ public function getClassesPsr4(string $dir, string $base_namespace, null|mixed $
 | dir | string | 目录 |
 | base_namespace | string | 基础命名空间 |
 | rule | null|mixed | 规则 |
-| return_path_value | bool | 是否返回文件路径 |
+| return_path_value | bool|string | 是否返回文件路径，返回文件路径的话传入字符串 |
 
 ### 返回
 

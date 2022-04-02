@@ -52,7 +52,7 @@ public function getProcessState(mixed $id_or_name, int $type): false|int|mixed
 ## removeProcessState
 
 ```php
-public function removeProcessState(null $id_or_name, int $type): mixed
+public function removeProcessState(null|int|string $id_or_name, int $type): mixed
 ```
 
 ### 描述
@@ -63,7 +63,7 @@ public function removeProcessState(null $id_or_name, int $type): mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| id_or_name | null |  |
+| id_or_name | null|int|string |  |
 | type | int |  |
 
 ### 返回

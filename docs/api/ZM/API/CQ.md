@@ -573,7 +573,7 @@ public function removeCQ(string $msg): string
 ## getCQ
 
 ```php
-public function getCQ(string $msg, bool $is_object): array|CQObject
+public function getCQ(string $msg, bool $is_object): null|array|CQObject
 ```
 
 ### 描述
@@ -591,7 +591,7 @@ public function getCQ(string $msg, bool $is_object): array|CQObject
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| array|CQObject | 返回的CQ码（数组或对象） |
+| null|array|CQObject | 返回的CQ码（数组或对象） |
 
 
 ## getAllCQ

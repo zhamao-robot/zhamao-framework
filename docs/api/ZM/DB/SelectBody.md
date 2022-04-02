@@ -37,7 +37,7 @@ public function count(): int
 ## fetchAll
 
 ```php
-public function fetchAll(int $fetch_mode): mixed
+public function fetchAll(mixed $fetch_mode): mixed
 ```
 
 ### 描述
@@ -48,7 +48,7 @@ public function fetchAll(int $fetch_mode): mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| fetch_mode | int |  |
+| fetch_mode | mixed |  |
 
 ### 返回
 
@@ -77,7 +77,7 @@ public function fetchFirst(): null|mixed
 ## value
 
 ```php
-public function value(null $key): null|mixed
+public function value(null|mixed $key): null|mixed
 ```
 
 ### 描述
@@ -88,7 +88,7 @@ public function value(null $key): null|mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| key | null |  |
+| key | null|mixed |  |
 
 ### 返回
 
