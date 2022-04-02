@@ -255,7 +255,7 @@ class Context implements ContextInterface
      * @throws InvalidArgumentException
      * @throws ZMKnownException
      * @throws WaitTimeoutException
-     * @return mixed|string
+     * @return float|int|string
      */
     public function getArgs($mode, $prompt_msg)
     {
