@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ZM\Context;
 
+use Closure;
 use Exception;
 use Stringable;
 use Swoole\Coroutine;
@@ -170,9 +171,9 @@ class Context implements ContextInterface
 
     /**
      * only can used by cq->message event function
-     * @param  array|string $msg   要回复的消息
-     * @param  bool         $yield 是否协程挂起（true），是否绑定异步事件（Closure）
-     * @return array|bool   返回API调用结果
+     * @param  array|string          $msg   要回复的消息
+     * @param  bool|callable|Closure $yield 是否协程挂起（true），是否绑定异步事件（Closure）
+     * @return array|bool            返回API调用结果
      */
     public function reply($msg, $yield = false)
     {
