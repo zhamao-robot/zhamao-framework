@@ -4,9 +4,8 @@ on:
   push:
     branches:
       - master
-    paths-ignore:
-      - '**.md'
-      - 'docs/**'
+    paths:
+      - '**/**.php'
   pull_request:
     branches:
       - master
@@ -16,9 +15,8 @@ on:
       - reopened
       - ready_for_review
       - review_requested
-    paths-ignore:
-      - '**.md'
-      - 'docs/**'
+    paths:
+      - '**/**.php'
 
 jobs:
   integration:
