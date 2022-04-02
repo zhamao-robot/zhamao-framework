@@ -38,7 +38,7 @@ class AnnotationParser
 
     private $middlewares = [];
 
-    /** @var null|AnnotationReader */
+    /** @var null|AnnotationReader|DualReader */
     private $reader;
 
     private $req_mapping = [];

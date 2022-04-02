@@ -8,6 +8,6 @@ use ZM\MySQL\MySQLPool;
 
 class SqlPoolStorage
 {
-    /** @var MySQLPool */
+    /** @var null|MySQLPool */
     public static $sql_pool;
 }

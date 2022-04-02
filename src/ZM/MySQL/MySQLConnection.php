@@ -10,9 +10,7 @@ use Doctrine\DBAL\Driver\Connection;
 use Doctrine\DBAL\ParameterType;
 use PDO;
 use PDOException;
-use PDOStatement;
 use Swoole\Database\PDOProxy;
-use Swoole\Database\PDOStatementProxy;
 use ZM\Console\Console;
 use ZM\Exception\DbException;
 use ZM\Store\MySQL\SqlPoolStorage;
@@ -34,23 +32,31 @@ class MySQLConnection implements Connection
         SqlPoolStorage::$sql_pool->putConnection($this->conn);
     }
 
+    /**
+     * @param  mixed       $sql
+     * @param  mixed       $options
+     * @throws DbException
+     */
     public function prepare($sql, $options = [])
     {
         try {
             Console::debug('Running SQL prepare: ' . $sql);
             $statement = $this->conn->prepare($sql, $options);
-            assert(($statement instanceof PDOStatementProxy) || ($statement instanceof PDOStatement));
+            assert($statement !== false);
         } catch (PDOException $exception) {
             throw new DbException($exception->getMessage(), $exception->getCode(), $exception);
         }
         return new MySQLStatement($statement);
     }
 
+    /**
+     * @throws DbException
+     */
     public function query(...$args)
     {
         try {
             $statement = $this->conn->query(...$args);
-            assert(($statement instanceof PDOStatementProxy) || ($statement instanceof PDOStatement));
+            assert($statement !== false);
         } catch (PDOException $exception) {
             throw new DbException($exception->getMessage(), $exception->getCode(), $exception);
         }
@@ -62,6 +68,10 @@ class MySQLConnection implements Connection
         return $this->conn->quote($value, $type);
     }
 
+    /**
+     * @param  mixed       $sql
+     * @throws DbException
+     */
     public function exec($sql)
     {
         try {
@@ -74,6 +84,10 @@ class MySQLConnection implements Connection
         }
     }
 
+    /**
+     * @param  null|mixed  $name
+     * @throws DbException
+     */
     public function lastInsertId($name = null)
     {
         try {

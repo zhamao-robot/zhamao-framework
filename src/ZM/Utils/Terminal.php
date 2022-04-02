@@ -7,6 +7,7 @@ declare(strict_types=1);
 namespace ZM\Utils;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Error;
 use Exception;
 use ReflectionClass;
 use Swoole\Process;
@@ -22,6 +23,7 @@ class Terminal
 
     /**
      * @throws Exception
+     * @throws Error
      * @return bool
      * @noinspection PhpMissingReturnTypeInspection
      * @noinspection PhpUnused

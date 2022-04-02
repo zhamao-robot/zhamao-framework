@@ -379,9 +379,9 @@ class CQ
 
     /**
      * 获取消息中第一个CQ码
-     * @param  string         $msg       消息内容
-     * @param  bool           $is_object 是否以对象形式返回，如果为False的话，返回数组形式（默认为false）
-     * @return array|CQObject 返回的CQ码（数组或对象）
+     * @param  string              $msg       消息内容
+     * @param  bool                $is_object 是否以对象形式返回，如果为False的话，返回数组形式（默认为false）
+     * @return null|array|CQObject 返回的CQ码（数组或对象）
      */
     public static function getCQ(string $msg, bool $is_object = false)
     {

@@ -15,6 +15,7 @@ use ZM\Annotation\Swoole\OnRequestEvent;
 use ZM\API\CQ;
 use ZM\API\OneBotV11;
 use ZM\API\TuringAPI;
+use ZM\Config\ZMConfig;
 use ZM\ConnectionManager\ConnectionObject;
 use ZM\Console\Console;
 use ZM\Event\EventDispatcher;
@@ -95,11 +96,11 @@ class Hello
     public function turingAPI()
     {
         $user_id = ctx()->getUserId();
-        $api = ''; // 请在这里填入你的图灵机器人的apikey
+        $api = ZMConfig::get('global', 'custom.turing_apikey') ?? ''; // 请在这里填入你的图灵机器人的apikey
         if ($api === '') {
             return false;
         } // 如果没有填入apikey则此功能关闭
-        if (($this->_running_annotation ?? null) instanceof CQCommand) {
+        if (property_exists($this, '_running_annotation') && ($this->_running_annotation instanceof CQCommand)) {
             $msg = ctx()->getFullArg('我在！有什么事吗？');
         } else {
             $msg = ctx()->getMessage();
