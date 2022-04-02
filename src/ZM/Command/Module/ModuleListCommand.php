@@ -4,47 +4,31 @@ declare(strict_types=1);
 
 namespace ZM\Command\Module;
 
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use ZM\Config\ZMConfig;
 use ZM\Console\Console;
+use ZM\Exception\ZMException;
 use ZM\Utils\DataProvider;
 use ZM\Utils\Manager\ModuleManager;
 
-class ModuleListCommand extends Command
+class ModuleListCommand extends ModuleCommand
 {
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'module:list';
 
     protected function configure()
     {
+        parent::configure();
         $this->setDescription('查看所有模块信息');
         $this->setHelp('此功能将会把炸毛框架的模块列举出来。');
-        // ...
     }
 
+    /**
+     * @throws ZMException
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        ZMConfig::setDirectory(DataProvider::getSourceRootDir() . '/config');
-        ZMConfig::setEnv($args['env'] ?? '');
-        if (ZMConfig::get('global') === false) {
-            exit(zm_internal_errcode('E00007') . 'Global config load failed: ' . ZMConfig::$last_error . "\nPlease init first!\nSee: https://github.com/zhamao-robot/zhamao-framework/issues/37\n");
-        }
-
-        // 定义常量
-        /** @noinspection PhpIncludeInspection */
-        include_once DataProvider::getFrameworkRootDir() . '/src/ZM/global_defines.php';
-
-        Console::init(
-            ZMConfig::get('global', 'info_level') ?? 2,
-            null,
-            $args['log-theme'] ?? 'default',
-            ($o = ZMConfig::get('console_color')) === false ? [] : $o
-        );
-
-        $timezone = ZMConfig::get('global', 'timezone') ?? 'Asia/Shanghai';
-        date_default_timezone_set($timezone);
+        parent::execute($input, $output);
 
         $list = ModuleManager::getConfiguredModules();
 
