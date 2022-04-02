@@ -141,19 +141,20 @@ class ModuleManager
 
     /**
      * 打包模块
-     * @param $module
+     * @param  array       $module 模块信息
+     * @param  string      $target 目标路径
      * @throws ZMException
      */
-    public static function packModule($module): bool
+    public static function packModule(array $module, string $target): bool
     {
         try {
             $packer = new ModulePacker($module);
             if (!is_dir(DataProvider::getDataFolder())) {
                 throw new ModulePackException(zm_internal_errcode('E00070') . 'zm_data dir not found!');
             }
-            $path = realpath(DataProvider::getDataFolder() . '/output');
+            $path = realpath($target);
             if ($path === false) {
-                mkdir($path = DataProvider::getDataFolder() . '/output');
+                mkdir($path = $target, 0755, true);
             }
             $packer->setOutputPath($path);
             $packer->setOverride();
