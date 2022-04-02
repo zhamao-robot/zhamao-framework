@@ -22,12 +22,13 @@ class MessageUtil
     /**
      * 下载消息中 CQ 码的所有图片，通过 url
      * @param $msg
-     * @param  null        $path
      * @return array|false
      */
-    public static function downloadCQImage($msg, $path = null)
+    public static function downloadCQImage($msg, ?string $path = null)
     {
-        $path = $path ?? DataProvider::getDataFolder() . 'images/';
+        if ($path === null) {
+            $path = DataProvider::getDataFolder() . 'images/';
+        }
         if (!is_dir($path)) {
             @mkdir($path);
         }

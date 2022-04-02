@@ -14,10 +14,9 @@ use ZM\Utils\Manager\WorkerManager;
 class CoMessage
 {
     /**
-     * @param  int   $timeout
      * @return mixed
      */
-    public static function yieldByWS(array $hang, array $compare, $timeout = 600)
+    public static function yieldByWS(array $hang, array $compare, int $timeout = 600)
     {
         $cid = Coroutine::getuid();
         $api_id = ZMAtomic::get('wait_msg_id')->add(1);
@@ -43,9 +42,7 @@ class CoMessage
         unset($sess[$api_id]);
         LightCacheInside::set('wait_api', 'wait_api', $sess);
         SpinLock::unlock('wait_api');
-        if (isset($id)) {
-            swoole_timer_clear($id);
-        }
+        swoole_timer_clear($id);
         if ($result === null) {
             return false;
         }
