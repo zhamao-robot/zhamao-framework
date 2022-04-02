@@ -45,7 +45,7 @@ use ZM\Utils\SignalListener;
  */
 class OnWorkerStart implements SwooleEvent
 {
-    public function onCall(Server $server, $worker_id)
+    public function onCall(Server $server, int $worker_id)
     {
         Console::debug('Calling onWorkerStart event(1)');
         if (!Framework::$argv['disable-safe-exit']) {
