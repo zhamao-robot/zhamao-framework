@@ -4,6 +4,28 @@
 
 同时此处将只使用 build 版本号进行区分。
 
+## build 457 (2022-4-2)
+
+- 新增和优化测试用例（具体见文件）
+- 部分文件以 PHPStan Level 2 进行规范化
+
+## build 456 (2022-3-30)
+
+- 重构 phpunit-swoole，使其可以正常使用
+- 新增 `--private-mode` 参数，用于隐藏启动前的 MOTD 及敏感信息
+- 修复 Composer extra 配置项 `zm.exclude-annotation-path` 不能正常工作的 Bug
+- 优化注解事件加载器，防止 Master 进程中添加的事件在 Worker 中被覆盖的问题
+- 修复 `DataProvider::isRelativePath()` 方法判断有误的 Bug
+- 新增退出框架时支持以非 0 exit code 退出的功能
+- 优化 `ZMUtil::getClassesPsr4()` 方法，排除不含类的文件
+- 优化 PHP CS Fixer 的配置
+- 新增测试用例（具体见文件）
+
+## build 455 (2022-3-27)
+
+- 修复前几个小版本无法收发消息的 Bug
+- 新增 API Document 自动生成脚本
+
 ## build 454 (2022-3-27)
 
 - 修复部分命令下无法杀掉进程的 Bug
