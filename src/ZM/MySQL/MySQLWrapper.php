@@ -20,6 +20,7 @@ use ZM\Exception\DbException;
 
 class MySQLWrapper
 {
+    /** @var Connection */
     private $connection;
 
     /**
