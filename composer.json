@@ -73,10 +73,10 @@
             "post-merge": "composer install",
             "pre-commit": [
                 "echo committing as $(git config user.name)",
-                "./vendor/bin/php-cs-fixer fix --dry-run --diff ./src"
+                "composer cs-fix -- --dry-run --diff"
             ],
             "pre-push": [
-                "./vendor/bin/php-cs-fixer fix --dry-run --diff ./src",
+                "composer cs-fix -- --dry-run --diff",
                 "composer analyse"
             ]
         },
