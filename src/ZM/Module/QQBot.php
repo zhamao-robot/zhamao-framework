@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ZM\Module;
 
 use Exception;
+use Iterator;
 use ZM\Annotation\CQ\CQAfter;
 use ZM\Annotation\CQ\CQAPIResponse;
 use ZM\Annotation\CQ\CQBefore;
@@ -17,6 +18,7 @@ use ZM\Config\ZMConfig;
 use ZM\Event\EventDispatcher;
 use ZM\Exception\InterruptException;
 use ZM\Exception\WaitTimeoutException;
+use ZM\Exception\ZMKnownException;
 use ZM\Utils\CoMessage;
 use ZM\Utils\MessageUtil;
 use ZM\Utils\SingletonTrait;
@@ -28,18 +30,24 @@ class QQBot
 {
     use SingletonTrait;
 
+    /**
+     * @throws ZMKnownException
+     * @throws InterruptException
+     */
     public function handleByEvent()
     {
-        $data = json_decode(context()->getFrame()->data, true);
+        $data = json_decode(ctx()->getFrame()->data, true);
         $this->handle($data);
     }
 
     /**
-     * @param $data
-     * @param  int                $level
+     * @param  array|Iterator     $data  数据包
+     * @param  int                $level 递归等级
      * @throws InterruptException
+     * @throws ZMKnownException
+     * @throws Exception
      */
-    public function handle($data, $level = 0)
+    public function handle($data, int $level = 0)
     {
         try {
             if ($level > 10) {
@@ -102,11 +110,11 @@ class QQBot
     }
 
     /**
-     * @param $data
-     * @param $time
+     * @param  array|Iterator $data 数据包
+     * @param  string         $time 类型（pre或post）
      * @throws Exception
      */
-    public function dispatchBeforeEvents($data, $time): EventDispatcher
+    public function dispatchBeforeEvents($data, string $time): EventDispatcher
     {
         $before = new EventDispatcher(CQBefore::class);
         if ($time === 'pre') {
@@ -128,7 +136,7 @@ class QQBot
     }
 
     /**
-     * @param $data
+     * @param  array|Iterator     $data 数据包
      * @throws InterruptException
      * @throws Exception
      */
@@ -147,7 +155,11 @@ class QQBot
                         EventDispatcher::interrupt();
                     }
                 });
-                $s = MessageUtil::matchCommand(ctx()->getStringMessage(), ctx()->getData());
+                $msg = $data['message'];
+                if (is_array($msg)) {
+                    $msg = MessageUtil::arrayToStr($msg);
+                }
+                $s = MessageUtil::matchCommand($msg, ctx()->getData());
                 if ($s->status !== false) {
                     if (!empty($s->match)) {
                         ctx()->setCache('match', $s->match);
@@ -173,7 +185,7 @@ class QQBot
                 // 分发CQMessage事件
                 $msg_dispatcher = new EventDispatcher(CQMessage::class);
                 $msg_dispatcher->setRuleFunction(function ($v) {
-                    return ($v->message == '' || ($v->message == ctx()->getStringMessage()))
+                    return ($v->message == '' || ($v->message == ctx()->getMessage()))
                         && ($v->user_id == 0 || ($v->user_id == ctx()->getUserId()))
                         && ($v->group_id == 0 || ($v->group_id == (ctx()->getGroupId() ?? 0)))
                         && ($v->message_type == '' || ($v->message_type == ctx()->getMessageType()))
@@ -190,7 +202,7 @@ class QQBot
                 // Console::success("当前数据包：".json_encode(ctx()->getData()));
                 $dispatcher = new EventDispatcher(CQMetaEvent::class);
                 $dispatcher->setRuleFunction(function (CQMetaEvent $v) {
-                    return $v->meta_event_type == '' || ($v->meta_event_type != '' && $v->meta_event_type == ctx()->getData()['meta_event_type']);
+                    return $v->meta_event_type == '' || ($v->meta_event_type == ctx()->getData()['meta_event_type']);
                 });
                 // eval(BP);
                 $dispatcher->dispatchEvents(ctx()->getData());
@@ -199,26 +211,30 @@ class QQBot
                 $dispatcher = new EventDispatcher(CQNotice::class);
                 $dispatcher->setRuleFunction(function (CQNotice $v) {
                     return
-                        ($v->notice_type == '' || ($v->notice_type != '' && $v->notice_type == ctx()->getData()['notice_type']))
-                        && ($v->sub_type == '' || ($v->sub_type != '' && $v->sub_type == ctx()->getData()['sub_type']))
-                        && ($v->group_id == '' || ($v->group_id != '' && $v->group_id == ctx()->getData()['group_id']))
-                        && ($v->operator_id == '' || ($v->operator_id != '' && $v->operator_id == ctx()->getData()['operator_id']));
+                        ($v->notice_type == '' || ($v->notice_type == ctx()->getData()['notice_type']))
+                        && ($v->sub_type == '' || ($v->sub_type == ctx()->getData()['sub_type']))
+                        && ($v->group_id == '' || ($v->group_id == ctx()->getData()['group_id']))
+                        && ($v->operator_id == '' || ($v->operator_id == ctx()->getData()['operator_id']));
                 });
                 $dispatcher->dispatchEvents(ctx()->getData());
                 return;
             case 'request':
                 $dispatcher = new EventDispatcher(CQRequest::class);
                 $dispatcher->setRuleFunction(function (CQRequest $v) {
-                    return ($v->request_type == '' || ($v->request_type != '' && $v->request_type == ctx()->getData()['request_type']))
-                        && ($v->sub_type == '' || ($v->sub_type != '' && $v->sub_type == ctx()->getData()['sub_type']))
-                        && ($v->user_id == 0 || ($v->user_id != 0 && $v->user_id == ctx()->getData()['user_id']))
-                        && ($v->comment == '' || ($v->comment != '' && $v->comment == ctx()->getData()['comment']));
+                    return ($v->request_type == '' || ($v->request_type == ctx()->getData()['request_type']))
+                        && ($v->sub_type == '' || ($v->sub_type == ctx()->getData()['sub_type']))
+                        && ($v->user_id == 0 || ($v->user_id == ctx()->getData()['user_id']))
+                        && ($v->comment == '' || ($v->comment == ctx()->getData()['comment']));
                 });
                 $dispatcher->dispatchEvents(ctx()->getData());
                 return;
         }
     }
 
+    /**
+     * @param  mixed     $data 分发事件数据包
+     * @throws Exception
+     */
     private function dispatchAfterEvents($data): EventDispatcher
     {
         $after = new EventDispatcher(CQAfter::class);
@@ -230,7 +246,7 @@ class QQBot
     }
 
     /**
-     * @param $req
+     * @param  mixed     $req
      * @throws Exception
      */
     private function dispatchAPIResponse($req)

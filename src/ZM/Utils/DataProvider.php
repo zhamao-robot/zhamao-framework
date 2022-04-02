@@ -5,6 +5,9 @@ declare(strict_types=1);
 
 namespace ZM\Utils;
 
+use Iterator;
+use JsonSerializable;
+use Traversable;
 use ZM\Config\ZMConfig;
 use ZM\Console\Console;
 
@@ -76,11 +79,11 @@ class DataProvider
 
     /**
      * 将变量保存在zm_data下的数据目录，传入数组
-     * @param $filename
-     * @param $file_array
-     * @return false|int
+     * @param  string                                                 $filename   文件名
+     * @param  array|int|Iterator|JsonSerializable|string|Traversable $file_array 文件内容数组
+     * @return false|int                                              返回文件大小或false
      */
-    public static function saveToJson($filename, $file_array)
+    public static function saveToJson(string $filename, $file_array)
     {
         $path = ZMConfig::get('global', 'config_dir');
         $r = explode('/', $filename);
@@ -101,10 +104,10 @@ class DataProvider
 
     /**
      * 从json加载变量到内存
-     * @param $filename
-     * @return null|mixed
+     * @param  string     $filename 文件名
+     * @return null|mixed 返回文件内容数据或null
      */
-    public static function loadFromJson($filename)
+    public static function loadFromJson(string $filename)
     {
         $path = ZMConfig::get('global', 'config_dir');
         if (file_exists($path . $filename . '.json')) {
@@ -115,12 +118,13 @@ class DataProvider
 
     /**
      * 递归或非递归扫描目录，可返回相对目录的文件列表或绝对目录的文件列表
-     * @param $dir
-     * @param  bool|string $relative
+     * @param  string      $dir       目录
+     * @param  bool        $recursive 是否递归扫描子目录
+     * @param  bool        $relative  是否返回相对目录，如果为true则返回相对目录，如果为false则返回绝对目录
      * @return array|false
      * @since 2.5
      */
-    public static function scanDirFiles($dir, bool $recursive = true, $relative = false)
+    public static function scanDirFiles(string $dir, bool $recursive = true, bool $relative = false)
     {
         $dir = rtrim($dir, '/');
         if (!is_dir($dir)) {
@@ -157,11 +161,11 @@ class DataProvider
 
     /**
      * 检查路径是否为相对路径（根据第一个字符是否为"/"来判断）
-     * @param $path
-     * @return bool
+     * @param  string $path 路径
+     * @return bool   返回结果
      * @since 2.5
      */
-    public static function isRelativePath($path)
+    public static function isRelativePath(string $path): bool
     {
         return strlen($path) > 0 && $path[0] !== '/';
     }

@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace ZM\Http;
 
+use Stringable;
+
 class Response
 {
     public $fd = 0;
@@ -55,11 +57,11 @@ class Response
     }
 
     /**
-     * @param $name
-     * @param  mixed ...$params
-     * @return mixed
+     * @param  string $name      名称
+     * @param  mixed  ...$params 参数
+     * @return mixed  返回值
      */
-    public function cookie($name, ...$params)
+    public function cookie(string $name, ...$params)
     {
         return empty($params) ? $this->response->rawcookie($name) : $this->response->rawcookie($name, ...$params);
     }
@@ -85,11 +87,10 @@ class Response
     }
 
     /**
-     * @param $http_code
-     * @param $reason
+     * @param  mixed ...$params
      * @return mixed
      */
-    public function status($http_code, ...$params)
+    public function status(int $http_code, ...$params)
     {
         $this->status_code = $http_code;
         if (!$this->is_end) {
@@ -104,11 +105,10 @@ class Response
     }
 
     /**
-     * @param $http_code
-     * @param $reason
+     * @param  mixed ...$params
      * @return mixed
      */
-    public function setStatusCode($http_code, ...$params)
+    public function setStatusCode(int $http_code, ...$params)
     {
         if (!$this->is_end) {
             return empty($params) ? $this->response->status($http_code) : $this->response->status($http_code, ...$params);
@@ -117,12 +117,11 @@ class Response
     }
 
     /**
-     * @param $key
-     * @param $value
-     * @param $ucwords
+     * @param  array|string      $value
+     * @param  null|array|string $ucwords
      * @return mixed
      */
-    public function header($key, $value, $ucwords = null)
+    public function header(string $key, $value, $ucwords = null)
     {
         if (!$this->is_end) {
             return $ucwords === null ? $this->response->header($key, $value) : $this->response->header($key, $value, $ucwords);
@@ -131,12 +130,11 @@ class Response
     }
 
     /**
-     * @param $key
-     * @param $value
-     * @param $ucwords
+     * @param  array|string      $value
+     * @param  null|array|string $ucwords
      * @return mixed
      */
-    public function setHeader($key, $value, $ucwords = null)
+    public function setHeader(string $key, $value, $ucwords = null)
     {
         if (!$this->is_end) {
             return $ucwords === null ? $this->response->setHeader($key, $value) : $this->response->setHeader($key, $value, $ucwords);
@@ -145,11 +143,10 @@ class Response
     }
 
     /**
-     * @param $key
-     * @param $value
+     * @param  array|string $value
      * @return mixed
      */
-    public function trailer($key, $value)
+    public function trailer(string $key, $value)
     {
         return $this->response->trailer($key, $value);
     }
@@ -163,7 +160,7 @@ class Response
     }
 
     /**
-     * @param $content
+     * @param  string|Stringable $content
      * @return mixed
      */
     public function write($content)
@@ -172,7 +169,7 @@ class Response
     }
 
     /**
-     * @param $content
+     * @param  null|string|Stringable $content
      * @return mixed
      */
     public function end($content = null)
@@ -196,22 +193,19 @@ class Response
     }
 
     /**
-     * @param $filename
-     * @param $offset
-     * @param $length
+     * @param  null|int|string $offset
+     * @param  null|int|string $length
      * @return mixed
      */
-    public function sendfile($filename, $offset = null, $length = null)
+    public function sendfile(string $filename, $offset = null, $length = null)
     {
         return $this->response->sendfile($filename, $offset, $length);
     }
 
     /**
-     * @param $location
-     * @param $http_code
      * @return mixed
      */
-    public function redirect($location, $http_code = null)
+    public function redirect(string $location, ?int $http_code = null)
     {
         $this->is_end = true;
         return $this->response->redirect($location, $http_code);
@@ -226,7 +220,7 @@ class Response
     }
 
     /**
-     * @param $fd
+     * @param  mixed $fd
      * @return mixed
      */
     public static function create($fd)
@@ -243,9 +237,9 @@ class Response
     }
 
     /**
-     * @param $data
-     * @param  null  $opcode
-     * @param  null  $flags
+     * @param  mixed $data
+     * @param  mixed $opcode
+     * @param  mixed $flags
      * @return mixed
      */
     public function push($data, $opcode = null, $flags = null)

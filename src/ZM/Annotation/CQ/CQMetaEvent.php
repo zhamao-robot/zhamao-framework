@@ -36,7 +36,7 @@ class CQMetaEvent extends AnnotationBase implements Level
     }
 
     /**
-     * @return mixed
+     * @return int 返回等级
      */
     public function getLevel(): int
     {

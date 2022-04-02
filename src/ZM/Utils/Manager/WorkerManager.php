@@ -19,11 +19,11 @@ class WorkerManager
 {
     /**
      * Worker 进程间通信触发的动作类型函数
-     * @param $src_worker_id
-     * @param $data
+     * @param  int       $src_worker_id 源 Worker 进程 ID
+     * @param  array     $data          数据
      * @throws Exception
      */
-    public static function workerAction($src_worker_id, $data)
+    public static function workerAction(int $src_worker_id, array $data)
     {
         $server = server();
         switch ($data['action'] ?? '') {
@@ -106,12 +106,12 @@ class WorkerManager
 
     /**
      * 给 Worker 进程发送动作指令（包括自身，自身将直接执行）
-     * @param $worker_id
-     * @param $action
-     * @param $data
+     * @param  int       $worker_id 进程ID
+     * @param  string    $action    动作
+     * @param  mixed     $data      参数
      * @throws Exception
      */
-    public static function sendActionToWorker($worker_id, $action, $data)
+    public static function sendActionToWorker(int $worker_id, string $action, $data)
     {
         $obj = ['action' => $action, 'data' => $data];
         if (server()->worker_id === -1 && server()->getManagerPid() != posix_getpid()) {

@@ -11,12 +11,12 @@ class TuringAPI
 {
     /**
      * 请求图灵API，返回图灵的消息
-     * @param $msg
-     * @param $user_id
-     * @param $api
-     * @return string
+     * @param  string     $msg     消息
+     * @param  int|string $user_id 用户ID
+     * @param  string     $api     API Key
+     * @return string     图灵的回复
      */
-    public static function getTuringMsg($msg, $user_id, $api)
+    public static function getTuringMsg(string $msg, $user_id, string $api): string
     {
         $origin = $msg;
         if (($cq = CQ::getCQ($msg)) !== null) {// 如有CQ码则去除
@@ -86,7 +86,11 @@ class TuringAPI
         return trim($final);
     }
 
-    public static function getResultStatus($r)
+    /**
+     * @param  array       $r 数据API回包
+     * @return bool|string 错误消息或成功鸥鸟
+     */
+    public static function getResultStatus(array $r)
     {
         switch ($r['intent']['code']) {
             case 5000:

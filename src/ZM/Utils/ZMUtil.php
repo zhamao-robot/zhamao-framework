@@ -21,7 +21,6 @@ use function md5_file;
 use function pathinfo;
 use function server;
 use function str_replace;
-use function substr;
 
 class ZMUtil
 {
@@ -77,13 +76,13 @@ class ZMUtil
 
     /**
      * 使用Psr-4标准获取目录下的所有类
-     * @param $dir
-     * @param $base_namespace
-     * @param  null|mixed $rule
-     * @param  bool       $return_path_value
+     * @param  string     $dir               目录
+     * @param  string     $base_namespace    基础命名空间
+     * @param  null|mixed $rule              规则
+     * @param  bool       $return_path_value 是否返回文件路径
      * @return string[]
      */
-    public static function getClassesPsr4($dir, $base_namespace, $rule = null, $return_path_value = false): array
+    public static function getClassesPsr4(string $dir, string $base_namespace, $rule = null, bool $return_path_value = false): array
     {
         // 预先读取下composer的file列表
         $composer = json_decode(file_get_contents(DataProvider::getSourceRootDir() . '/composer.json'), true);

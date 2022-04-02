@@ -25,10 +25,10 @@ class DB
     private static $table_list = [];
 
     /**
-     * @param $db_name
+     * @param  string      $db_name 数据库名称
      * @throws DbException
      */
-    public static function initTableList($db_name)
+    public static function initTableList(string $db_name)
     {
         if (!extension_loaded('mysqlnd')) {
             throw new DbException('Can not find mysqlnd PHP extension.');
@@ -40,10 +40,11 @@ class DB
     }
 
     /**
-     * @param $table_name
+     * @param  string      $table_name 表名
      * @throws DbException
+     * @return Table       返回表对象
      */
-    public static function table($table_name): Table
+    public static function table(string $table_name): Table
     {
         if (Table::getTableInstance($table_name) === null) {
             if (in_array($table_name, self::$table_list)) {
@@ -58,36 +59,34 @@ class DB
     }
 
     /**
-     * @param $line
+     * @param  string      $line SQL语句
      * @throws DbException
      */
-    public static function statement($line)
+    public static function statement(string $line)
     {
         self::rawQuery($line, []);
     }
 
     /**
-     * @param $line
-     * @throws DbException
+     * @param  string $line SQL语句
+     * @return bool   返回查询是否成功的结果
      */
-    public static function unprepared($line): bool
+    public static function unprepared(string $line): bool
     {
-        try {
-            $conn = SqlPoolStorage::$sql_pool->getConnection();
-            if ($conn === false) {
-                SqlPoolStorage::$sql_pool->putConnection(null);
-                throw new DbException('无法连接SQL！' . $line);
-            }
-            $result = !($conn->query($line) === false);
-            SqlPoolStorage::$sql_pool->putConnection($conn);
-            return $result;
-        } catch (DBException $e) {
-            Console::warning($e->getMessage());
-            throw $e;
-        }
+        $conn = SqlPoolStorage::$sql_pool->getConnection();
+        $result = !($conn->query($line) === false);
+        SqlPoolStorage::$sql_pool->putConnection($conn);
+        return $result;
     }
 
-    public static function rawQuery(string $line, $params = [], $fetch_mode = ZM_DEFAULT_FETCH_MODE)
+    /**
+     * @param  string      $line       SQL语句
+     * @param  array       $params     查询参数
+     * @param  int         $fetch_mode fetch规则
+     * @throws DbException
+     * @return array|false 返回结果集或false
+     */
+    public static function rawQuery(string $line, array $params = [], int $fetch_mode = ZM_DEFAULT_FETCH_MODE)
     {
         if (!is_array($params)) {
             $params = [$params];
@@ -98,15 +97,10 @@ class DB
                 throw new DbException('未连接到任何数据库！');
             }
             $conn = SqlPoolStorage::$sql_pool->getConnection();
-            if ($conn === false) {
-                SqlPoolStorage::$sql_pool->putConnection(null);
-                throw new DbException('无法连接SQL！' . $line);
-            }
             $ps = $conn->prepare($line);
             if ($ps === false) {
                 SqlPoolStorage::$sql_pool->putConnection(null);
-                /* @noinspection PhpUndefinedFieldInspection */
-                throw new DbException('SQL语句查询错误，' . $line . '，错误信息：' . $conn->error);
+                throw new DbException('SQL语句查询错误，' . $line . '，错误信息：' . $conn->errorInfo()[2]);
             }
             if (!($ps instanceof PDOStatement) && !($ps instanceof PDOStatementProxy)) {
                 var_dump($ps);
@@ -129,7 +123,7 @@ class DB
             return $ps->fetchAll($fetch_mode);
         } catch (DbException $e) {
             if (mb_strpos($e->getMessage(), 'has gone away') !== false) {
-                zm_sleep(0.2);
+                zm_sleep();
                 Console::warning('Gone away of MySQL! retrying!');
                 return self::rawQuery($line, $params);
             }
@@ -137,7 +131,7 @@ class DB
             throw $e;
         } catch (PDOException $e) {
             if (mb_strpos($e->getMessage(), 'has gone away') !== false) {
-                zm_sleep(0.2);
+                zm_sleep();
                 Console::warning('Gone away of MySQL! retrying!');
                 return self::rawQuery($line, $params);
             }

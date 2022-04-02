@@ -57,9 +57,8 @@ class MySQLWrapper
 
     /**
      * wrapper method
-     * @param $autoCommit
      */
-    public function setAutoCommit($autoCommit)
+    public function setAutoCommit(bool $autoCommit)
     {
         $this->connection->setAutoCommit($autoCommit);
     }
@@ -114,7 +113,7 @@ class MySQLWrapper
     }
 
     /**
-     * @param $table
+     * @param  mixed       $table
      * @throws DbException
      */
     public function delete($table, array $criteria, array $types = []): int
@@ -128,7 +127,7 @@ class MySQLWrapper
 
     /**
      * wrapper method
-     * @param $level
+     * @param mixed $level
      */
     public function setTransactionIsolation($level): int
     {
@@ -145,7 +144,7 @@ class MySQLWrapper
 
     /**
      * wrapper method
-     * @param $table
+     * @param  mixed       $table
      * @throws DbException
      */
     public function update($table, array $data, array $criteria, array $types = []): int
@@ -159,7 +158,7 @@ class MySQLWrapper
 
     /**
      * wrapper method
-     * @param $table
+     * @param  mixed       $table
      * @throws DbException
      */
     public function insert($table, array $data, array $types = []): int
@@ -173,7 +172,7 @@ class MySQLWrapper
 
     /**
      * wrapper method
-     * @param $str
+     * @param mixed $str
      */
     public function quoteIdentifier($str): string
     {
@@ -182,7 +181,7 @@ class MySQLWrapper
 
     /**
      * wrapper method
-     * @param $value
+     * @param  mixed $value
      * @param  int   $type
      * @return mixed
      */
@@ -323,7 +322,7 @@ class MySQLWrapper
 
     /**
      * wrapper method
-     * @param $sql
+     * @param  mixed       $sql
      * @param  array       $types
      * @throws DbException
      */
@@ -339,9 +338,9 @@ class MySQLWrapper
 
     /**
      * wrapper method
-     * @param $sql
-     * @param $params
-     * @param $types
+     * @param  mixed       $sql
+     * @param  mixed       $params
+     * @param  mixed       $types
      * @throws DbException
      */
     public function executeCacheQuery($sql, $params, $types, QueryCacheProfile $qcp): MySQLStatementWrapper
@@ -356,7 +355,7 @@ class MySQLWrapper
 
     /**
      * wrapper method
-     * @param $sql
+     * @param  mixed       $sql
      * @throws DbException
      */
     public function executeStatement($sql, array $params = [], array $types = []): int
@@ -405,7 +404,7 @@ class MySQLWrapper
 
     /**
      * wrapper method
-     * @param $nestTransactionsWithSavepoints
+     * @param  mixed       $nestTransactionsWithSavepoints
      * @throws DbException
      */
     public function setNestTransactionsWithSavepoints($nestTransactionsWithSavepoints)
@@ -461,7 +460,7 @@ class MySQLWrapper
 
     /**
      * wrapper method
-     * @param $savepoint
+     * @param  mixed       $savepoint
      * @throws DbException
      */
     public function createSavepoint($savepoint)
@@ -475,7 +474,7 @@ class MySQLWrapper
 
     /**
      * wrapper method
-     * @param $savepoint
+     * @param  mixed       $savepoint
      * @throws DbException
      */
     public function releaseSavepoint($savepoint)
@@ -489,7 +488,7 @@ class MySQLWrapper
 
     /**
      * wrapper method
-     * @param $savepoint
+     * @param  mixed       $savepoint
      * @throws DbException
      */
     public function rollbackSavepoint($savepoint)

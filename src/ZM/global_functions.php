@@ -111,6 +111,10 @@ function match_pattern(string $pattern, string $subject): bool
     return false;
 }
 
+/**
+ * @requires symfony/polyfill-ctype
+ * @return array|string[]
+ */
 function split_explode(string $del, string $string, bool $divide_en = false): array
 {
     $str = explode($del, $string);
@@ -521,7 +525,7 @@ function zm_dump($var, ...$moreVars)
  *
  * 与 {@link Console::info()} 一致
  *
- * @param $obj
+ * @param mixed $obj
  */
 function zm_info($obj): void
 {
@@ -533,7 +537,7 @@ function zm_info($obj): void
  *
  * 与 {@link Console::warning()} 一致
  *
- * @param $obj
+ * @param mixed $obj
  */
 function zm_warning($obj): void
 {
@@ -545,7 +549,7 @@ function zm_warning($obj): void
  *
  * 与 {@link Console::success()} 一致
  *
- * @param $obj
+ * @param mixed $obj
  */
 function zm_success($obj): void
 {
@@ -557,7 +561,7 @@ function zm_success($obj): void
  *
  * 与 {@link Console::debug()} 一致
  *
- * @param $obj
+ * @param mixed $obj
  */
 function zm_debug($obj): void
 {
@@ -569,7 +573,7 @@ function zm_debug($obj): void
  *
  * 与 {@link Console::verbose()} 一致
  *
- * @param $obj
+ * @param mixed $obj
  */
 function zm_verbose($obj): void
 {
@@ -581,7 +585,7 @@ function zm_verbose($obj): void
  *
  * 与 {@link Console::error()} 一致
  *
- * @param $obj
+ * @param mixed $obj
  */
 function zm_error($obj): void
 {
@@ -603,7 +607,7 @@ function zm_config(string $name, ?string $key = null)
 /**
  * 生成快速回复闭包
  *
- * @param $reply
+ * @param mixed $reply
  */
 function quick_reply_closure($reply): Closure
 {
@@ -615,7 +619,7 @@ function quick_reply_closure($reply): Closure
 /**
  * 获取内部错误码
  *
- * @param $code
+ * @param int|string $code
  */
 function zm_internal_errcode($code): string
 {
@@ -711,7 +715,7 @@ function matchPattern($pattern, $context): bool
 }
 
 /**
- * @param mixed $message_type
+ * @param string $message_type 消息类型
  * @deprecated 已废弃，请使用 {@link get_onebot_target_id_name()}
  */
 function onebot_target_id_name(string $message_type): string

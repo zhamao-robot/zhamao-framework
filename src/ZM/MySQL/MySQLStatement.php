@@ -14,11 +14,10 @@ use Doctrine\DBAL\ParameterType;
 use IteratorAggregate;
 use PDO;
 use PDOStatement;
-use Swoole\Database\PDOStatementProxy;
 
 class MySQLStatement implements IteratorAggregate, Statement
 {
-    /** @var PDOStatement|PDOStatementProxy */
+    /** @var PDOStatement */
     private $statement;
 
     public function __construct($obj)
@@ -108,8 +107,15 @@ class MySQLStatement implements IteratorAggregate, Statement
         return new StatementIterator($this);
     }
 
+    /**
+     * @deprecated 最好不使用此方法，此方法可能存在 Bug
+     * @return mixed
+     */
     public function current()
     {
-        return $this->statement->current();
+        if (method_exists($this->statement, 'current')) {
+            return $this->statement->current();
+        }
+        return null;
     }
 }

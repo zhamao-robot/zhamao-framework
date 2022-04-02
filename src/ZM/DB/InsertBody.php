@@ -21,7 +21,8 @@ class InsertBody
 
     /**
      * InsertBody constructor.
-     * @param $row
+     * @param Table        $table 表对象
+     * @param array|string $row   行数据
      */
     public function __construct(Table $table, $row)
     {

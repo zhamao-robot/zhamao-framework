@@ -58,11 +58,9 @@ class HttpUtil
     }
 
     /**
-     * @param $uri
-     * @param  Response|\Swoole\Http\Response $response
-     * @return bool
+     * @param Response|\Swoole\Http\Response $response
      */
-    public static function handleStaticPage($uri, $response, array $settings = [])
+    public static function handleStaticPage(string $uri, $response, array $settings = []): bool
     {
         $base_dir = $settings['document_root'] ?? ZMConfig::get('global', 'static_file_server')['document_root'];
         $base_index = $settings['document_index'] ?? ZMConfig::get('global', 'static_file_server')['document_index'];
