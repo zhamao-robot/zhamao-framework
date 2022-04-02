@@ -110,7 +110,7 @@ public function registerServerEvents(): mixed
 ## parseCliArgs
 
 ```php
-public function parseCliArgs(mixed $args, mixed $add_port): mixed
+public function parseCliArgs(array $args, bool|string $add_port): mixed
 ```
 
 ### 描述
@@ -121,8 +121,8 @@ public function parseCliArgs(mixed $args, mixed $add_port): mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| args | mixed |  |
-| add_port | mixed |  |
+| args | array | 命令行参数 |
+| add_port | bool|string | 是否添加端口号 |
 
 ### 返回
 

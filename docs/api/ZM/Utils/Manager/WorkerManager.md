@@ -3,7 +3,7 @@
 ## workerAction
 
 ```php
-public function workerAction(mixed $src_worker_id, mixed $data): mixed
+public function workerAction(int $src_worker_id, array $data): mixed
 ```
 
 ### 描述
@@ -14,8 +14,8 @@ Worker 进程间通信触发的动作类型函数
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| src_worker_id | mixed |  |
-| data | mixed |  |
+| src_worker_id | int | 源 Worker 进程 ID |
+| data | array | 数据 |
 
 ### 返回
 
@@ -27,7 +27,7 @@ Worker 进程间通信触发的动作类型函数
 ## sendActionToWorker
 
 ```php
-public function sendActionToWorker(mixed $worker_id, mixed $action, mixed $data): mixed
+public function sendActionToWorker(int $worker_id, string $action, mixed $data): mixed
 ```
 
 ### 描述
@@ -38,9 +38,9 @@ public function sendActionToWorker(mixed $worker_id, mixed $action, mixed $data)
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| worker_id | mixed |  |
-| action | mixed |  |
-| data | mixed |  |
+| worker_id | int | 进程ID |
+| action | string | 动作 |
+| data | mixed | 参数 |
 
 ### 返回
 

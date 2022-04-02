@@ -30,7 +30,7 @@ public function parseUri(mixed $request, mixed $response, mixed $uri, mixed $nod
 ## handleStaticPage
 
 ```php
-public function handleStaticPage(mixed $uri, Response|\Swoole\Http\Response $response, array $settings): bool
+public function handleStaticPage(Response|\Swoole\Http\Response $response, string $uri, array $settings): bool
 ```
 
 ### 描述
@@ -41,8 +41,8 @@ public function handleStaticPage(mixed $uri, Response|\Swoole\Http\Response $res
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| uri | mixed |  |
 | response | Response|\Swoole\Http\Response |  |
+| uri | string |  |
 | settings | array |  |
 
 ### 返回

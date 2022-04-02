@@ -3,7 +3,7 @@
 ## __construct
 
 ```php
-public function __construct(mixed $row, ZM\DB\Table $table): mixed
+public function __construct(Table $table, array|string $row): mixed
 ```
 
 ### 描述
@@ -14,8 +14,8 @@ InsertBody constructor.
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| row | mixed |  |
-| table | ZM\DB\Table |  |
+| table | Table | 表对象 |
+| row | array|string | 行数据 |
 
 ### 返回
 

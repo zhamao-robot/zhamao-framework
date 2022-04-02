@@ -37,7 +37,7 @@ public function registerMods(): mixed
 ## addRegisterPath
 
 ```php
-public function addRegisterPath(mixed $path, mixed $indoor_name): mixed
+public function addRegisterPath(string $path, string $indoor_name): mixed
 ```
 
 ### 描述
@@ -48,8 +48,8 @@ public function addRegisterPath(mixed $path, mixed $indoor_name): mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| path | mixed |  |
-| indoor_name | mixed |  |
+| path | string | 注册解析注解的路径 |
+| indoor_name | string | 起始命名空间的名称 |
 
 ### 返回
 
@@ -61,7 +61,7 @@ public function addRegisterPath(mixed $path, mixed $indoor_name): mixed
 ## sortByLevel
 
 ```php
-public function sortByLevel(mixed $events, string $class_name, string $prefix): mixed
+public function sortByLevel(array $events, string $class_name, string $prefix): mixed
 ```
 
 ### 描述
@@ -72,9 +72,9 @@ public function sortByLevel(mixed $events, string $class_name, string $prefix): 
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| events | mixed |  |
-| class_name | string |  |
-| prefix | string |  |
+| events | array | 需要排序的 |
+| class_name | string | 排序的类名 |
+| prefix | string | 前缀 |
 
 ### 返回
 

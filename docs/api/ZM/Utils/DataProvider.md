@@ -111,7 +111,7 @@ public function getDataFolder(string $second): null|array|false|mixed|string
 ## saveToJson
 
 ```php
-public function saveToJson(mixed $filename, mixed $file_array): false|int
+public function saveToJson(string $filename, array|int|Iterator|JsonSerializable|string|Traversable $file_array): false|int
 ```
 
 ### 描述
@@ -122,20 +122,20 @@ public function saveToJson(mixed $filename, mixed $file_array): false|int
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| filename | mixed |  |
-| file_array | mixed |  |
+| filename | string | 文件名 |
+| file_array | array|int|Iterator|JsonSerializable|string|Traversable | 文件内容数组 |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| false|int |  |
+| false|int | 返回文件大小或false |
 
 
 ## loadFromJson
 
 ```php
-public function loadFromJson(mixed $filename): null|mixed
+public function loadFromJson(string $filename): null|mixed
 ```
 
 ### 描述
@@ -146,19 +146,19 @@ public function loadFromJson(mixed $filename): null|mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| filename | mixed |  |
+| filename | string | 文件名 |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|mixed |  |
+| null|mixed | 返回文件内容数据或null |
 
 
 ## scanDirFiles
 
 ```php
-public function scanDirFiles(mixed $dir, bool|string $relative, bool $recursive): array|false
+public function scanDirFiles(string $dir, bool $recursive, bool|string $relative): array|false
 ```
 
 ### 描述
@@ -169,9 +169,9 @@ public function scanDirFiles(mixed $dir, bool|string $relative, bool $recursive)
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| dir | mixed |  |
-| relative | bool|string |  |
-| recursive | bool |  |
+| dir | string | 目录 |
+| recursive | bool | 是否递归扫描子目录 |
+| relative | bool|string | 是否返回相对目录，如果为true则返回相对目录，如果为false则返回绝对目录 |
 
 ### 返回
 
@@ -183,7 +183,7 @@ public function scanDirFiles(mixed $dir, bool|string $relative, bool $recursive)
 ## isRelativePath
 
 ```php
-public function isRelativePath(mixed $path): bool
+public function isRelativePath(string $path): bool
 ```
 
 ### 描述
@@ -194,10 +194,10 @@ public function isRelativePath(mixed $path): bool
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| path | mixed |  |
+| path | string | 路径 |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| bool |  |
+| bool | 返回结果 |

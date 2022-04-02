@@ -77,7 +77,7 @@ public function testlog(): mixed
 ## call
 
 ```php
-public function call(mixed $it): mixed
+public function call(array $it): mixed
 ```
 
 ### 描述
@@ -88,7 +88,7 @@ public function call(mixed $it): mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| it | mixed |  |
+| it | array |  |
 
 ### 返回
 
@@ -100,7 +100,7 @@ public function call(mixed $it): mixed
 ## level
 
 ```php
-public function level(mixed $it): mixed
+public function level(array $it): mixed
 ```
 
 ### 描述
@@ -111,7 +111,7 @@ public function level(mixed $it): mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| it | mixed |  |
+| it | array |  |
 
 ### 返回
 
@@ -123,7 +123,7 @@ public function level(mixed $it): mixed
 ## bc
 
 ```php
-public function bc(mixed $it): mixed
+public function bc(array $it): mixed
 ```
 
 ### 描述
@@ -134,7 +134,7 @@ public function bc(mixed $it): mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| it | mixed |  |
+| it | array |  |
 
 ### 返回
 
@@ -146,7 +146,7 @@ public function bc(mixed $it): mixed
 ## echoI
 
 ```php
-public function echoI(mixed $it): mixed
+public function echoI(array $it): mixed
 ```
 
 ### 描述
@@ -157,7 +157,7 @@ public function echoI(mixed $it): mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| it | mixed |  |
+| it | array |  |
 
 ### 返回
 

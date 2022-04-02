@@ -44,7 +44,7 @@ public function packModule(array $module, string $target): bool
 ## unpackModule
 
 ```php
-public function unpackModule(mixed $module, array $options): array|false
+public function unpackModule(array|Iterator $module, array $options): array|false
 ```
 
 ### 描述
@@ -55,11 +55,11 @@ public function unpackModule(mixed $module, array $options): array|false
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| module | mixed |  |
+| module | array|Iterator | 模块信息 |
 | options | array |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| array|false |  |
+| array|false | 返回解包的信息或false |

@@ -17,60 +17,10 @@ public function initHeader(): mixed
 | mixed |  |
 
 
-## status
-
-```php
-public function status(mixed $http_code, mixed $reason, mixed $params): mixed
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| http_code | mixed |  |
-| reason | mixed |  |
-| params | mixed |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| mixed |  |
-
-
-## setStatusCode
-
-```php
-public function setStatusCode(mixed $http_code, mixed $reason, mixed $params): mixed
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| http_code | mixed |  |
-| reason | mixed |  |
-| params | mixed |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| mixed |  |
-
-
 ## header
 
 ```php
-public function header(mixed $key, mixed $value, mixed $ucwords): mixed
+public function header(array|string $value, null|array|string $ucwords, string $key): mixed
 ```
 
 ### 描述
@@ -81,9 +31,9 @@ public function header(mixed $key, mixed $value, mixed $ucwords): mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| key | mixed |  |
-| value | mixed |  |
-| ucwords | mixed |  |
+| value | array|string |  |
+| ucwords | null|array|string |  |
+| key | string |  |
 
 ### 返回
 
@@ -95,7 +45,7 @@ public function header(mixed $key, mixed $value, mixed $ucwords): mixed
 ## setHeader
 
 ```php
-public function setHeader(mixed $key, mixed $value, mixed $ucwords): mixed
+public function setHeader(array|string $value, null|array|string $ucwords, string $key): mixed
 ```
 
 ### 描述
@@ -106,9 +56,9 @@ public function setHeader(mixed $key, mixed $value, mixed $ucwords): mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| key | mixed |  |
-| value | mixed |  |
-| ucwords | mixed |  |
+| value | array|string |  |
+| ucwords | null|array|string |  |
+| key | string |  |
 
 ### 返回
 
@@ -120,7 +70,7 @@ public function setHeader(mixed $key, mixed $value, mixed $ucwords): mixed
 ## trailer
 
 ```php
-public function trailer(mixed $key, mixed $value): mixed
+public function trailer(array|string $value, string $key): mixed
 ```
 
 ### 描述
@@ -131,8 +81,8 @@ public function trailer(mixed $key, mixed $value): mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| key | mixed |  |
-| value | mixed |  |
+| value | array|string |  |
+| key | string |  |
 
 ### 返回
 
@@ -161,7 +111,7 @@ public function ping(): mixed
 ## write
 
 ```php
-public function write(mixed $content): mixed
+public function write(string|Stringable $content): mixed
 ```
 
 ### 描述
@@ -172,7 +122,7 @@ public function write(mixed $content): mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| content | mixed |  |
+| content | string|Stringable |  |
 
 ### 返回
 
@@ -184,7 +134,7 @@ public function write(mixed $content): mixed
 ## end
 
 ```php
-public function end(mixed $content): mixed
+public function end(null|string|Stringable $content): mixed
 ```
 
 ### 描述
@@ -195,7 +145,7 @@ public function end(mixed $content): mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| content | mixed |  |
+| content | null|string|Stringable |  |
 
 ### 返回
 
@@ -207,7 +157,7 @@ public function end(mixed $content): mixed
 ## sendfile
 
 ```php
-public function sendfile(mixed $filename, mixed $offset, mixed $length): mixed
+public function sendfile(null|int|string $offset, null|int|string $length, string $filename): mixed
 ```
 
 ### 描述
@@ -218,9 +168,9 @@ public function sendfile(mixed $filename, mixed $offset, mixed $length): mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| filename | mixed |  |
-| offset | mixed |  |
-| length | mixed |  |
+| offset | null|int|string |  |
+| length | null|int|string |  |
+| filename | string |  |
 
 ### 返回
 
@@ -232,7 +182,7 @@ public function sendfile(mixed $filename, mixed $offset, mixed $length): mixed
 ## redirect
 
 ```php
-public function redirect(mixed $location, mixed $http_code): mixed
+public function redirect(string $location, int $http_code): mixed
 ```
 
 ### 描述
@@ -243,8 +193,8 @@ public function redirect(mixed $location, mixed $http_code): mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| location | mixed |  |
-| http_code | mixed |  |
+| location | string |  |
+| http_code | int |  |
 
 ### 返回
 
@@ -313,7 +263,7 @@ public function upgrade(): mixed
 ## push
 
 ```php
-public function push(mixed $data, null $opcode, null $flags): mixed
+public function push(mixed $data, mixed $opcode, mixed $flags): mixed
 ```
 
 ### 描述
@@ -325,8 +275,8 @@ public function push(mixed $data, null $opcode, null $flags): mixed
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | data | mixed |  |
-| opcode | null |  |
-| flags | null |  |
+| opcode | mixed |  |
+| flags | mixed |  |
 
 ### 返回
 

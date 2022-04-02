@@ -3,7 +3,7 @@
 ## downloadCQImage
 
 ```php
-public function downloadCQImage(mixed $msg, string $path): array|false
+public function downloadCQImage(array|string $msg, null|string $path): array|false
 ```
 
 ### 描述
@@ -14,20 +14,20 @@ public function downloadCQImage(mixed $msg, string $path): array|false
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| msg | mixed |  |
-| path | string |  |
+| msg | array|string | 消息或消息数组 |
+| path | null|string | 保存路径 |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| array|false |  |
+| array|false | 返回图片信息或失败返回false |
 
 
 ## containsImage
 
 ```php
-public function containsImage(mixed $msg): bool
+public function containsImage(array|string $msg): bool
 ```
 
 ### 描述
@@ -38,7 +38,7 @@ public function containsImage(mixed $msg): bool
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| msg | mixed |  |
+| msg | array|string | 消息或消息数组 |
 
 ### 返回
 
@@ -50,7 +50,7 @@ public function containsImage(mixed $msg): bool
 ## getImageCQFromLocal
 
 ```php
-public function getImageCQFromLocal(mixed $file, int $type): string
+public function getImageCQFromLocal(string $file, int $type): string
 ```
 
 ### 描述
@@ -64,8 +64,8 @@ type == 2 : 返回图片的 http://xxx CQ 码（默认为 /images/ 路径就是�
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| file | mixed |  |
-| type | int |  |
+| file | string | 文件数据 |
+| type | int | 文件类型（0，1，2可选，默认为0） |
 
 ### 返回
 
@@ -77,7 +77,7 @@ type == 2 : 返回图片的 http://xxx CQ 码（默认为 /images/ 路径就是�
 ## splitCommand
 
 ```php
-public function splitCommand(mixed $msg): array|string[]
+public function splitCommand(string $msg): array|string[]
 ```
 
 ### 描述
@@ -88,7 +88,7 @@ public function splitCommand(mixed $msg): array|string[]
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| msg | mixed |  |
+| msg | string | 消息内容 |
 
 ### 返回
 
@@ -100,19 +100,19 @@ public function splitCommand(mixed $msg): array|string[]
 ## matchCommand
 
 ```php
-public function matchCommand(mixed $msg, mixed $obj): ZM\Entity\MatchResult
+public function matchCommand(array|string $msg, array|Iterator $obj): ZM\Entity\MatchResult
 ```
 
 ### 描述
 
-作者很懒，什么也没有说
+根据CQCommand的规则匹配消息，获取是否匹配到对应的注解事件
 
 ### 参数
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| msg | mixed |  |
-| obj | mixed |  |
+| msg | array|string | 消息内容 |
+| obj | array|Iterator | 数据对象 |
 
 ### 返回
 
@@ -124,7 +124,7 @@ public function matchCommand(mixed $msg, mixed $obj): ZM\Entity\MatchResult
 ## addShortCommand
 
 ```php
-public function addShortCommand(mixed $command, string $reply): mixed
+public function addShortCommand(string $command, string $reply): mixed
 ```
 
 ### 描述
@@ -135,8 +135,8 @@ public function addShortCommand(mixed $command, string $reply): mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| command | mixed |  |
-| reply | string |  |
+| command | string | 命令内容 |
+| reply | string | 回复内容 |
 
 ### 返回
 
@@ -148,7 +148,7 @@ public function addShortCommand(mixed $command, string $reply): mixed
 ## strToArray
 
 ```php
-public function strToArray(mixed $msg, false $trim_text, bool $ignore_space): array
+public function strToArray(string $msg, bool $ignore_space, bool $trim_text): array
 ```
 
 ### 描述
@@ -159,15 +159,15 @@ public function strToArray(mixed $msg, false $trim_text, bool $ignore_space): ar
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| msg | mixed |  |
-| trim_text | false |  |
-| ignore_space | bool |  |
+| msg | string | 消息内容 |
+| ignore_space | bool | 是否忽略空行 |
+| trim_text | bool | 是否去除空格 |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| array |  |
+| array | 返回数组 |
 
 
 ## arrayToStr

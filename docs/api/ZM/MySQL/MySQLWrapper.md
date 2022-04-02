@@ -54,7 +54,7 @@ wrapper method
 ## setAutoCommit
 
 ```php
-public function setAutoCommit(mixed $autoCommit): mixed
+public function setAutoCommit(bool $auto_commit): mixed
 ```
 
 ### 描述
@@ -65,7 +65,7 @@ wrapper method
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| autoCommit | mixed |  |
+| auto_commit | bool |  |
 
 ### 返回
 
@@ -169,7 +169,7 @@ wrapper method
 ## delete
 
 ```php
-public function delete(mixed $table, array $criteria, array $types): int
+public function delete(string $table, array $criteria, array $types): int
 ```
 
 ### 描述
@@ -180,7 +180,7 @@ public function delete(mixed $table, array $criteria, array $types): int
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| table | mixed |  |
+| table | string | 表 |
 | criteria | array |  |
 | types | array |  |
 
@@ -194,7 +194,7 @@ public function delete(mixed $table, array $criteria, array $types): int
 ## setTransactionIsolation
 
 ```php
-public function setTransactionIsolation(mixed $level): int
+public function setTransactionIsolation(int $level): int
 ```
 
 ### 描述
@@ -205,7 +205,7 @@ wrapper method
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| level | mixed |  |
+| level | int | Sets the transaction isolation level |
 
 ### 返回
 
@@ -234,7 +234,7 @@ wrapper method
 ## update
 
 ```php
-public function update(mixed $table, array $data, array $criteria, array $types): int
+public function update(string $table, array $data, array $criteria, array $types): int
 ```
 
 ### 描述
@@ -245,7 +245,7 @@ wrapper method
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| table | mixed |  |
+| table | string | 表名 |
 | data | array |  |
 | criteria | array |  |
 | types | array |  |
@@ -260,7 +260,7 @@ wrapper method
 ## insert
 
 ```php
-public function insert(mixed $table, array $data, array $types): int
+public function insert(string $table, array $data, array $types): int
 ```
 
 ### 描述
@@ -271,7 +271,7 @@ wrapper method
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| table | mixed |  |
+| table | string | 表名 |
 | data | array |  |
 | types | array |  |
 
@@ -285,7 +285,7 @@ wrapper method
 ## quoteIdentifier
 
 ```php
-public function quoteIdentifier(mixed $str): string
+public function quoteIdentifier(string $str): string
 ```
 
 ### 描述
@@ -296,7 +296,7 @@ wrapper method
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| str | mixed |  |
+| str | string | The name to be quoted |
 
 ### 返回
 
@@ -308,7 +308,7 @@ wrapper method
 ## quote
 
 ```php
-public function quote(mixed $value, int $type): mixed
+public function quote(mixed $value, null|int|string|Type $type): mixed
 ```
 
 ### 描述
@@ -320,340 +320,13 @@ wrapper method
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | value | mixed |  |
-| type | int |  |
+| type | null|int|string|Type |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
 | mixed |  |
-
-
-## fetchAllNumeric
-
-```php
-public function fetchAllNumeric(string $query, array $params, array $types): array
-```
-
-### 描述
-
-wrapper method
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| query | string |  |
-| params | array |  |
-| types | array |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| array |  |
-
-
-## fetchAllAssociative
-
-```php
-public function fetchAllAssociative(string $query, array $params, array $types): array
-```
-
-### 描述
-
-wrapper method
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| query | string |  |
-| params | array |  |
-| types | array |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| array |  |
-
-
-## fetchAllKeyValue
-
-```php
-public function fetchAllKeyValue(string $query, array $params, array $types): array
-```
-
-### 描述
-
-wrapper method
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| query | string |  |
-| params | array |  |
-| types | array |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| array |  |
-
-
-## fetchAllAssociativeIndexed
-
-```php
-public function fetchAllAssociativeIndexed(string $query, array $params, array $types): array
-```
-
-### 描述
-
-wrapper method
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| query | string |  |
-| params | array |  |
-| types | array |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| array |  |
-
-
-## fetchFirstColumn
-
-```php
-public function fetchFirstColumn(string $query, array $params, array $types): array
-```
-
-### 描述
-
-wrapper method
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| query | string |  |
-| params | array |  |
-| types | array |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| array |  |
-
-
-## iterateNumeric
-
-```php
-public function iterateNumeric(string $query, array $params, array $types): Traversable
-```
-
-### 描述
-
-wrapper method
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| query | string |  |
-| params | array |  |
-| types | array |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| Traversable |  |
-
-
-## iterateAssociative
-
-```php
-public function iterateAssociative(string $query, array $params, array $types): Traversable
-```
-
-### 描述
-
-wrapper method
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| query | string |  |
-| params | array |  |
-| types | array |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| Traversable |  |
-
-
-## iterateKeyValue
-
-```php
-public function iterateKeyValue(string $query, array $params, array $types): Traversable
-```
-
-### 描述
-
-wrapper method
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| query | string |  |
-| params | array |  |
-| types | array |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| Traversable |  |
-
-
-## iterateAssociativeIndexed
-
-```php
-public function iterateAssociativeIndexed(string $query, array $params, array $types): Traversable
-```
-
-### 描述
-
-wrapper method
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| query | string |  |
-| params | array |  |
-| types | array |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| Traversable |  |
-
-
-## iterateColumn
-
-```php
-public function iterateColumn(string $query, array $params, array $types): Traversable
-```
-
-### 描述
-
-wrapper method
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| query | string |  |
-| params | array |  |
-| types | array |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| Traversable |  |
-
-
-## executeQuery
-
-```php
-public function executeQuery(mixed $sql, array $types, array $params, Doctrine\DBAL\Cache\QueryCacheProfile $qcp): ZM\MySQL\MySQLStatementWrapper
-```
-
-### 描述
-
-wrapper method
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| sql | mixed |  |
-| types | array |  |
-| params | array |  |
-| qcp | Doctrine\DBAL\Cache\QueryCacheProfile |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| ZM\MySQL\MySQLStatementWrapper |  |
-
-
-## executeCacheQuery
-
-```php
-public function executeCacheQuery(mixed $sql, mixed $params, mixed $types, Doctrine\DBAL\Cache\QueryCacheProfile $qcp): ZM\MySQL\MySQLStatementWrapper
-```
-
-### 描述
-
-wrapper method
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| sql | mixed |  |
-| params | mixed |  |
-| types | mixed |  |
-| qcp | Doctrine\DBAL\Cache\QueryCacheProfile |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| ZM\MySQL\MySQLStatementWrapper |  |
-
-
-## executeStatement
-
-```php
-public function executeStatement(mixed $sql, array $params, array $types): int
-```
-
-### 描述
-
-wrapper method
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| sql | mixed |  |
-| params | array |  |
-| types | array |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| int |  |
 
 
 ## getTransactionNestingLevel
@@ -676,7 +349,7 @@ wrapper method
 ## lastInsertId
 
 ```php
-public function lastInsertId(null $name): string
+public function lastInsertId(null|string $name): false|int|string
 ```
 
 ### 描述
@@ -687,13 +360,13 @@ wrapper method
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| name | null |  |
+| name | null|string | name of the sequence object from which the ID should be returned |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| string |  |
+| false|int|string | a string representation of the last inserted ID |
 
 
 ## transactional
@@ -722,7 +395,7 @@ overwrite method to $this->connection->transactional()
 ## setNestTransactionsWithSavepoints
 
 ```php
-public function setNestTransactionsWithSavepoints(mixed $nestTransactionsWithSavepoints): mixed
+public function setNestTransactionsWithSavepoints(bool $nest_transactions_with_savepoints): mixed
 ```
 
 ### 描述
@@ -733,7 +406,7 @@ wrapper method
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| nestTransactionsWithSavepoints | mixed |  |
+| nest_transactions_with_savepoints | bool |  |
 
 ### 返回
 
@@ -813,7 +486,7 @@ wrapper method
 ## createSavepoint
 
 ```php
-public function createSavepoint(mixed $savepoint): mixed
+public function createSavepoint(string $savepoint): mixed
 ```
 
 ### 描述
@@ -824,7 +497,7 @@ wrapper method
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| savepoint | mixed |  |
+| savepoint | string | the name of the savepoint to create |
 
 ### 返回
 
@@ -836,7 +509,7 @@ wrapper method
 ## releaseSavepoint
 
 ```php
-public function releaseSavepoint(mixed $savepoint): mixed
+public function releaseSavepoint(string $savepoint): mixed
 ```
 
 ### 描述
@@ -847,7 +520,7 @@ wrapper method
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| savepoint | mixed |  |
+| savepoint | string | the name of the savepoint to release |
 
 ### 返回
 
@@ -859,7 +532,7 @@ wrapper method
 ## rollbackSavepoint
 
 ```php
-public function rollbackSavepoint(mixed $savepoint): mixed
+public function rollbackSavepoint(string $savepoint): mixed
 ```
 
 ### 描述
@@ -870,7 +543,7 @@ wrapper method
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| savepoint | mixed |  |
+| savepoint | string | the name of the savepoint to rollback to |
 
 ### 返回
 

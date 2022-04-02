@@ -3,7 +3,7 @@
 ## initTableList
 
 ```php
-public function initTableList(mixed $db_name): mixed
+public function initTableList(string $db_name): mixed
 ```
 
 ### 描述
@@ -14,7 +14,7 @@ public function initTableList(mixed $db_name): mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| db_name | mixed |  |
+| db_name | string | 数据库名称 |
 
 ### 返回
 
@@ -26,7 +26,7 @@ public function initTableList(mixed $db_name): mixed
 ## table
 
 ```php
-public function table(mixed $table_name): ZM\DB\Table
+public function table(string $table_name): Table
 ```
 
 ### 描述
@@ -37,19 +37,19 @@ public function table(mixed $table_name): ZM\DB\Table
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| table_name | mixed |  |
+| table_name | string | 表名 |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| ZM\DB\Table |  |
+| Table | 返回表对象 |
 
 
 ## statement
 
 ```php
-public function statement(mixed $line): mixed
+public function statement(string $line): mixed
 ```
 
 ### 描述
@@ -60,7 +60,7 @@ public function statement(mixed $line): mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| line | mixed |  |
+| line | string | SQL语句 |
 
 ### 返回
 
@@ -72,7 +72,7 @@ public function statement(mixed $line): mixed
 ## unprepared
 
 ```php
-public function unprepared(mixed $line): bool
+public function unprepared(string $line): bool
 ```
 
 ### 描述
@@ -83,10 +83,35 @@ public function unprepared(mixed $line): bool
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| line | mixed |  |
+| line | string | SQL语句 |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| bool |  |
+| bool | 返回查询是否成功的结果 |
+
+
+## rawQuery
+
+```php
+public function rawQuery(string $line, array $params, int $fetch_mode): array|false
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| line | string | SQL语句 |
+| params | array | 查询参数 |
+| fetch_mode | int | fetch规则 |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| array|false | 返回结果集或false |

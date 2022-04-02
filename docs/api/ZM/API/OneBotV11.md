@@ -3,24 +3,24 @@
 ## get
 
 ```php
-public function get(mixed $robot_id): ZMRobot
+public function get(int|string $robot_id): ZMRobot
 ```
 
 ### 描述
 
-作者很懒，什么也没有说
+获取机器人Action/API实例
 
 ### 参数
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| robot_id | mixed |  |
+| robot_id | int|string | 机器人ID |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| ZMRobot |  |
+| ZMRobot | 机器人实例 |
 
 
 ## getRandom
@@ -31,13 +31,13 @@ public function getRandom(): ZMRobot
 
 ### 描述
 
-作者很懒，什么也没有说
+随机获取一个连接到框架的机器人实例
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| ZMRobot |  |
+| ZMRobot | 机器人实例 |
 
 
 ## getAllRobot
@@ -48,19 +48,65 @@ public function getAllRobot(): ZMRobot[]
 
 ### 描述
 
-作者很懒，什么也没有说
+获取所有机器人实例
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| ZMRobot[] |  |
+| ZMRobot[] | 机器人实例们 |
+
+
+## setCallback
+
+```php
+public function setCallback(bool|Closure $callback): OneBotV11
+```
+
+### 描述
+
+设置回调或启用协程等待API回包
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| callback | bool|Closure | 是否开启协程或设置异步回调函数，如果为true，则协程等待结果，如果为false，则异步执行并不等待结果，如果为回调函数，则异步执行且调用回调 |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| OneBotV11 | 返回本身 |
+
+
+## setPrefix
+
+```php
+public function setPrefix(int $prefix): OneBotV11
+```
+
+### 描述
+
+设置API调用类型后缀
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| prefix | int | 设置后缀类型，API_NORMAL为不加后缀，API_ASYNC为异步调用，API_RATE_LIMITED为加后缀并且限制调用频率 |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| OneBotV11 | 返回本身 |
 
 
 ## sendPrivateMsg
 
 ```php
-public function sendPrivateMsg(mixed $user_id, mixed $message, bool $auto_escape): null|array|bool
+public function sendPrivateMsg(int|string $user_id, string $message, bool $auto_escape): array|bool
 ```
 
 ### 描述
@@ -71,21 +117,21 @@ public function sendPrivateMsg(mixed $user_id, mixed $message, bool $auto_escape
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| user_id | mixed |  |
-| message | mixed |  |
-| auto_escape | bool |  |
+| user_id | int|string | 用户ID |
+| message | string | 消息内容 |
+| auto_escape | bool | 是否自动转义（默认为false） |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## sendGroupMsg
 
 ```php
-public function sendGroupMsg(mixed $group_id, mixed $message, bool $auto_escape): null|array|bool
+public function sendGroupMsg(int|string $group_id, string $message, bool $auto_escape): array|bool
 ```
 
 ### 描述
@@ -96,21 +142,21 @@ public function sendGroupMsg(mixed $group_id, mixed $message, bool $auto_escape)
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| group_id | mixed |  |
-| message | mixed |  |
-| auto_escape | bool |  |
+| group_id | int|string | 群组ID |
+| message | string | 消息内容 |
+| auto_escape | bool | 是否自动转义（默认为false） |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## sendMsg
 
 ```php
-public function sendMsg(mixed $message_type, mixed $target_id, mixed $message, bool $auto_escape): null|array|bool
+public function sendMsg(string $message_type, int|string $target_id, string $message, bool $auto_escape): array|bool
 ```
 
 ### 描述
@@ -121,22 +167,22 @@ public function sendMsg(mixed $message_type, mixed $target_id, mixed $message, b
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| message_type | mixed |  |
-| target_id | mixed |  |
-| message | mixed |  |
-| auto_escape | bool |  |
+| message_type | string | 消息类型 |
+| target_id | int|string | 目标ID |
+| message | string | 消息内容 |
+| auto_escape | bool | 是否自动转义（默认为false） |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## deleteMsg
 
 ```php
-public function deleteMsg(mixed $message_id): null|array|bool
+public function deleteMsg(int|string $message_id): array|bool
 ```
 
 ### 描述
@@ -147,19 +193,19 @@ public function deleteMsg(mixed $message_id): null|array|bool
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| message_id | mixed |  |
+| message_id | int|string | 消息ID |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## getMsg
 
 ```php
-public function getMsg(mixed $message_id): null|array|bool
+public function getMsg(int|string $message_id): array|bool
 ```
 
 ### 描述
@@ -170,19 +216,19 @@ public function getMsg(mixed $message_id): null|array|bool
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| message_id | mixed |  |
+| message_id | int|string | 消息ID |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## getForwardMsg
 
 ```php
-public function getForwardMsg(mixed $id): null|array|bool
+public function getForwardMsg(int|string $id): array|bool
 ```
 
 ### 描述
@@ -193,19 +239,19 @@ public function getForwardMsg(mixed $id): null|array|bool
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| id | mixed |  |
+| id | int|string | ID |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## sendLike
 
 ```php
-public function sendLike(mixed $user_id, int $times): null|array|bool
+public function sendLike(int|string $user_id, int $times): array|bool
 ```
 
 ### 描述
@@ -216,20 +262,20 @@ public function sendLike(mixed $user_id, int $times): null|array|bool
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| user_id | mixed |  |
-| times | int |  |
+| user_id | int|string | 用户ID |
+| times | int | 时间 |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## setGroupKick
 
 ```php
-public function setGroupKick(mixed $group_id, mixed $user_id, bool $reject_add_request): null|array|bool
+public function setGroupKick(int|string $group_id, int|string $user_id, bool $reject_add_request): array|bool
 ```
 
 ### 描述
@@ -240,21 +286,21 @@ public function setGroupKick(mixed $group_id, mixed $user_id, bool $reject_add_r
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| group_id | mixed |  |
-| user_id | mixed |  |
+| group_id | int|string | 群ID |
+| user_id | int|string | 用户ID |
 | reject_add_request | bool |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## setGroupBan
 
 ```php
-public function setGroupBan(mixed $group_id, mixed $user_id, int $duration): null|array|bool
+public function setGroupBan(int|string $group_id, int|string $user_id, int $duration): array|bool
 ```
 
 ### 描述
@@ -265,21 +311,21 @@ public function setGroupBan(mixed $group_id, mixed $user_id, int $duration): nul
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| group_id | mixed |  |
-| user_id | mixed |  |
-| duration | int |  |
+| group_id | int|string | 群ID |
+| user_id | int|string | 用户ID |
+| duration | int | 禁言时长 |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## setGroupAnonymousBan
 
 ```php
-public function setGroupAnonymousBan(mixed $group_id, mixed $anonymous_or_flag, int $duration): null|array|bool
+public function setGroupAnonymousBan(int|string $group_id, array|int|string $anonymous_or_flag, int $duration): array|bool
 ```
 
 ### 描述
@@ -290,21 +336,21 @@ public function setGroupAnonymousBan(mixed $group_id, mixed $anonymous_or_flag, 
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| group_id | mixed |  |
-| anonymous_or_flag | mixed |  |
+| group_id | int|string | 群ID |
+| anonymous_or_flag | array|int|string | 匿名禁言Flag或匿名用户对象 |
 | duration | int |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## setGroupWholeBan
 
 ```php
-public function setGroupWholeBan(mixed $group_id, bool $enable): null|array|bool
+public function setGroupWholeBan(int|string $group_id, bool $enable): array|bool
 ```
 
 ### 描述
@@ -315,20 +361,20 @@ public function setGroupWholeBan(mixed $group_id, bool $enable): null|array|bool
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| group_id | mixed |  |
+| group_id | int|string | 群ID |
 | enable | bool |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## setGroupAdmin
 
 ```php
-public function setGroupAdmin(mixed $group_id, mixed $user_id, bool $enable): null|array|bool
+public function setGroupAdmin(int|string $group_id, int|string $user_id, bool $enable): array|bool
 ```
 
 ### 描述
@@ -339,21 +385,21 @@ public function setGroupAdmin(mixed $group_id, mixed $user_id, bool $enable): nu
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| group_id | mixed |  |
-| user_id | mixed |  |
+| group_id | int|string | 群ID |
+| user_id | int|string | 用户ID |
 | enable | bool |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## setGroupAnonymous
 
 ```php
-public function setGroupAnonymous(mixed $group_id, bool $enable): null|array|bool
+public function setGroupAnonymous(int|string $group_id, bool $enable): array|bool
 ```
 
 ### 描述
@@ -364,20 +410,20 @@ public function setGroupAnonymous(mixed $group_id, bool $enable): null|array|boo
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| group_id | mixed |  |
-| enable | bool |  |
+| group_id | int|string | 群ID |
+| enable | bool | 是否启用（默认为true） |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## setGroupCard
 
 ```php
-public function setGroupCard(mixed $group_id, mixed $user_id, string $card): null|array|bool
+public function setGroupCard(int|string $group_id, int|string $user_id, string $card): array|bool
 ```
 
 ### 描述
@@ -388,21 +434,21 @@ public function setGroupCard(mixed $group_id, mixed $user_id, string $card): nul
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| group_id | mixed |  |
-| user_id | mixed |  |
-| card | string |  |
+| group_id | int|string | 群ID |
+| user_id | int|string | 用户ID |
+| card | string | 名片内容（默认为空） |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## setGroupName
 
 ```php
-public function setGroupName(mixed $group_id, mixed $group_name): null|array|bool
+public function setGroupName(int|string $group_id, string $group_name): array|bool
 ```
 
 ### 描述
@@ -413,20 +459,20 @@ public function setGroupName(mixed $group_id, mixed $group_name): null|array|boo
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| group_id | mixed |  |
-| group_name | mixed |  |
+| group_id | int|string | 群ID |
+| group_name | string | 群名 |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## setGroupLeave
 
 ```php
-public function setGroupLeave(mixed $group_id, bool $is_dismiss): null|array|bool
+public function setGroupLeave(int|string $group_id, bool $is_dismiss): array|bool
 ```
 
 ### 描述
@@ -437,20 +483,20 @@ public function setGroupLeave(mixed $group_id, bool $is_dismiss): null|array|boo
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| group_id | mixed |  |
-| is_dismiss | bool |  |
+| group_id | int|string | 群ID |
+| is_dismiss | bool | 是否解散（默认为false） |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## setGroupSpecialTitle
 
 ```php
-public function setGroupSpecialTitle(mixed $group_id, mixed $user_id, string $special_title, int $duration): null|array|bool
+public function setGroupSpecialTitle(int|string $group_id, int|string $user_id, string $special_title, int $duration): array|bool
 ```
 
 ### 描述
@@ -461,22 +507,22 @@ public function setGroupSpecialTitle(mixed $group_id, mixed $user_id, string $sp
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| group_id | mixed |  |
-| user_id | mixed |  |
-| special_title | string |  |
-| duration | int |  |
+| group_id | int|string | 群ID |
+| user_id | int|string | 用户ID |
+| special_title | string | 专属头衔内容 |
+| duration | int | 持续时间（默认为-1，永久） |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## setFriendAddRequest
 
 ```php
-public function setFriendAddRequest(mixed $flag, bool $approve, string $remark): null|array|bool
+public function setFriendAddRequest(array|int|string $flag, bool $approve, string $remark): array|bool
 ```
 
 ### 描述
@@ -487,21 +533,21 @@ public function setFriendAddRequest(mixed $flag, bool $approve, string $remark):
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| flag | mixed |  |
-| approve | bool |  |
-| remark | string |  |
+| flag | array|int|string | 处理加好友请求的flag |
+| approve | bool | 是否同意（默认为true） |
+| remark | string | 设置昵称（默认不设置） |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## setGroupAddRequest
 
 ```php
-public function setGroupAddRequest(mixed $flag, mixed $sub_type, bool $approve, string $reason): null|array|bool
+public function setGroupAddRequest(array|int|string $flag, string $sub_type, bool $approve, string $reason): array|bool
 ```
 
 ### 描述
@@ -512,22 +558,22 @@ public function setGroupAddRequest(mixed $flag, mixed $sub_type, bool $approve, 
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| flag | mixed |  |
-| sub_type | mixed |  |
-| approve | bool |  |
-| reason | string |  |
+| flag | array|int|string | 处理加群请求的flag |
+| sub_type | string | 处理请求类型（包含add和invite） |
+| approve | bool | 是否同意（默认为true） |
+| reason | string | 拒绝理由（仅在拒绝时有效，默认为空） |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## getLoginInfo
 
 ```php
-public function getLoginInfo(): null|array|bool
+public function getLoginInfo(): array|bool
 ```
 
 ### 描述
@@ -538,13 +584,13 @@ public function getLoginInfo(): null|array|bool
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## getStrangerInfo
 
 ```php
-public function getStrangerInfo(mixed $user_id, bool $no_cache): null|array|bool
+public function getStrangerInfo(int|string $user_id, bool $no_cache): array|bool
 ```
 
 ### 描述
@@ -555,20 +601,20 @@ public function getStrangerInfo(mixed $user_id, bool $no_cache): null|array|bool
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| user_id | mixed |  |
-| no_cache | bool |  |
+| user_id | int|string | 用户ID |
+| no_cache | bool | 是否不使用缓存（默认为false） |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## getFriendList
 
 ```php
-public function getFriendList(): null|array|bool
+public function getFriendList(): array|bool
 ```
 
 ### 描述
@@ -579,13 +625,13 @@ public function getFriendList(): null|array|bool
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## getGroupInfo
 
 ```php
-public function getGroupInfo(mixed $group_id, bool $no_cache): null|array|bool
+public function getGroupInfo(int|string $group_id, bool $no_cache): array|bool
 ```
 
 ### 描述
@@ -596,20 +642,20 @@ public function getGroupInfo(mixed $group_id, bool $no_cache): null|array|bool
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| group_id | mixed |  |
+| group_id | int|string | 群ID |
 | no_cache | bool |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## getGroupList
 
 ```php
-public function getGroupList(): null|array|bool
+public function getGroupList(): array|bool
 ```
 
 ### 描述
@@ -620,13 +666,13 @@ public function getGroupList(): null|array|bool
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## getGroupMemberInfo
 
 ```php
-public function getGroupMemberInfo(mixed $group_id, mixed $user_id, bool $no_cache): null|array|bool
+public function getGroupMemberInfo(int|string $group_id, int|string $user_id, bool $no_cache): array|bool
 ```
 
 ### 描述
@@ -637,21 +683,21 @@ public function getGroupMemberInfo(mixed $group_id, mixed $user_id, bool $no_cac
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| group_id | mixed |  |
-| user_id | mixed |  |
+| group_id | int|string | 群ID |
+| user_id | int|string | 用户ID |
 | no_cache | bool |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## getGroupMemberList
 
 ```php
-public function getGroupMemberList(mixed $group_id): null|array|bool
+public function getGroupMemberList(int|string $group_id): array|bool
 ```
 
 ### 描述
@@ -662,19 +708,19 @@ public function getGroupMemberList(mixed $group_id): null|array|bool
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| group_id | mixed |  |
+| group_id | int|string | 群ID |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## getGroupHonorInfo
 
 ```php
-public function getGroupHonorInfo(mixed $group_id, mixed $type): null|array|bool
+public function getGroupHonorInfo(int|string $group_id, string $type): array|bool
 ```
 
 ### 描述
@@ -685,20 +731,20 @@ public function getGroupHonorInfo(mixed $group_id, mixed $type): null|array|bool
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| group_id | mixed |  |
-| type | mixed |  |
+| group_id | int|string | 群ID |
+| type | string | 荣誉类型 |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## getCsrfToken
 
 ```php
-public function getCsrfToken(): null|array|bool
+public function getCsrfToken(): array|bool
 ```
 
 ### 描述
@@ -709,13 +755,13 @@ public function getCsrfToken(): null|array|bool
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## getCredentials
 
 ```php
-public function getCredentials(string $domain): null|array|bool
+public function getCredentials(string $domain): array|bool
 ```
 
 ### 描述
@@ -732,13 +778,13 @@ public function getCredentials(string $domain): null|array|bool
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## getRecord
 
 ```php
-public function getRecord(mixed $file, mixed $out_format): null|array|bool
+public function getRecord(string $file, string $out_format): array|bool
 ```
 
 ### 描述
@@ -749,20 +795,20 @@ public function getRecord(mixed $file, mixed $out_format): null|array|bool
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| file | mixed |  |
-| out_format | mixed |  |
+| file | string | 文件 |
+| out_format | string | 输出格式 |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## getImage
 
 ```php
-public function getImage(mixed $file): null|array|bool
+public function getImage(string $file): array|bool
 ```
 
 ### 描述
@@ -773,19 +819,19 @@ public function getImage(mixed $file): null|array|bool
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| file | mixed |  |
+| file | string | 文件 |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## canSendImage
 
 ```php
-public function canSendImage(): null|array|bool
+public function canSendImage(): array|bool
 ```
 
 ### 描述
@@ -796,13 +842,13 @@ public function canSendImage(): null|array|bool
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## canSendRecord
 
 ```php
-public function canSendRecord(): null|array|bool
+public function canSendRecord(): array|bool
 ```
 
 ### 描述
@@ -813,13 +859,13 @@ public function canSendRecord(): null|array|bool
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## getStatus
 
 ```php
-public function getStatus(): null|array|bool
+public function getStatus(): array|bool
 ```
 
 ### 描述
@@ -830,13 +876,13 @@ public function getStatus(): null|array|bool
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## getVersionInfo
 
 ```php
-public function getVersionInfo(): null|array|bool
+public function getVersionInfo(): array|bool
 ```
 
 ### 描述
@@ -847,13 +893,13 @@ public function getVersionInfo(): null|array|bool
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## setRestart
 
 ```php
-public function setRestart(int $delay): null|array|bool
+public function setRestart(int $delay): array|bool
 ```
 
 ### 描述
@@ -864,19 +910,19 @@ public function setRestart(int $delay): null|array|bool
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| delay | int |  |
+| delay | int | 延迟时间（毫秒，默认为0） |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## cleanCache
 
 ```php
-public function cleanCache(): null|array|bool
+public function cleanCache(): array|bool
 ```
 
 ### 描述
@@ -887,7 +933,7 @@ public function cleanCache(): null|array|bool
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| null|array|bool |  |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |
 
 
 ## getExtendedAPI
@@ -911,4 +957,28 @@ public function getExtendedAPI(string $package_name): mixed
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| mixed |  |
+| mixed | 返回包的操作对象 |
+
+
+## callExtendedAPI
+
+```php
+public function callExtendedAPI(string $action, array $params): array|bool
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| action | string | 动作（API）名称 |
+| params | array | 参数 |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| array|bool | 返回API调用结果（数组）或异步API调用状态（bool） |

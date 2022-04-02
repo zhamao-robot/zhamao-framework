@@ -43,7 +43,7 @@ public function signalManager(): mixed
 ## signalWorker
 
 ```php
-public function signalWorker(mixed $worker_id, Swoole\Server $server): mixed
+public function signalWorker(int $worker_id, Swoole\Server $server): mixed
 ```
 
 ### 描述
@@ -54,7 +54,7 @@ public function signalWorker(mixed $worker_id, Swoole\Server $server): mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| worker_id | mixed |  |
+| worker_id | int | 当前进程的ID |
 | server | Swoole\Server |  |
 
 ### 返回

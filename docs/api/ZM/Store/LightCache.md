@@ -3,7 +3,7 @@
 ## init
 
 ```php
-public function init(mixed $config): bool|mixed
+public function init(array $config): bool|mixed
 ```
 
 ### 描述
@@ -14,13 +14,13 @@ public function init(mixed $config): bool|mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| config | mixed |  |
+| config | array | 配置 |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| bool|mixed |  |
+| bool|mixed | 返回失败（false）或创建SwooleTable成功结果 |
 
 
 ## get

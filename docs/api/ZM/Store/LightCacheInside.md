@@ -27,7 +27,7 @@ public function get(string $table, string $key): null|mixed
 ## set
 
 ```php
-public function set(array|int|string $value, string $table, string $key): mixed
+public function set(array|int|string $value, string $table, string $key): bool
 ```
 
 ### 描述
@@ -46,13 +46,13 @@ public function set(array|int|string $value, string $table, string $key): mixed
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| mixed |  |
+| bool |  |
 
 
 ## createTable
 
 ```php
-public function createTable(mixed $name, mixed $size, mixed $str_size, int $conflict_proportion): mixed
+public function createTable(float|int $conflict_proportion, string $name, int $size, int $str_size): mixed
 ```
 
 ### 描述
@@ -63,10 +63,10 @@ public function createTable(mixed $name, mixed $size, mixed $str_size, int $conf
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| name | mixed |  |
-| size | mixed |  |
-| str_size | mixed |  |
-| conflict_proportion | int |  |
+| conflict_proportion | float|int |  |
+| name | string |  |
+| size | int |  |
+| str_size | int |  |
 
 ### 返回
 

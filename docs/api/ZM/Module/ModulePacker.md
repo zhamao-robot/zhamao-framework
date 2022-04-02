@@ -26,7 +26,7 @@ public function __construct(array $module): mixed
 ## setOutputPath
 
 ```php
-public function setOutputPath(mixed $path): mixed
+public function setOutputPath(string $path): mixed
 ```
 
 ### 描述
@@ -37,7 +37,7 @@ public function setOutputPath(mixed $path): mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| path | mixed |  |
+| path | string | 输出路径 |
 
 ### 返回
 
