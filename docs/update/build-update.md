@@ -4,6 +4,19 @@
 
 同时此处将只使用 build 版本号进行区分。
 
+## build 460 (2022-4-3)
+
+- 优化代码到 phpstan-level-4
+
+## build 459 (2022-4-3)
+
+- 优化代码到 phpstan-level-2
+
+## build 458 (2022-4-3)
+
+- 优化代码到 phpstan-level-1
+- 优化 `module:xxx` 类命令的有关实现代码
+
 ## build 457 (2022-4-2)
 
 - 新增和优化测试用例（具体见文件）
