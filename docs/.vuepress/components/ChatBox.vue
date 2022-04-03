@@ -4,7 +4,7 @@
     <div v-for="i in chat" v-bind="i">
       <div class="doc-chat-row" v-if="i.type === 0">
         <div class="doc-chat-box">{{ i.content }}</div>
-        <img class="doc-chat-avatar" src="http://api.btstu.cn/sjtx/api.php"  alt=""/>
+        <img class="doc-chat-avatar" src="https://api.btstu.cn/sjtx/api.php"  alt=""/>
       </div>
       <div class="doc-chat-row doc-chat-row-robot" v-else-if="i.type === 1">
         <img class="doc-chat-avatar" src="https://docs-v1.zhamao.xin/logo.png" alt=""/>
