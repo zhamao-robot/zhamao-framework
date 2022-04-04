@@ -12,12 +12,15 @@ use ZM\Annotation\Http\RequestMapping;
 use ZM\Annotation\Swoole\OnCloseEvent;
 use ZM\Annotation\Swoole\OnOpenEvent;
 use ZM\Annotation\Swoole\OnRequestEvent;
+use ZM\Annotation\Swoole\OnStart;
 use ZM\API\CQ;
 use ZM\API\OneBotV11;
 use ZM\API\TuringAPI;
 use ZM\Config\ZMConfig;
 use ZM\ConnectionManager\ConnectionObject;
 use ZM\Console\Console;
+use ZM\Container\WorkerContainer;
+use ZM\Context\ContextInterface;
 use ZM\Event\EventDispatcher;
 use ZM\Exception\InterruptException;
 use ZM\Module\QQBot;
@@ -243,5 +246,32 @@ class Hello
     public function proxy()
     {
         bot()->all()->allGroups()->sendGroupMsg(0, ctx()->getMessage());
+    }
+
+    /*
+     * @OnStart(-1)
+     */
+    #[OnStart(-1)]
+    public function initContainer()
+    {
+        $worker_container = new WorkerContainer();
+        $worker_container->bindIf('echo', function ($container, $parameters) {
+            return 'Hello, ' . $parameters[0];
+        });
+        container()->bind(ContextInterface::class, function () {
+            return ctx();
+        });
+    }
+
+    /**
+     * 容器呐
+     *
+     * @CQCommand("container")
+     */
+    #[CQCommand('container')]
+    public function container(): string
+    {
+        resolve(ContextInterface::class)->reply('Good'); // ctx()->reply('good')
+        return resolve('echo', ['hello']); // Hello, hello
     }
 }
