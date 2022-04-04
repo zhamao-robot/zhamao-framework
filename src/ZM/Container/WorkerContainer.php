@@ -210,10 +210,11 @@ class WorkerContainer implements ContainerInterface
     /**
      * 获取一个绑定的实例
      *
+     * @template T
      * @param  string                   $abstract   类或接口名
      * @param  array                    $parameters 参数
      * @throws EntryResolutionException
-     * @return mixed                    实例
+     * @return T                        实例
      */
     public function make(string $abstract, array $parameters = [])
     {

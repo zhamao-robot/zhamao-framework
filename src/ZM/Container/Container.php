@@ -13,12 +13,9 @@ class Container extends WorkerContainer
      */
     protected $parent;
 
-    /**
-     * @param ContainerInterface $parent 父容器
-     */
-    public function __construct(ContainerInterface $parent)
+    public function __construct()
     {
-        $this->parent = $parent;
+        $this->parent = WorkerContainer::getInstance();
     }
 
     /**
@@ -46,10 +43,11 @@ class Container extends WorkerContainer
     /**
      * 获取一个绑定的实例
      *
+     * @template T
      * @param  string                   $abstract   类或接口名
      * @param  array                    $parameters 参数
      * @throws EntryResolutionException
-     * @return mixed                    实例
+     * @return T                        实例
      */
     public function make(string $abstract, array $parameters = [])
     {

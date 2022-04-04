@@ -655,7 +655,9 @@ function container(): ContainerInterface
 /**
  * 解析类实例（使用容器）
  *
- * @return mixed
+ * @template T
+ * @param  string<T> $abstract
+ * @return T
  */
 function resolve(string $abstract, array $parameters = [])
 {
@@ -665,8 +667,9 @@ function resolve(string $abstract, array $parameters = [])
 /**
  * 获取容器实例
  *
- * @param  null|string              $abstract 类或接口名，不传入则返回容器实例
- * @return ContainerInterface|mixed
+ * @template T
+ * @param  null|string<T>       $abstract
+ * @return ContainerInterface|T
  */
 function app(string $abstract = null, array $parameters = [])
 {
