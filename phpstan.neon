@@ -7,5 +7,6 @@ parameters:
     - '#Used constant OS_TYPE_(LINUX|WINDOWS) not found#'
     - '#Constant .* not found#'
     - '#PHPDoc tag @throws with type Psr\\Container\\ContainerExceptionInterface is not subtype of Throwable#'
+    - '#Unsafe usage of new static#'
   dynamicConstantNames:
     - SWOOLE_VERSION
