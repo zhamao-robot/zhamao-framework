@@ -656,8 +656,8 @@ function container(): ContainerInterface
  * 解析类实例（使用容器）
  *
  * @template T
- * @param  string<T> $abstract
- * @return T
+ * @param  class-string<T> $abstract
+ * @return Closure|mixed|T
  */
 function resolve(string $abstract, array $parameters = [])
 {
@@ -668,8 +668,8 @@ function resolve(string $abstract, array $parameters = [])
  * 获取容器实例
  *
  * @template T
- * @param  null|string<T>       $abstract
- * @return ContainerInterface|T
+ * @param  null|class-string<T>               $abstract
+ * @return Closure|ContainerInterface|mixed|T
  */
 function app(string $abstract = null, array $parameters = [])
 {

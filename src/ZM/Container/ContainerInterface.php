@@ -92,9 +92,9 @@ interface ContainerInterface extends PsrContainerInterface
      * 获取一个绑定的实例
      *
      * @template T
-     * @param  string $abstract   类或接口名
-     * @param  array  $parameters 参数
-     * @return T      实例
+     * @param  class-string<T> $abstract   类或接口名
+     * @param  array           $parameters 参数
+     * @return Closure|mixed|T 实例
      */
     public function make(string $abstract, array $parameters = []);
 
