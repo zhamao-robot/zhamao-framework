@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace ZM\Container;
 
-use ReflectionException;
-
 class Container extends WorkerContainer
 {
     /**
@@ -51,7 +49,6 @@ class Container extends WorkerContainer
      * @param  string                   $abstract   类或接口名
      * @param  array                    $parameters 参数
      * @throws EntryResolutionException
-     * @throws ReflectionException
      * @return mixed                    实例
      */
     public function make(string $abstract, array $parameters = [])

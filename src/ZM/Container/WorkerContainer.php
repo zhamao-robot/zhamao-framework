@@ -13,9 +13,12 @@ use ReflectionClass;
 use ReflectionException;
 use ReflectionNamedType;
 use ReflectionParameter;
+use ZM\Utils\SingletonTrait;
 
 class WorkerContainer implements ContainerInterface
 {
+    use SingletonTrait;
+
     /**
      * @var array
      */
@@ -210,7 +213,6 @@ class WorkerContainer implements ContainerInterface
      * @param  string                   $abstract   类或接口名
      * @param  array                    $parameters 参数
      * @throws EntryResolutionException
-     * @throws ReflectionException
      * @return mixed                    实例
      */
     public function make(string $abstract, array $parameters = [])
@@ -260,7 +262,6 @@ class WorkerContainer implements ContainerInterface
      *
      * @param  Closure|string           $concrete 类名或对应的闭包
      * @throws EntryResolutionException
-     * @throws ReflectionException
      * @return mixed
      */
     public function build($concrete)
@@ -293,7 +294,12 @@ class WorkerContainer implements ContainerInterface
         $dependencies = $constructor->getParameters();
 
         // 获取所有依赖的实例
-        $instances = $this->resolveDependencies($dependencies);
+        try {
+            $instances = $this->resolveDependencies($dependencies);
+        } catch (EntryResolutionException $e) {
+            array_pop($this->buildStack);
+            throw $e;
+        }
 
         array_pop($this->buildStack);
 
@@ -448,7 +454,6 @@ class WorkerContainer implements ContainerInterface
      *
      * @param  ReflectionParameter[]    $dependencies
      * @throws EntryResolutionException
-     * @throws ReflectionException
      */
     protected function resolveDependencies(array $dependencies): array
     {
@@ -566,7 +571,6 @@ class WorkerContainer implements ContainerInterface
      * 解析类
      *
      * @throws EntryResolutionException 如果无法解析类，则抛出异常
-     * @throws ReflectionException      实际上不会抛出，请无视
      * @return mixed
      */
     protected function resolveClass(ReflectionParameter $parameter)
@@ -576,8 +580,14 @@ class WorkerContainer implements ContainerInterface
             return $this->make($parameter->getClass()->name);
         } catch (EntryResolutionException $e) {
             // 如果参数是可选的，则返回默认值
-            if ($parameter->isOptional()) {
+            if ($parameter->isDefaultValueAvailable()) {
+                array_pop($this->with);
                 return $parameter->getDefaultValue();
+            }
+
+            if ($parameter->isVariadic()) {
+                array_pop($this->with);
+                return [];
             }
 
             throw $e;

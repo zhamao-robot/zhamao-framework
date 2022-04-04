@@ -13,6 +13,8 @@ use ZM\API\ZMRobot;
 use ZM\Config\ZMConfig;
 use ZM\ConnectionManager\ManagerGM;
 use ZM\Console\Console;
+use ZM\Container\Container;
+use ZM\Container\ContainerInterface;
 use ZM\Context\Context;
 use ZM\Context\ContextInterface;
 use ZM\Event\EventManager;
@@ -40,6 +42,7 @@ function get_class_path(string $class_name): ?string
 
 /**
  * 检查炸毛框架运行的环境
+ *
  * @internal
  */
 function _zm_env_check()
@@ -416,6 +419,7 @@ function server(): Server
 
 /**
  * 获取缓存当前框架pid的临时目录
+ *
  * @internal
  */
 function _zm_pid_dir(): string
@@ -433,6 +437,7 @@ function _zm_pid_dir(): string
  * 随机返回一个 ZMRobot 实例，效果等同于 {@link ZMRobot::getRandom()}。
  *
  * 在单机器人模式下，会直接返回该机器人实例。
+ *
  * @throws RobotNotFoundException
  */
 function bot(): ZMRobot
@@ -627,6 +632,7 @@ function zm_internal_errcode($code): string
 }
 
 /**
+<<<<<<< HEAD
  * 将可能为数组的参数转换为字符串
  *
  * 如传入字符串则为原样返回
@@ -636,6 +642,39 @@ function zm_internal_errcode($code): string
 function implode_when_necessary($string_or_array): string
 {
     return is_array($string_or_array) ? implode(', ', $string_or_array) : $string_or_array;
+}
+
+/**
+ * 获取容器（请求级）实例
+ */
+function container(): ContainerInterface
+{
+    return Container::getInstance();
+}
+
+/**
+ * 解析类实例（使用容器）
+ *
+ * @return mixed
+ */
+function resolve(string $abstract, array $parameters = [])
+{
+    return Container::getInstance()->make($abstract, $parameters);
+}
+
+/**
+ * 获取容器实例
+ *
+ * @param  null|string              $abstract 类或接口名，不传入则返回容器实例
+ * @return ContainerInterface|mixed
+ */
+function app(string $abstract = null, array $parameters = [])
+{
+    if (is_null($abstract)) {
+        return container();
+    }
+
+    return resolve($abstract, $parameters);
 }
 
 /**
