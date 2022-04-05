@@ -705,6 +705,25 @@ if (!function_exists('chain')) {
     }
 }
 
+if (!function_exists('stopwatch')) {
+    /**
+     * 执行回调函数并返回平均执行耗时
+     *
+     * @param  int   $times 执行次数
+     * @return float 平均执行耗时
+     */
+    function stopwatch(callable $callback, int $times = 1): float
+    {
+        $total = 0;
+        for ($i = 0; $i < $times; ++$i) {
+            $start = microtime(true);
+            $callback();
+            $total += microtime(true) - $start;
+        }
+        return $total / $times;
+    }
+}
+
 /**
  * 以下为废弃的函数，将于未来移除
  */
