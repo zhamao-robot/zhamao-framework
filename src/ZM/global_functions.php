@@ -241,8 +241,6 @@ function set_coroutine_params(array $params): void
 
 /**
  * 获取当前上下文
- *
- * @throws ZMKnownException
  */
 function context(): ContextInterface
 {
@@ -251,8 +249,6 @@ function context(): ContextInterface
 
 /**
  * 获取当前上下文
- *
- * @throws ZMKnownException
  */
 function ctx(): ContextInterface
 {
