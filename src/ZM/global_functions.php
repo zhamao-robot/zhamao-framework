@@ -40,6 +40,7 @@ function get_class_path(string $class_name): ?string
 
 /**
  * 检查炸毛框架运行的环境
+ *
  * @internal
  */
 function _zm_env_check()
@@ -416,6 +417,7 @@ function server(): Server
 
 /**
  * 获取缓存当前框架pid的临时目录
+ *
  * @internal
  */
 function _zm_pid_dir(): string
@@ -433,6 +435,7 @@ function _zm_pid_dir(): string
  * 随机返回一个 ZMRobot 实例，效果等同于 {@link ZMRobot::getRandom()}。
  *
  * 在单机器人模式下，会直接返回该机器人实例。
+ *
  * @throws RobotNotFoundException
  */
 function bot(): ZMRobot
@@ -624,6 +627,82 @@ function quick_reply_closure($reply): Closure
 function zm_internal_errcode($code): string
 {
     return "[ErrCode:{$code}] ";
+}
+
+if (!function_exists('chain')) {
+    define('CARRY', '{carry}');
+
+    /**
+     * 链式调用对象方法
+     *
+     * 如需使用上一步的返回值作为参数，请使用 CARRY 常量替换对应的参数值
+     *
+     * @param  object $object 需要进行链式调用的对象
+     * @return object 链式操作对象，可当成传入的对象使用
+     */
+    function chain(object $object): object
+    {
+        return new class($object) {
+            /**
+             * 最后一次执行的方法的返回值
+             *
+             * @var mixed
+             */
+            protected $return;
+
+            /**
+             * 需要进行链式调用的对象
+             *
+             * @var object
+             */
+            protected $wrapped;
+
+            /**
+             * 构造链式调用匿名类
+             */
+            public function __construct(object $object)
+            {
+                $this->wrapped = $object;
+            }
+
+            /**
+             * 代理所有调用
+             */
+            public function __call(string $name, array $arguments)
+            {
+                if (($index = array_search(CARRY, $arguments, true)) !== false) {
+                    $arguments[$index] = $this->return;
+                }
+                $this->return = $this->wrapped->{$name}(...$arguments);
+                return $this;
+            }
+
+            /**
+             * 返回最后执行结果
+             */
+            public function __toString()
+            {
+                return (string) $this->return;
+            }
+
+            /**
+             * 允许调用最后返回结果
+             */
+            public function __invoke()
+            {
+                return $this->return;
+            }
+
+            /**
+             * 使用链式操作对象作为参数，执行回调
+             */
+            public function tap(callable $callback): self
+            {
+                $callback($this->wrapped);
+                return $this;
+            }
+        };
+    }
 }
 
 /**
