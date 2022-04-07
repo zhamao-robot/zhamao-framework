@@ -101,9 +101,10 @@ interface ContainerInterface extends PsrContainerInterface
     /**
      * 调用对应的方法，并自动注入依赖
      *
-     * @param  callable $callback   对应的方法
-     * @param  array    $parameters 参数
+     * @param  callable    $callback       对应的方法
+     * @param  array       $parameters     参数
+     * @param  null|string $default_method 默认方法
      * @return mixed
      */
-    public function call(callable $callback, array $parameters = []);
+    public function call(callable $callback, array $parameters = [], string $default_method = null);
 }

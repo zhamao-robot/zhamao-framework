@@ -13,6 +13,7 @@ use ReflectionClass;
 use ReflectionException;
 use ReflectionNamedType;
 use ReflectionParameter;
+use ZM\Utils\ReflectionUtil;
 use ZM\Utils\SingletonTrait;
 
 class WorkerContainer implements ContainerInterface
@@ -310,13 +311,14 @@ class WorkerContainer implements ContainerInterface
     /**
      * 调用对应的方法，并自动注入依赖
      *
-     * @param  callable $callback   对应的方法
-     * @param  array    $parameters 参数
+     * @param  callable|string $callback       对应的方法
+     * @param  array           $parameters     参数
+     * @param  null|string     $default_method 默认方法
      * @return mixed
      */
-    public function call(callable $callback, array $parameters = [])
+    public function call($callback, array $parameters = [], string $default_method = null)
     {
-        // TODO: Implement call() method.
+        return BoundMethod::call($this, $callback, $parameters, $default_method);
     }
 
     /**
@@ -474,26 +476,8 @@ class WorkerContainer implements ContainerInterface
                 continue;
             }
 
-            // 获取参数类型
-            $type = $dependency->getType();
-            // 没有声明类型或为基本类型
-            if (!$type instanceof ReflectionNamedType || $type->isBuiltin()) {
-                $class_name = null;
-            } else {
-                // 获取类名
-                $class_name = $type->getName();
-                // 如果存在父类
-                if (!is_null($class = $dependency->getDeclaringClass())) {
-                    if ($class_name === 'self') {
-                        $class_name = $class->getName();
-                    } elseif ($class_name === 'parent') {
-                        $class_name = $class->getParentClass()->getName();
-                    }
-                }
-            }
-
             // 如果类名为空，则代表此依赖是基本类型，且无法对其进行依赖解析
-            $results[] = is_null($class_name)
+            $results[] = is_null(ReflectionUtil::getParameterClassName($dependency))
                 ? $this->resolvePrimitive($dependency)
                 : $this->resolveClass($dependency);
         }
