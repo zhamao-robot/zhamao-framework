@@ -97,7 +97,7 @@ class Framework
         $this->registerBaseBindings();
 
         // 初始化配置
-        ZMConfig::setDirectory($this->container->get('path.config'));
+        ZMConfig::setDirectory(app('path.config'));
         ZMConfig::setEnv($args['env'] ?? '');
         if (ZMConfig::get('global') === false) {
             echo zm_internal_errcode('E00007') . 'Global config load failed: ' . ZMConfig::$last_error . "\nError path: " . DataProvider::getSourceRootDir() . "\nPlease init first!\nSee: https://github.com/zhamao-robot/zhamao-framework/issues/37\n";
@@ -624,7 +624,9 @@ class Framework
         $this->container->instance('path.source', DataProvider::getSourceRootDir());
         $this->container->alias('path.source', 'path.base');
         $this->container->instance('path.config', DataProvider::getSourceRootDir() . '/config');
-        $this->container->instance('path.module_config', ZMConfig::get('global', 'config_dir'));
+        $this->container->singleton('path.module_config', function () {
+            return ZMConfig::get('global', 'config_dir');
+        });
         $this->container->singleton('path.data', function () {
             return DataProvider::getDataFolder();
         });
