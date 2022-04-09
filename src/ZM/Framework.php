@@ -109,7 +109,7 @@ class Framework
 
         // 确保目录存在
         DataProvider::createIfNotExists(app('path.data'));
-        DataProvider::createIfNotExists(app('path.config'));
+        DataProvider::createIfNotExists(app('path.module_config'));
         DataProvider::createIfNotExists(ZMConfig::get('global', 'crash_dir'));
 
         // 初始化连接池？
@@ -624,6 +624,7 @@ class Framework
         $this->container->instance('path.source', DataProvider::getSourceRootDir());
         $this->container->alias('path.source', 'path.base');
         $this->container->instance('path.config', DataProvider::getSourceRootDir() . '/config');
+        $this->container->instance('path.module_config', ZMConfig::get('global', 'config_dir'));
         $this->container->singleton('path.data', function () {
             return DataProvider::getDataFolder();
         });
