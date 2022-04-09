@@ -7,6 +7,7 @@ namespace ZM\Utils;
 
 use Iterator;
 use JsonSerializable;
+use RuntimeException;
 use Traversable;
 use ZM\Config\ZMConfig;
 use ZM\Console\Console;
@@ -25,6 +26,7 @@ class DataProvider
 
     /**
      * 返回工作目录，不带最右边文件夹的斜杠（/）
+     *
      * @return false|string
      */
     public static function getWorkingDir()
@@ -34,6 +36,7 @@ class DataProvider
 
     /**
      * 获取框架所在根目录
+     *
      * @return false|string
      */
     public static function getFrameworkRootDir()
@@ -43,6 +46,7 @@ class DataProvider
 
     /**
      * 获取源码根目录，除Phar模式外均与工作目录相同
+     *
      * @return false|string
      */
     public static function getSourceRootDir()
@@ -52,6 +56,7 @@ class DataProvider
 
     /**
      * 获取框架反代链接
+     *
      * @return null|array|false|mixed
      */
     public static function getFrameworkLink()
@@ -61,6 +66,7 @@ class DataProvider
 
     /**
      * 获取zm_data数据目录，如果二级目录不为空，则自动创建目录并返回
+     *
      * @return null|array|false|mixed|string
      */
     public static function getDataFolder(string $second = '')
@@ -79,6 +85,7 @@ class DataProvider
 
     /**
      * 将变量保存在zm_data下的数据目录，传入数组
+     *
      * @param  string                                                 $filename   文件名
      * @param  array|int|Iterator|JsonSerializable|string|Traversable $file_array 文件内容数组
      * @return false|int                                              返回文件大小或false
@@ -104,6 +111,7 @@ class DataProvider
 
     /**
      * 从json加载变量到内存
+     *
      * @param  string     $filename 文件名
      * @return null|mixed 返回文件内容数据或null
      */
@@ -118,6 +126,7 @@ class DataProvider
 
     /**
      * 递归或非递归扫描目录，可返回相对目录的文件列表或绝对目录的文件列表
+     *
      * @param  string      $dir       目录
      * @param  bool        $recursive 是否递归扫描子目录
      * @param  bool|string $relative  是否返回相对目录，如果为true则返回相对目录，如果为false则返回绝对目录
@@ -161,6 +170,7 @@ class DataProvider
 
     /**
      * 检查路径是否为相对路径（根据第一个字符是否为"/"来判断）
+     *
      * @param  string $path 路径
      * @return bool   返回结果
      * @since 2.5
@@ -168,5 +178,17 @@ class DataProvider
     public static function isRelativePath(string $path): bool
     {
         return strlen($path) > 0 && $path[0] !== '/';
+    }
+
+    /**
+     * 创建目录（如果不存在）
+     *
+     * @param string $path 目录路径
+     */
+    public static function createIfNotExists(string $path): void
+    {
+        if (!is_dir($path) && !mkdir($path, 0777, true) && !is_dir($path)) {
+            throw new RuntimeException(sprintf('无法建立目录：%s', $path));
+        }
     }
 }

@@ -5,15 +5,18 @@ declare(strict_types=1);
 namespace ZM\Event\SwooleEvent;
 
 use Swoole\Coroutine;
+use Swoole\Http\Server;
 use Swoole\WebSocket\Frame;
 use Throwable;
 use ZM\Annotation\Swoole\OnMessageEvent;
 use ZM\Annotation\Swoole\OnSwooleEvent;
 use ZM\Annotation\Swoole\SwooleHandler;
+use ZM\ConnectionManager\ConnectionObject;
 use ZM\ConnectionManager\ManagerGM;
 use ZM\Console\Console;
 use ZM\Console\TermColor;
 use ZM\Context\Context;
+use ZM\Context\ContextInterface;
 use ZM\Event\EventDispatcher;
 use ZM\Event\SwooleEvent;
 
@@ -29,6 +32,15 @@ class OnMessage implements SwooleEvent
         unset(Context::$context[Coroutine::getCid()]);
         $conn = ManagerGM::get($frame->fd);
         set_coroutine_params(['server' => $server, 'frame' => $frame, 'connection' => $conn]);
+
+        container()->instance(Server::class, $server);
+        container()->instance(Frame::class, $frame);
+        container()->instance(ConnectionObject::class, $conn);
+        container()->bind(ContextInterface::class, function () {
+            return ctx();
+        });
+        container()->alias(ContextInterface::class, Context::class);
+
         $dispatcher1 = new EventDispatcher(OnMessageEvent::class);
         $dispatcher1->setRuleFunction(function ($v) use ($conn) {
             return $v->connect_type === $conn->getName() && ($v->getRule() === '' || eval('return ' . $v->getRule() . ';'));
@@ -56,6 +68,11 @@ class OnMessage implements SwooleEvent
             $error_msg = $e->getMessage() . ' at ' . $e->getFile() . '(' . $e->getLine() . ')';
             Console::error(zm_internal_errcode('E00017') . 'Uncaught ' . get_class($e) . ' when calling "message": ' . $error_msg);
             Console::trace();
+        } finally {
+            container()->flush();
+            if (Console::getLevel() >= 4) {
+                Console::debug(sprintf('Request container [fd=%d, cid=%d] flushed.', $frame->fd, Coroutine::getCid()));
+            }
         }
     }
 }

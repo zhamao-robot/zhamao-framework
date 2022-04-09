@@ -223,7 +223,7 @@ function get_annotations(): array
  */
 function set_coroutine_params(array $params): void
 {
-    $cid = Co::getCid();
+    $cid = co::getCid();
     if ($cid === -1) {
         exit(zm_internal_errcode('E00061') . 'Cannot set coroutine params at none coroutine mode.');
     }
@@ -233,7 +233,7 @@ function set_coroutine_params(array $params): void
         Context::$context[$cid] = $params;
     }
     foreach (Context::$context as $c => $v) {
-        if (!Co::exists($c)) {
+        if (!co::exists($c)) {
             unset(Context::$context[$c], ZMBuf::$context_class[$c]);
         }
     }
@@ -252,13 +252,13 @@ function context(): ContextInterface
  */
 function ctx(): ContextInterface
 {
-    $cid = Co::getCid();
+    $cid = co::getCid();
     $c_class = ZMConfig::get('global', 'context_class');
     if (isset(Context::$context[$cid])) {
         return ZMBuf::$context_class[$cid] ?? (ZMBuf::$context_class[$cid] = new $c_class($cid));
     }
     Console::debug("未找到当前协程的上下文({$cid})，正在找父进程的上下文");
-    while (($parent_cid = Co::getPcid($cid)) !== -1) {
+    while (($parent_cid = co::getPcid($cid)) !== -1) {
         $cid = $parent_cid;
         if (isset(Context::$context[$cid])) {
             return ZMBuf::$context_class[$cid] ?? (ZMBuf::$context_class[$cid] = new $c_class($cid));
@@ -320,7 +320,7 @@ function zm_exec(string $command): array
  */
 function zm_cid(): int
 {
-    return Co::getCid();
+    return co::getCid();
 }
 
 /**
@@ -330,7 +330,7 @@ function zm_cid(): int
  */
 function zm_yield()
 {
-    Co::yield();
+    co::yield();
 }
 
 /**
@@ -340,7 +340,7 @@ function zm_yield()
  */
 function zm_resume(int $cid)
 {
-    Co::resume($cid);
+    co::resume($cid);
 }
 
 /**

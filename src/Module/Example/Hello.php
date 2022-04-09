@@ -27,6 +27,7 @@ use ZM\Utils\ZMUtil;
 
 /**
  * Class Hello
+ *
  * @since 2.0
  */
 class Hello
@@ -68,6 +69,7 @@ class Hello
      */
     public function hello()
     {
+        zm_dump(resolve('swoole_server')->worker_id);
         return '你好啊，我是由炸毛框架构建的机器人！';
     }
 
@@ -134,10 +136,12 @@ class Hello
      * 问法2：从1到20的随机数
      * @CQCommand("随机数")
      * @CQCommand(pattern="*从*到*的随机数")
+     *
      * @return string
      */
     public function randNum()
     {
+        zm_dump(resolve('swoole_server')->worker_id);
         // 获取第一个数字类型的参数
         $num1 = ctx()->getNumArg('请输入第一个数字');
         // 获取第二个数字类型的参数
@@ -171,6 +175,7 @@ class Hello
     /**
      * 使用自定义参数的路由参数
      * @RequestMapping("/whoami/{name}")
+     *
      * @param  array  $param 参数
      * @return string 返回的 HTML Body
      */
@@ -182,11 +187,18 @@ class Hello
     /**
      * 在机器人连接后向终端输出信息
      * @OnOpenEvent("qq")
+     *
      * @param ConnectionObject $conn WebSocket 连接对象
      */
     public function onConnect(ConnectionObject $conn)
     {
+        zm_dump(resolve('path.base'));
+        zm_dump(resolve('path.config'));
+        zm_dump(resolve('app')::$server->worker_id);
         Console::info('机器人 ' . $conn->getOption('connect_id') . ' 已连接！');
+        container()->bind('cid', function () use ($conn) {
+            return resolve('app')::$server->worker_id . $conn->getOption('connect_id');
+        });
     }
 
     /**
@@ -195,12 +207,14 @@ class Hello
      */
     public function onDisconnect(ConnectionObject $conn)
     {
+        zm_dump(resolve('cid'));
         Console::info('机器人 ' . $conn->getOption('connect_id') . ' 已断开连接！');
     }
 
     /**
      * 阻止 Chrome 自动请求 /favicon.ico 导致的多条请求并发和干扰
      * @OnRequestEvent(rule="ctx()->getRequest()->server['request_uri'] == '/favicon.ico'",level=200)
+     *
      * @throws InterruptException
      */
     public function onRequest()

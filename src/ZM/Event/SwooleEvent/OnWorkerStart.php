@@ -20,6 +20,7 @@ use ZM\Annotation\Swoole\OnStart;
 use ZM\Annotation\Swoole\SwooleHandler;
 use ZM\Config\ZMConfig;
 use ZM\Console\Console;
+use ZM\Container\WorkerContainer;
 use ZM\Context\Context;
 use ZM\Context\ContextInterface;
 use ZM\DB\DB;
@@ -52,6 +53,13 @@ class OnWorkerStart implements SwooleEvent
             SignalListener::signalWorker($server, $worker_id);
         }
         unset(Context::$context[Coroutine::getCid()]);
+
+        /* @noinspection PhpExpressionResultUnusedInspection */
+        new WorkerContainer();
+        if (Console::getLevel() >= 4) {
+            Console::debug(sprintf('Worker container [id=%d,cid=%d] booted', $worker_id, Coroutine::getCid()));
+        }
+
         if ($server->taskworker === false) {
             Framework::saveProcessState(ZM_PROCESS_WORKER, $server->worker_pid, ['worker_id' => $worker_id]);
             zm_atomic('_#worker_' . $worker_id)->set($server->worker_pid);
@@ -274,7 +282,7 @@ class OnWorkerStart implements SwooleEvent
                 (new PDOConfig())
                     ->withHost($real_conf['host'])
                     ->withPort($real_conf['port'])
-                // ->withUnixSocket('/tmp/mysql.sock')
+                    // ->withUnixSocket('/tmp/mysql.sock')
                     ->withDbName($real_conf['dbname'])
                     ->withCharset($real_conf['charset'])
                     ->withUsername($real_conf['username'])
