@@ -38,6 +38,6 @@ class GlobalFunctionsTest extends TestCase
         $time = stopwatch(static function () {
             usleep(10000);
         });
-        $this->assertEquals(0.01, round($time, 2));
+        $this->assertLessThan(0.1, $time);
     }
 }
