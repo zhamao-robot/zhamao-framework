@@ -13,6 +13,7 @@ use ReflectionClass;
 use ReflectionException;
 use ReflectionNamedType;
 use ReflectionParameter;
+use ZM\Console\Console;
 use ZM\Utils\ReflectionUtil;
 use ZM\Utils\SingletonTrait;
 
@@ -96,6 +97,10 @@ class WorkerContainer implements ContainerInterface
         }
 
         self::$aliases[$alias] = $abstract;
+
+        if ($this->shouldLog()) {
+            $this->log("[{$abstract}] is aliased as [{$alias}]");
+        }
     }
 
     /**
@@ -114,12 +119,18 @@ class WorkerContainer implements ContainerInterface
             $concrete = $abstract;
         }
 
+        $concrete_name = is_string($concrete) ? $concrete : 'Closure';
+
         // 如果不是闭包，则认为是类名，此时将其包装在一个闭包中，以方便后续处理
         if (!$concrete instanceof Closure) {
             $concrete = $this->getClosure($abstract, $concrete);
         }
 
         self::$bindings[$abstract] = compact('concrete', 'shared');
+
+        if ($this->shouldLog()) {
+            $this->log("[{$abstract}] is bound to [{$concrete_name}]" . ($shared ? ' (shared)' : ''));
+        }
     }
 
     /**
@@ -179,6 +190,10 @@ class WorkerContainer implements ContainerInterface
 
         self::$instances[$abstract] = $instance;
 
+        if ($this->shouldLog()) {
+            $this->log("[{$abstract}] is bound to [{$instance}] (instance)");
+        }
+
         return $instance;
     }
 
@@ -224,11 +239,21 @@ class WorkerContainer implements ContainerInterface
         $needs_contextual_build = !empty($parameters);
 
         if (isset($this->shared[$abstract])) {
+            if ($this->shouldLog()) {
+                $this->log(sprintf(
+                    '[%s] resolved (shared)%s',
+                    $abstract,
+                    ($needs_contextual_build ? ' with ' . implode(', ', $parameters) : '')
+                ));
+            }
             return $this->shared[$abstract];
         }
 
         // 如果已经存在在实例池中（通常意味着单例绑定），则直接返回该实例
         if (isset(self::$instances[$abstract]) && !$needs_contextual_build) {
+            if ($this->shouldLog()) {
+                $this->log("[{$abstract}] resolved (instance)");
+            }
             return self::$instances[$abstract];
         }
 
@@ -251,10 +276,21 @@ class WorkerContainer implements ContainerInterface
         // 如果该类被注册为单例，则需要将其存放在实例池中，方便后续取用同一实例
         if (!$needs_contextual_build && $this->isShared($abstract)) {
             $this->shared[$abstract] = $object;
+            if ($this->shouldLog()) {
+                $this->log("[{$abstract}] added to shared pool");
+            }
         }
 
         // 弹出本次构造的覆盖参数
         array_pop($this->with);
+
+        if ($this->shouldLog()) {
+            $this->log(sprintf(
+                '[%s] resolved%s',
+                $abstract,
+                ($needs_contextual_build ? ' with ' . implode(', ', $parameters) : '')
+            ));
+        }
 
         return $object;
     }
@@ -318,6 +354,14 @@ class WorkerContainer implements ContainerInterface
      */
     public function call($callback, array $parameters = [], string $default_method = null)
     {
+        if ($this->shouldLog()) {
+            $this->log(sprintf(
+                '[%s] called%s%s',
+                $this->getCallableName($callback),
+                ($default_method ? ' defaulting' . $default_method : ''),
+                ($parameters ? ' with ' . implode(', ', $parameters) : '')
+            ));
+        }
         return BoundMethod::call($this, $callback, $parameters, $default_method);
     }
 
@@ -374,6 +418,10 @@ class WorkerContainer implements ContainerInterface
             self::$instances[$abstract] = $closure(self::$instances[$abstract], $this);
         } else {
             self::$extenders[$abstract][] = $closure;
+        }
+
+        if ($this->shouldLog()) {
+            $this->log("[{$abstract}] extended");
         }
     }
 
@@ -477,9 +525,21 @@ class WorkerContainer implements ContainerInterface
             }
 
             // 如果类名为空，则代表此依赖是基本类型，且无法对其进行依赖解析
-            $results[] = is_null(ReflectionUtil::getParameterClassName($dependency))
+            $class_name = ReflectionUtil::getParameterClassName($dependency);
+            $results[] = is_null($class_name)
                 ? $this->resolvePrimitive($dependency)
                 : $this->resolveClass($dependency);
+
+            if ($this->shouldLog()) {
+                if (is_null($class_name)) {
+                    if ($dependency->hasType()) {
+                        $class_name = $dependency->getType();
+                    } else {
+                        $class_name = 'Primitive';
+                    }
+                }
+                $this->log("Dependency [{$class_name} {$dependency->name}] resolved");
+            }
         }
 
         return $results;
@@ -615,5 +675,39 @@ class WorkerContainer implements ContainerInterface
         return isset($this->instances[$abstract])
             || (isset($this->bindings[$abstract]['shared'])
                 && $this->bindings[$abstract]['shared'] === true);
+    }
+
+    /**
+     * 获取回调的名称
+     *
+     * @param callable|string $callable 回调
+     */
+    private function getCallableName($callable): string
+    {
+        $name = is_string($callable) ? $callable : '{closure}';
+        if (is_array($callable)) {
+            if (is_object($callable[0])) {
+                $name = get_class($callable[0]) . '@' . $callable[1];
+            } else {
+                $name = $callable[0] . '::' . $callable[1];
+            }
+        }
+        return $name;
+    }
+
+    /**
+     * 判断是否输出日志
+     */
+    private function shouldLog(): bool
+    {
+        return Console::getLevel() >= 4;
+    }
+
+    /**
+     * 记录日志
+     */
+    private function log(string $message): void
+    {
+        Console::debug($message);
     }
 }
