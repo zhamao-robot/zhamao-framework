@@ -188,7 +188,9 @@ class EventDispatcher
         if (isset(EventManager::$middleware_map[$q_c][$q_f])) {
             $middlewares = EventManager::$middleware_map[$q_c][$q_f];
             if ($this->log) {
-                Console::verbose("[事件分发{$this->eid}] " . $q_c . '::' . $q_f . ' 方法还绑定了 Middleware：' . implode(', ', array_map(function ($x) { return $x->middleware; }, $middlewares)));
+                Console::verbose("[事件分发{$this->eid}] " . $q_c . '::' . $q_f . ' 方法还绑定了 Middleware：' . implode(', ', array_map(function ($x) {
+                    return $x->middleware;
+                }, $middlewares)));
             }
             $before_result = true;
             $r = [];
@@ -231,7 +233,7 @@ class EventDispatcher
                     if ($this->log) {
                         Console::verbose("[事件分发{$this->eid}] 正在执行方法 " . $q_c . '::' . $q_f . ' ...');
                     }
-                    $this->store = $q_o->{$q_f}(...$params);
+                    $this->store = container()->call([$q_o, $q_f], $params);
                 } catch (Exception $e) {
                     if ($e instanceof InterruptException) {
                         if ($this->log) {
@@ -283,7 +285,7 @@ class EventDispatcher
         if ($this->log) {
             Console::verbose("[事件分发{$this->eid}] 正在执行方法 " . $q_c . '::' . $q_f . ' ...');
         }
-        $this->store = $q_o->{$q_f}(...$params);
+        $this->store = container()->call([$q_o, $q_f], $params);
         $this->status = self::STATUS_NORMAL;
         return true;
     }
