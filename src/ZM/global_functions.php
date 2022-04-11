@@ -627,6 +627,18 @@ function zm_internal_errcode($code): string
 }
 
 /**
+ * 将可能为数组的参数转换为字符串
+ *
+ * 如传入字符串则为原样返回
+ *
+ * @param array|string $string_or_array
+ */
+function implode_when_necessary($string_or_array): string
+{
+    return is_array($string_or_array) ? implode(', ', $string_or_array) : $string_or_array;
+}
+
+/**
  * 以下为废弃的函数，将于未来移除
  */
 

@@ -27,6 +27,7 @@ use ZM\Utils\ZMUtil;
 
 /**
  * Class Hello
+ *
  * @since 2.0
  */
 class Hello
@@ -134,6 +135,7 @@ class Hello
      * 问法2：从1到20的随机数
      * @CQCommand("随机数")
      * @CQCommand(pattern="*从*到*的随机数")
+     *
      * @return string
      */
     public function randNum()
@@ -171,6 +173,7 @@ class Hello
     /**
      * 使用自定义参数的路由参数
      * @RequestMapping("/whoami/{name}")
+     *
      * @param  array  $param 参数
      * @return string 返回的 HTML Body
      */
@@ -182,6 +185,7 @@ class Hello
     /**
      * 在机器人连接后向终端输出信息
      * @OnOpenEvent("qq")
+     *
      * @param ConnectionObject $conn WebSocket 连接对象
      */
     public function onConnect(ConnectionObject $conn)
@@ -201,6 +205,7 @@ class Hello
     /**
      * 阻止 Chrome 自动请求 /favicon.ico 导致的多条请求并发和干扰
      * @OnRequestEvent(rule="ctx()->getRequest()->server['request_uri'] == '/favicon.ico'",level=200)
+     *
      * @throws InterruptException
      */
     public function onRequest()
@@ -229,5 +234,14 @@ class Hello
         $helps = MessageUtil::generateCommandHelp();
         array_unshift($helps, '帮助：');
         return implode("\n", $helps);
+    }
+
+    /**
+     * @CQCommand("proxy")
+     */
+    #[CQCommand('proxy')]
+    public function proxy()
+    {
+        bot()->all()->allGroups()->sendGroupMsg(0, ctx()->getMessage());
     }
 }
