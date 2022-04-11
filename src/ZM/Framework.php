@@ -61,11 +61,11 @@ class Framework
     public static $instant_mode = false;
 
     /**
-     * Swoole 配置
+     * Swoole 服务端配置
      *
      * @var null|array
      */
-    private $swoole_config;
+    private $swoole_server_config;
 
     /**
      * @var array
@@ -148,8 +148,8 @@ class Framework
             date_default_timezone_set($timezone);
 
             // 读取 Swoole 配置
-            $this->swoole_config = ZMConfig::get('global', 'swoole');
-            $this->swoole_config['log_level'] = SWOOLE_LOG_DEBUG;
+            $this->swoole_server_config = ZMConfig::get('global', 'swoole');
+            $this->swoole_server_config['log_level'] = SWOOLE_LOG_DEBUG;
 
             // 是否启用远程终端
             $add_port = ZMConfig::get('global', 'remote_terminal')['status'] ?? false;
@@ -163,11 +163,11 @@ class Framework
             $this->parseCliArgs(self::$argv, $add_port);
 
             // 设置默认最长等待时间
-            if (!isset($this->swoole_config['max_wait_time'])) {
-                $this->swoole_config['max_wait_time'] = 5;
+            if (!isset($this->swoole_server_config['max_wait_time'])) {
+                $this->swoole_server_config['max_wait_time'] = 5;
             }
             // 设置最大 worker 进程数
-            $worker = $this->swoole_config['worker_num'] ?? swoole_cpu_num();
+            $worker = $this->swoole_server_config['worker_num'] ?? swoole_cpu_num();
             define('ZM_WORKER_NUM', $worker);
 
             // 初始化原子计数器
@@ -177,14 +177,14 @@ class Framework
             if (!self::$argv['private-mode']) {
                 $out['working_dir'] = DataProvider::getWorkingDir();
                 $out['listen'] = ZMConfig::get('global', 'host') . ':' . ZMConfig::get('global', 'port');
-                if (!isset($this->swoole_config['worker_num'])) {
+                if (!isset($this->swoole_server_config['worker_num'])) {
                     if ((ZMConfig::get('global', 'runtime')['swoole_server_mode'] ?? SWOOLE_PROCESS) === SWOOLE_PROCESS) {
                         $out['worker'] = swoole_cpu_num() . ' (auto)';
                     } else {
                         $out['single_proc_mode'] = 'true';
                     }
                 } else {
-                    $out['worker'] = $this->swoole_config['worker_num'];
+                    $out['worker'] = $this->swoole_server_config['worker_num'];
                 }
                 $out['environment'] = ($args['env'] ?? null) === null ? 'default' : $args['env'];
                 $out['log_level'] = Console::getLevel();
@@ -193,8 +193,8 @@ class Framework
                 if (APP_VERSION !== 'unknown') {
                     $out['app_version'] = APP_VERSION;
                 }
-                if (isset($this->swoole_config['task_worker_num'])) {
-                    $out['task_worker'] = $this->swoole_config['task_worker_num'];
+                if (isset($this->swoole_server_config['task_worker_num'])) {
+                    $out['task_worker'] = $this->swoole_server_config['task_worker_num'];
                 }
                 if ((ZMConfig::get('global', 'sql_config')['sql_host'] ?? '') !== '') {
                     $conf = ZMConfig::get('global', 'sql_config');
@@ -315,7 +315,7 @@ class Framework
             }
 
             // 设置服务器配置
-            self::$server->set($this->swoole_config);
+            self::$server->set($this->swoole_server_config);
             Console::setServer(self::$server);
 
             // 非静默模式下，打印欢迎信息
@@ -734,15 +734,15 @@ class Framework
                 switch ($x) {
                     case 'worker-num':
                         if (intval($y) >= 1 && intval($y) <= 1024) {
-                            $this->swoole_config['worker_num'] = intval($y);
+                            $this->swoole_server_config['worker_num'] = intval($y);
                         } else {
-                            Console::warning(zm_internal_errcode('E00013') . 'Invalid worker num! Turn to default value (' . ($this->swoole_config['worker_num'] ?? swoole_cpu_num()) . ')');
+                            Console::warning(zm_internal_errcode('E00013') . 'Invalid worker num! Turn to default value (' . ($this->swoole_server_config['worker_num'] ?? swoole_cpu_num()) . ')');
                         }
                         break;
                     case 'task-worker-num':
                         if (intval($y) >= 1 && intval($y) <= 1024) {
-                            $this->swoole_config['task_worker_num'] = intval($y);
-                            $this->swoole_config['task_enable_coroutine'] = true;
+                            $this->swoole_server_config['task_worker_num'] = intval($y);
+                            $this->swoole_server_config['task_enable_coroutine'] = true;
                         } else {
                             Console::warning(zm_internal_errcode('E00013') . 'Invalid worker num! Turn to default value (0)');
                         }
@@ -758,9 +758,9 @@ class Framework
                         echo "* You are in debug mode, do not use in production!\n";
                         break;
                     case 'daemon':
-                        $this->swoole_config['daemonize'] = 1;
+                        $this->swoole_server_config['daemonize'] = 1;
                         Console::$theme = 'no-color';
-                        Console::log('已启用守护进程，输出重定向到 ' . $this->swoole_config['log_file']);
+                        Console::log('已启用守护进程，输出重定向到 ' . $this->swoole_server_config['log_file']);
                         $terminal_id = null;
                         break;
                     case 'disable-console-input':
