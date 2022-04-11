@@ -15,6 +15,7 @@ class Container extends WorkerContainer
 
     public function __construct()
     {
+        parent::__construct();
         $this->parent = WorkerContainer::getInstance();
     }
 

@@ -19,8 +19,6 @@ use ZM\Config\ZMConfig;
 use ZM\ConnectionManager\ManagerGM;
 use ZM\Console\Console;
 use ZM\Console\TermColor;
-use ZM\Container\Container;
-use ZM\Container\ContainerInterface;
 use ZM\Exception\ZMKnownException;
 use ZM\Store\LightCache;
 use ZM\Store\LightCacheInside;
@@ -73,13 +71,6 @@ class Framework
     private $setup_events = [];
 
     /**
-     * 容器
-     *
-     * @var ContainerInterface
-     */
-    private $container;
-
-    /**
      * 创建一个新的框架实例
      *
      * @param array $args         运行参数
@@ -91,13 +82,8 @@ class Framework
         self::$instant_mode = $instant_mode;
         self::$argv = $args;
 
-        // 初始化全局容器
-        $this->container = new Container();
-        $this->bindPathsInContainer();
-        $this->registerBaseBindings();
-
         // 初始化配置
-        ZMConfig::setDirectory(app('path.config'));
+        ZMConfig::setDirectory(DataProvider::getSourceRootDir() . '/config');
         ZMConfig::setEnv($args['env'] ?? '');
         if (ZMConfig::get('global') === false) {
             echo zm_internal_errcode('E00007') . 'Global config load failed: ' . ZMConfig::$last_error . "\nError path: " . DataProvider::getSourceRootDir() . "\nPlease init first!\nSee: https://github.com/zhamao-robot/zhamao-framework/issues/37\n";
@@ -108,8 +94,8 @@ class Framework
         require_once 'global_defines.php';
 
         // 确保目录存在
-        DataProvider::createIfNotExists(app('path.data'));
-        DataProvider::createIfNotExists(app('path.module_config'));
+        DataProvider::createIfNotExists(ZMConfig::get('global', 'zm_data'));
+        DataProvider::createIfNotExists(ZMConfig::get('global', 'config_dir'));
         DataProvider::createIfNotExists(ZMConfig::get('global', 'crash_dir'));
 
         // 初始化连接池？
@@ -589,7 +575,7 @@ class Framework
         echo str_pad('', $max_border, '=') . PHP_EOL;
     }
 
-    public static function getTtyWidth(): int
+    public function getTtyWidth(): int
     {
         $size = exec('stty size');
         if (empty($size)) {
@@ -613,33 +599,6 @@ class Framework
     public static function saveFrameworkState($data)
     {
         return file_put_contents(DataProvider::getDataFolder() . '.state.json', json_encode($data, 64 | 128 | 256));
-    }
-
-    /**
-     * 注册所有应用路径到容器
-     */
-    protected function bindPathsInContainer(): void
-    {
-        $this->container->instance('path.working', DataProvider::getWorkingDir());
-        $this->container->instance('path.source', DataProvider::getSourceRootDir());
-        $this->container->alias('path.source', 'path.base');
-        $this->container->instance('path.config', DataProvider::getSourceRootDir() . '/config');
-        $this->container->singleton('path.module_config', function () {
-            return ZMConfig::get('global', 'config_dir');
-        });
-        $this->container->singleton('path.data', function () {
-            return DataProvider::getDataFolder();
-        });
-        $this->container->instance('path.framework', DataProvider::getFrameworkRootDir());
-    }
-
-    /**
-     * 注册基础绑定到容器
-     */
-    protected function registerBaseBindings(): void
-    {
-        $this->container->instance('framework', $this);
-        $this->container->alias('framework', 'app');
     }
 
     private static function printMotd($tty_width)

@@ -22,9 +22,6 @@ class OnWorkerStop implements SwooleEvent
     public function onCall(Server $server, $worker_id)
     {
         WorkerContainer::getInstance()->flush();
-        if (Console::getLevel() >= 4) {
-            Console::debug(sprintf('Worker container [id=%d] flushed', $worker_id));
-        }
 
         if ($worker_id == (ZMConfig::get('worker_cache')['worker'] ?? 0)) {
             LightCache::savePersistence();

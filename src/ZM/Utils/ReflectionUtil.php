@@ -40,4 +40,40 @@ class ReflectionUtil
 
         return $class_name;
     }
+
+    /**
+     * 将传入变量转换为字符串
+     *
+     * @param mixed $var
+     */
+    public static function variableToString($var): string
+    {
+        switch (true) {
+            case is_callable($var):
+                if (is_array($var)) {
+                    if (is_object($var[0])) {
+                        return get_class($var[0]) . '@' . $var[1];
+                    }
+                    return $var[0] . '::' . $var[1];
+                }
+                return 'closure';
+            case is_string($var):
+                return $var;
+            case is_array($var):
+                return 'array' . json_encode($var);
+            case is_object($var):
+                return get_class($var);
+            case is_resource($var):
+                return 'resource' . get_resource_type($var);
+            case is_null($var):
+                return 'null';
+            case is_bool($var):
+                return $var ? 'true' : 'false';
+            case is_float($var):
+            case is_int($var):
+                return (string) $var;
+            default:
+                return 'unknown';
+        }
+    }
 }

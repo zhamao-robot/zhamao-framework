@@ -29,12 +29,19 @@ class WorkerContainer implements ContainerInterface
     /**
      * @var array[]
      */
-    protected $buildStack = [];
+    protected $build_stack = [];
 
     /**
      * @var array[]
      */
     protected $with = [];
+
+    /**
+     * 日志前缀
+     *
+     * @var string
+     */
+    protected $log_prefix;
 
     /**
      * @var array[]
@@ -55,6 +62,13 @@ class WorkerContainer implements ContainerInterface
      * @var Closure[][]
      */
     private static $extenders = [];
+
+    public function __construct()
+    {
+        if ($this->shouldLog()) {
+            $this->log('Container created');
+        }
+    }
 
     /**
      * 判断对应的类或接口是否已经注册
@@ -119,7 +133,10 @@ class WorkerContainer implements ContainerInterface
             $concrete = $abstract;
         }
 
-        $concrete_name = is_string($concrete) ? $concrete : 'Closure';
+        $concrete_name = '';
+        if ($this->shouldLog()) {
+            $concrete_name = ReflectionUtil::variableToString($concrete);
+        }
 
         // 如果不是闭包，则认为是类名，此时将其包装在一个闭包中，以方便后续处理
         if (!$concrete instanceof Closure) {
@@ -191,7 +208,8 @@ class WorkerContainer implements ContainerInterface
         self::$instances[$abstract] = $instance;
 
         if ($this->shouldLog()) {
-            $this->log("[{$abstract}] is bound to [{$instance}] (instance)");
+            $class_name = ReflectionUtil::variableToString($instance);
+            $this->log("[{$abstract}] is bound to [{$class_name}] (instance)");
         }
 
         return $instance;
@@ -219,8 +237,12 @@ class WorkerContainer implements ContainerInterface
         self::$instances = [];
 
         $this->shared = [];
-        $this->buildStack = [];
+        $this->build_stack = [];
         $this->with = [];
+
+        if ($this->shouldLog()) {
+            $this->log('Container flushed');
+        }
     }
 
     /**
@@ -319,13 +341,13 @@ class WorkerContainer implements ContainerInterface
             $this->notInstantiable($concrete);
         }
 
-        $this->buildStack[] = $concrete;
+        $this->build_stack[] = $concrete;
 
         $constructor = $reflection->getConstructor();
 
         // 如果不存在构造函数，则代表不需要进一步解析，直接实例化即可
         if (is_null($constructor)) {
-            array_pop($this->buildStack);
+            array_pop($this->build_stack);
             return new $concrete();
         }
 
@@ -335,11 +357,11 @@ class WorkerContainer implements ContainerInterface
         try {
             $instances = $this->resolveDependencies($dependencies);
         } catch (EntryResolutionException $e) {
-            array_pop($this->buildStack);
+            array_pop($this->build_stack);
             throw $e;
         }
 
-        array_pop($this->buildStack);
+        array_pop($this->build_stack);
 
         return $reflection->newInstanceArgs($instances);
     }
@@ -355,11 +377,17 @@ class WorkerContainer implements ContainerInterface
     public function call($callback, array $parameters = [], string $default_method = null)
     {
         if ($this->shouldLog()) {
+            if (count($parameters)) {
+                $str_parameters = array_map([ReflectionUtil::class, 'variableToString'], $parameters);
+                $str_parameters = implode(', ', $str_parameters);
+            } else {
+                $str_parameters = '';
+            }
             $this->log(sprintf(
-                '[%s] called%s%s',
-                $this->getCallableName($callback),
-                ($default_method ? ' defaulting' . $default_method : ''),
-                ($parameters ? ' with ' . implode(', ', $parameters) : '')
+                'Called %s%s(%s)',
+                ReflectionUtil::variableToString($callback),
+                ($default_method ? '@' . $default_method : ''),
+                $str_parameters
             ));
         }
         return BoundMethod::call($this, $callback, $parameters, $default_method);
@@ -423,6 +451,22 @@ class WorkerContainer implements ContainerInterface
         if ($this->shouldLog()) {
             $this->log("[{$abstract}] extended");
         }
+    }
+
+    /**
+     * 获取日志前缀
+     */
+    public function getLogPrefix(): string
+    {
+        return ($this->log_prefix ?: '[WorkerContainer(U)]') . ' ';
+    }
+
+    /**
+     * 设置日志前缀
+     */
+    public function setLogPrefix(string $prefix): void
+    {
+        $this->log_prefix = $prefix;
     }
 
     /**
@@ -490,8 +534,8 @@ class WorkerContainer implements ContainerInterface
      */
     protected function notInstantiable(string $concrete, string $reason = ''): void
     {
-        if (!empty($this->buildStack)) {
-            $previous = implode(', ', $this->buildStack);
+        if (!empty($this->build_stack)) {
+            $previous = implode(', ', $this->build_stack);
             $message = "类 {$concrete} 无法实例化，其被 {$previous} 依赖";
         } else {
             $message = "类 {$concrete} 无法实例化";
@@ -678,36 +722,18 @@ class WorkerContainer implements ContainerInterface
     }
 
     /**
-     * 获取回调的名称
-     *
-     * @param callable|string $callable 回调
-     */
-    private function getCallableName($callable): string
-    {
-        $name = is_string($callable) ? $callable : '{closure}';
-        if (is_array($callable)) {
-            if (is_object($callable[0])) {
-                $name = get_class($callable[0]) . '@' . $callable[1];
-            } else {
-                $name = $callable[0] . '::' . $callable[1];
-            }
-        }
-        return $name;
-    }
-
-    /**
      * 判断是否输出日志
      */
-    private function shouldLog(): bool
+    protected function shouldLog(): bool
     {
         return Console::getLevel() >= 4;
     }
 
     /**
-     * 记录日志
+     * 记录日志（自动附加容器日志前缀）
      */
-    private function log(string $message): void
+    protected function log(string $message): void
     {
-        Console::debug($message);
+        Console::debug($this->getLogPrefix() . $message);
     }
 }

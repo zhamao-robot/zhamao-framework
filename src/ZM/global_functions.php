@@ -628,7 +628,6 @@ function zm_internal_errcode($code): string
 }
 
 /**
-<<<<<<< HEAD
  * 将可能为数组的参数转换为字符串
  *
  * 如传入字符串则为原样返回

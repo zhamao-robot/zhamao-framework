@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace ZM\Event\SwooleEvent;
 
 use Swoole\Coroutine;
-use Swoole\Http\Server;
 use Swoole\WebSocket\Frame;
 use Throwable;
 use ZM\Annotation\Swoole\OnMessageEvent;
@@ -15,6 +14,7 @@ use ZM\ConnectionManager\ConnectionObject;
 use ZM\ConnectionManager\ManagerGM;
 use ZM\Console\Console;
 use ZM\Console\TermColor;
+use ZM\Container\Container;
 use ZM\Context\Context;
 use ZM\Context\ContextInterface;
 use ZM\Event\EventDispatcher;
@@ -33,13 +33,7 @@ class OnMessage implements SwooleEvent
         $conn = ManagerGM::get($frame->fd);
         set_coroutine_params(['server' => $server, 'frame' => $frame, 'connection' => $conn]);
 
-        container()->instance(Server::class, $server);
-        container()->instance(Frame::class, $frame);
-        container()->instance(ConnectionObject::class, $conn);
-        container()->bind(ContextInterface::class, function () {
-            return ctx();
-        });
-        container()->alias(ContextInterface::class, Context::class);
+        $this->registerRequestContainerBindings($frame, $conn);
 
         $dispatcher1 = new EventDispatcher(OnMessageEvent::class);
         $dispatcher1->setRuleFunction(function ($v) use ($conn) {
@@ -70,9 +64,21 @@ class OnMessage implements SwooleEvent
             Console::trace();
         } finally {
             container()->flush();
-            if (Console::getLevel() >= 4) {
-                Console::debug(sprintf('Request container [fd=%d, cid=%d] flushed.', $frame->fd, Coroutine::getCid()));
-            }
         }
+    }
+
+    /**
+     * 注册请求容器绑定
+     */
+    private function registerRequestContainerBindings(Frame $frame, ?ConnectionObject $conn): void
+    {
+        $container = Container::getInstance();
+        $container->setLogPrefix("[Container#{$frame->fd}]");
+        $container->instance(Frame::class, $frame);
+        $container->instance(ConnectionObject::class, $conn);
+        $container->bind(ContextInterface::class, function () {
+            return ctx();
+        });
+        $container->alias(ContextInterface::class, Context::class);
     }
 }
