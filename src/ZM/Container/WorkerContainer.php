@@ -334,7 +334,7 @@ class WorkerContainer implements ContainerInterface
         try {
             $reflection = new ReflectionClass($concrete);
         } catch (ReflectionException $e) {
-            throw new EntryResolutionException("指定的类 {$concrete} 不存在");
+            throw new EntryResolutionException("指定的类 {$concrete} 不存在", 0, $e);
         }
 
         if (!$reflection->isInstantiable()) {
