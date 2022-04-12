@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace ZM\Utils;
 
+use Closure;
+use ReflectionException;
+use ReflectionFunction;
+use ReflectionFunctionAbstract;
+use ReflectionMethod;
 use ReflectionNamedType;
 use ReflectionParameter;
 
@@ -75,5 +80,44 @@ class ReflectionUtil
             default:
                 return 'unknown';
         }
+    }
+
+    /**
+     * 判断传入的回调是否为任意类的非静态方法
+     *
+     * @param  callable|string     $callback 回调
+     * @throws ReflectionException
+     */
+    public static function isNonStaticMethod($callback): bool
+    {
+        if (is_array($callback) && is_string($callback[0])) {
+            $reflection = new ReflectionMethod($callback[0], $callback[1]);
+            return !$reflection->isStatic();
+        }
+        return false;
+    }
+
+    /**
+     * 获取传入的回调的反射实例
+     *
+     * 如果传入的是类方法，则会返回 {@link ReflectionMethod} 实例
+     * 否则将返回 {@link ReflectionFunction} 实例
+     *
+     * 可传入实现了 __invoke 的类
+     *
+     * @param  callable|string     $callback 回调
+     * @throws ReflectionException
+     */
+    public static function getCallReflector($callback): ReflectionFunctionAbstract
+    {
+        if (is_string($callback) && str_contains($callback, '::')) {
+            $callback = explode('::', $callback);
+        } elseif (is_object($callback) && !$callback instanceof Closure) {
+            $callback = [$callback, '__invoke'];
+        }
+
+        return is_array($callback)
+            ? new ReflectionMethod($callback[0], $callback[1])
+            : new ReflectionFunction($callback);
     }
 }

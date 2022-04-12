@@ -4,12 +4,8 @@ declare(strict_types=1);
 
 namespace ZM\Container;
 
-use Closure;
 use InvalidArgumentException;
 use ReflectionException;
-use ReflectionFunction;
-use ReflectionFunctionAbstract;
-use ReflectionMethod;
 use ReflectionParameter;
 use ZM\Utils\ReflectionUtil;
 
@@ -34,7 +30,7 @@ class BoundMethod
             $callback = [$callback, $default_method];
         }
 
-        if (self::isCallingNonStaticMethod($callback)) {
+        if (ReflectionUtil::isNonStaticMethod($callback)) {
             $callback[0] = $container->make($callback[0]);
         }
 
@@ -43,21 +39,6 @@ class BoundMethod
         }
 
         return call_user_func_array($callback, self::getMethodDependencies($container, $callback, $parameters));
-    }
-
-    /**
-     * 判断调用的是否为非静态方法
-     *
-     * @param  array|string        $callback
-     * @throws ReflectionException
-     */
-    protected static function isCallingNonStaticMethod($callback): bool
-    {
-        if (is_array($callback) && is_string($callback[0])) {
-            $reflection = new ReflectionMethod($callback[0], $callback[1]);
-            return !$reflection->isStatic();
-        }
-        return false;
     }
 
     /**
@@ -70,31 +51,11 @@ class BoundMethod
     {
         $dependencies = [];
 
-        foreach (static::getCallReflector($callback)->getParameters() as $parameter) {
+        foreach (ReflectionUtil::getCallReflector($callback)->getParameters() as $parameter) {
             static::addDependencyForCallParameter($container, $parameter, $parameters, $dependencies);
         }
 
         return array_merge($dependencies, array_values($parameters));
-    }
-
-    /**
-     * Get the proper reflection instance for the given callback.
-     *
-     * @param  callable|string            $callback
-     * @throws \ReflectionException
-     * @return ReflectionFunctionAbstract
-     */
-    protected static function getCallReflector($callback)
-    {
-        if (is_string($callback) && str_contains($callback, '::')) {
-            $callback = explode('::', $callback);
-        } elseif (is_object($callback) && !$callback instanceof Closure) {
-            $callback = [$callback, '__invoke'];
-        }
-
-        return is_array($callback)
-            ? new ReflectionMethod($callback[0], $callback[1])
-            : new ReflectionFunction($callback);
     }
 
     /**
