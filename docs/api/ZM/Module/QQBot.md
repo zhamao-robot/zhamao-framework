@@ -137,15 +137,15 @@ public function dispatchAPIResponse(mixed $req): mixed
 ## getInstance
 
 ```php
-public function getInstance(): self
+public function getInstance(): static
 ```
 
 ### 描述
 
-作者很懒，什么也没有说
+获取类实例
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| self |  |
+| static |  |

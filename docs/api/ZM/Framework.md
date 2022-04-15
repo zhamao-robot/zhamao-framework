@@ -1,5 +1,29 @@
 # ZM\Framework
 
+## __construct
+
+```php
+public function __construct(array $args, bool $instant_mode): mixed
+```
+
+### 描述
+
+创建一个新的框架实例
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| args | array | 运行参数 |
+| instant_mode | bool | 是否为单文件模式 |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| mixed |  |
+
+
 ## saveProcessState
 
 ```php

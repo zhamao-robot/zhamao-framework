@@ -201,3 +201,26 @@ public function isRelativePath(string $path): bool
 | 类型 | 描述 |
 | ---- | ----------- |
 | bool | 返回结果 |
+
+
+## createIfNotExists
+
+```php
+public function createIfNotExists(string $path): void
+```
+
+### 描述
+
+创建目录（如果不存在）
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| path | string | 目录路径 |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| void |  |
