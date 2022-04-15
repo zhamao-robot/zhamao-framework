@@ -91,6 +91,8 @@ use Jasny\PhpdocParser\Set\PhpDocumentor;
 use Jasny\PhpdocParser\Tag\Summery;
 use ZM\Console\Console;
 
+var_dump('hi');
+
 $opts = getopt('', ['show-warnings']);
 if (array_key_exists('show-warnings', $opts)) {
     $show_warnings = true;
@@ -98,7 +100,7 @@ if (array_key_exists('show-warnings', $opts)) {
     $show_warnings = false;
 }
 
-Console::init(2);
+Console::init(4);
 
 $errors = [];
 $warnings = [];
@@ -296,12 +298,16 @@ foreach (new \RecursiveIteratorIterator($fs) as $file) {
     // 过滤不包含类的文件
     $tokens = token_get_all(file_get_contents($path));
     $found = false;
-    foreach ($tokens as $token) {
+    foreach ($tokens as $k => $token) {
         if (!is_array($token)) {
             continue;
         }
-        if ($token[0] === T_CLASS) {
+        if ($token[0] === T_CLASS && $tokens[$k - 2][0] !== T_NEW) {
             $found = true;
+            break;
+        }
+        if ($k >= 100) {
+            break;
         }
     }
     if (!$found) {
