@@ -18,6 +18,7 @@ use ZM\API\TuringAPI;
 use ZM\Config\ZMConfig;
 use ZM\ConnectionManager\ConnectionObject;
 use ZM\Console\Console;
+use ZM\Context\Context;
 use ZM\Event\EventDispatcher;
 use ZM\Exception\InterruptException;
 use ZM\Module\QQBot;
@@ -243,5 +244,17 @@ class Hello
     public function proxy()
     {
         bot()->all()->allGroups()->sendGroupMsg(0, ctx()->getMessage());
+    }
+
+    /*
+     * 欢迎来到容器时代
+     *
+     * @param Context $context 通过依赖注入实现的
+     *
+     * @CQCommand("容器你好")
+     */
+    public function welcomeToContainerAge(Context $context)
+    {
+        $context->reply('欢迎来到容器时代');
     }
 }

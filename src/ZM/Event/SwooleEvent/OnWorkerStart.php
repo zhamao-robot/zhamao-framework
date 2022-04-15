@@ -20,6 +20,7 @@ use ZM\Annotation\Swoole\OnStart;
 use ZM\Annotation\Swoole\SwooleHandler;
 use ZM\Config\ZMConfig;
 use ZM\Console\Console;
+use ZM\Container\WorkerContainer;
 use ZM\Context\Context;
 use ZM\Context\ContextInterface;
 use ZM\DB\DB;
@@ -52,6 +53,9 @@ class OnWorkerStart implements SwooleEvent
             SignalListener::signalWorker($server, $worker_id);
         }
         unset(Context::$context[Coroutine::getCid()]);
+
+        $this->registerWorkerContainerBindings($server);
+
         if ($server->taskworker === false) {
             Framework::saveProcessState(ZM_PROCESS_WORKER, $server->worker_pid, ['worker_id' => $worker_id]);
             zm_atomic('_#worker_' . $worker_id)->set($server->worker_pid);
@@ -274,7 +278,7 @@ class OnWorkerStart implements SwooleEvent
                 (new PDOConfig())
                     ->withHost($real_conf['host'])
                     ->withPort($real_conf['port'])
-                // ->withUnixSocket('/tmp/mysql.sock')
+                    // ->withUnixSocket('/tmp/mysql.sock')
                     ->withDbName($real_conf['dbname'])
                     ->withCharset($real_conf['charset'])
                     ->withUsername($real_conf['username'])
@@ -283,5 +287,25 @@ class OnWorkerStart implements SwooleEvent
             );
             DB::initTableList($real_conf['dbname']);
         }
+    }
+
+    /**
+     * 注册进程容器绑定
+     */
+    private function registerWorkerContainerBindings(Server $server): void
+    {
+        $container = WorkerContainer::getInstance();
+        $container->setLogPrefix("[WorkerContainer#{$server->worker_id}]");
+        // 路径
+        $container->instance('path.working', DataProvider::getWorkingDir());
+        $container->instance('path.source', DataProvider::getSourceRootDir());
+        $container->alias('path.source', 'path.base');
+        $container->instance('path.config', DataProvider::getSourceRootDir() . '/config');
+        $container->instance('path.module_config', ZMConfig::get('global', 'config_dir'));
+        $container->instance('path.data', DataProvider::getDataFolder());
+        $container->instance('path.framework', DataProvider::getFrameworkRootDir());
+        // 基础
+        $container->instance('server', $server);
+        $container->instance('worker_id', $server->worker_id);
     }
 }

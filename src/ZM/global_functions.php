@@ -13,6 +13,8 @@ use ZM\API\ZMRobot;
 use ZM\Config\ZMConfig;
 use ZM\ConnectionManager\ManagerGM;
 use ZM\Console\Console;
+use ZM\Container\Container;
+use ZM\Container\ContainerInterface;
 use ZM\Context\Context;
 use ZM\Context\ContextInterface;
 use ZM\Event\EventManager;
@@ -40,6 +42,7 @@ function get_class_path(string $class_name): ?string
 
 /**
  * 检查炸毛框架运行的环境
+ *
  * @internal
  */
 function _zm_env_check()
@@ -220,7 +223,7 @@ function get_annotations(): array
  */
 function set_coroutine_params(array $params): void
 {
-    $cid = Co::getCid();
+    $cid = co::getCid();
     if ($cid === -1) {
         exit(zm_internal_errcode('E00061') . 'Cannot set coroutine params at none coroutine mode.');
     }
@@ -230,7 +233,7 @@ function set_coroutine_params(array $params): void
         Context::$context[$cid] = $params;
     }
     foreach (Context::$context as $c => $v) {
-        if (!Co::exists($c)) {
+        if (!co::exists($c)) {
             unset(Context::$context[$c], ZMBuf::$context_class[$c]);
         }
     }
@@ -238,8 +241,6 @@ function set_coroutine_params(array $params): void
 
 /**
  * 获取当前上下文
- *
- * @throws ZMKnownException
  */
 function context(): ContextInterface
 {
@@ -248,18 +249,16 @@ function context(): ContextInterface
 
 /**
  * 获取当前上下文
- *
- * @throws ZMKnownException
  */
 function ctx(): ContextInterface
 {
-    $cid = Co::getCid();
+    $cid = co::getCid();
     $c_class = ZMConfig::get('global', 'context_class');
     if (isset(Context::$context[$cid])) {
         return ZMBuf::$context_class[$cid] ?? (ZMBuf::$context_class[$cid] = new $c_class($cid));
     }
     Console::debug("未找到当前协程的上下文({$cid})，正在找父进程的上下文");
-    while (($parent_cid = Co::getPcid($cid)) !== -1) {
+    while (($parent_cid = co::getPcid($cid)) !== -1) {
         $cid = $parent_cid;
         if (isset(Context::$context[$cid])) {
             return ZMBuf::$context_class[$cid] ?? (ZMBuf::$context_class[$cid] = new $c_class($cid));
@@ -321,7 +320,7 @@ function zm_exec(string $command): array
  */
 function zm_cid(): int
 {
-    return Co::getCid();
+    return co::getCid();
 }
 
 /**
@@ -331,7 +330,7 @@ function zm_cid(): int
  */
 function zm_yield()
 {
-    Co::yield();
+    co::yield();
 }
 
 /**
@@ -341,7 +340,7 @@ function zm_yield()
  */
 function zm_resume(int $cid)
 {
-    Co::resume($cid);
+    co::resume($cid);
 }
 
 /**
@@ -416,6 +415,7 @@ function server(): Server
 
 /**
  * 获取缓存当前框架pid的临时目录
+ *
  * @internal
  */
 function _zm_pid_dir(): string
@@ -433,6 +433,7 @@ function _zm_pid_dir(): string
  * 随机返回一个 ZMRobot 实例，效果等同于 {@link ZMRobot::getRandom()}。
  *
  * 在单机器人模式下，会直接返回该机器人实例。
+ *
  * @throws RobotNotFoundException
  */
 function bot(): ZMRobot
@@ -636,6 +637,42 @@ function zm_internal_errcode($code): string
 function implode_when_necessary($string_or_array): string
 {
     return is_array($string_or_array) ? implode(', ', $string_or_array) : $string_or_array;
+}
+
+/**
+ * 获取容器（请求级）实例
+ */
+function container(): ContainerInterface
+{
+    return Container::getInstance();
+}
+
+/**
+ * 解析类实例（使用容器）
+ *
+ * @template T
+ * @param  class-string<T> $abstract
+ * @return Closure|mixed|T
+ */
+function resolve(string $abstract, array $parameters = [])
+{
+    return Container::getInstance()->make($abstract, $parameters);
+}
+
+/**
+ * 获取容器实例
+ *
+ * @template T
+ * @param  null|class-string<T>               $abstract
+ * @return Closure|ContainerInterface|mixed|T
+ */
+function app(string $abstract = null, array $parameters = [])
+{
+    if (is_null($abstract)) {
+        return container();
+    }
+
+    return resolve($abstract, $parameters);
 }
 
 /**

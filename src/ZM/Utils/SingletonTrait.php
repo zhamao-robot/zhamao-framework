@@ -1,30 +1,34 @@
 <?php
 
-/** @noinspection PhpUnused */
-
 declare(strict_types=1);
 
 namespace ZM\Utils;
 
 trait SingletonTrait
 {
+    /**
+     * @deprecated 将会于未来版本移除
+     *
+     * @var array
+     */
     protected static $cached = [];
 
     /**
-     * @var self
+     * @var null|static
      */
-    private static $instance;
+    protected static $instance;
 
     /**
-     * @return self
-     * @noinspection PhpMissingReturnTypeInspection
+     * 获取类实例
+     *
+     * @return static
      */
     public static function getInstance()
     {
-        if (self::$instance === null) {
-            self::$instance = new self();
+        if (is_null(static::$instance)) {
+            static::$instance = new static();
         }
 
-        return self::$instance;
+        return static::$instance;
     }
 }

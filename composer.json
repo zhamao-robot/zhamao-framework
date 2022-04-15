@@ -16,6 +16,7 @@
         "dragonmantank/cron-expression": "^3.3",
         "jelix/version": "^2.0",
         "koriym/attributes": "^1.0",
+        "psr/container": "^2.0",
         "psy/psysh": "^0.11.2",
         "symfony/console": "~5.0 || ~4.0 || ~3.0",
         "symfony/polyfill-ctype": "^1.19",

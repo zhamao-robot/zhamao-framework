@@ -13,6 +13,7 @@ use ZM\Annotation\Swoole\OnOpenEvent;
 use ZM\Annotation\Swoole\OnSwooleEvent;
 use ZM\Annotation\Swoole\SwooleHandler;
 use ZM\Config\ZMConfig;
+use ZM\ConnectionManager\ConnectionObject;
 use ZM\ConnectionManager\ManagerGM;
 use ZM\Console\Console;
 use ZM\Context\Context;
@@ -30,6 +31,7 @@ class OnOpen implements SwooleEvent
     {
         Console::debug('Calling Swoole "open" event from fd=' . $request->fd);
         unset(Context::$context[Coroutine::getCid()]);
+
         $type = strtolower($request->header['x-client-role'] ?? $request->get['type'] ?? '');
         $access_token = explode(' ', $request->header['authorization'] ?? '')[1] ?? $request->get['token'] ?? '';
         $token = ZMConfig::get('global', 'access_token');
@@ -51,6 +53,8 @@ class OnOpen implements SwooleEvent
         $conn = ManagerGM::get($request->fd);
         set_coroutine_params(['server' => $server, 'request' => $request, 'connection' => $conn, 'fd' => $request->fd]);
         $conn->setOption('connect_id', strval($request->header['x-self-id'] ?? ''));
+
+        container()->instance(ConnectionObject::class, $conn);
 
         $dispatcher1 = new EventDispatcher(OnOpenEvent::class);
         $dispatcher1->setRuleFunction(function ($v) {
