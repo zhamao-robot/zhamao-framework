@@ -91,16 +91,15 @@ use Jasny\PhpdocParser\Set\PhpDocumentor;
 use Jasny\PhpdocParser\Tag\Summery;
 use ZM\Console\Console;
 
-var_dump('hi');
+$opts = getopt('', ['show-warnings', 'show-debug']);
 
-$opts = getopt('', ['show-warnings']);
 if (array_key_exists('show-warnings', $opts)) {
     $show_warnings = true;
 } else {
     $show_warnings = false;
 }
 
-Console::init(4);
+Console::init(array_key_exists('show-debug', $opts) ? 4 : 2);
 
 $errors = [];
 $warnings = [];
