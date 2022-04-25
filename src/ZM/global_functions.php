@@ -99,8 +99,8 @@ function unicode_decode(string $str): ?string
  */
 function match_pattern(string $pattern, string $subject): bool
 {
-    $pattern = str_replace('\*', '.*', preg_quote($pattern, '/'));
-    $pattern = '/^' . $pattern . '$/';
+    $pattern = str_replace(['\*', '\\\\.*'], ['.*', '\*'], preg_quote($pattern, '/'));
+    $pattern = '/^' . $pattern . '$/i';
     return preg_match($pattern, $subject) === 1;
 }
 
