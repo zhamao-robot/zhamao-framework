@@ -40,4 +40,35 @@ class GlobalFunctionsTest extends TestCase
         });
         $this->assertLessThan(0.1, $time);
     }
+
+    /**
+     * @dataProvider providerTestMatchPattern
+     */
+    public function testMatchPattern(string $pattern, string $subject, bool $expected): void
+    {
+        $this->assertEquals($expected, match_pattern($pattern, $subject));
+    }
+
+    public function providerTestMatchPattern(): array
+    {
+        return [
+            'empty' => ['', '', true],
+            'empty subject' => ['foo', '', false],
+            'empty pattern' => ['', 'foo', false],
+            'simple' => ['foo', 'foo', true],
+            'simple case insensitive' => ['FOO', 'foo', true],
+            'simple case insensitive 2' => ['foo', 'FOO', true],
+            'unicode' => ['föö', 'föö', true],
+            'chinese' => ['中文', '中文', true],
+            'wildcard' => ['foo*', 'foo', true],
+            'wildcard 2' => ['foo*', 'foobar', true],
+            'wildcard 3' => ['foo*bar', 'foo with bar', true],
+            'wildcard 4' => ['foo*bar', 'foo but no bar with it', false],
+            'wildcard with chinese' => ['中文*', '中文', true],
+            'wildcard with chinese 2' => ['全世界*中国话', '全世界都在说中国话', true],
+            'complex' => ['foo*bar*baz', 'foo with bar and baz', true],
+            'regex' => ['[a-z]+', 'foo', false], // regex is not supported yet
+            'escaped' => ['foo\\*bar', 'foo*bar', true],
+        ];
+    }
 }
