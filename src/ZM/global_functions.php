@@ -99,19 +99,9 @@ function unicode_decode(string $str): ?string
  */
 function match_pattern(string $pattern, string $subject): bool
 {
-    if (empty($pattern) && empty($subject)) {
-        return true;
-    }
-    if (mb_strpos($pattern, '*') === 0 && mb_substr($pattern, 1, 1) !== '' && empty($subject)) {
-        return false;
-    }
-    if (mb_strpos($pattern, mb_substr($subject, 0, 1)) === 0) {
-        return match_pattern(mb_substr($pattern, 1), mb_substr($subject, 1));
-    }
-    if (mb_strpos($pattern, '*') === 0) {
-        return match_pattern(mb_substr($pattern, 1), $subject) || match_pattern($pattern, mb_substr($subject, 1));
-    }
-    return false;
+    $pattern = str_replace('\*', '.*', preg_quote($pattern, '/'));
+    $pattern = '/^' . $pattern . '$/';
+    return preg_match($pattern, $subject) === 1;
 }
 
 /**
