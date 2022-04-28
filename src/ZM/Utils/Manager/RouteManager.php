@@ -10,7 +10,6 @@ use ZM\Annotation\Http\Controller;
 use ZM\Annotation\Http\RequestMapping;
 use ZM\Console\Console;
 use ZM\Http\StaticFileHandler;
-use ZM\Store\LightCacheInside;
 
 /**
  * 路由管理器，2.5版本更改了命名空间
@@ -50,17 +49,14 @@ class RouteManager
         $tail = trim($route, '/');
         $route_name = ($tail === '' ? '' : '/') . $tail . '/{filename}';
         Console::debug('添加静态文件路由：' . $route_name);
-        $route = new Route($route_name, ['_class' => RouteManager::class, '_method' => 'onStaticRoute']);
-        // echo $path.PHP_EOL;
-        LightCacheInside::set('static_route', $route->getPath(), $path);
+        $route = new Route($route_name, ['_class' => __CLASS__, '_method' => 'onStaticRoute'], [], compact('path'));
 
         self::$routes->add(md5($route_name), $route);
     }
 
-    public function onStaticRoute($params)
+    public function onStaticRoute(array $params)
     {
-        $route_path = self::$routes->get($params['_route'])->getPath();
-        if (($path = LightCacheInside::get('static_route', $route_path)) === null) {
+        if (($path = self::$routes->get($params['_route'])->getOption('path')) === null) {
             ctx()->getResponse()->endWithStatus(404);
             return false;
         }
