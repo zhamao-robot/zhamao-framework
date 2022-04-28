@@ -51,7 +51,13 @@ class BoundMethod
     {
         $dependencies = [];
 
-        foreach (ReflectionUtil::getCallReflector($callback)->getParameters() as $parameter) {
+        foreach (ReflectionUtil::getCallReflector($callback)->getParameters() as $i => $parameter) {
+            if (isset($parameters[$i]) && $parameter->hasType() && ($type = $parameter->getType())) {
+                if ($type instanceof \ReflectionNamedType && gettype($parameters[$i]) === $type->getName()) {
+                    $dependencies[] = $parameters[$i];
+                    continue;
+                }
+            }
             static::addDependencyForCallParameter($container, $parameter, $parameters, $dependencies);
         }
 
