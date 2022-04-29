@@ -48,6 +48,7 @@ jobs:
 
       - name: Commit api docs
         if: steps.generate-api-docs.outcome == 'success'
+        continue-on-error: true
         run: |
           git config --global user.name 'Github Build Bot'
           git config --global user.email 'noreply@github.com'
