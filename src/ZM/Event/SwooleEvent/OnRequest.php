@@ -72,7 +72,9 @@ class OnRequest implements SwooleEvent
                     $div->class = $node['class'];
                     $dispatcher->dispatchEvent($div, null, $params, $request, $response);
 
-                    $this->response($response, $dispatcher->store);
+                    if (!$response->isEnd()) {
+                        $this->response($response, $dispatcher->store);
+                    }
                 }
             }
             if (!$response->isEnd()) {
