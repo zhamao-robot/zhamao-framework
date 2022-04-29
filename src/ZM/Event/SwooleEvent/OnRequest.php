@@ -14,7 +14,9 @@ use ZM\Annotation\Swoole\OnSwooleEvent;
 use ZM\Annotation\Swoole\SwooleHandler;
 use ZM\Config\ZMConfig;
 use ZM\Console\Console;
+use ZM\Container\Container;
 use ZM\Context\Context;
+use ZM\Context\ContextInterface;
 use ZM\Event\EventDispatcher;
 use ZM\Event\SwooleEvent;
 use ZM\Exception\InterruptException;
@@ -36,6 +38,8 @@ class OnRequest implements SwooleEvent
         unset(Context::$context[Coroutine::getCid()]);
         Console::debug('Calling Swoole "request" event from fd=' . $request->fd);
         set_coroutine_params(['request' => $request, 'response' => $response]);
+
+        $this->registerRequestContainerBindings($request, $response);
 
         $dis1 = new EventDispatcher(OnRequestEvent::class);
         $dis1->setRuleFunction(function ($v) {
@@ -66,15 +70,14 @@ class OnRequest implements SwooleEvent
                     $div->method = $node['method'];
                     $div->request_method = $node['request_method'];
                     $div->class = $node['class'];
-                    // Console::success("正在执行路由：".$node["method"]);
                     $dispatcher->dispatchEvent($div, null, $params, $request, $response);
-                    if (is_string($dispatcher->store) && !$response->isEnd()) {
-                        $response->end($dispatcher->store);
+
+                    if (!$response->isEnd()) {
+                        $this->response($response, $dispatcher->store);
                     }
                 }
             }
             if (!$response->isEnd()) {
-                // Console::warning('返回了404');
                 HttpUtil::responseCodePage($response, 404);
             }
         } catch (InterruptException $e) {
@@ -110,6 +113,41 @@ class OnRequest implements SwooleEvent
             }
             Console::error(zm_internal_errcode('E00023') . 'Internal server error (500), caused by ' . get_class($e) . ': ' . $e->getMessage());
             Console::log($e->getTraceAsString(), 'gray');
+        } finally {
+            container()->flush();
+        }
+    }
+
+    /**
+     * 注册请求容器绑定
+     */
+    private function registerRequestContainerBindings(Request $request, Response $response): void
+    {
+        $container = Container::getInstance();
+//        $container->setLogPrefix("[Container#{$frame->fd}]");
+        $container->instance(Request::class, $request);
+        $container->bind(ContextInterface::class, function () {
+            return ctx();
+        });
+        $container->alias(ContextInterface::class, Context::class);
+    }
+
+    /**
+     * 返回响应
+     * @param mixed $result
+     */
+    private function response(Response $response, $result): void
+    {
+        if (is_string($result)) {
+            $response->end($result);
+        } else {
+            try {
+                $response->header('Content-Type', 'application/json');
+                $response->end(json_encode($result, JSON_UNESCAPED_UNICODE));
+            } catch (Exception $e) {
+                Console::error('无法将响应转换为JSON：' . $e->getMessage());
+                $response->end(json_encode(zm_internal_errcode('E00023') . 'Internal server error.'));
+            }
         }
     }
 }
