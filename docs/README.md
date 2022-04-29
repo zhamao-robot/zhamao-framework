@@ -26,7 +26,7 @@ footer: |
 ```bash
 mkdir my-app
 cd my-app
-bash -c "$(curl -fsSL https://api.zhamao.xin/go.sh)"
+bash <(curl -fsSL https://api.zhamao.xin/go.sh)
 ```
 
 ## 运行框架
