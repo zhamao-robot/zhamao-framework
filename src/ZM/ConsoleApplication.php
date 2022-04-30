@@ -37,7 +37,7 @@ class ConsoleApplication extends Application
     /**
      * @throws InitException
      */
-    public function __construct(string $name = 'unknown')
+    public function __construct(string $name = 'UNKNOWN')
     {
         if (self::$obj !== null) {
             throw new InitException(zm_internal_errcode('E00069') . 'Initializing another Application is not allowed!');
