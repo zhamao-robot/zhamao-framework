@@ -10,3 +10,4 @@ parameters:
     - '#Unsafe usage of new static#'
   dynamicConstantNames:
     - SWOOLE_VERSION
+    - ZM_TEST_LOG_DEBUG

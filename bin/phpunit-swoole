@@ -2,12 +2,25 @@
 <?php
 /** For Swoole coroutine tests */
 
+// 如果改成 true，则会在终端显示所有炸毛框架的 Log
+const ZM_TEST_LOG_DEBUG = false;
+
+use Swoole\Coroutine;
+use ZM\Annotation\Swoole\OnStart;
 use ZM\Command\RunServerCommand;
+use ZM\Console\Console;
+use ZM\ConsoleApplication;
+use ZM\Event\EventManager;
+use ZM\Framework;
 use ZM\Store\ZMAtomic;
+use ZM\Utils\ZMUtil;
 
 $root = dirname(__DIR__);
 
-co::set([
+// 用于删除无用信息
+require $root . '/ext/lib/Version.php';
+
+Coroutine::set([
     'log_level' => SWOOLE_LOG_INFO,
     'trace_flags' => 0,
 ]);
@@ -40,9 +53,11 @@ if (!ini_get('date.timezone')) {
 }
 
 require $root . '/vendor/autoload.php';
+// 用于删除 PHPUnit 自带的无用信息
+require $root . '/ext/lib/Printer.php';
 
-const ZM_VERSION_ID = \ZM\ConsoleApplication::VERSION_ID;
-const ZM_VERSION = \ZM\ConsoleApplication::VERSION;
+const ZM_VERSION_ID = ConsoleApplication::VERSION_ID;
+const ZM_VERSION = ConsoleApplication::VERSION;
 
 // 模拟define
 const ZM_PROCESS_MASTER = 1;
@@ -64,19 +79,23 @@ $options['disable-safe-exit'] = true;
 $options['worker-num'] = 1;
 $options['private-mode'] = true;
 $options['log-error'] = true;
-\ZM\Console\Console::setLevel(0);
-$framework = new \ZM\Framework($options);
-$start = new \ZM\Annotation\Swoole\OnStart();
+
+$_SERVER['argv'][] = '--printer';
+$_SERVER['argv'][] = 'SEPrinter';
+
+Console::setLevel(0);
+$framework = new Framework($options);
+$start = new OnStart();
 $start->method = function () {
     try {
-        \ZM\Console\Console::setLevel(4);
+        Console::setLevel(ZM_TEST_LOG_DEBUG ? 4 : 0);
         $retcode = PHPUnit\TextUI\Command::main(false);
-        \ZM\Console\Console::setLevel(0);
     } finally {
-        \ZM\Utils\ZMUtil::stop(($retcode ?? 1) !== 0);
+        Console::setLevel(0);
+        ZMUtil::stop(($retcode ?? 1) !== 0);
     }
 };
-\ZM\Event\EventManager::addEvent(\ZM\Annotation\Swoole\OnStart::class, $start);
+EventManager::addEvent(OnStart::class, $start);
 
 $framework->start();
 

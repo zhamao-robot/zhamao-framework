@@ -254,7 +254,8 @@ function ctx(): ContextInterface
             return ZMBuf::$context_class[$cid] ?? (ZMBuf::$context_class[$cid] = new $c_class($cid));
         }
     }
-    throw new ZMKnownException(zm_internal_errcode('E00072') . 'Unable to find context environment');
+    Console::warning('当前环境不是协程环境，将返回独立的非协程的容器');
+    return ZMBuf::$context_class[$cid] ?? (ZMBuf::$context_class[$cid] = new $c_class($cid));
 }
 
 /**

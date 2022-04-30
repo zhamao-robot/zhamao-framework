@@ -521,7 +521,9 @@ class Framework
             self::$loaded_files = get_included_files();
             self::$server->start();
             zm_atomic('server_is_stopped')->set(1);
-            Console::log('zhamao-framework is stopped.');
+            if (!self::$argv['private-mode']) {
+                Console::log('zhamao-framework is stopped.');
+            }
         } catch (Throwable $e) {
             exit(zm_internal_errcode('E00011') . 'Framework has an uncaught ' . get_class($e) . ': ' . $e->getMessage() . PHP_EOL);
         }

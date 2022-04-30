@@ -110,8 +110,11 @@ class OnWorkerStart implements SwooleEvent
                 }
                 Console::success('Worker #' . $worker_id . ' started');
             } catch (Exception $e) {
+                if ($e->getMessage() === 'swoole exit') {
+                    return;
+                }
                 Console::error('Worker加载出错！停止服务！');
-                Console::error(zm_internal_errcode('E00030') . $e->getMessage() . "\n" . $e->getTraceAsString());
+                Console::error(zm_internal_errcode('E00030') . 'Uncaught ' . get_class($e) . ': ' . $e->getMessage() . "\n" . $e->getTraceAsString());
                 Process::kill($server->master_pid, SIGTERM);
                 return;
             } catch (Error $e) {
