@@ -42,8 +42,9 @@ final class Version
         }
 
         if (self::$version === '') {
-            $cmd = "grep -Eo '\\d+.\\d+.\\d+' --color=never " . __DIR__ . '/../../vendor/phpunit/phpunit/src/Runner/Version.php';
-            self::$version = '1.0.0'; // trim(exec($cmd));
+            $file = __DIR__ . '/../../vendor/phpunit/phpunit/src/Runner/Version.php';
+            preg_match('/\d+.\d+.\d+/', file_get_contents($file), $match);
+            self::$version = $match[0];
         }
 
         return self::$version;
