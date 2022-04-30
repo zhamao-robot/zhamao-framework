@@ -71,4 +71,9 @@ class GlobalFunctionsTest extends TestCase
             'escaped' => ['foo\\*bar', 'foo*bar', true],
         ];
     }
+
+    public function testZmExec(): void
+    {
+        $this->assertEquals(['code' => 0, 'signal' => 0, 'output' => "foo\n"], zm_exec('echo foo'));
+    }
 }
