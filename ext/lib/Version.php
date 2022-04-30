@@ -12,9 +12,7 @@ declare(strict_types=1);
 
 namespace PHPUnit\Runner;
 
-use SebastianBergmann\Version as VersionId;
 use function array_slice;
-use function dirname;
 use function explode;
 use function implode;
 use function strpos;
@@ -45,7 +43,7 @@ final class Version
 
         if (self::$version === '') {
             $cmd = "grep -Eo '\\d+.\\d+.\\d+' --color=never " . __DIR__ . '/../../vendor/phpunit/phpunit/src/Runner/Version.php';
-            self::$version = trim(exec($cmd));
+            self::$version = '1.0.0'; // trim(exec($cmd));
         }
 
         return self::$version;
