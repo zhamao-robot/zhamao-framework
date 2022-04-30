@@ -21,6 +21,7 @@ use ZM\Annotation\Interfaces\Level;
 use ZM\Annotation\Module\Closed;
 use ZM\Config\ZMConfig;
 use ZM\Console\Console;
+use ZM\Event\EventManager;
 use ZM\Exception\AnnotationException;
 use ZM\Utils\Manager\RouteManager;
 use ZM\Utils\ZMUtil;
@@ -156,11 +157,12 @@ class AnnotationParser
                                 }
                                 $inserted[$v][$method_name] = true;
                             }
-                        }
-                        if ($method_anno instanceof RequestMapping) {
+                        } elseif ($method_anno instanceof RequestMapping) {
                             RouteManager::importRouteByAnnotation($method_anno, $method_name, $v, $methods_annotations);
                         } elseif ($method_anno instanceof Middleware) {
                             $this->middleware_map[$method_anno->class][$method_anno->method][] = $method_anno;
+                        } else {
+                            EventManager::$event_map[$method_anno->class][$method_anno->method][] = $method_anno;
                         }
                     }
                 }

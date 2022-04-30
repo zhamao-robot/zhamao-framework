@@ -23,6 +23,8 @@ class EventManager
 
     public static $middleware_map = [];
 
+    public static $event_map = [];
+
     public static $middlewares = [];
 
     public static $req_mapping = [];
@@ -33,6 +35,7 @@ class EventManager
             Console::debug("Adding event {$event_name} at @Anonymous");
         } else {
             Console::debug("Adding event {$event_name} at " . ($event_obj->class) . ':' . ($event_obj->method));
+            self::$event_map[$event_obj->class][$event_obj->method][] = $event_obj;
         }
         self::$events[$event_name][] = $event_obj;
         (new AnnotationParser())->sortByLevel(self::$events, $event_name);
