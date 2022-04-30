@@ -98,6 +98,6 @@
         ],
         "analyse": "phpstan analyse --memory-limit 300M",
         "cs-fix": "php-cs-fixer fix",
-        "test": "bin/phpunit-swoole --no-coverage"
+        "test": "bin/phpunit-swoole --no-coverage -c phpunit.xml.dist"
     }
 }
