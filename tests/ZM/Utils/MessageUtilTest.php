@@ -9,6 +9,7 @@ use Throwable;
 use ZM\Annotation\CQ\CQCommand;
 use ZM\API\CQ;
 use ZM\Event\EventManager;
+use ZM\Utils\CommandInfoUtil;
 use ZM\Utils\DataProvider;
 use ZM\Utils\MessageUtil;
 
@@ -51,8 +52,8 @@ class MessageUtilTest extends TestCase
         $cmd->class = self::class;
         $cmd->method = __FUNCTION__;
         EventManager::addEvent(CQCommand::class, $cmd);
-        $help = MessageUtil::generateCommandHelp();
-        $this->assertEquals('测试命令：无描述', $help[0]);
+        $help = resolve(CommandInfoUtil::class)->getHelp(self::class . '@' . __FUNCTION__);
+        $this->assertEquals('测试命令：无描述', $help);
     }
 
     /**
