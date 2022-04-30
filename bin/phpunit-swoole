@@ -88,9 +88,8 @@ $framework = new Framework($options);
 $start = new OnStart();
 $start->method = function () {
     try {
-        Console::setLevel(ZM_TEST_LOG_DEBUG);
+        Console::setLevel(ZM_TEST_LOG_DEBUG ? 4 : 0);
         $retcode = PHPUnit\TextUI\Command::main(false);
-        Console::setLevel(0);
     } finally {
         Console::setLevel(0);
         ZMUtil::stop(($retcode ?? 1) !== 0);
