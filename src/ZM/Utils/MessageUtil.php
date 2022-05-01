@@ -373,7 +373,7 @@ class MessageUtil
                     if (!isset($arguments[$annotation->name])) {
                         $value = ctx()->waitMessage($annotation->prompt === '' ? ('请输入' . $annotation->name) : $annotation->prompt, $annotation->timeout);
                         if (!is_numeric($value)) {
-                            if ($annotation->error_prompt_policy === CommandArgument::ERROR_ONCE) {
+                            if ($annotation->error_prompt_policy === 1) {
                                 $value = ctx()->waitMessage($annotation->getTypeErrorPrompt(), $annotation->timeout);
                                 if (!is_numeric($value)) {
                                     throw new WaitTimeoutException(ctx(), $annotation->getErrorQuitPrompt());
@@ -406,7 +406,7 @@ class MessageUtil
                     if (!isset($arguments[$annotation->name])) {
                         $value = strtolower(ctx()->waitMessage($annotation->prompt === '' ? ('请输入' . $annotation->name) : $annotation->prompt, $annotation->timeout));
                         if (!in_array($value, array_merge(TRUE_LIST, FALSE_LIST))) {
-                            if ($annotation->error_prompt_policy === CommandArgument::ERROR_ONCE) {
+                            if ($annotation->error_prompt_policy === 1) {
                                 $value = strtolower(ctx()->waitMessage($annotation->getTypeErrorPrompt(), $annotation->timeout));
                                 if (!in_array($value, array_merge(TRUE_LIST, FALSE_LIST))) {
                                     throw new WaitTimeoutException(ctx(), $annotation->getErrorQuitPrompt());
