@@ -21,10 +21,6 @@ use ZM\Exception\ZMKnownException;
 #[Attribute(Attribute::IS_REPEATABLE | Attribute::TARGET_ALL)]
 class CommandArgument extends AnnotationBase implements ErgodicAnnotation
 {
-    public const ERROR_ONCE = 1;
-
-    public const ERROR_QUIT = 0;
-
     /**
      * @var string
      * @Required()
@@ -36,6 +32,9 @@ class CommandArgument extends AnnotationBase implements ErgodicAnnotation
      */
     public $description = '';
 
+    /**
+     * @var string
+     */
     public $type = 'string';
 
     /**
@@ -61,7 +60,7 @@ class CommandArgument extends AnnotationBase implements ErgodicAnnotation
     /**
      * @var int
      */
-    public $error_prompt_policy = self::ERROR_ONCE;
+    public $error_prompt_policy = 1;
 
     /**
      * @param  string                                    $name        参数名称（可以是中文）
@@ -80,7 +79,7 @@ class CommandArgument extends AnnotationBase implements ErgodicAnnotation
         string $prompt = '',
         string $default = '',
         int $timeout = 60,
-        int $error_prompt_policy = self::ERROR_ONCE,
+        int $error_prompt_policy = 1
     ) {
         $this->name = $name;
         $this->description = $description;
