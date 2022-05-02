@@ -5,6 +5,8 @@
 // 如果改成 true，则会在终端显示所有炸毛框架的 Log
 const ZM_TEST_LOG_DEBUG = false;
 
+use PHPUnit\Runner\Version;
+use PHPUnit\TextUI\TestRunner;
 use Swoole\Coroutine;
 use ZM\Annotation\Swoole\OnStart;
 use ZM\Command\RunServerCommand;
@@ -16,9 +18,6 @@ use ZM\Store\ZMAtomic;
 use ZM\Utils\ZMUtil;
 
 $root = dirname(__DIR__);
-
-// 用于删除无用信息
-require $root . '/ext/lib/Version.php';
 
 Coroutine::set([
     'log_level' => SWOOLE_LOG_INFO,
@@ -53,8 +52,6 @@ if (!ini_get('date.timezone')) {
 }
 
 require $root . '/vendor/autoload.php';
-// 用于删除 PHPUnit 自带的无用信息
-require $root . '/ext/lib/Printer.php';
 
 const ZM_VERSION_ID = ConsoleApplication::VERSION_ID;
 const ZM_VERSION = ConsoleApplication::VERSION;
@@ -80,8 +77,17 @@ $options['worker-num'] = 1;
 $options['private-mode'] = true;
 $options['log-error'] = true;
 
-$_SERVER['argv'][] = '--printer';
-$_SERVER['argv'][] = 'SEPrinter';
+spl_autoload_register(static function ($class) {
+    $map = [
+        TestRunner::class => 'vendor/phpunit/phpunit/src/TextUI/TestRunner.php',
+        Version::class => 'vendor/phpunit/phpunit/src/Runner/Version.php',
+    ];
+    if (isset($map[$class])) {
+        $source = file_get_contents(SOURCE_ROOT_DIR . '/' . $map[$class]);
+        $source = str_replace(['#StandWith', 'Ukraine', 'declare(strict_types=1);'], '', $source);
+        eval('?>' . $source);
+    }
+}, true, true);
 
 Console::setLevel(0);
 $framework = new Framework($options);
