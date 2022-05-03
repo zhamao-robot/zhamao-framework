@@ -209,3 +209,28 @@ public function generateCommandHelp(): array
 | 类型 | 描述 |
 | ---- | ----------- |
 | array | 帮助信息，每个元素对应一个命令的帮助信息，格式为：命令名（其他触发条件）：命令描述 |
+
+
+## checkArguments
+
+```php
+public function checkArguments(string $class, string $method, array $match): array
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| class | string |  |
+| method | string |  |
+| match | array |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| array |  |
