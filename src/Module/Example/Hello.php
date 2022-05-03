@@ -236,10 +236,9 @@ class Hello
     {
         $util = resolve(CommandInfoUtil::class);
         $commands = $util->get();
-        $helps = [];
-        foreach ($commands as $command) {
-            $helps[] = $util->getHelp($command['id']);
-        }
+        $helps = array_map(static function ($command) use ($util) {
+            return $util->getHelp($command['id']);
+        }, $commands);
         array_unshift($helps, '帮助：');
         return implode("\n", $helps);
     }
