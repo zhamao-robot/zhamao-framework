@@ -103,20 +103,20 @@ class CommandInfoUtil
                 $lines[0][] = "<{$arg_name}: {$arg_info['type']}>";
             } else {
                 $buffer = "[{$arg_name}: {$arg_info['type']}";
-                if ($arg_info['default'] !== null) {
+                if (!empty($arg_info['default'])) {
                     $buffer .= " = {$arg_info['default']}";
                 }
                 $lines[0][] = $buffer . ']';
             }
 
-            $lines[1][] = "{$arg_name}；{$arg_info['description']}";
+            $lines[][] = "{$arg_name}；{$arg_info['description']}";
         }
 
-        $buffer = '';
+        $buffer = [];
         foreach ($lines as $line) {
-            $buffer .= implode(' ', $line) . "\n";
+            $buffer[] = implode(' ', $line);
         }
-        return $buffer;
+        return implode("\n", $buffer);
     }
 
     /**
