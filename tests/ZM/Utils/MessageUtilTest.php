@@ -52,7 +52,7 @@ class MessageUtilTest extends TestCase
         $cmd->class = self::class;
         $cmd->method = __FUNCTION__;
         EventManager::addEvent(CQCommand::class, $cmd);
-        $help = resolve(CommandInfoUtil::class)->getHelp(self::class . '@' . __FUNCTION__);
+        $help = resolve(CommandInfoUtil::class)->getHelp(self::class . '@' . __FUNCTION__, true);
         $this->assertEquals('测试命令：作者很懒，啥也没说', $help);
     }
 

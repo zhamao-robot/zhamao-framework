@@ -7,6 +7,7 @@ namespace ZM\Utils;
 use JetBrains\PhpStorm\ArrayShape;
 use ReflectionException;
 use ReflectionMethod;
+use ZM\Annotation\CQ\CommandArgument;
 use ZM\Annotation\CQ\CQCommand;
 use ZM\Console\Console;
 use ZM\Event\EventManager;
