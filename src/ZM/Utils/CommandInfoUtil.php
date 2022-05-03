@@ -26,19 +26,7 @@ class CommandInfoUtil
     /**
      * 获取命令信息
      */
-    #[ArrayShape([[
-        'id' => 'string',
-        'call' => 'callable',
-        'descriptions' => ['string'],
-        'triggers' => ['trigger_name' => ['string']],
-        'args' => ['arg_name' => [
-            'name' => 'string',
-            'type' => 'string',
-            'description' => 'string',
-            'default' => 'mixed',
-            'required' => 'bool',
-        ]],
-    ]])]
+    #[ArrayShape([['id' => 'string', 'call' => 'callable', 'descriptions' => ['string'], 'triggers' => ['trigger_name' => ['string']], 'args' => ['arg_name' => ['name' => 'string', 'type' => 'string', 'description' => 'string', 'default' => 'mixed', 'required' => 'bool']]]])]
     public function get(): array
     {
         if (!$this->exists()) {
