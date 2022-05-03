@@ -25,26 +25,25 @@ class CommandInfoUtil
     /**
      * 获取命令信息
      */
-    #[ArrayShape([['id' => 'string', 'call' => 'callable', 'descriptions' => ['string'], 'trigger' => ['string' => ['string']]]])]
+    #[ArrayShape([[
+        'id' => 'string',
+        'call' => 'callable',
+        'descriptions' => ['string'],
+        'triggers' => ['trigger_name' => ['string']],
+        'args' => ['arg_name' => [
+            'name' => 'string',
+            'type' => 'string',
+            'description' => 'string',
+            'default' => 'mixed',
+            'required' => 'bool',
+        ]],
+    ]])]
     public function get(): array
     {
         if (!$this->exists()) {
-            return $this->generate();
+            return $this->generateCommandList();
         }
         return WorkerCache::get('commands');
-    }
-
-    /**
-     * 根据注解树生成命令信息
-     */
-    #[ArrayShape([['id' => 'string', 'call' => 'callable', 'descriptions' => ['string'], 'trigger' => ['string' => ['string']]]])]
-    public function generate(): array
-    {
-        if ($this->exists()) {
-            return $this->get();
-        }
-
-        return $this->generate0();
     }
 
     /**
@@ -52,15 +51,16 @@ class CommandInfoUtil
      */
     public function regenerate(): void
     {
-        $this->generate0();
+        $this->generateCommandList();
     }
 
     /**
      * 获取命令帮助
      *
      * @param string $command_id 命令ID，为 `class@method` 格式
+     * @param bool   $simple     是否仅输出简易信息（只有命令触发条件和描述）
      */
-    public function getHelp(string $command_id): string
+    public function getHelp(string $command_id, bool $simple = false): string
     {
         $command = $this->get()[$command_id];
 
@@ -100,7 +100,34 @@ class CommandInfoUtil
             $description = implode('；', $command['descriptions']);
         }
 
-        return "{$name}：{$description}";
+        if ($simple) {
+            return "{$name}：{$description}";
+        }
+
+        $lines = [];
+
+        $lines[0][] = $name;
+        $lines[1][] = $description;
+
+        foreach ($command['args'] as $arg_name => $arg_info) {
+            if ($arg_info['required']) {
+                $lines[0][] = "<{$arg_name}: {$arg_info['type']}>";
+            } else {
+                $buffer = "[{$arg_name}: {$arg_info['type']}";
+                if ($arg_info['default'] !== null) {
+                    $buffer .= " = {$arg_info['default']}";
+                }
+                $lines[0][] = $buffer . ']';
+            }
+
+            $lines[1][] = "{$arg_name}；{$arg_info['description']}";
+        }
+
+        $buffer = '';
+        foreach ($lines as $line) {
+            $buffer .= implode(' ', $line) . "\n";
+        }
+        return $buffer;
     }
 
     /**
@@ -114,8 +141,7 @@ class CommandInfoUtil
     /**
      * 根据注解树生成命令信息（内部）
      */
-    #[ArrayShape([['id' => 'string', 'call' => 'callable', 'descriptions' => ['string'], 'trigger' => ['string' => ['string']]]])]
-    protected function generate0(): array
+    protected function generateCommandList(): array
     {
         $commands = [];
 
@@ -146,6 +172,7 @@ class CommandInfoUtil
                 'call' => [$annotation->class, $annotation->method],
                 'descriptions' => $descriptions ?? [],
                 'triggers' => [],
+                'args' => [],
             ];
 
             if (empty($command['descriptions'])) {
@@ -171,10 +198,41 @@ class CommandInfoUtil
                 continue;
             }
 
+            $command['args'] = $this->generateCommandArgumentList($id);
+
             $commands[$id] = $command;
         }
 
         $this->save($commands);
         return $commands;
+    }
+
+    /**
+     * 生成指定命令的参数列表
+     *
+     * @param string $id 命令 ID
+     */
+    protected function generateCommandArgumentList(string $id): array
+    {
+        [$class, $method] = explode('@', $id);
+        $map = EventManager::$event_map[$class][$method];
+
+        $args = [];
+
+        foreach ($map as $annotation) {
+            if (!$annotation instanceof CommandArgument) {
+                continue;
+            }
+
+            $args[$annotation->name] = [
+                'name' => $annotation->name,
+                'type' => $annotation->type,
+                'description' => $annotation->description,
+                'default' => $annotation->default,
+                'required' => $annotation->required,
+            ];
+        }
+
+        return $args;
     }
 }
