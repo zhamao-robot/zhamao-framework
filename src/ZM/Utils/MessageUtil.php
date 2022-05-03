@@ -8,12 +8,16 @@ use Exception;
 use Iterator;
 use ReflectionException;
 use ReflectionMethod;
+use ZM\Annotation\CQ\CommandArgument;
 use ZM\Annotation\CQ\CQCommand;
 use ZM\API\CQ;
 use ZM\Config\ZMConfig;
 use ZM\Console\Console;
+use ZM\Entity\InputArguments;
 use ZM\Entity\MatchResult;
 use ZM\Event\EventManager;
+use ZM\Event\EventMapIterator;
+use ZM\Exception\WaitTimeoutException;
 use ZM\Requests\ZMRequest;
 use ZM\Store\WorkerCache;
 use ZM\Utils\Manager\WorkerManager;
@@ -326,5 +330,97 @@ class MessageUtil
         // 放到跨进程缓存以供取用
         WorkerCache::set('command_helps', $helps);
         return $helps;
+    }
+
+    /**
+     * @throws WaitTimeoutException
+     */
+    public static function checkArguments(string $class, string $method, array &$match): array
+    {
+        $iterator = new EventMapIterator($class, $method, CommandArgument::class);
+        $offset = 0;
+        $arguments = [];
+        foreach ($iterator as $annotation) {
+            /** @var CommandArgument $annotation */
+            switch ($annotation->type) {
+                case 'string':
+                case 'any':
+                    if (isset($match[$offset])) {
+                        $arguments[$annotation->name] = $match[$offset++];
+                    } else {
+                        if ($annotation->required) {
+                            $value = ctx()->waitMessage($annotation->prompt === '' ? ('请输入' . $annotation->name) : $annotation->prompt, $annotation->timeout);
+                            $arguments[$annotation->name] = $value;
+                        } else {
+                            $arguments[$annotation->name] = $annotation->default;
+                        }
+                    }
+                    break;
+                case 'number':
+                    for ($k = $offset; $k < count($match); ++$k) {
+                        $v = $match[$k];
+                        if (is_numeric($v)) {
+                            array_splice($match, $k, 1);
+                            $arguments[$annotation->name] = $v / 1;
+                            break 2;
+                        }
+                    }
+                    if (!$annotation->required) {
+                        if (is_numeric($annotation->default)) {
+                            $arguments[$annotation->name] = $annotation->default / 1;
+                        }
+                    }
+                    if (!isset($arguments[$annotation->name])) {
+                        $value = ctx()->waitMessage($annotation->prompt === '' ? ('请输入' . $annotation->name) : $annotation->prompt, $annotation->timeout);
+                        if (!is_numeric($value)) {
+                            if ($annotation->error_prompt_policy === 1) {
+                                $value = ctx()->waitMessage($annotation->getTypeErrorPrompt(), $annotation->timeout);
+                                if (!is_numeric($value)) {
+                                    throw new WaitTimeoutException(ctx(), $annotation->getErrorQuitPrompt());
+                                }
+                            } else {
+                                throw new WaitTimeoutException(ctx(), $annotation->getErrorQuitPrompt());
+                            }
+                        }
+                        $arguments[$annotation->name] = $value / 1;
+                    }
+                    break;
+                case 'bool':
+                    for ($k = $offset; $k < count($match); ++$k) {
+                        $v = strtolower($match[$k]);
+                        if (in_array(strtolower($v), TRUE_LIST)) {
+                            array_splice($match, $k, 1);
+                            $arguments[$annotation->name] = true;
+                            break 2;
+                        }
+                        if (in_array(strtolower($v), FALSE_LIST)) {
+                            array_splice($match, $k, 1);
+                            $arguments[$annotation->name] = false;
+                            break 2;
+                        }
+                    }
+                    if (!$annotation->required) {
+                        $default = $annotation->default === '' ? true : 'true';
+                        $arguments[$annotation->name] = in_array($default, TRUE_LIST);
+                    }
+                    if (!isset($arguments[$annotation->name])) {
+                        $value = strtolower(ctx()->waitMessage($annotation->prompt === '' ? ('请输入' . $annotation->name) : $annotation->prompt, $annotation->timeout));
+                        if (!in_array($value, array_merge(TRUE_LIST, FALSE_LIST))) {
+                            if ($annotation->error_prompt_policy === 1) {
+                                $value = strtolower(ctx()->waitMessage($annotation->getTypeErrorPrompt(), $annotation->timeout));
+                                if (!in_array($value, array_merge(TRUE_LIST, FALSE_LIST))) {
+                                    throw new WaitTimeoutException(ctx(), $annotation->getErrorQuitPrompt());
+                                }
+                            } else {
+                                throw new WaitTimeoutException(ctx(), $annotation->getErrorQuitPrompt());
+                            }
+                        }
+                        $arguments[$annotation->name] = in_array($value, TRUE_LIST);
+                    }
+                    break;
+            }
+        }
+        container()->instance(InputArguments::class, new InputArguments($arguments));
+        return $arguments;
     }
 }

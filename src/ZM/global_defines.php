@@ -17,6 +17,9 @@ if (!is_dir(CRASH_DIR)) {
     @mkdir(CRASH_DIR);
 }
 
+const TRUE_LIST = ['yes', 'y', 'true', 'on', '是', '对', true];
+const FALSE_LIST = ['no', 'n', 'false', 'off', '否', '错', false];
+
 const CONN_WEBSOCKET = 0;
 const CONN_HTTP = 1;
 const ZM_MATCH_ALL = 0;

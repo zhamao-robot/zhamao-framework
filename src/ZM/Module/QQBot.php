@@ -161,10 +161,13 @@ class QQBot
                 }
                 $s = MessageUtil::matchCommand($msg, ctx()->getData());
                 if ($s->status !== false) {
-                    if (!empty($s->match)) {
-                        ctx()->setCache('match', $s->match);
+                    $match = $s->match;
+
+                    $input_arguments = MessageUtil::checkArguments($s->object->class, $s->object->method, $match);
+                    if (!empty($match)) {
+                        ctx()->setCache('match', $match);
                     }
-                    $dispatcher->dispatchEvent($s->object, null);
+                    $dispatcher->dispatchEvent($s->object, null, ...$input_arguments);
                     if (is_string($dispatcher->store)) {
                         ctx()->reply($dispatcher->store);
                     }

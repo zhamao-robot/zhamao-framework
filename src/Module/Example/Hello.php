@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Module\Example;
 
+use ZM\Annotation\CQ\CommandArgument;
 use ZM\Annotation\CQ\CQBefore;
 use ZM\Annotation\CQ\CQCommand;
 use ZM\Annotation\CQ\CQMessage;
@@ -136,19 +137,18 @@ class Hello
      * 问法2：从1到20的随机数
      * @CQCommand("随机数")
      * @CQCommand(pattern="*从*到*的随机数")
-     *
+     * @CommandArgument(name="num1",type="int",required=true)
+     * @CommandArgument(name="num2",type="int",required=true)
+     * @param  mixed  $num1
+     * @param  mixed  $num2
      * @return string
      */
-    public function randNum()
+    public function randNum($num1, $num2)
     {
-        // 获取第一个数字类型的参数
-        $num1 = ctx()->getNumArg('请输入第一个数字');
-        // 获取第二个数字类型的参数
-        $num2 = ctx()->getNumArg('请输入第二个数字');
-        $a = min(intval($num1), intval($num2));
-        $b = max(intval($num1), intval($num2));
+        $a = min($num1, $num2);
+        $b = max($num1, $num2);
         // 回复用户结果
-        return '随机数是：' . mt_rand($a, $b);
+        return '从' . $a . '到' . $b . '的随机数是：' . mt_rand($a, $b);
     }
 
     /**
