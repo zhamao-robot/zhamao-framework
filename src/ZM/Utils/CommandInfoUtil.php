@@ -134,12 +134,7 @@ class CommandInfoUtil
     {
         $commands = [];
 
-        foreach (EventManager::$events[CQCommand::class] as $annotation) {
-            // 正常来说不可能，但保险起见需要判断
-            if (!$annotation instanceof CQCommand) {
-                continue;
-            }
-
+        foreach (EventManager::$events[CQCommand::class] ?? [] as $annotation) {
             $id = "{$annotation->class}@{$annotation->method}";
 
             try {
