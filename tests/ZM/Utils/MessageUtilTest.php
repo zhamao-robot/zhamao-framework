@@ -9,7 +9,6 @@ use Throwable;
 use ZM\Annotation\CQ\CQCommand;
 use ZM\API\CQ;
 use ZM\Event\EventManager;
-use ZM\Utils\CommandInfoUtil;
 use ZM\Utils\DataProvider;
 use ZM\Utils\MessageUtil;
 
@@ -43,17 +42,6 @@ class MessageUtilTest extends TestCase
             'two image' => ['hello world![CQ:image,file=123456.jpg][CQ:image,file=123456.jpg]', true],
             // 'malformed image' => ['[CQ:image,file=]', false],
         ];
-    }
-
-    public function testGenerateCommandHelp(): void
-    {
-        EventManager::$events[CQCommand::class] = [];
-        $cmd = new CQCommand('测试命令');
-        $cmd->class = self::class;
-        $cmd->method = __FUNCTION__;
-        EventManager::addEvent(CQCommand::class, $cmd);
-        $help = resolve(CommandInfoUtil::class)->getHelp(self::class . '@' . __FUNCTION__, true);
-        $this->assertEquals('测试命令：作者很懒，啥也没说', $help);
     }
 
     /**
