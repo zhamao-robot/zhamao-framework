@@ -194,23 +194,6 @@ public function arrayToStr(array $array): string
 | string |  |
 
 
-## generateCommandHelp
-
-```php
-public function generateCommandHelp(): array
-```
-
-### 描述
-
-根据注解树生成命令列表、帮助
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| array | 帮助信息，每个元素对应一个命令的帮助信息，格式为：命令名（其他触发条件）：命令描述 |
-
-
 ## checkArguments
 
 ```php
