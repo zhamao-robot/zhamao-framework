@@ -7,7 +7,6 @@ namespace Tests\ZM\Event;
 use Module\Example\Hello;
 use PHPUnit\Framework\TestCase;
 use ZM\Annotation\CQ\CommandArgument;
-use ZM\Console\Console;
 use ZM\Event\EventMapIterator;
 
 /**
