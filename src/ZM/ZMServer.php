@@ -15,21 +15,31 @@ use ZM\Module\ModuleBase;
  */
 class ZMServer
 {
+    /** @var string App名称 */
     protected $app_name;
 
     /** @var ModuleBase[] */
     protected $modules = [];
 
-    public function __construct($app_name)
+    /**
+     * @param string $app_name App名称
+     */
+    public function __construct(string $app_name)
     {
         $this->app_name = $app_name;
     }
 
+    /**
+     * @param mixed $module_class
+     */
     public function addModule($module_class)
     {
         $this->modules[] = $module_class;
     }
 
+    /**
+     * @throws InitException
+     */
     public function run()
     {
         Console::setLevel(4);
@@ -39,7 +49,7 @@ class ZMServer
             }
         }
         echo "Running...\n";
-        if (defined('WORKDING_DIR')) {
+        if (defined('WORKING_DIR')) {
             throw new InitException();
         }
 
@@ -57,10 +67,7 @@ class ZMServer
         (new Framework($options, true))->start();
     }
 
-    /**
-     * @return mixed
-     */
-    public function getAppName()
+    public function getAppName(): string
     {
         return $this->app_name;
     }
