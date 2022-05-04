@@ -15,11 +15,11 @@ use ZM\ConnectionManager\ManagerGM;
 use ZM\Console\Console;
 use ZM\Container\Container;
 use ZM\Container\ContainerInterface;
+use ZM\Container\EntryResolutionException;
 use ZM\Context\Context;
 use ZM\Context\ContextInterface;
 use ZM\Event\EventManager;
 use ZM\Exception\RobotNotFoundException;
-use ZM\Exception\ZMKnownException;
 use ZM\Framework;
 use ZM\Store\LightCacheInside;
 use ZM\Store\ZMAtomic;
@@ -183,8 +183,7 @@ function match_args(string $pattern, string $subject)
 /**
  * 判断当前连接类型是否为传入的$type
  *
- * @param  string           $type 连接类型
- * @throws ZMKnownException
+ * @param string $type 连接类型
  */
 function current_connection_is(string $type): bool
 {
@@ -737,7 +736,8 @@ function container(): ContainerInterface
  * 解析类实例（使用容器）
  *
  * @template T
- * @param  class-string<T> $abstract
+ * @param  class-string<T>          $abstract
+ * @throws EntryResolutionException
  * @return Closure|mixed|T
  */
 function resolve(string $abstract, array $parameters = [])
@@ -750,6 +750,7 @@ function resolve(string $abstract, array $parameters = [])
  *
  * @template T
  * @param  null|class-string<T>               $abstract
+ * @throws EntryResolutionException
  * @return Closure|ContainerInterface|mixed|T
  */
 function app(string $abstract = null, array $parameters = [])
