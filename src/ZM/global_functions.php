@@ -15,7 +15,6 @@ use ZM\ConnectionManager\ManagerGM;
 use ZM\Console\Console;
 use ZM\Container\Container;
 use ZM\Container\ContainerInterface;
-use ZM\Container\EntryResolutionException;
 use ZM\Context\Context;
 use ZM\Context\ContextInterface;
 use ZM\Event\EventManager;
@@ -736,8 +735,7 @@ function container(): ContainerInterface
  * 解析类实例（使用容器）
  *
  * @template T
- * @param  class-string<T>          $abstract
- * @throws EntryResolutionException
+ * @param  class-string<T> $abstract
  * @return Closure|mixed|T
  */
 function resolve(string $abstract, array $parameters = [])
@@ -750,7 +748,6 @@ function resolve(string $abstract, array $parameters = [])
  *
  * @template T
  * @param  null|class-string<T>               $abstract
- * @throws EntryResolutionException
  * @return Closure|ContainerInterface|mixed|T
  */
 function app(string $abstract = null, array $parameters = [])

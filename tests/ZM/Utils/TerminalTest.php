@@ -18,7 +18,7 @@ class TerminalTest extends TestCase
     {
         Console::setLevel(4);
         Terminal::init();
-        $this->assertStringContainsString('Initializing Terminal', $this->getActualOutput());
+        $this->expectOutputRegex('/Initializing\ Terminal/');
     }
 
     /**
@@ -28,6 +28,6 @@ class TerminalTest extends TestCase
     {
         Console::setLevel(2);
         Terminal::executeCommand('echo zhamao-framework');
-        $this->assertStringContainsString('zhamao-framework', $this->getActualOutput());
+        $this->expectOutputRegex('/zhamao-framework/');
     }
 }
