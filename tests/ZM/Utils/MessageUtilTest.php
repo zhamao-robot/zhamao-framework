@@ -44,17 +44,6 @@ class MessageUtilTest extends TestCase
         ];
     }
 
-    public function testGenerateCommandHelp(): void
-    {
-        EventManager::$events[CQCommand::class] = [];
-        $cmd = new CQCommand('测试命令');
-        $cmd->class = self::class;
-        $cmd->method = __FUNCTION__;
-        EventManager::addEvent(CQCommand::class, $cmd);
-        $help = MessageUtil::generateCommandHelp();
-        $this->assertEquals('测试命令：无描述', $help[0]);
-    }
-
     /**
      * @dataProvider providerTestArrayToStr
      */

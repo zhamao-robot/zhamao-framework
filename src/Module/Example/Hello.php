@@ -13,6 +13,7 @@ use ZM\Annotation\Http\RequestMapping;
 use ZM\Annotation\Swoole\OnCloseEvent;
 use ZM\Annotation\Swoole\OnOpenEvent;
 use ZM\Annotation\Swoole\OnRequestEvent;
+use ZM\Annotation\Swoole\OnStart;
 use ZM\API\CQ;
 use ZM\API\OneBotV11;
 use ZM\API\TuringAPI;
@@ -24,6 +25,7 @@ use ZM\Event\EventDispatcher;
 use ZM\Exception\InterruptException;
 use ZM\Module\QQBot;
 use ZM\Requests\ZMRequest;
+use ZM\Utils\CommandInfoUtil;
 use ZM\Utils\MessageUtil;
 use ZM\Utils\ZMUtil;
 
@@ -232,7 +234,11 @@ class Hello
     #[CQCommand('帮助')]
     public function help(): string
     {
-        $helps = MessageUtil::generateCommandHelp();
+        $util = resolve(CommandInfoUtil::class);
+        $commands = $util->get();
+        $helps = array_map(static function ($command) use ($util) {
+            return $util->getHelp($command['id']);
+        }, $commands);
         array_unshift($helps, '帮助：');
         return implode("\n", $helps);
     }
