@@ -17,7 +17,6 @@ class EventMapIteratorTest extends TestCase
 {
     public function testIterator(): void
     {
-        Console::setLevel(4);
         $iterator = new EventMapIterator(Hello::class, 'randNum', CommandArgument::class);
         $arr = iterator_to_array($iterator);
         $this->assertArrayNotHasKey(0, $arr);
