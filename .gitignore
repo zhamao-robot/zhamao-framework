@@ -8,6 +8,9 @@
 /temp/
 /site/
 
+# 框架审计文件
+audit.log
+
 # 进程锁文件
 .daemon_pid
 .zm_worker_*.pid
