@@ -18,6 +18,7 @@ class TerminalTest extends TestCase
     {
         Console::setLevel(4);
         Terminal::init();
+        Console::setLevel(0);
         $this->expectOutputRegex('/Initializing\ Terminal/');
     }
 
@@ -28,6 +29,7 @@ class TerminalTest extends TestCase
     {
         Console::setLevel(2);
         Terminal::executeCommand('echo zhamao-framework');
+        Console::setLevel(0);
         $this->expectOutputRegex('/zhamao-framework/');
     }
 }

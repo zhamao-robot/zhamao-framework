@@ -354,7 +354,7 @@ class CQ
      */
     public static function encode($msg, bool $is_content = false): string
     {
-        $msg = str_replace(['&', '[', ']'], ['&amp;', '&#91;', '&#93;'], $msg);
+        $msg = str_replace(['&', '[', ']'], ['&amp;', '&#91;', '&#93;'], strval($msg));
         if ($is_content) {
             $msg = str_replace(',', '&#44;', $msg);
         }
