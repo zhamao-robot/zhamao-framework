@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ZM\API;
 
+use Stringable;
 use ZM\Console\Console;
 use ZM\Entity\CQObject;
 
@@ -169,11 +170,11 @@ class CQ
 
     /**
      * 发送好友或群推荐名片
-     * @param  string     $type 名片类型
+     * @param  int|string $type 名片类型
      * @param  int|string $id   好友或群ID
      * @return string     CQ码
      */
-    public static function contact(string $type, $id): string
+    public static function contact($type, $id): string
     {
         return "[CQ:contact,type={$type},id={$id}]";
     }
@@ -306,11 +307,11 @@ class CQ
 
     /**
      * 反转义字符串中的CQ码敏感符号
-     * @param  string $msg        字符串
-     * @param  bool   $is_content 如果是解码CQ码本体内容，则为false（默认），如果是参数内的字符串，则为true
-     * @return string 转义后的CQ码
+     * @param  int|string|Stringable $msg        字符串
+     * @param  bool                  $is_content 如果是解码CQ码本体内容，则为false（默认），如果是参数内的字符串，则为true
+     * @return string                转义后的CQ码
      */
-    public static function decode(string $msg, bool $is_content = false): string
+    public static function decode($msg, bool $is_content = false): string
     {
         $msg = str_replace(['&amp;', '&#91;', '&#93;'], ['&', '[', ']'], $msg);
         if ($is_content) {
@@ -321,10 +322,10 @@ class CQ
 
     /**
      * 简单反转义替换CQ码的方括号
-     * @param  string $str 字符串
-     * @return string 字符串
+     * @param  int|string|Stringable $str 字符串
+     * @return string                字符串
      */
-    public static function replace(string $str): string
+    public static function replace($str): string
     {
         $str = str_replace('{{', '[', $str);
         return str_replace('}}', ']', $str);
@@ -332,11 +333,11 @@ class CQ
 
     /**
      * 转义CQ码的特殊字符，同encode
-     * @param  string $msg        字符串
-     * @param  bool   $is_content 如果是转义CQ码本体内容，则为false（默认），如果是参数内的字符串，则为true
-     * @return string 转义后的CQ码
+     * @param  int|string|Stringable $msg        字符串
+     * @param  bool                  $is_content 如果是转义CQ码本体内容，则为false（默认），如果是参数内的字符串，则为true
+     * @return string                转义后的CQ码
      */
-    public static function escape(string $msg, bool $is_content = false): string
+    public static function escape($msg, bool $is_content = false): string
     {
         $msg = str_replace(['&', '[', ']'], ['&amp;', '&#91;', '&#93;'], $msg);
         if ($is_content) {
@@ -347,11 +348,11 @@ class CQ
 
     /**
      * 转义CQ码的特殊字符
-     * @param  string $msg        字符串
-     * @param  bool   $is_content 如果是转义CQ码本体内容，则为false（默认），如果是参数内的字符串，则为true
-     * @return string 转义后的CQ码
+     * @param  int|string|Stringable $msg        字符串
+     * @param  bool                  $is_content 如果是转义CQ码本体内容，则为false（默认），如果是参数内的字符串，则为true
+     * @return string                转义后的CQ码
      */
-    public static function encode(string $msg, bool $is_content = false): string
+    public static function encode($msg, bool $is_content = false): string
     {
         $msg = str_replace(['&', '[', ']'], ['&amp;', '&#91;', '&#93;'], $msg);
         if ($is_content) {
