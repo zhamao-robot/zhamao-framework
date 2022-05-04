@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ZM\Event;
 
 use Iterator;
+use ReturnTypeWillChange;
 use ZM\Console\Console;
 
 class EventMapIterator implements Iterator
@@ -24,6 +25,7 @@ class EventMapIterator implements Iterator
         $this->event_name = $event_name;
     }
 
+    #[ReturnTypeWillChange]
     public function current()
     {
         Console::debug('从 [' . $this->offset . '] 开始获取');
@@ -36,6 +38,7 @@ class EventMapIterator implements Iterator
         $this->nextToValid();
     }
 
+    #[ReturnTypeWillChange]
     public function key()
     {
         Console::debug('返回key：' . $this->offset);
