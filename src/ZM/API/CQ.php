@@ -17,11 +17,7 @@ class CQ
      */
     public static function at($qq): string
     {
-        if (is_numeric($qq) || $qq === 'all') {
-            return '[CQ:at,qq=' . $qq . ']';
-        }
-        Console::warning(zm_internal_errcode('E00035') . "传入的QQ号码({$qq})错误！");
-        return ' ';
+        return self::buildCQ('at', ['qq' => $qq]);
     }
 
     /**
@@ -31,11 +27,7 @@ class CQ
      */
     public static function face($id): string
     {
-        if (is_numeric($id)) {
-            return '[CQ:face,id=' . $id . ']';
-        }
-        Console::warning(zm_internal_errcode('E00035') . "传入的face id({$id})错误！");
-        return ' ';
+        return self::buildCQ('face', ['id' => $id]);
     }
 
     /**
@@ -49,13 +41,13 @@ class CQ
      */
     public static function image(string $file, bool $cache = true, bool $flash = false, bool $proxy = true, int $timeout = -1): string
     {
-        return
-            '[CQ:image,file=' . self::encode($file, true) .
-            (!$cache ? ',cache=0' : '') .
-            ($flash ? ',type=flash' : '') .
-            (!$proxy ? ',proxy=false' : '') .
-            ($timeout != -1 ? (',timeout=' . $timeout) : '') .
-            ']';
+        $optional_values = [
+            'cache' => !$cache ? 'cache=0' : '',
+            'flash' => $flash ? 'type=flash' : '',
+            'proxy' => !$proxy ? 'proxy=false' : '',
+            'timeout' => $timeout != -1 ? 'timeout=' . $timeout : '',
+        ];
+        return self::buildCQ('image', ['file' => $file], $optional_values);
     }
 
     /**
@@ -69,13 +61,13 @@ class CQ
      */
     public static function record(string $file, bool $magic = false, bool $cache = true, bool $proxy = true, int $timeout = -1): string
     {
-        return
-            '[CQ:record,file=' . self::encode($file, true) .
-            ($magic ? ',magic=1' : '') .
-            (!$cache ? ',cache=0' : '') .
-            (!$proxy ? ',proxy=false' : '') .
-            ($timeout != -1 ? (',timeout=' . $timeout) : '') .
-            ']';
+        $optional_values = [
+            'magic' => $magic ? 'magic=true' : '',
+            'cache' => !$cache ? 'cache=0' : '',
+            'proxy' => !$proxy ? 'proxy=false' : '',
+            'timeout' => $timeout != -1 ? 'timeout=' . $timeout : '',
+        ];
+        return self::buildCQ('record', ['file' => $file], $optional_values);
     }
 
     /**
@@ -88,12 +80,12 @@ class CQ
      */
     public static function video(string $file, bool $cache = true, bool $proxy = true, int $timeout = -1): string
     {
-        return
-            '[CQ:video,file=' . self::encode($file, true) .
-            (!$cache ? ',cache=0' : '') .
-            (!$proxy ? ',proxy=false' : '') .
-            ($timeout != -1 ? (',timeout=' . $timeout) : '') .
-            ']';
+        $optional_values = [
+            'cache' => !$cache ? 'cache=0' : '',
+            'proxy' => !$proxy ? 'proxy=false' : '',
+            'timeout' => $timeout != -1 ? 'timeout=' . $timeout : '',
+        ];
+        return self::buildCQ('video', ['file' => $file], $optional_values);
     }
 
     /**
@@ -132,7 +124,10 @@ class CQ
      */
     public static function poke($type, $id, string $name = ''): string
     {
-        return "[CQ:poke,type={$type},id={$id}" . ($name != '' ? (',name=' . self::encode($name, true)) : '') . ']';
+        $optional_values = [
+            'name' => $name ? 'name=' . $name : '',
+        ];
+        return self::buildCQ('poke', ['type' => $type, 'id' => $id], $optional_values);
     }
 
     /**
@@ -142,7 +137,7 @@ class CQ
      */
     public static function anonymous(int $ignore = 1): string
     {
-        return '[CQ:anonymous' . ($ignore != 1 ? ',ignore=0' : '') . ']';
+        return self::buildCQ('anonymous', [], ['ignore' => $ignore != 1 ? 'ignore=0' : '']);
     }
 
     /**
@@ -155,17 +150,11 @@ class CQ
      */
     public static function share(string $url, string $title, ?string $content = null, ?string $image = null): string
     {
-        if ($content === null) {
-            $c = '';
-        } else {
-            $c = ',content=' . self::encode($content, true);
-        }
-        if ($image === null) {
-            $i = '';
-        } else {
-            $i = ',image=' . self::encode($image, true);
-        }
-        return '[CQ:share,url=' . self::encode($url, true) . ',title=' . self::encode($title, true) . $c . $i . ']';
+        $optional_values = [
+            'content' => $content ? 'content=' . self::encode($content, true) : '',
+            'image' => $image ? 'image=' . self::encode($image, true) : '',
+        ];
+        return self::buildCQ('share', ['url' => $url, 'title' => $title], $optional_values);
     }
 
     /**
@@ -176,7 +165,7 @@ class CQ
      */
     public static function contact($type, $id): string
     {
-        return "[CQ:contact,type={$type},id={$id}]";
+        return self::buildCQ('contact', ['type' => $type, 'id' => $id]);
     }
 
     /**
@@ -189,12 +178,11 @@ class CQ
      */
     public static function location($lat, $lon, string $title = '', string $content = ''): string
     {
-        return '[CQ:location' .
-            ',lat=' . self::encode((string) $lat, true) .
-            ',lon=' . self::encode((string) $lon, true) .
-            ($title != '' ? (',title=' . self::encode($title, true)) : '') .
-            ($content != '' ? (',content=' . self::encode($content, true)) : '') .
-            ']';
+        $optional_values = [
+            'title' => $title ? 'title=' . self::encode($title, true) : '',
+            'content' => $content ? 'content=' . self::encode($content, true) : '',
+        ];
+        return self::buildCQ('location', ['lat' => $lat, 'lon' => $lon], $optional_values);
     }
 
     /**
@@ -216,26 +204,17 @@ class CQ
             case 'qq':
             case '163':
             case 'xiami':
-                return "[CQ:music,type={$type},id={$id_or_url}]";
+                return self::buildCQ('music', ['type' => $type, 'id' => $id_or_url]);
             case 'custom':
                 if ($title === null || $audio === null) {
                     Console::warning(zm_internal_errcode('E00035') . '传入CQ码实例的标题和音频链接不能为空！');
                     return ' ';
                 }
-                if ($content === null) {
-                    $c = '';
-                } else {
-                    $c = ',content=' . self::encode($content, true);
-                }
-                if ($image === null) {
-                    $i = '';
-                } else {
-                    $i = ',image=' . self::encode($image, true);
-                }
-                return '[CQ:music,type=custom,url=' .
-                    self::encode($id_or_url, true) .
-                    ',audio=' . self::encode($audio, true) . ',title=' . self::encode($title, true) . $c . $i .
-                    ']';
+                $optional_values = [
+                    'content' => $content ? 'content=' . self::encode($content, true) : '',
+                    'image' => $image ? 'image=' . self::encode($image, true) : '',
+                ];
+                return self::buildCQ('music', ['type' => 'custom', 'url' => $id_or_url, 'audio' => $audio, 'title' => $title], $optional_values);
             default:
                 Console::warning(zm_internal_errcode('E00035') . "传入的music type({$type})错误！");
                 return ' ';
@@ -249,7 +228,7 @@ class CQ
      */
     public static function forward($id): string
     {
-        return '[CQ:forward,id=' . self::encode((string) $id) . ']';
+        return self::buildCQ('forward', ['id' => $id]);
     }
 
     /**
@@ -257,15 +236,15 @@ class CQ
      * 特殊说明: 需要使用单独的API /send_group_forward_msg 发送, 并且由于消息段较为复杂, 仅支持Array形式入参。
      * 如果引用消息和自定义消息同时出现, 实际查看顺序将取消息段顺序。
      * 另外按 CQHTTP 文档说明, data 应全为字符串, 但由于需要接收message 类型的消息, 所以 仅限此Type的content字段 支持Array套娃
-     * @deprecated 这个不推荐使用，因为 go-cqhttp 官方没有对其提供CQ码模式相关支持，仅支持Array模式发送
      * @param  int|string $user_id  转发消息id
      * @param  string     $nickname 发送者显示名字
      * @param  string     $content  具体消息
      * @return string     CQ码
+     * @deprecated 这个不推荐使用，因为 go-cqhttp 官方没有对其提供CQ码模式相关支持，仅支持Array模式发送
      */
     public static function node($user_id, string $nickname, string $content): string
     {
-        return "[CQ:node,user_id={$user_id},nickname=" . self::encode($nickname, true) . ',content=' . self::encode($content, true) . ']';
+        return self::buildCQ('node', ['user_id' => $user_id, 'nickname' => $nickname, 'content' => $content]);
     }
 
     /**
@@ -275,7 +254,7 @@ class CQ
      */
     public static function xml(string $data): string
     {
-        return '[CQ:xml,data=' . self::encode($data, true) . ']';
+        return self::buildCQ('xml', ['data' => $data]);
     }
 
     /**
@@ -286,7 +265,7 @@ class CQ
      */
     public static function json(string $data, int $resid = 0): string
     {
-        return '[CQ:json,data=' . self::encode($data, true) . ',resid=' . $resid . ']';
+        return self::buildCQ('json', ['data' => $data, 'resid' => $resid]);
     }
 
     /**
@@ -297,12 +276,7 @@ class CQ
      */
     public static function _custom(string $type_name, array $params): string
     {
-        $code = '[CQ:' . $type_name;
-        foreach ($params as $k => $v) {
-            $code .= ',' . $k . '=' . self::escape($v, true);
-        }
-        $code .= ']';
-        return $code;
+        return self::buildCQ($type_name, $params);
     }
 
     /**
@@ -313,7 +287,7 @@ class CQ
      */
     public static function decode($msg, bool $is_content = false): string
     {
-        $msg = str_replace(['&amp;', '&#91;', '&#93;'], ['&', '[', ']'], $msg);
+        $msg = str_replace(['&amp;', '&#91;', '&#93;'], ['&', '[', ']'], (string) $msg);
         if ($is_content) {
             $msg = str_replace('&#44;', ',', $msg);
         }
@@ -327,7 +301,7 @@ class CQ
      */
     public static function replace($str): string
     {
-        $str = str_replace('{{', '[', $str);
+        $str = str_replace('{{', '[', (string) $str);
         return str_replace('}}', ']', $str);
     }
 
@@ -339,7 +313,7 @@ class CQ
      */
     public static function escape($msg, bool $is_content = false): string
     {
-        $msg = str_replace(['&', '[', ']'], ['&amp;', '&#91;', '&#93;'], $msg);
+        $msg = str_replace(['&', '[', ']'], ['&amp;', '&#91;', '&#93;'], (string) $msg);
         if ($is_content) {
             $msg = str_replace(',', '&#44;', $msg);
         }
@@ -354,7 +328,7 @@ class CQ
      */
     public static function encode($msg, bool $is_content = false): string
     {
-        $msg = str_replace(['&', '[', ']'], ['&amp;', '&#91;', '&#93;'], strval($msg));
+        $msg = str_replace(['&', '[', ']'], ['&amp;', '&#91;', '&#93;'], (string) $msg);
         if ($is_content) {
             $msg = str_replace(',', '&#44;', $msg);
         }
@@ -438,5 +412,23 @@ class CQ
             $cqs[] = (!$is_object ? $cq : CQObject::fromArray($cq));
         }
         return $cqs;
+    }
+
+    private static function buildCQ(string $cq, array $array, array $optional_values = []): string
+    {
+        $str = '[CQ:' . $cq;
+        foreach ($array as $k => $v) {
+            if ($v === null) {
+                Console::warning('param ' . $k . ' cannot be set with null, empty CQ will returned!');
+                return ' ';
+            }
+            $str .= ',' . $k . '=' . self::encode($v);
+        }
+        foreach ($optional_values as $v) {
+            if ($v !== '') {
+                $str .= ',' . $v;
+            }
+        }
+        return $str . ']';
     }
 }
