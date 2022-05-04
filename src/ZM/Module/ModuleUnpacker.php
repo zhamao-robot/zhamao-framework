@@ -197,6 +197,10 @@ class ModuleUnpacker
             $prompt = !is_string($this->module['unpack']['global-config-override']) ? '请根据模块提供者提供的要求进行修改 global.php 中对应的配置项' : $this->module['unpack']['global-config-override'];
             Console::warning('模块作者要求用户手动修改 global.php 配置文件中的项目：');
             Console::warning('*' . $prompt);
+            if (STDIN === false) {
+                Console::warning('检测到终端无法输入，请手动修改 global.php 配置文件中的项目');
+                return;
+            }
             echo Console::setColor('请输入修改模式，y(使用vim修改)/e(自行使用其他编辑器修改后确认)/N(默认暂不修改)：[y/e/N] ', 'gold');
             $r = strtolower(trim(fgets(STDIN)));
             switch ($r) {
