@@ -69,7 +69,7 @@ class ReflectionUtil
             case is_object($var):
                 return get_class($var);
             case is_resource($var):
-                return 'resource' . get_resource_type($var);
+                return 'resource(' . get_resource_type($var) . ')';
             case is_null($var):
                 return 'null';
             case is_bool($var):
