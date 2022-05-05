@@ -254,7 +254,7 @@ public function share(string $url, string $title, null|string $content, null|str
 ## contact
 
 ```php
-public function contact(string $type, int|string $id): string
+public function contact(int|string $type, int|string $id): string
 ```
 
 ### 描述
@@ -265,7 +265,7 @@ public function contact(string $type, int|string $id): string
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| type | string | 名片类型 |
+| type | int|string | 名片类型 |
 | id | int|string | 好友或群ID |
 
 ### 返回
@@ -455,7 +455,7 @@ public function _custom(string $type_name, array $params): string
 ## decode
 
 ```php
-public function decode(string $msg, bool $is_content): string
+public function decode(int|string|Stringable $msg, bool $is_content): string
 ```
 
 ### 描述
@@ -466,7 +466,7 @@ public function decode(string $msg, bool $is_content): string
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| msg | string | 字符串 |
+| msg | int|string|Stringable | 字符串 |
 | is_content | bool | 如果是解码CQ码本体内容，则为false（默认），如果是参数内的字符串，则为true |
 
 ### 返回
@@ -479,7 +479,7 @@ public function decode(string $msg, bool $is_content): string
 ## replace
 
 ```php
-public function replace(string $str): string
+public function replace(int|string|Stringable $str): string
 ```
 
 ### 描述
@@ -490,7 +490,7 @@ public function replace(string $str): string
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| str | string | 字符串 |
+| str | int|string|Stringable | 字符串 |
 
 ### 返回
 
@@ -502,7 +502,7 @@ public function replace(string $str): string
 ## escape
 
 ```php
-public function escape(string $msg, bool $is_content): string
+public function escape(int|string|Stringable $msg, bool $is_content): string
 ```
 
 ### 描述
@@ -513,7 +513,7 @@ public function escape(string $msg, bool $is_content): string
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| msg | string | 字符串 |
+| msg | int|string|Stringable | 字符串 |
 | is_content | bool | 如果是转义CQ码本体内容，则为false（默认），如果是参数内的字符串，则为true |
 
 ### 返回
@@ -526,7 +526,7 @@ public function escape(string $msg, bool $is_content): string
 ## encode
 
 ```php
-public function encode(string $msg, bool $is_content): string
+public function encode(int|string|Stringable $msg, bool $is_content): string
 ```
 
 ### 描述
@@ -537,7 +537,7 @@ public function encode(string $msg, bool $is_content): string
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| msg | string | 字符串 |
+| msg | int|string|Stringable | 字符串 |
 | is_content | bool | 如果是转义CQ码本体内容，则为false（默认），如果是参数内的字符串，则为true |
 
 ### 返回
