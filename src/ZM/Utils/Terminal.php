@@ -7,10 +7,10 @@ declare(strict_types=1);
 namespace ZM\Utils;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Error;
 use Exception;
 use ReflectionClass;
 use Swoole\Process;
+use Throwable;
 use ZM\Annotation\Command\TerminalCommand;
 use ZM\ConnectionManager\ManagerGM;
 use ZM\Console\Console;
@@ -22,8 +22,7 @@ class Terminal
     public static $default_commands = false;
 
     /**
-     * @throws Exception
-     * @throws Error
+     * @throws Throwable
      * @return bool
      * @noinspection PhpMissingReturnTypeInspection
      * @noinspection PhpUnused

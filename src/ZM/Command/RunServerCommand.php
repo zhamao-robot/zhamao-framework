@@ -48,6 +48,7 @@ class RunServerCommand extends Command
             new InputOption('polling-watch', null, null, '强制启用轮询模式监听'),
             new InputOption('no-state-check', null, null, '关闭启动前框架运行状态检查'),
             new InputOption('private-mode', null, null, '启动时隐藏MOTD和敏感信息'),
+            new InputOption('audit-mode', null, null, '启动时开启审计模式，独立将所有日志输出到文件供开发人员审计'),
         ]);
         $this->setDescription('Run zhamao-framework | 启动框架');
         $this->setHelp('直接运行可以启动');

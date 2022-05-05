@@ -744,6 +744,17 @@ class Framework
                     case 'log-debug':
                         Console::setLevel(4);
                         break;
+                    case 'audit-mode':
+                        Console::warning('审计模式已开启，请正常执行需要审计的流程，然后Ctrl+C正常结束框架');
+                        Console::warning('审计的日志文件将存放到：' . DataProvider::getWorkingDir() . '/audit.log');
+                        if (file_exists(DataProvider::getWorkingDir() . '/audit.log')) {
+                            unlink(DataProvider::getWorkingDir() . '/audit.log');
+                        }
+                        Console::info('框架将于5秒后开始启动...');
+                        Console::setOutputFile(DataProvider::getWorkingDir() . '/audit.log');
+                        Console::setLevel(4);
+                        sleep(5);
+                        break;
                     case 'log-theme':
                         Console::$theme = $y;
                         break;

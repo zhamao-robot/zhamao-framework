@@ -15,7 +15,7 @@ cd zhamao-app/
 bash -c "$(curl -fsSL https://api.zhamao.xin/go.sh)"
 
 # 安装完成后的启动框架命令（2.5.0 版本后可省略掉 runtime/php 前缀）
-vendor/bin/start server
+./zhamao server
 
 # 扩展用法：使用静态 PHP 版本的 Composer update
 runtime/composer update
@@ -80,3 +80,15 @@ $ vendor/bin/start server
 
 ## 进阶环境部署和开发
 炸毛框架还支持更多种启动方式，如源码模式、守护进程模式，具体后续有关环境和部署的进阶教程，请查看 [进阶开发](/advanced/) 部分！
+
+## Windows 注意事项
+
+由于 Swoole 扩展目前无法原生支持 Windows 环境的 PHP，所以以上方式都是默认在 Linux、macOS 系统下的命令。
+
+如果需要在 Windows 上开发和运行，可以使用 WSL（1 和 2 均可）、Linux 虚拟机、Docker 或 cygwin。
+
+如果使用 WSL、虚拟机或 Docker，方式可以直接参考上方相关命令。如果使用 cygwin，可先从 [Swoole 官方仓库](https://github.com/swoole/swoole-src) 下载 swoole 的 cygwin 构建版本，然后下载 Composer 后安装依赖，直接运行框架即可。
+
+## macOS 注意事项
+
+macOS 理论上运行环境和 Linux 无异，但 macOS 由于不能静态编译，所以不能使用静态编译的 PHP 直接运行，需自行从 `Homebrew` 下载最新版 PHP（命令 `brew install php`），然后使用命令 `pecl install swoole` 来安装 Swoole 后运行框架。

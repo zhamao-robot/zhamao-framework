@@ -6,6 +6,7 @@ namespace ZM\Event;
 
 use Iterator;
 use ReturnTypeWillChange;
+use ZM\Console\Console;
 
 class EventMapIterator implements Iterator
 {
@@ -22,40 +23,56 @@ class EventMapIterator implements Iterator
         $this->class = $class;
         $this->method = $method;
         $this->event_name = $event_name;
-        $this->nextToValid();
     }
 
+    #[ReturnTypeWillChange]
     public function current()
     {
+        Console::debug('从 [' . $this->offset . '] 开始获取');
         return EventManager::$event_map[$this->class][$this->method][$this->offset];
     }
 
     public function next(): void
     {
-        ++$this->offset;
+        Console::debug('下一个offset为 [' . ++$this->offset . ']');
         $this->nextToValid();
     }
 
     #[ReturnTypeWillChange]
     public function key()
     {
-        return $this->offset;
+        Console::debug('返回key：' . $this->offset);
+        return isset(EventManager::$event_map[$this->class][$this->method][$this->offset]) ? $this->offset : null;
     }
 
-    public function valid(): bool
+    public function valid($s = false): bool
     {
-        return isset(EventManager::$event_map[$this->class][$this->method][$this->offset]);
+        Console::debug(
+            "[{$this->offset}] " .
+            ($s ? 'valid' : '') . '存在：' .
+            (!isset(EventManager::$event_map[$this->class][$this->method][$this->offset]) ? Console::setColor('false', 'red') : ('true' .
+                (is_a(EventManager::$event_map[$this->class][$this->method][$this->offset], $this->event_name, true) ? '，是目标对象' : '，不是目标对象')))
+        );
+        return
+            isset(EventManager::$event_map[$this->class][$this->method][$this->offset])
+            && is_a(EventManager::$event_map[$this->class][$this->method][$this->offset], $this->event_name, true);
     }
 
     public function rewind(): void
     {
+        Console::debug('回到0');
         $this->offset = 0;
+        $this->nextToValid();
     }
 
     private function nextToValid()
     {
-        while ($this->valid() && !is_a($this->current(), $this->event_name, true)) {
+        while (
+            isset(EventManager::$event_map[$this->class][$this->method][$this->offset])
+            && !is_a(EventManager::$event_map[$this->class][$this->method][$this->offset], $this->event_name, true)
+        ) {
             ++$this->offset;
         }
+        Console::debug('内部偏移offset为 [' . $this->offset . ']');
     }
 }

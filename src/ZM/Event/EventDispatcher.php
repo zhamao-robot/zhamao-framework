@@ -9,6 +9,7 @@ use Closure;
 use Doctrine\Common\Annotations\AnnotationException;
 use Error;
 use Exception;
+use Throwable;
 use ZM\Config\ZMConfig;
 use ZM\Console\Console;
 use ZM\Exception\InterruptException;
@@ -110,7 +111,7 @@ class EventDispatcher
 
     /**
      * @param  mixed     ...$params
-     * @throws Exception
+     * @throws Throwable
      */
     public function dispatchEvents(...$params)
     {
@@ -137,7 +138,7 @@ class EventDispatcher
         } catch (InterruptException $e) {
             $this->store = $e->return_var;
             $this->status = self::STATUS_INTERRUPTED;
-        } catch (Exception|Error $e) {
+        } catch (Throwable $e) {
             $this->status = self::STATUS_EXCEPTION;
             throw $e;
         }

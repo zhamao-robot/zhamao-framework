@@ -19,7 +19,6 @@ use ZM\Context\Context;
 use ZM\Context\ContextInterface;
 use ZM\Event\EventManager;
 use ZM\Exception\RobotNotFoundException;
-use ZM\Exception\ZMKnownException;
 use ZM\Framework;
 use ZM\Store\LightCacheInside;
 use ZM\Store\ZMAtomic;
@@ -183,8 +182,7 @@ function match_args(string $pattern, string $subject)
 /**
  * 判断当前连接类型是否为传入的$type
  *
- * @param  string           $type 连接类型
- * @throws ZMKnownException
+ * @param string $type 连接类型
  */
 function current_connection_is(string $type): bool
 {
