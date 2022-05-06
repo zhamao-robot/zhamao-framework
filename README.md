@@ -74,18 +74,32 @@ public function index() {
 
 ## 开始
 
-如果你是初学者，可以直接使用以下脚本部署 PHP 环境和安装框架的脚手架：
+框架目前支持 Linux、WSL、macOS 环境直接运行，上述环境可直接使用下方一键安装脚本。
+
+> 如果你想在其他环境安装部署，可使用 Docker、Cygwin，详见文档。
 
 ```bash
-# 新建一个自己喜欢名字的文件夹，运行一键安装脚本 (仅限 x86-64(AMD64) 和 AArch64(ARM64) 平台)
-mkdir zhamao-app/
-cd zhamao-app/
-# 默认安装的 PHP 版本为 7.4，如需使用其他版本，请设置环境变量 ZM_DOWN_PHP_VERSION 为对应的 PHP 版本，例如：
-# export ZM_DOWN_PHP_VERSION=8.1
-bash -c "$(curl -fsSL https://api.zhamao.xin/go.sh)"
+# 检测PHP环境、安装框架
+bash <(curl -fsSL https://zhamao.xin/go.sh)
 
-# 启动
-./zhamao server:start
+# 启动框架
+cd zhamao-app
+./zhamao server
+```
+
+一键安装脚本还有可以自定义参数的方式，比如：
+
+```bash
+# 脚本默认会检测系统的PHP，如果想直接跳过检测，安装独立的PHP版本，则添加此环境变量
+export ZM_NO_LOCAL_PHP="yes"
+# 脚本如果安装独立版本PHP，默认版本为8.0，如果想使用其他版本，则添加此环境变量指定版本
+export ZM_DOWN_PHP_VERSION="8.1"
+# 脚本默认会将框架在当前目录下的 `zhamao-app` 目录进行安装，如果想使用其他目录，则添加此环境变量
+export ZM_CUSTOM_DIR="my-custom-app"
+# 脚本默认会对本项目使用阿里云国内加速镜像，如果想使用packagist源，则添加此环境变量
+export ZM_COMPOSER_PACKAGIST="yes"
+# 执行完前面的环境变量再执行一键安装脚本，就可以实现自定义参数！
+bash <(curl -fsSL https://zhamao.xin/go.sh)
 ```
 
 关于其他安装方式，请参阅[文档](https://framework.zhamao.xin/guide/installation.html) 。
