@@ -1,5 +1,22 @@
 # ZM\Container\WorkerContainer
 
+## getInstance
+
+```php
+public function getInstance(): static
+```
+
+### 描述
+
+获取类实例
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| static |  |
+
+
 ## bound
 
 ```php
@@ -822,20 +839,3 @@ public function log(string $message): void
 | 类型 | 描述 |
 | ---- | ----------- |
 | void |  |
-
-
-## getInstance
-
-```php
-public function getInstance(): static
-```
-
-### 描述
-
-获取类实例
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| static |  |
