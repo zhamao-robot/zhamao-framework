@@ -43,7 +43,9 @@ class ServerStopCommand extends DaemonCommand
         } else {
             parent::execute($input, $output);
         }
-        Process::kill(intval($this->daemon_file['pid']), SIGTERM);
+        if ($this->daemon_file !== null) {
+            Process::kill(intval($this->daemon_file['pid']), SIGTERM);
+        }
         $i = 10;
         while (Framework::getProcessState(ZM_PROCESS_MASTER) !== false && $i > 0) {
             sleep(1);
