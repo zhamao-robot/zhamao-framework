@@ -4,19 +4,13 @@ declare(strict_types=1);
 
 namespace ZM\Container;
 
-class Container extends WorkerContainer
-{
-    /**
-     * 父容器
-     *
-     * @var ContainerInterface
-     */
-    protected $parent;
+use ZM\Utils\SingletonTrait;
 
-    public function __construct()
-    {
-        parent::__construct();
-        $this->parent = WorkerContainer::getInstance();
+class Container implements ContainerInterface
+{
+    use SingletonTrait;
+    use ContainerTrait {
+        make as protected traitMake;
     }
 
     /**
@@ -24,7 +18,7 @@ class Container extends WorkerContainer
      */
     public function getParent(): ContainerInterface
     {
-        return $this->parent;
+        return WorkerContainer::getInstance();
     }
 
     /**
@@ -38,7 +32,7 @@ class Container extends WorkerContainer
      */
     public function has(string $id): bool
     {
-        return $this->bound($id) || $this->parent->has($id);
+        return $this->bound($id) || $this->getParent()->has($id);
     }
 
     /**
@@ -57,19 +51,11 @@ class Container extends WorkerContainer
         }
 
         // 此类没有，父类有，则从父类中获取
-        if (!$this->bound($abstract) && $this->parent->bound($abstract)) {
-            return $this->parent->make($abstract, $parameters);
+        if (!$this->bound($abstract) && $this->getParent()->bound($abstract)) {
+            $this->log("{$abstract} is not bound, but in parent container, using parent container");
+            return $this->getParent()->make($abstract, $parameters);
         }
 
-        return parent::make($abstract, $parameters);
-    }
-
-    /**
-     * 清除所有绑定和实例
-     */
-    public function flush(): void
-    {
-        parent::flush();
-        $this->parent->flush();
+        return $this->traitMake($abstract, $parameters);
     }
 }
