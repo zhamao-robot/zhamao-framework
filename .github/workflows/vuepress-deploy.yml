@@ -1,10 +1,11 @@
-name: VuePress Auto Deploy
+name: Docs and Script Auto Deploy
 on:
   push:
     branches:
       - master
     paths:
       - 'docs/**'
+      - 'ext/**'
 
 jobs:
   build:
@@ -32,3 +33,11 @@ jobs:
           REMOTE_HOST: ${{ secrets.ZHAMAO_XIN_HOST }}
           REMOTE_USER: ${{ secrets.ZHAMAO_XIN_USER }}
           TARGET: ${{ secrets.ZHAMAO_XIN_TARGET }}
+      - name: deploy script file
+        uses: wlixcc/SFTP-Deploy-Action@v1.0
+        with:
+          username: ${{ secrets.ZHAMAO_XIN_USER }}
+          server: ${{ secrets.ZHAMAO_XIN_HOST }}
+          ssh_private_key: ${{ secrets.ZHAMAO_XIN_PRIVATE_KEY }}
+          local_path: './ext/go.sh'
+          remote_path: ${{ secrets.ZHAMAO_XIN_MAIN_TARGET }}
