@@ -14,6 +14,8 @@ use Swoole\Coroutine;
 use Swoole\Database\PDOConfig;
 use Swoole\Process;
 use Swoole\WebSocket\Server;
+use ZM\Adapters\AdapterInterface;
+use ZM\Adapters\OneBot11Adapter;
 use ZM\Annotation\AnnotationParser;
 use ZM\Annotation\Swoole\OnMessageEvent;
 use ZM\Annotation\Swoole\OnStart;
@@ -30,7 +32,6 @@ use ZM\Event\SwooleEvent;
 use ZM\Exception\DbException;
 use ZM\Exception\ZMKnownException;
 use ZM\Framework;
-use ZM\Module\QQBot;
 use ZM\MySQL\MySQLPool;
 use ZM\Store\LightCacheInside;
 use ZM\Store\MySQL\SqlPoolStorage;
@@ -215,8 +216,8 @@ class OnWorkerStart implements SwooleEvent
             Console::debug('OneBot support enabled, listening OneBot event(3).');
             $obj = new OnMessageEvent();
             $obj->connect_type = 'qq';
-            $obj->class = QQBot::class;
-            $obj->method = 'handleByEvent';
+            $obj->class = AdapterInterface::class;
+            $obj->method = 'handleIncomingRequest';
             $obj->level = $obb_onebot['message_level'] ?? 99;
             EventManager::addEvent(OnMessageEvent::class, $obj);
             if ($obb_onebot['single_bot_mode']) {
@@ -310,5 +311,7 @@ class OnWorkerStart implements SwooleEvent
         // 基础
         $container->instance('server', $server);
         $container->instance('worker_id', $server->worker_id);
+
+        $container->singleton(AdapterInterface::class, OneBot11Adapter::class);
     }
 }

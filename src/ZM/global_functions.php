@@ -760,6 +760,23 @@ function app(string $abstract = null, array $parameters = [])
 }
 
 /**
+ * 根据键名比较对象和数组
+ *
+ * @param object $object 对象
+ * @param array  $array  数组
+ * @param array  $keys   键名
+ */
+function compare_object_and_array_by_keys(object $object, array $array, array $keys): bool
+{
+    foreach ($keys as $key) {
+        if (!isset($object->{$key}, $array[$key]) || $object->{$key} !== $array[$key]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+/**
  * 以下为废弃的函数，将于未来移除
  */
 
