@@ -21,17 +21,16 @@ footer: |
 
 ## 安装框架和环境
 
-此命令可一键以模板安装 `zhamao-framework` 和 `PHP` 独立环境到目录下，无需 root！（仅限 Linux）
+此命令可一键以模板安装框架！（仅限 Linux 和 macOS）
 
 ```bash
-mkdir my-app
-cd my-app
-bash <(curl -fsSL https://api.zhamao.xin/go.sh)
+bash <(curl -fsSL https://zhamao.xin/go.sh)
 ```
 
 ## 运行框架
 
 ```bash
+cd zhamao-app/
 ./zhamao server
 ```
 

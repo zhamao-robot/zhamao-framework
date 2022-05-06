@@ -6,21 +6,15 @@
 
 ## 一键下载静态 PHP 环境和框架脚手架
 
-从 2.4.4 版本起，炸毛框架支持一键拉取一个静态的 PHP 运行时和脚手架，只需运行下面的脚本即可。（开发环境推荐此方法）
+从 2.4.4 版本起，炸毛框架支持一键拉取一个静态的 PHP 运行时和脚手架（如果本机内安装的 PHP 已符合要求，则不安装），只需运行下面的脚本即可。
 
 ```bash
 # 将会把 PHP、框架都安装在此目录下
-mkdir zhamao-app/ # 这里可以取自己的项目名字
-cd zhamao-app/
-bash -c "$(curl -fsSL https://api.zhamao.xin/go.sh)"
+bash <(curl -fsSL https://zhamao.xin/go.sh)
 
 # 安装完成后的启动框架命令（2.5.0 版本后可省略掉 runtime/php 前缀）
+cd zhamao-app
 ./zhamao server
-
-# 扩展用法：使用静态 PHP 版本的 Composer update
-runtime/composer update
-# 扩展用法：使用静态 PHP 运行别的 CLI 脚本
-runtime/php path/to/your/script.php
 ```
 
 > 有关静态 PHP 的多种用法（如 Composer），见 [进阶 - PHP 环境高级](/advanced/php-env)
