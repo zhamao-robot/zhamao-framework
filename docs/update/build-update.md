@@ -4,6 +4,41 @@
 
 同时此处将只使用 build 版本号进行区分。
 
+## build 473 (2022-5-7)
+
+- 修复 `server:stop` 命令下部分情况报错的问题
+
+## build 472 (2022-5-6)
+
+- 修复 Container 环境继承全局变量的问题
+
+## build 471 (2022-5-5)
+
+- 修复 `CQ::encode()` 无法传入 `int` 的强类型解析问题（#113）
+- （内部）重构 CQ 类
+- 新增启动命令参数 `--audit-mode`，用于单次审计模式
+- 修复 `EventMapIterator` 对 PHP 8.1 的兼容性问题
+- 修复 #95 中提到的无输入流时报错的问题
+- 新增部分不可执行脚本的防呆退出功能
+- 修复 `ZMServer` 中的 typo
+
+## build 470 (2022-5-4)
+
+- 重构帮助生成器，将帮助生成器重构为 `CommandInfoUtil` 类
+
+## build 469 (2022-5-3)
+
+- 新增 `@CommandArgument` 注解，可直接通过注解添加聊天机器人命令参数
+- 修改默认 Hello 模块下随机数功能为采用 `@CommandArgument` 注解模式
+- （内部）新增 `EventManager::$event_map`，用于补充对事件对象遍历的方式
+- 新增 `EventMapIterator` 类，用于遍历注解事件对象
+- 新增 `MessageUtil::checkArguments()` 方法，用于检查 `@CommandArgument` 注解
+
+## build 468 (2022-4-30)
+
+- 优化单元测试流程
+- 优化上下文对象，在非协程环境下不再会抛出异常或返回 null
+
 ## build 467 (2022-4-29)
 
 - 优化 `@RequestMapping` 注解事件的方法返回值处理，支持数组和字符串（数组自动转为 JSON 格式）
