@@ -30,6 +30,10 @@ use ZM\Utils\ZMUtil;
 
 class Framework
 {
+    public const VERSION_ID = 600;
+
+    public const VERSION = '3.0.0-alpha1';
+
     /**
      * 框架运行的参数
      *
