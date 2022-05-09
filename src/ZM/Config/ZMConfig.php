@@ -82,7 +82,7 @@ class ZMConfig
         $head_name = array_shift($separated);
         // 首先判断有没有初始化这个配置文件，因为是只读，所以是懒加载，加载第一次后缓存起来
         if (!isset(self::$config[$head_name])) {
-            Console::success('配置文件' . $name . ' ' . $additional_key . '没读取过，正在从文件加载 ...');
+            Console::debug('配置文件' . $name . ' ' . $additional_key . '没读取过，正在从文件加载 ...');
             self::$config[$head_name] = self::loadConfig($head_name);
         }
         // global.remote_terminal
