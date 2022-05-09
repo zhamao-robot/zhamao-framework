@@ -4,11 +4,13 @@ on:
   push:
     branches:
       - master
+      - '*-develop'
     paths:
       - '**/**.php'
   pull_request:
     branches:
       - master
+      - '*-develop'
     types:
       - opened
       - synchronize
