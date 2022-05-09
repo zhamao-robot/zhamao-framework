@@ -57,8 +57,8 @@ jobs:
       - name: Increment build number
         id: increment-build-number
         run: |
-          sed -i -r 's/(.*)(\VERSION_ID\s=\s)([0-9]+)(.*)/echo "\1\2$((\3+1))\4"/ge' src/ZM/ConsoleApplication.php
-          BUILD_ID=$(cat src/ZM/ConsoleApplication.php | grep "VERSION_ID = " | sed 's/[^0-9]//g')
+          sed -i -r 's/(.*)(\VERSION_ID\s=\s)([0-9]+)(.*)/echo "\1\2$((\3+1))\4"/ge' src/ZM/Framework.php
+          BUILD_ID=$(cat src/ZM/Framework.php | grep "VERSION_ID = " | sed 's/[^0-9]//g')
           echo "::set-output name=build_id::$BUILD_ID"
 
       - name: Commit build number
