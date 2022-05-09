@@ -19,6 +19,7 @@ use ZM\Config\ZMConfig;
 use ZM\ConnectionManager\ManagerGM;
 use ZM\Console\Console;
 use ZM\Console\TermColor;
+use ZM\Exception\ConfigException;
 use ZM\Exception\ZMKnownException;
 use ZM\Store\LightCache;
 use ZM\Store\LightCacheInside;
@@ -77,8 +78,9 @@ class Framework
     /**
      * 创建一个新的框架实例
      *
-     * @param array $args         运行参数
-     * @param bool  $instant_mode 是否为单文件模式
+     * @param  array           $args         运行参数
+     * @param  bool            $instant_mode 是否为单文件模式
+     * @throws ConfigException
      */
     public function __construct(array $args = [], bool $instant_mode = false)
     {
@@ -88,7 +90,7 @@ class Framework
 
         // 初始化配置
         ZMConfig::setDirectory(DataProvider::getSourceRootDir() . '/config');
-        ZMConfig::setEnv($args['env'] ?? '');
+        ZMConfig::setEnv($args['env'] ?? 'development');
         if (ZMConfig::get('global') === false) {
             echo zm_internal_errcode('E00007') . 'Global config load failed: ' . ZMConfig::$last_error . "\nError path: " . DataProvider::getSourceRootDir() . "\nPlease init first!\nSee: https://github.com/zhamao-robot/zhamao-framework/issues/37\n";
             exit(1);
@@ -686,8 +688,9 @@ class Framework
     /**
      * 解析命令行的 $argv 参数们
      *
-     * @param array       $args     命令行参数
-     * @param bool|string $add_port 是否添加端口号
+     * @param  array           $args     命令行参数
+     * @param  bool|string     $add_port 是否添加端口号
+     * @throws ConfigException
      */
     private function parseCliArgs(array $args, &$add_port)
     {
