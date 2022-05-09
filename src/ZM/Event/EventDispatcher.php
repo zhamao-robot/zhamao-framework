@@ -10,9 +10,11 @@ use Doctrine\Common\Annotations\AnnotationException;
 use Error;
 use Exception;
 use Throwable;
+use ZM\Adapters\OneBot11Adapter;
 use ZM\Config\ZMConfig;
 use ZM\Console\Console;
 use ZM\Exception\InterruptException;
+use ZM\Module\QQBot;
 use ZM\Store\LightCacheInside;
 use ZM\Store\Lock\SpinLock;
 use ZM\Store\ZMAtomic;
@@ -117,6 +119,11 @@ class EventDispatcher
     {
         try {
             foreach ((EventManager::$events[$this->class] ?? []) as $v) {
+//                if ($v->class === QQBot::class && $v->method === 'handleByEvent') {
+//                    zm_dump(EventManager::$events[$this->class]);
+//                    $v->class = OneBot11Adapter::class;
+//                    $v->method = 'handleIncomingRequest';
+//                }
                 $this->dispatchEvent($v, $this->rule, ...$params);
                 if ($this->log) {
                     Console::verbose("[事件分发{$this->eid}] 单一对象 " . $v->class . '::' . (is_string($v->method) ? $v->method : '{closure}') . ' 分发结束。');

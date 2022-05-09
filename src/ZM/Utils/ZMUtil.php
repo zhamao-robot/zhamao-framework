@@ -10,7 +10,6 @@ use ZM\Console\Console;
 use ZM\Framework;
 use ZM\Store\Lock\SpinLock;
 use ZM\Store\ZMAtomic;
-use ZM\Store\ZMBuf;
 use function file_get_contents;
 use function get_included_files;
 use function is_callable;
@@ -51,11 +50,7 @@ class ZMUtil
 
     public static function getModInstance($class)
     {
-        if (!isset(ZMBuf::$instance[$class])) {
-            // Console::debug('Class instance $class not exist, so I created it.');
-            return ZMBuf::$instance[$class] = new $class();
-        }
-        return ZMBuf::$instance[$class];
+        return resolve($class);
     }
 
     /**
