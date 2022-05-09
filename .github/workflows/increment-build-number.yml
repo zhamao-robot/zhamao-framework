@@ -19,7 +19,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
-          ref: ${{ github.head_ref }}
+          ref: ${{ github.base_ref }}
 
       - name: Setup PHP
         uses: "shivammathur/setup-php@v2"
