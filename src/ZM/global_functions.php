@@ -776,6 +776,11 @@ function compare_object_and_array_by_keys(object $object, array $array, array $k
     return true;
 }
 
+function is_assoc_array(array $array): bool
+{
+    return !empty($array) && array_keys($array) !== range(0, count($array) - 1);
+}
+
 /**
  * 以下为废弃的函数，将于未来移除
  */
