@@ -48,12 +48,12 @@ class ZMConfigTest extends TestCase
      */
     public function testReload()
     {
+        $this->expectOutputRegex('/没读取过，正在从文件加载/');
         $this->assertEquals('0.0.0.0', ZMConfig::get('global.host'));
         ZMConfig::reload();
         Console::setLevel(4);
         $this->assertEquals('0.0.0.0', ZMConfig::get('global.host'));
         Console::setLevel(0);
-        $this->assertStringContainsString('没读取过，正在从文件加载', $this->getActualOutput());
     }
 
     public function testSetAndRestoreDirectory()
