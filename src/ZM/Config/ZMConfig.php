@@ -268,14 +268,7 @@ class ZMConfig
         Console::debug('正加载配置文件 ' . $filename);
         switch ($ext_name) {
             case 'php':
-                $r = include_once $filename;
-                if ($r === true) {
-                    // 已经加载过的文件，掐头直接eval读取
-                    $file_content = str_replace(['<?php', 'declare(strict_types=1);'], '', file_get_contents($filename));
-                    // 配置文件中可能有使用到 __DIR__ 的本地变量，在 eval 中执行会发生变化，所以需要重置下
-                    $file_content = str_replace('__DIR__', '"' . dirname($filename) . '"', $file_content);
-                    $r = eval($file_content);
-                }
+                $r = require $filename;
                 if (is_array($r)) {
                     return $r;
                 }
