@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\ZM\Utils;
 
+use Exception;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 use ZM\Annotation\CQ\CQCommand;
-use ZM\API\CQ;
 use ZM\Event\EventManager;
 use ZM\Utils\DataProvider;
 use ZM\Utils\MessageUtil;
@@ -17,6 +17,9 @@ use ZM\Utils\MessageUtil;
  */
 class MessageUtilTest extends TestCase
 {
+    /**
+     * @throws Exception
+     */
     public function testAddShortCommand(): void
     {
         EventManager::$events[CQCommand::class] = [];
@@ -152,17 +155,17 @@ class MessageUtilTest extends TestCase
      */
     public function testDownloadCQImage(): void
     {
-        if (file_exists(DataProvider::getDataFolder('images') . '/test.jpg')) {
-            unlink(DataProvider::getDataFolder('images') . '/test.jpg');
+        if (file_exists(DataProvider::getDataFolder('images') . '/test.png')) {
+            unlink(DataProvider::getDataFolder('images') . '/test.png');
         }
-        $msg = '[CQ:image,file=test.jpg,url=https://zhamao.xin/file/hello.jpg]';
+        $msg = '[CQ:image,file=test.png,url=https://zhamao.xin/file/hello.png]';
 
         try {
             $result = MessageUtil::downloadCQImage($msg);
             $this->assertIsArray($result);
             $this->assertCount(1, $result);
-            $this->assertFileExists(DataProvider::getDataFolder('images') . '/test.jpg');
-            unlink(DataProvider::getDataFolder('images') . '/test.jpg');
+            $this->assertFileExists(DataProvider::getDataFolder('images') . '/test.png');
+            unlink(DataProvider::getDataFolder('images') . '/test.png');
         } catch (Throwable $e) {
             if (strpos($e->getMessage(), 'enable-openssl') !== false) {
                 $this->markTestSkipped('OpenSSL is not enabled');

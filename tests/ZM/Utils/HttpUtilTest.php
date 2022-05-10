@@ -10,6 +10,7 @@ use Swoole\Http\Response;
 use Symfony\Component\Routing\RouteCollection;
 use ZM\Annotation\Http\RequestMapping;
 use ZM\Annotation\Http\RequestMethod;
+use ZM\Config\ZMConfig;
 use ZM\Utils\HttpUtil;
 use ZM\Utils\Manager\RouteManager;
 
@@ -25,7 +26,7 @@ class HttpUtilTest extends TestCase
     {
         $swoole_response = $this->getMockClass(Response::class);
         $r = new \ZM\Http\Response(new $swoole_response());
-        HttpUtil::handleStaticPage($page, $r);
+        HttpUtil::handleStaticPage($page, $r, ZMConfig::get('global', 'static_file_server'));
         $this->assertEquals($expected, $r->getStatusCode() === 200);
     }
 

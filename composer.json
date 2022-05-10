@@ -27,7 +27,6 @@
         "symfony/polyfill-mbstring": "^1.19",
         "symfony/polyfill-php80": "^1.16",
         "symfony/routing": "~6.0 || ~5.0 || ~4.0 || ~3.0",
-        "zhamao/config": "^1.0",
         "zhamao/connection-manager": "^1.0",
         "zhamao/console": "^1.0",
         "zhamao/request": "^1.1"

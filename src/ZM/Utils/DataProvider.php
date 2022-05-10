@@ -11,6 +11,7 @@ use RuntimeException;
 use Traversable;
 use ZM\Config\ZMConfig;
 use ZM\Console\Console;
+use ZM\Exception\ConfigException;
 
 class DataProvider
 {
@@ -57,6 +58,7 @@ class DataProvider
     /**
      * 获取框架反代链接
      *
+     * @throws ConfigException
      * @return null|array|false|mixed
      */
     public static function getFrameworkLink()
@@ -88,6 +90,7 @@ class DataProvider
      *
      * @param  string                                                 $filename   文件名
      * @param  array|int|Iterator|JsonSerializable|string|Traversable $file_array 文件内容数组
+     * @throws ConfigException
      * @return false|int                                              返回文件大小或false
      */
     public static function saveToJson(string $filename, $file_array)
@@ -112,8 +115,9 @@ class DataProvider
     /**
      * 从json加载变量到内存
      *
-     * @param  string     $filename 文件名
-     * @return null|mixed 返回文件内容数据或null
+     * @param  string          $filename 文件名
+     * @throws ConfigException
+     * @return null|mixed      返回文件内容数据或null
      */
     public static function loadFromJson(string $filename)
     {
