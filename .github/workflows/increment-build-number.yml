@@ -53,6 +53,7 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: update api docs
+          branch: ${{ github.base_ref }}
 
       - name: Increment build number
         id: increment-build-number
@@ -65,3 +66,4 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: increment build number (build ${{ steps.increment-build-number.outputs.build_id }})
+          branch: ${{ github.base_ref }}
