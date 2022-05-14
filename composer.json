@@ -29,6 +29,7 @@
         "symfony/routing": "~6.0 || ~5.0 || ~4.0 || ~3.0",
         "zhamao/connection-manager": "^1.0",
         "zhamao/console": "^1.0",
+        "zhamao/logger": "dev-master",
         "zhamao/request": "^1.1"
     },
     "require-dev": {

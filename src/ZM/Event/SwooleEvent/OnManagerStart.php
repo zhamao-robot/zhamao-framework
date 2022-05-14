@@ -46,7 +46,7 @@ class OnManagerStart implements SwooleEvent
         if (!Framework::$argv['disable-safe-exit']) {
             SignalListener::signalManager();
         }
-        Framework::saveProcessState(ZM_PROCESS_MANAGER, $server->manager_pid);
+        ProcessManager::saveProcessState(ZM_PROCESS_MANAGER, $server->manager_pid);
 
         ProcessManager::createUserProcess('monitor', function () use ($server) {
             Process::signal(SIGINT, function () {

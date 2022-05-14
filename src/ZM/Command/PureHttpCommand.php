@@ -16,7 +16,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use ZM\Config\ZMConfig;
 use ZM\Console\Console;
-use ZM\Framework;
+use ZM\Logger\TablePrinter;
 use ZM\Store\ZMAtomic;
 use ZM\Utils\DataProvider;
 use ZM\Utils\HttpUtil;
@@ -55,7 +55,8 @@ class PureHttpCommand extends Command
             'web_root' => realpath($input->getArgument('dir') ?? '.'),
             'index' => implode(',', $index),
         ];
-        Framework::printProps($out, $tty_width);
+        $printer = new TablePrinter($out);
+        $printer->printAll();
         $server = new Server($host, $port);
         $server->set(ZMConfig::get('global', 'swoole'));
         Console::init(2, $server);

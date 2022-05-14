@@ -34,11 +34,13 @@ use ZM\Exception\ZMKnownException;
 use ZM\Framework;
 use ZM\MySQL\MySQLPool;
 use ZM\Store\LightCacheInside;
+use ZM\Store\Lock\SpinLock;
 use ZM\Store\MySQL\SqlPoolStorage;
 use ZM\Store\Redis\ZMRedisPool;
 use ZM\Utils\DataProvider;
 use ZM\Utils\Manager\CronManager;
 use ZM\Utils\Manager\ModuleManager;
+use ZM\Utils\Manager\ProcessManager;
 use ZM\Utils\SignalListener;
 
 /**
@@ -58,7 +60,7 @@ class OnWorkerStart implements SwooleEvent
         $this->registerWorkerContainerBindings($server);
 
         if ($server->taskworker === false) {
-            Framework::saveProcessState(ZM_PROCESS_WORKER, $server->worker_pid, ['worker_id' => $worker_id]);
+            ProcessManager::saveProcessState(ZM_PROCESS_WORKER, $server->worker_pid, ['worker_id' => $worker_id]);
             zm_atomic('_#worker_' . $worker_id)->set($server->worker_pid);
             if (LightCacheInside::get('wait_api', 'wait_api') !== null) {
                 LightCacheInside::unset('wait_api', 'wait_api');
@@ -109,12 +111,13 @@ class OnWorkerStart implements SwooleEvent
                 } else {
                     Console::warning('@OnStart 执行异常！');
                 }
-                Console::success('Worker #' . $worker_id . ' started');
+                Console::verbose('Worker #' . $worker_id . ' started');
+                $this->gatherWorkerStartStatus();
             } catch (Exception $e) {
                 if ($e->getMessage() === 'swoole exit') {
                     return;
                 }
-                Console::error('Worker加载出错！停止服务！');
+                Console::error('Worker #' . $server->worker_id . ' 加载出错！停止服务！');
                 Console::error(zm_internal_errcode('E00030') . 'Uncaught ' . get_class($e) . ': ' . $e->getMessage() . "\n" . $e->getTraceAsString());
                 Process::kill($server->master_pid, SIGTERM);
                 return;
@@ -128,13 +131,13 @@ class OnWorkerStart implements SwooleEvent
             }
         } else {
             // 这里是TaskWorker初始化的内容部分
-            Framework::saveProcessState(ZM_PROCESS_TASKWORKER, $server->worker_pid, ['worker_id' => $worker_id]);
+            ProcessManager::saveProcessState(ZM_PROCESS_TASKWORKER, $server->worker_pid, ['worker_id' => $worker_id]);
             try {
                 Framework::$server = $server;
                 $this->loadAnnotations();
-                Console::success('TaskWorker #' . $server->worker_id . ' started');
+                Console::verbose('TaskWorker #' . $server->worker_id . ' started');
             } catch (Exception $e) {
-                Console::error('Worker加载出错！停止服务！');
+                Console::error('TaskWorker #' . $server->worker_id . ' 加载出错！停止服务！');
                 Console::error(zm_internal_errcode('E00030') . $e->getMessage() . "\n" . $e->getTraceAsString());
                 Process::kill($server->master_pid, SIGTERM);
                 return;
@@ -313,5 +316,22 @@ class OnWorkerStart implements SwooleEvent
         $container->instance('worker_id', $server->worker_id);
 
         $container->singleton(AdapterInterface::class, OneBot11Adapter::class);
+    }
+
+    private function gatherWorkerStartStatus()
+    {
+        SpinLock::lock('worker_start_status');
+        $ls = LightCacheInside::get('tmp_kv', 'worker_start_status') ?? [];
+        $ls[\server()->worker_id] = true;
+        if (count($ls) === \server()->setting['worker_num']) {
+            LightCacheInside::set('tmp_kv', 'worker_start_status', $ls);
+            SpinLock::unlock('worker_start_status');
+            $used = round((microtime(true) - LightCacheInside::get('tmp_kv', 'start_time')) * 1000, 3);
+            $worker_count = \server()->setting['worker_num'];
+            Console::success("{$worker_count} 个工作进程成功启动，共用时 {$used} ms");
+        } else {
+            LightCacheInside::set('tmp_kv', 'worker_start_status', $ls);
+            SpinLock::unlock('worker_start_status');
+        }
     }
 }

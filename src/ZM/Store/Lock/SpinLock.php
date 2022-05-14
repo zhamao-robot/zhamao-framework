@@ -6,8 +6,6 @@ declare(strict_types=1);
 
 namespace ZM\Store\Lock;
 
-use Swoole\Coroutine;
-use Swoole\Coroutine\System;
 use Swoole\Table;
 
 class SpinLock
@@ -28,11 +26,7 @@ class SpinLock
     public static function lock(string $key)
     {
         while (($r = self::$kv_lock->incr($key, 'lock_num')) > 1) { // 此资源已经被锁上了
-            if (Coroutine::getCid() != -1) {
-                System::sleep(self::$delay / 1000);
-            } else {
-                usleep(self::$delay * 1000);
-            }
+            usleep(self::$delay * 1000);
         }
     }
 

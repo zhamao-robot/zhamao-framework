@@ -6,6 +6,7 @@ namespace ZM\Utils;
 
 use Exception;
 use Swoole\Coroutine;
+use Swoole\Timer;
 use ZM\Store\LightCacheInside;
 use ZM\Store\Lock\SpinLock;
 use ZM\Store\ZMAtomic;
@@ -19,7 +20,7 @@ class CoMessage
     public static function yieldByWS(array $hang, array $compare, int $timeout = 600)
     {
         $cid = Coroutine::getuid();
-        $api_id = ZMAtomic::get('wait_msg_id')->add(1);
+        $api_id = ZMAtomic::get('wait_msg_id')->add();
         $hang['compare'] = $compare;
         $hang['coroutine'] = $cid;
         $hang['worker_id'] = server()->worker_id;
@@ -42,7 +43,7 @@ class CoMessage
         unset($sess[$api_id]);
         LightCacheInside::set('wait_api', 'wait_api', $sess);
         SpinLock::unlock('wait_api');
-        swoole_timer_clear($id);
+        Timer::clear($id);
         if ($result === null) {
             return false;
         }

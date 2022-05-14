@@ -7,9 +7,8 @@ namespace ZM\Command\Server;
 use Swoole\Process;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use ZM\Command\Daemon\DaemonCommand;
 
-class ServerReloadCommand extends DaemonCommand
+class ServerReloadCommand extends ServerCommand
 {
     protected static $defaultName = 'server:reload';
 

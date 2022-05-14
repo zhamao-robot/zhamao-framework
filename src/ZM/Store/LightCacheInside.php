@@ -21,6 +21,7 @@ class LightCacheInside
             self::createTable('connect', 3, 64);        // 用于存单机器人模式下的机器人fd的
             self::createTable('static_route', 64, 256); // 用于存储
             self::createTable('light_array', 8, 512, 0.6);
+            self::createTable('tmp_kv', 3, 512, 0.6);
         } catch (ZMException $e) {
             return false;
         }    // 用于存协程等待的状态内容的
