@@ -86,7 +86,7 @@ class ZMConfig
             self::$config[$head_name] = self::loadConfig($head_name);
         }
         // global.remote_terminal
-        // 根据切分来寻找子配置
+        Console::debug('根据切分来寻找子配置: ' . $name);
         $obj = self::$config[$head_name];
         foreach ($separated as $key) {
             if (isset($obj[$key])) {

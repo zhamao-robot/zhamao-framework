@@ -46,7 +46,7 @@ function get_class_path(string $class_name): ?string
  */
 function _zm_env_check()
 {
-    if (!extension_loaded('swoole')) {
+    if (!extension_loaded('swoole') && !extension_loaded('openswoole')) {
         exit(zm_internal_errcode('E00001') . "Can not find swoole extension.\n");
     }
     if (version_compare(SWOOLE_VERSION, '4.5.0') === -1) {
