@@ -5,7 +5,10 @@
 # author: crazywhalecc
 # since: 2.5.0
 
-if [ -f "$(pwd)/runtime/php" ]; then
+if [ "$ZM_CUSTOM_PHP_PATH" != "" ]; then
+    echo "* Using PHP executable: ""$ZM_CUSTOM_PHP_PATH"
+    executable="$ZM_CUSTOM_PHP_PATH"
+elif [ -f "$(pwd)/runtime/php" ]; then
     executable="$(pwd)/runtime/php"
     echo "* Framework started with built-in php."
 else
