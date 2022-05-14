@@ -28,6 +28,6 @@ class OnWorkerExit implements SwooleEvent
                 Coroutine::resume($v['coroutine']);
             }
         }
-        Console::info('正在结束 Worker #' . $worker_id . '，进程内可能有事务在运行...');
+        Console::verbose('正在结束 Worker #' . $worker_id . '，进程内可能有事务在运行...');
     }
 }

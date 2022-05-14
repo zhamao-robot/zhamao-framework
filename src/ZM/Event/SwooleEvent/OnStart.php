@@ -10,6 +10,7 @@ use ZM\Config\ZMConfig;
 use ZM\Console\Console;
 use ZM\Event\SwooleEvent;
 use ZM\Framework;
+use ZM\Utils\Manager\ProcessManager;
 use ZM\Utils\SignalListener;
 
 /**
@@ -24,7 +25,7 @@ class OnStart implements SwooleEvent
         if (!Framework::$argv['disable-safe-exit']) {
             SignalListener::signalMaster($server);
         }
-        Framework::saveProcessState(ZM_PROCESS_MASTER, $server->master_pid, [
+        ProcessManager::saveProcessState(ZM_PROCESS_MASTER, $server->master_pid, [
             'stdout' => ZMConfig::get('global')['swoole']['log_file'],
             'daemon' => (bool) Framework::$argv['daemon'],
         ]);
