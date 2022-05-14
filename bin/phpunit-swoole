@@ -9,10 +9,11 @@ use PHPUnit\Runner\Version;
 use PHPUnit\TextUI\TestRunner;
 use Swoole\Coroutine;
 use ZM\Annotation\Swoole\OnStart;
-use ZM\Command\RunServerCommand;
+use ZM\Command\Server\ServerStartCommand;
 use ZM\Console\Console;
 use ZM\ConsoleApplication;
 use ZM\Event\EventManager;
+use ZM\Exception\ConfigException;
 use ZM\Framework;
 use ZM\Store\ZMAtomic;
 use ZM\Utils\ZMUtil;
@@ -71,7 +72,7 @@ chdir(__DIR__ . '/../');
 
 $options = array_map(function ($x) {
     return $x->getDefault();
-}, RunServerCommand::exportDefinition()->getOptions());
+}, ServerStartCommand::exportDefinition()->getOptions());
 $options['disable-safe-exit'] = true;
 $options['worker-num'] = 1;
 $options['private-mode'] = true;
@@ -90,7 +91,12 @@ spl_autoload_register(static function ($class) {
 }, true, true);
 
 Console::setLevel(0);
-$framework = new Framework($options);
+try {
+    $framework = new Framework($options);
+} catch (ConfigException $e) {
+    echo $e->getMessage();
+    exit(1);
+}
 $start = new OnStart();
 $start->method = function () {
     try {
