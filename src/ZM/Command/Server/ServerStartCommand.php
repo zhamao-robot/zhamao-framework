@@ -2,19 +2,22 @@
 
 declare(strict_types=1);
 
-namespace ZM\Command;
+namespace ZM\Command\Server;
 
-use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use ZM\Exception\ConfigException;
+use ZM\Exception\ZMKnownException;
 use ZM\Framework;
+use ZM\Utils\Manager\ProcessManager;
 
-class RunServerCommand extends Command
+class ServerStartCommand extends ServerCommand
 {
     protected static $defaultName = 'server';
 
-    public static function exportDefinition()
+    public static function exportDefinition(): InputDefinition
     {
         $cmd = new self();
         $cmd->configure();
@@ -54,6 +57,10 @@ class RunServerCommand extends Command
         $this->setHelp('直接运行可以启动');
     }
 
+    /**
+     * @throws ZMKnownException
+     * @throws ConfigException
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (($opt = $input->getOption('env')) !== null) {
@@ -62,7 +69,7 @@ class RunServerCommand extends Command
                 return 1;
             }
         }
-        $state = Framework::getProcessState(ZM_PROCESS_MASTER);
+        $state = ProcessManager::getProcessState(ZM_PROCESS_MASTER);
         if (!$input->getOption('no-state-check')) {
             if (is_array($state) && posix_getsid($state['pid'] ?? -1) !== false) {
                 $output->writeln("<error>检测到已经在 pid: {$state['pid']} 进程启动了框架！</error>");

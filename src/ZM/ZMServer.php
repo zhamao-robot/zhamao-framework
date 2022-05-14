@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ZM;
 
-use ZM\Command\RunServerCommand;
+use ZM\Command\Server\ServerStartCommand;
 use ZM\Console\Console;
 use ZM\Event\EventManager;
 use ZM\Exception\InitException;
@@ -59,11 +59,11 @@ class ZMServer
         define('SOURCE_ROOT_DIR', WORKING_DIR);
         define('LOAD_MODE', is_dir(SOURCE_ROOT_DIR . '/src/ZM') ? 0 : 1);
         define('FRAMEWORK_ROOT_DIR', realpath(__DIR__ . '/../../'));
-        define('ZM_VERSION_ID', ConsoleApplication::VERSION_ID);
-        define('ZM_VERSION', ConsoleApplication::VERSION);
+        define('ZM_VERSION_ID', Framework::VERSION_ID);
+        define('ZM_VERSION', Framework::VERSION);
         $options = array_map(function ($x) {
             return $x->getDefault();
-        }, RunServerCommand::exportDefinition()->getOptions());
+        }, ServerStartCommand::exportDefinition()->getOptions());
         (new Framework($options, true))->start();
     }
 

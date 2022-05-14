@@ -11,17 +11,14 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use ZM\Command\BuildCommand;
 use ZM\Command\CheckConfigCommand;
-use ZM\Command\Daemon\DaemonReloadCommand;
-use ZM\Command\Daemon\DaemonStatusCommand;
-use ZM\Command\Daemon\DaemonStopCommand;
 use ZM\Command\Generate\SystemdGenerateCommand;
 use ZM\Command\InitCommand;
 use ZM\Command\Module\ModuleListCommand;
 use ZM\Command\Module\ModulePackCommand;
 use ZM\Command\Module\ModuleUnpackCommand;
 use ZM\Command\PureHttpCommand;
-use ZM\Command\RunServerCommand;
 use ZM\Command\Server\ServerReloadCommand;
+use ZM\Command\Server\ServerStartCommand;
 use ZM\Command\Server\ServerStatusCommand;
 use ZM\Command\Server\ServerStopCommand;
 use ZM\Exception\InitException;
@@ -84,13 +81,10 @@ class ConsoleApplication extends Application
         }
 
         $this->addCommands([
-            new DaemonStatusCommand(),
-            new DaemonReloadCommand(),
-            new DaemonStopCommand(),
-            new RunServerCommand(), // 运行主服务的指令控制器
             new ServerStatusCommand(),
-            new ServerStopCommand(),
             new ServerReloadCommand(),
+            new ServerStopCommand(),
+            new ServerStartCommand(), // 运行主服务的指令控制器
             new PureHttpCommand(), // 纯HTTP服务器指令
             new SystemdGenerateCommand(),
         ]);

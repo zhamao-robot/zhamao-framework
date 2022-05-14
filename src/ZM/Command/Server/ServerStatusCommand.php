@@ -6,9 +6,8 @@ namespace ZM\Command\Server;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use ZM\Command\Daemon\DaemonCommand;
 
-class ServerStatusCommand extends DaemonCommand
+class ServerStatusCommand extends ServerCommand
 {
     protected static $defaultName = 'server:status';
 

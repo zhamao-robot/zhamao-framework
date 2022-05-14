@@ -8,11 +8,10 @@ use Swoole\Process;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use ZM\Command\Daemon\DaemonCommand;
-use ZM\Framework;
 use ZM\Utils\DataProvider;
+use ZM\Utils\Manager\ProcessManager;
 
-class ServerStopCommand extends DaemonCommand
+class ServerStopCommand extends ServerCommand
 {
     protected static $defaultName = 'server:stop';
 
@@ -47,7 +46,7 @@ class ServerStopCommand extends DaemonCommand
             Process::kill(intval($this->daemon_file['pid']), SIGTERM);
         }
         $i = 10;
-        while (Framework::getProcessState(ZM_PROCESS_MASTER) !== false && $i > 0) {
+        while (ProcessManager::getProcessState(ZM_PROCESS_MASTER) !== false && $i > 0) {
             sleep(1);
             --$i;
         }
