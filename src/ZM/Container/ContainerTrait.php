@@ -663,7 +663,7 @@ trait ContainerTrait
     {
         try {
             // 尝试解析
-            return $this->make($parameter->getClass()->name);
+            return $this->make(ReflectionUtil::getParameterClassName($parameter));
         } catch (EntryResolutionException $e) {
             // 如果参数是可选的，则返回默认值
             if ($parameter->isDefaultValueAvailable()) {
