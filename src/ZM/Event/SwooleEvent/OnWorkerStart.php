@@ -9,6 +9,7 @@ namespace ZM\Event\SwooleEvent;
 use Error;
 use Exception;
 use PDO;
+use Psr\Log\LoggerInterface;
 use ReflectionException;
 use Swoole\Coroutine;
 use Swoole\Database\PDOConfig;
@@ -316,6 +317,8 @@ class OnWorkerStart implements SwooleEvent
         $container->instance('worker_id', $server->worker_id);
 
         $container->singleton(AdapterInterface::class, OneBot11Adapter::class);
+
+        $container->singleton(LoggerInterface::class, ZMConfig::get('logging.logger'));
     }
 
     private function gatherWorkerStartStatus()
