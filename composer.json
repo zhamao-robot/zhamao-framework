@@ -36,7 +36,10 @@
         "brainmaestro/composer-git-hooks": "^2.8",
         "friendsofphp/php-cs-fixer": "^3.2 != 3.7.0",
         "jetbrains/phpstorm-attributes": "^1.0",
+        "phpstan/extension-installer": "^1.1",
         "phpstan/phpstan": "^1.1",
+        "phpstan/phpstan-deprecation-rules": "^1.0",
+        "phpstan/phpstan-phpunit": "^1.1",
         "phpunit/phpunit": "^8.5 || ^9.0",
         "roave/security-advisories": "dev-latest",
         "swoole/ide-helper": "^4.5"
@@ -72,7 +75,10 @@
     ],
     "config": {
         "optimize-autoloader": true,
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "phpstan/extension-installer": true
+        }
     },
     "extra": {
         "hooks": {
