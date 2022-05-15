@@ -9,11 +9,11 @@ declare(strict_types=1);
 namespace ZM\MySQL;
 
 use Doctrine\DBAL\Driver\Statement;
-use Doctrine\DBAL\Driver\StatementIterator;
 use Doctrine\DBAL\ParameterType;
 use IteratorAggregate;
 use PDO;
 use PDOStatement;
+use Traversable;
 
 class MySQLStatement implements IteratorAggregate, Statement
 {
@@ -102,9 +102,11 @@ class MySQLStatement implements IteratorAggregate, Statement
         return $this->statement->rowCount();
     }
 
-    public function getIterator(): StatementIterator
+    public function getIterator(): Traversable
     {
-        return new StatementIterator($this);
+        while (($result = $this->statement->fetch()) !== false) {
+            yield $result;
+        }
     }
 
     /**
