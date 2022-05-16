@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Psr\Log\LoggerInterface;
 use Swoole\Atomic;
 use Swoole\Coroutine;
 use Swoole\Coroutine as Co;
@@ -589,7 +590,7 @@ function zm_error($obj): void
  *
  * @return mixed
  */
-function zm_config(string $name, ?string $key = null)
+function zm_config(string $name, string $key = '')
 {
     return ZMConfig::get($name, $key);
 }
@@ -779,6 +780,14 @@ function compare_object_and_array_by_keys(object $object, array $array, array $k
 function is_assoc_array(array $array): bool
 {
     return !empty($array) && array_keys($array) !== range(0, count($array) - 1);
+}
+
+/**
+ * 返回 Logger 实例
+ */
+function logger(): LoggerInterface
+{
+    return resolve(LoggerInterface::class);
 }
 
 /**
