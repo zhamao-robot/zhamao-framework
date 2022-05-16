@@ -31,7 +31,7 @@ use ZM\Utils\ZMUtil;
 
 class Framework
 {
-    public const VERSION_ID = 603;
+    public const VERSION_ID = 604;
 
     public const VERSION = '3.0.0-alpha1';
 
