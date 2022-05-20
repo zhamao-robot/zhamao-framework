@@ -13,9 +13,9 @@ use ZM\Annotation\Swoole\OnOpenEvent;
 use ZM\Annotation\Swoole\OnSwooleEvent;
 use ZM\Annotation\Swoole\SwooleHandler;
 use ZM\Config\ZMConfig;
-use ZM\ConnectionManager\ConnectionObject;
 use ZM\ConnectionManager\ManagerGM;
 use ZM\Console\Console;
+use ZM\Container\ContainerServicesProvider;
 use ZM\Context\Context;
 use ZM\Event\EventDispatcher;
 use ZM\Event\SwooleEvent;
@@ -52,9 +52,9 @@ class OnOpen implements SwooleEvent
         ManagerGM::pushConnect($request->fd, $type_conn);
         $conn = ManagerGM::get($request->fd);
         set_coroutine_params(['server' => $server, 'request' => $request, 'connection' => $conn, 'fd' => $request->fd]);
-        $conn->setOption('connect_id', strval($request->header['x-self-id'] ?? ''));
+        $conn->setOption('connect_id', (string) ($request->header['x-self-id'] ?? ''));
 
-        container()->instance(ConnectionObject::class, $conn);
+        resolve(ContainerServicesProvider::class)->registerServices('connection');
 
         $dispatcher1 = new EventDispatcher(OnOpenEvent::class);
         $dispatcher1->setRuleFunction(function ($v) {
@@ -91,6 +91,8 @@ class OnOpen implements SwooleEvent
             $error_msg = $e->getMessage() . ' at ' . $e->getFile() . '(' . $e->getLine() . ')';
             Console::error(zm_internal_errcode('E00020') . 'Uncaught ' . get_class($e) . ' when calling "open": ' . $error_msg);
             Console::trace();
+        } finally {
+            resolve(ContainerServicesProvider::class)->cleanup();
         }
     }
 }

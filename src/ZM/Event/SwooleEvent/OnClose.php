@@ -13,6 +13,7 @@ use ZM\Annotation\Swoole\SwooleHandler;
 use ZM\Config\ZMConfig;
 use ZM\ConnectionManager\ManagerGM;
 use ZM\Console\Console;
+use ZM\Container\ContainerServicesProvider;
 use ZM\Context\Context;
 use ZM\Event\EventDispatcher;
 use ZM\Event\SwooleEvent;
@@ -33,6 +34,8 @@ class OnClose implements SwooleEvent
             return;
         }
         set_coroutine_params(['server' => $server, 'connection' => $conn, 'fd' => $fd]);
+
+        resolve(ContainerServicesProvider::class)->registerServices('connection');
 
         $dispatcher1 = new EventDispatcher(OnCloseEvent::class);
         $dispatcher1->setRuleFunction(function ($v) {
@@ -68,7 +71,9 @@ class OnClose implements SwooleEvent
             $error_msg = $e->getMessage() . ' at ' . $e->getFile() . '(' . $e->getLine() . ')';
             Console::error(zm_internal_errcode('E00016') . 'Uncaught ' . get_class($e) . ' when calling "close": ' . $error_msg);
             Console::trace();
+        } finally {
+            resolve(ContainerServicesProvider::class)->cleanup();
+            ManagerGM::popConnect($fd);
         }
-        ManagerGM::popConnect($fd);
     }
 }
