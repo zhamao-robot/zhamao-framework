@@ -23,6 +23,14 @@ class ContainerServicesProvider
     /**
      * 注册服务
      *
+     * ```
+     * 作用域：
+     * global: worker start
+     * request: request
+     * message: message
+     * connection: open, close
+     * ```
+     *
      * @param string $scope 作用域
      */
     public function registerServices(string $scope): void
@@ -32,7 +40,6 @@ class ContainerServicesProvider
                 $this->registerGlobalServices(WorkerContainer::getInstance());
                 break;
             case 'request':
-                $this->registerConnectionServices(Container::getInstance());
                 $this->registerRequestServices(Container::getInstance());
                 break;
             case 'message':
