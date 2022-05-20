@@ -28,7 +28,7 @@ class ContainerServicesProvider
      * global: worker start
      * request: request
      * message: message
-     * connection: open, close
+     * connection: open, close, message
      * ```
      *
      * @param string $scope 作用域
