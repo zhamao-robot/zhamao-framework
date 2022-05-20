@@ -11,6 +11,7 @@ use ZM\Annotation\Swoole\OnCloseEvent;
 use ZM\Annotation\Swoole\OnSwooleEvent;
 use ZM\Annotation\Swoole\SwooleHandler;
 use ZM\Config\ZMConfig;
+use ZM\ConnectionManager\ConnectionObject;
 use ZM\ConnectionManager\ManagerGM;
 use ZM\Console\Console;
 use ZM\Context\Context;
@@ -33,6 +34,8 @@ class OnClose implements SwooleEvent
             return;
         }
         set_coroutine_params(['server' => $server, 'connection' => $conn, 'fd' => $fd]);
+
+        container()->instance(ConnectionObject::class, $conn);
 
         $dispatcher1 = new EventDispatcher(OnCloseEvent::class);
         $dispatcher1->setRuleFunction(function ($v) {
