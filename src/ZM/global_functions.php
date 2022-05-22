@@ -777,6 +777,9 @@ function compare_object_and_array_by_keys(object $object, array $array, array $k
     return true;
 }
 
+/**
+ * 判断传入的数组是否为关联数组
+ */
 function is_assoc_array(array $array): bool
 {
     return !empty($array) && array_keys($array) !== range(0, count($array) - 1);
@@ -788,118 +791,4 @@ function is_assoc_array(array $array): bool
 function logger(): LoggerInterface
 {
     return resolve(LoggerInterface::class);
-}
-
-/**
- * 以下为废弃的函数，将于未来移除
- */
-
-/**
- * @deprecated 已废弃，请使用 {@link get_all_fd_of_type()}
- */
-function getAllFdByConnectType(string $type = 'default'): array
-{
-    return get_all_fd_of_type($type);
-}
-
-/**
- * @param mixed $class_name
- * @deprecated 已废弃，请使用 {@link get_class_path()}
- */
-function getClassPath($class_name): ?string
-{
-    return get_class_path($class_name);
-}
-
-/**
- * @param mixed $msg
- * @param mixed $ban_comma
- * @deprecated 已废弃，请使用 {@link explode_msg()}，参数有变
- */
-function explodeMsg($msg, $ban_comma = false): array
-{
-    if ($ban_comma) {
-        return explode_msg($msg, [' ']);
-    }
-
-    return explode_msg($msg);
-}
-
-/**
- * @deprecated 已废弃，请使用 {@link current_connection_is()}
- */
-function connectIsQQ(): bool
-{
-    return current_connection_is('qq');
-}
-
-/**
- * @deprecated 已废弃，请使用 {@link current_connection_is()}
- */
-function connectIsDefault(): bool
-{
-    return current_connection_is('default');
-}
-
-/**
- * @param mixed $type
- * @deprecated 已废弃，请使用 {@link current_connection_is()}
- */
-function connectIs($type): bool
-{
-    return current_connection_is($type);
-}
-
-/**
- * @deprecated 已废弃，请使用 {@link get_annotations()}
- */
-function getAnnotations(): array
-{
-    return get_annotations();
-}
-
-/**
- * @param mixed $pattern
- * @param mixed $context
- * @deprecated 已废弃，请使用 {@link match_args()}
- */
-function matchArgs($pattern, $context)
-{
-    return match_args($pattern, $context);
-}
-
-/**
- * @param mixed $pattern
- * @param mixed $context
- * @deprecated 已废弃，请使用 {@link match_pattern()}
- */
-function matchPattern($pattern, $context): bool
-{
-    return match_pattern($pattern, $context);
-}
-
-/**
- * @param string $message_type 消息类型
- * @deprecated 已废弃，请使用 {@link get_onebot_target_id_name()}
- */
-function onebot_target_id_name(string $message_type): string
-{
-    return get_onebot_target_id_name($message_type);
-}
-
-/**
- * @deprecated 已废弃，请直接使用 {@link call_with_catch()}
- */
-function zm_go(callable $callable)
-{
-    call_with_catch($callable);
-}
-
-/**
- * @param mixed $v
- * @deprecated 已废弃，请使用 {@link hash_message()}
- */
-function zm_data_hash($v): string
-{
-    return hash_message($v);
 }
