@@ -313,7 +313,7 @@ class Framework
                 ];
                 $level_tip = $tips[$error_no] ?? ['PHP Unknown: ', 'error'];
                 $error = $level_tip[0] . $error_msg . ' in ' . $error_file . ' on ' . $error_line;
-                logger()->{$level_tip}[1]($error);
+                logger()->{$level_tip[1]}($error);
                 // 如果 return false 则错误会继续递交给 PHP 标准错误处理
                 return true;
             }, E_ALL | E_STRICT);
