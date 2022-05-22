@@ -9,7 +9,6 @@ use Error;
 use Exception;
 use InvalidArgumentException;
 use Phar;
-use Psr\Log\LoggerInterface;
 use ReflectionClass;
 use ReflectionException;
 use Swoole\Runtime;
@@ -20,7 +19,6 @@ use ZM\Annotation\Swoole\SwooleHandler;
 use ZM\Config\ZMConfig;
 use ZM\ConnectionManager\ManagerGM;
 use ZM\Console\Console;
-use ZM\Container\WorkerContainer;
 use ZM\Exception\ConfigException;
 use ZM\Logger\TablePrinter;
 use ZM\Store\LightCache;
@@ -121,7 +119,7 @@ class Framework
                 ],
             ]);
         } catch (ConnectionManager\TableException $e) {
-            echo zm_internal_errcode('E00008') . $e->getMessage() . PHP_EOL;
+            logger()->emergency(zm_internal_errcode('E00008') . $e->getMessage());
             exit(1);
         }
 
@@ -137,9 +135,6 @@ class Framework
             if ((ZMConfig::get('global', 'runtime')['save_console_log_file'] ?? false) !== false) {
                 Console::setOutputFile(ZMConfig::get('global', 'runtime')['save_console_log_file']);
             }
-
-            // TODO: remove tmp statement
-            WorkerContainer::getInstance()->singleton(LoggerInterface::class, ZMConfig::get('logging.logger'));
 
             // 设置默认时区
             $timezone = ZMConfig::get('global', 'timezone') ?? 'Asia/Shanghai';
@@ -305,37 +300,20 @@ class Framework
 
             // 注册全局错误处理器
             set_error_handler(static function ($error_no, $error_msg, $error_file, $error_line) {
-                switch ($error_no) {
-                    case E_WARNING:
-                        $level_tips = 'PHP Warning: ';
-                        break;
-                    case E_NOTICE:
-                        $level_tips = 'PHP Notice: ';
-                        break;
-                    case E_DEPRECATED:
-                        $level_tips = 'PHP Deprecated: ';
-                        break;
-                    case E_USER_ERROR:
-                        $level_tips = 'User Error: ';
-                        break;
-                    case E_USER_WARNING:
-                        $level_tips = 'User Warning: ';
-                        break;
-                    case E_USER_NOTICE:
-                        $level_tips = 'User Notice: ';
-                        break;
-                    case E_USER_DEPRECATED:
-                        $level_tips = 'User Deprecated: ';
-                        break;
-                    case E_STRICT:
-                        $level_tips = 'PHP Strict: ';
-                        break;
-                    default:
-                        $level_tips = 'Unkonw Type Error: ';
-                        break;
-                }
-                $error = $level_tips . $error_msg . ' in ' . $error_file . ' on ' . $error_line;
-                Console::warning($error);
+                $tips = [
+                    E_WARNING => ['PHP Warning: ', 'warning'],
+                    E_NOTICE => ['PHP Notice: ', 'notice'],
+                    E_USER_ERROR => ['PHP Error: ', 'error'],
+                    E_USER_WARNING => ['PHP Warning: ', 'warning'],
+                    E_USER_NOTICE => ['PHP Notice: ', 'notice'],
+                    E_STRICT => ['PHP Strict: ', 'notice'],
+                    E_RECOVERABLE_ERROR => ['PHP Recoverable Error: ', 'error'],
+                    E_DEPRECATED => ['PHP Deprecated: ', 'notice'],
+                    E_USER_DEPRECATED => ['PHP User Deprecated: ', 'notice'],
+                ];
+                $level_tip = $tips[$error_no] ?? ['PHP Unknown: ', 'error'];
+                $error = $level_tip[0] . $error_msg . ' in ' . $error_file . ' on ' . $error_line;
+                logger()->{$level_tip}[1]($error);
                 // 如果 return false 则错误会继续递交给 PHP 标准错误处理
                 return true;
             }, E_ALL | E_STRICT);
@@ -377,10 +355,10 @@ class Framework
             self::$server->start();
             zm_atomic('server_is_stopped')->set(1);
             if (!self::$argv['private-mode']) {
-                Console::log('zhamao-framework is stopped.');
+                logger()->info('炸毛框架已停止！');
             }
         } catch (Throwable $e) {
-            exit(zm_internal_errcode('E00011') . 'Framework has an uncaught ' . get_class($e) . ': ' . $e->getMessage() . PHP_EOL);
+            exit(zm_internal_errcode('E00011') . '框架发生未捕获的异常：' . get_class($e) . ': ' . $e->getMessage() . PHP_EOL);
         }
     }
 
@@ -443,12 +421,12 @@ class Framework
             $r = exec(PHP_BINARY . ' ' . DataProvider::getFrameworkRootDir() . '/src/ZM/script_setup_loader.php', $output, $result_code);
         }
         if ($result_code !== 0) {
-            Console::error('Parsing code error!');
+            logger()->emergency('代码解析错误！');
             exit(1);
         }
         $json = json_decode($r, true);
         if (!is_array($json)) {
-            Console::warning(zm_internal_errcode('E00012') . 'Parsing @SwooleHandler and @OnSetup error!');
+            logger()->error(zm_internal_errcode('E00012') . '解析 @SwooleHandler 及 @OnSetup 时发生错误，请检查代码！');
         }
         $this->setup_events = $json;
     }
@@ -477,7 +455,7 @@ class Framework
         }
 
         foreach (($this->setup_events['setup'] ?? []) as $v) {
-            Console::debug('Calling @OnSetup: ' . $v['class']);
+            logger()->debug('Calling @OnSetup: ' . $v['class']);
             $c = ZMUtil::getModInstance($v['class']);
             $method = $v['method'];
             $c->{$method}();

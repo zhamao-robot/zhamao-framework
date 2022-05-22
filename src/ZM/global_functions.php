@@ -790,5 +790,8 @@ function is_assoc_array(array $array): bool
  */
 function logger(): LoggerInterface
 {
+    if (!app()->has(LoggerInterface::class)) {
+        return zm_config('logging.logger')();
+    }
     return resolve(LoggerInterface::class);
 }
