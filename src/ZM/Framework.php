@@ -191,19 +191,24 @@ class Framework
                     'port' => 20002,
                     'token' => '',
                 ];
-                $welcome_msg = Console::setColor('Welcome! You can use `help` for usage.', 'green');
+
+                $welcome_msg = capture_output([logger('trm'), 'info'], ['欢迎使用炸毛远程终端！输入 `help` 查看帮助！']);
+                $motd = capture_output(function () {
+                    $this->printMotd();
+                });
+
                 /** @var Port $port */
                 $port = self::$server->listen($conf['host'], $conf['port'], SWOOLE_SOCK_TCP);
                 $port->set([
                     'open_http_protocol' => false,
                 ]);
-                $port->on('connect', function (\Swoole\Server $serv, $fd) use ($welcome_msg, $conf) {
+                $port->on('connect', function (\Swoole\Server $serv, $fd) use ($welcome_msg, $conf, $motd) {
                     ManagerGM::pushConnect($fd, 'terminal');
                     // 推送欢迎信息
-                    $serv->send($fd, file_get_contents(working_dir() . '/config/motd.txt'));
+                    $serv->send($fd, $motd);
                     // 要求输入令牌
                     if (!empty($conf['token'])) {
-                        $serv->send($fd, 'Please input token: ');
+                        $serv->send($fd, '请输入令牌：');
                     } else {
                         $serv->send($fd, $welcome_msg . "\n>>> ");
                     }
@@ -213,38 +218,36 @@ class Framework
                     ob_start();
                     try {
                         $arr = LightCacheInside::get('light_array', 'input_token') ?? [];
-                        if (empty($arr[$fd] ?? '')) {
-                            if ($conf['token'] != '') {
-                                $token = trim($data);
-                                if ($token === $conf['token']) {
-                                    SpinLock::transaction('input_token', function () use ($fd, $token) {
-                                        $arr = LightCacheInside::get('light_array', 'input_token');
-                                        $arr[$fd] = $token;
-                                        LightCacheInside::set('light_array', 'input_token', $arr);
-                                    });
-                                    $serv->send($fd, Console::setColor("Auth success!!\n", 'green'));
-                                    $serv->send($fd, $welcome_msg . "\n>>> ");
-                                } else {
-                                    $serv->send($fd, Console::setColor("Auth failed!!\n", 'red'));
-                                    $serv->close($fd);
-                                }
-                                return;
+                        if (empty($arr[$fd] ?? '') && $conf['token'] !== '') {
+                            $token = trim($data);
+                            if ($token === $conf['token']) {
+                                SpinLock::transaction('input_token', static function () use ($fd, $token) {
+                                    $arr = LightCacheInside::get('light_array', 'input_token');
+                                    $arr[$fd] = $token;
+                                    LightCacheInside::set('light_array', 'input_token', $arr);
+                                });
+                                $serv->send($fd, capture_output([logger('trm'), 'info'], ['令牌验证成功！']));
+                                $serv->send($fd, $welcome_msg . "\n>>> ");
+                            } else {
+                                $serv->send($fd, capture_output([logger('trm'), 'error'], ['令牌验证失败！']));
+                                $serv->close($fd);
                             }
+                            return;
                         }
-                        if (trim($data) == 'exit' || trim($data) == 'q') {
-                            $serv->send($fd, Console::setColor("Bye!\n", 'blue'));
+                        if (trim($data) === 'exit' || trim($data) === 'q') {
+                            $serv->send($fd, capture_output([logger('trm'), 'info'], ['再见！']));
                             $serv->close($fd);
                             return;
                         }
                         Terminal::executeCommand(trim($data));
                     } catch (Exception $e) {
                         $error_msg = $e->getMessage() . ' at ' . $e->getFile() . '(' . $e->getLine() . ')';
-                        Console::error(zm_internal_errcode('E00009') . 'Uncaught exception ' . get_class($e) . ' when calling "open": ' . $error_msg);
-                        Console::trace();
+                        logger('trm')->error(zm_internal_errcode('E00009') . 'Uncaught exception ' . get_class($e) . ' when calling "open": ' . $error_msg);
+                        logger('trm')->error($e->getTraceAsString());
                     } catch (Error $e) {
                         $error_msg = $e->getMessage() . ' at ' . $e->getFile() . '(' . $e->getLine() . ')';
-                        Console::error(zm_internal_errcode('E00009') . 'Uncaught ' . get_class($e) . ' when calling "open": ' . $error_msg);
-                        Console::trace();
+                        logger('trm')->error(zm_internal_errcode('E00009') . 'Uncaught ' . get_class($e) . ' when calling "open": ' . $error_msg);
+                        logger('trm')->error($e->getTraceAsString());
                     }
 
                     $r = ob_get_clean();
@@ -258,7 +261,6 @@ class Framework
 
                 $port->on('close', function ($serv, $fd) {
                     ManagerGM::popConnect($fd);
-                    // echo "Client: Close.\n";
                 });
             }
 
@@ -277,9 +279,6 @@ class Framework
             } else {
                 Runtime::enableCoroutine(false, SWOOLE_HOOK_ALL);
             }
-
-            global $asd;
-            $asd = get_included_files();
 
             // 注册 Swoole Server 的事件
             $this->registerServerEvents();
@@ -571,6 +570,7 @@ class Framework
 
     /**
      * 更换数组键名
+     *
      * @param mixed $old_key
      * @param mixed $new_key
      */
