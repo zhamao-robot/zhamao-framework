@@ -788,7 +788,20 @@ function is_assoc_array(array $array): bool
 /**
  * 返回 Logger 实例
  */
-function logger(): LoggerInterface
+function logger(...$args): LoggerInterface
 {
+    if (!app()->has(LoggerInterface::class)) {
+        return zm_config('logging.logger')(...$args);
+    }
     return resolve(LoggerInterface::class);
+}
+
+/**
+ * 捕获输出
+ */
+function capture_output(callable $callback, array $args = []): string
+{
+    ob_start();
+    $callback(...$args);
+    return ob_get_clean();
 }
