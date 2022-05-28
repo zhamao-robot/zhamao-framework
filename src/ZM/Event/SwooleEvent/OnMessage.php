@@ -10,13 +10,11 @@ use Throwable;
 use ZM\Annotation\Swoole\OnMessageEvent;
 use ZM\Annotation\Swoole\OnSwooleEvent;
 use ZM\Annotation\Swoole\SwooleHandler;
-use ZM\ConnectionManager\ConnectionObject;
 use ZM\ConnectionManager\ManagerGM;
 use ZM\Console\Console;
 use ZM\Console\TermColor;
-use ZM\Container\Container;
+use ZM\Container\ContainerServicesProvider;
 use ZM\Context\Context;
-use ZM\Context\ContextInterface;
 use ZM\Event\EventDispatcher;
 use ZM\Event\SwooleEvent;
 
@@ -33,7 +31,7 @@ class OnMessage implements SwooleEvent
         $conn = ManagerGM::get($frame->fd);
         set_coroutine_params(['server' => $server, 'frame' => $frame, 'connection' => $conn]);
 
-        $this->registerRequestContainerBindings($frame, $conn);
+        resolve(ContainerServicesProvider::class)->registerServices('message');
 
         $dispatcher1 = new EventDispatcher(OnMessageEvent::class);
         $dispatcher1->setRuleFunction(function ($v) use ($conn) {
@@ -63,22 +61,7 @@ class OnMessage implements SwooleEvent
             Console::error(zm_internal_errcode('E00017') . 'Uncaught ' . get_class($e) . ' when calling "message": ' . $error_msg);
             Console::trace();
         } finally {
-            container()->flush();
+            resolve(ContainerServicesProvider::class)->cleanup();
         }
-    }
-
-    /**
-     * 注册请求容器绑定
-     */
-    private function registerRequestContainerBindings(Frame $frame, ?ConnectionObject $conn): void
-    {
-        $container = Container::getInstance();
-        $container->setLogPrefix("[Container#{$frame->fd}]");
-        $container->instance(Frame::class, $frame);
-        $container->instance(ConnectionObject::class, $conn);
-        $container->bind(ContextInterface::class, function () {
-            return ctx();
-        });
-        $container->alias(ContextInterface::class, Context::class);
     }
 }

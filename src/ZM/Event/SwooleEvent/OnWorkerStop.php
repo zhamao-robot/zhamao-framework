@@ -8,7 +8,6 @@ use Swoole\Server;
 use ZM\Annotation\Swoole\SwooleHandler;
 use ZM\Config\ZMConfig;
 use ZM\Console\Console;
-use ZM\Container\WorkerContainer;
 use ZM\Event\SwooleEvent;
 use ZM\Store\LightCache;
 use ZM\Utils\Manager\ProcessManager;
@@ -21,8 +20,6 @@ class OnWorkerStop implements SwooleEvent
 {
     public function onCall(Server $server, $worker_id)
     {
-        WorkerContainer::getInstance()->flush();
-
         if ($worker_id == (ZMConfig::get('global.worker_cache.worker') ?? 0)) {
             LightCache::savePersistence();
         }

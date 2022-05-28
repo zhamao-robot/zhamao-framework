@@ -14,9 +14,8 @@ use ZM\Annotation\Swoole\OnSwooleEvent;
 use ZM\Annotation\Swoole\SwooleHandler;
 use ZM\Config\ZMConfig;
 use ZM\Console\Console;
-use ZM\Container\Container;
+use ZM\Container\ContainerServicesProvider;
 use ZM\Context\Context;
-use ZM\Context\ContextInterface;
 use ZM\Event\EventDispatcher;
 use ZM\Event\SwooleEvent;
 use ZM\Exception\InterruptException;
@@ -39,7 +38,7 @@ class OnRequest implements SwooleEvent
         Console::debug('Calling Swoole "request" event from fd=' . $request->fd);
         set_coroutine_params(['request' => $request, 'response' => $response]);
 
-        $this->registerRequestContainerBindings($request, $response);
+        resolve(ContainerServicesProvider::class)->registerServices('request');
 
         $dis1 = new EventDispatcher(OnRequestEvent::class);
         $dis1->setRuleFunction(function ($v) {
@@ -114,26 +113,13 @@ class OnRequest implements SwooleEvent
             Console::error(zm_internal_errcode('E00023') . 'Internal server error (500), caused by ' . get_class($e) . ': ' . $e->getMessage());
             Console::log($e->getTraceAsString(), 'gray');
         } finally {
-            container()->flush();
+            resolve(ContainerServicesProvider::class)->cleanup();
         }
     }
 
     /**
-     * 注册请求容器绑定
-     */
-    private function registerRequestContainerBindings(Request $request, Response $response): void
-    {
-        $container = Container::getInstance();
-//        $container->setLogPrefix("[Container#{$frame->fd}]");
-        $container->instance(Request::class, $request);
-        $container->bind(ContextInterface::class, function () {
-            return ctx();
-        });
-        $container->alias(ContextInterface::class, Context::class);
-    }
-
-    /**
      * 返回响应
+     *
      * @param mixed $result
      */
     private function response(Response $response, $result): void

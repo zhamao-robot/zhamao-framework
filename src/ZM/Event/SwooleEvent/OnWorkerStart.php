@@ -9,21 +9,19 @@ namespace ZM\Event\SwooleEvent;
 use Error;
 use Exception;
 use PDO;
-use Psr\Log\LoggerInterface;
 use ReflectionException;
 use Swoole\Coroutine;
 use Swoole\Database\PDOConfig;
 use Swoole\Process;
 use Swoole\WebSocket\Server;
 use ZM\Adapters\AdapterInterface;
-use ZM\Adapters\OneBot11Adapter;
 use ZM\Annotation\AnnotationParser;
 use ZM\Annotation\Swoole\OnMessageEvent;
 use ZM\Annotation\Swoole\OnStart;
 use ZM\Annotation\Swoole\SwooleHandler;
 use ZM\Config\ZMConfig;
 use ZM\Console\Console;
-use ZM\Container\WorkerContainer;
+use ZM\Container\ContainerServicesProvider;
 use ZM\Context\Context;
 use ZM\Context\ContextInterface;
 use ZM\DB\DB;
@@ -58,7 +56,9 @@ class OnWorkerStart implements SwooleEvent
         }
         unset(Context::$context[Coroutine::getCid()]);
 
-        $this->registerWorkerContainerBindings($server);
+        Framework::$server = $server;
+
+        resolve(ContainerServicesProvider::class)->registerServices('global');
 
         if ($server->taskworker === false) {
             ProcessManager::saveProcessState(ZM_PROCESS_WORKER, $server->worker_pid, ['worker_id' => $worker_id]);
@@ -80,7 +80,6 @@ class OnWorkerStart implements SwooleEvent
                 });
 
                 Console::verbose("Worker #{$server->worker_id} starting");
-                Framework::$server = $server;
                 // ZMBuf::resetCache(); //清空变量缓存
                 // ZMBuf::set("wait_start", []); //添加队列，在workerStart运行完成前先让其他协程等待执行
 
@@ -134,7 +133,6 @@ class OnWorkerStart implements SwooleEvent
             // 这里是TaskWorker初始化的内容部分
             ProcessManager::saveProcessState(ZM_PROCESS_TASKWORKER, $server->worker_pid, ['worker_id' => $worker_id]);
             try {
-                Framework::$server = $server;
                 $this->loadAnnotations();
                 Console::verbose('TaskWorker #' . $server->worker_id . ' started');
             } catch (Exception $e) {
@@ -295,30 +293,6 @@ class OnWorkerStart implements SwooleEvent
             );
             DB::initTableList($real_conf['dbname']);
         }
-    }
-
-    /**
-     * 注册进程容器绑定
-     */
-    private function registerWorkerContainerBindings(Server $server): void
-    {
-        $container = WorkerContainer::getInstance();
-        $container->setLogPrefix("[WorkerContainer#{$server->worker_id}]");
-        // 路径
-        $container->instance('path.working', DataProvider::getWorkingDir());
-        $container->instance('path.source', DataProvider::getSourceRootDir());
-        $container->alias('path.source', 'path.base');
-        $container->instance('path.config', DataProvider::getSourceRootDir() . '/config');
-        $container->instance('path.module_config', ZMConfig::get('global', 'config_dir'));
-        $container->instance('path.data', DataProvider::getDataFolder());
-        $container->instance('path.framework', DataProvider::getFrameworkRootDir());
-        // 基础
-        $container->instance('server', $server);
-        $container->instance('worker_id', $server->worker_id);
-
-        $container->singleton(AdapterInterface::class, OneBot11Adapter::class);
-
-        $container->singleton(LoggerInterface::class, ZMConfig::get('logging.logger'));
     }
 
     private function gatherWorkerStartStatus()
