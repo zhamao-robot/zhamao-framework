@@ -79,7 +79,7 @@ class ContainerServicesProvider
         $container->instance('worker_id', Framework::$server->worker_id);
 
         $container->singleton(AdapterInterface::class, OneBot11Adapter::class);
-        $container->singleton(LoggerInterface::class, ZMConfig::get('logging.logger'));
+        $container->instance(LoggerInterface::class, ZMConfig::get('logging.logger')());
     }
 
     /**
