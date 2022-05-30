@@ -13,7 +13,6 @@ use ZM\Annotation\Http\RequestMapping;
 use ZM\Annotation\Swoole\OnCloseEvent;
 use ZM\Annotation\Swoole\OnOpenEvent;
 use ZM\Annotation\Swoole\OnRequestEvent;
-use ZM\Annotation\Swoole\OnStart;
 use ZM\API\CQ;
 use ZM\API\OneBotV11;
 use ZM\API\TuringAPI;
@@ -252,7 +251,7 @@ class Hello
         bot()->all()->allGroups()->sendGroupMsg(0, ctx()->getMessage());
     }
 
-    /*
+    /**
      * 欢迎来到容器时代
      *
      * @param Context $context 通过依赖注入实现的
