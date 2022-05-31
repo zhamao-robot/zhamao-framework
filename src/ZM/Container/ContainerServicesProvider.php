@@ -10,7 +10,7 @@ use Swoole\Http\Request;
 use Swoole\Http\Response;
 use Swoole\WebSocket\Frame;
 use ZM\Adapters\AdapterInterface;
-use ZM\Adapters\OneBot11Adapter;
+use ZM\Adapters\OneBot11\OneBot11Adapter;
 use ZM\Config\ZMConfig;
 use ZM\ConnectionManager\ConnectionObject;
 use ZM\Context\Context;

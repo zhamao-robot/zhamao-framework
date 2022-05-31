@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ZM\API;
 
 use Closure;
+use ZM\Adapters\AdapterInterface;
 use ZM\Console\Console;
 use ZM\Store\LightCacheInside;
 use ZM\Store\Lock\SpinLock;
@@ -42,8 +43,13 @@ trait CQAPI
             }
             $reply = $reply2;
         }
+        $api_id = (string) ZMAtomic::get('wait_msg_id')->add();
         if ($connection->getOption('type') === CONN_WEBSOCKET) {
-            return $this->processWebsocketAPI($connection, $reply, $function);
+            // TODO: remove this
+            if ($function !== true && $function !== null) {
+                logger()->warning('possible deprecated parameter: {function}, please report to dev for further develop', ['function' => $function]);
+            }
+            return app(AdapterInterface::class)->handleOutgoingRequest($reply['action'], $reply['params'] ?? [], $api_id);
         }
 
         return $this->processHttpAPI($connection, $reply, $function);

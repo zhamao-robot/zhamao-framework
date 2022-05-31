@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ZM\Adapters;
+namespace ZM\Adapters\OneBot11;
 
 use ZM\Annotation\CQ\CQAfter;
 use ZM\Annotation\CQ\CQAPIResponse;
@@ -19,27 +19,8 @@ use ZM\Exception\WaitTimeoutException;
 use ZM\Utils\CoMessage;
 use ZM\Utils\MessageUtil;
 
-class OneBot11Adapter implements AdapterInterface
+trait OneBot11IncomingTrait
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function getName(): string
-    {
-        return 'onebot';
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getVersion(): string
-    {
-        return '11';
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function handleIncomingRequest(ContextInterface $context): void
     {
         $data = json_decode($context->getFrame()->data, true);
