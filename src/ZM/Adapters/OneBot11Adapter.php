@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ZM\Adapters;
 
-use Swoole\WebSocket\Frame;
 use ZM\Annotation\CQ\CQAfter;
 use ZM\Annotation\CQ\CQAPIResponse;
 use ZM\Annotation\CQ\CQBefore;
@@ -41,68 +40,74 @@ class OneBot11Adapter implements AdapterInterface
     /**
      * {@inheritDoc}
      */
-    public function handleIncomingRequest(Frame $frame, ContextInterface $context): void
+    public function handleIncomingRequest(ContextInterface $context): void
     {
-        $data = json_decode($frame->data, true);
+        $data = json_decode($context->getFrame()->data, true);
 
         // 将数据存入协程参数中
         set_coroutine_params(compact('data'));
 
         try {
-            // 事件类型不存在，代表为非法请求或 API 响应
-            if (!isset($data['post_type'])) {
-                if (isset($data['echo']) && CoMessage::resumeByWS()) {
-                    EventDispatcher::interrupt();
-                }
-                $this->handleAPIResponse($data, $context);
-                return;
-            }
+            logger()->debug('start handle incoming request');
 
-            if ($data['post_type'] !== 'meta_event') {
-                $before_result = $this->handleBeforeEvent($data, 'pre');
-                if ($before_result->store === 'block') {
+            // 非元事件调用 pre-before 事件
+            if (!$this->isMetaEvent($data)) {
+                logger()->debug('pre-before event');
+                $pre_before_result = $this->handleBeforeEvent($data, 'pre');
+                if ($pre_before_result->store === 'block') {
                     EventDispatcher::interrupt();
                 }
             }
 
+            // 回调或事件处理 resume
             if (CoMessage::resumeByWS()) {
                 EventDispatcher::interrupt();
             }
 
-            if ($data['post_type'] !== 'meta_event') {
-                $before_result = $this->handleBeforeEvent($data, 'post');
-                if ($before_result->store === 'block') {
+            // 非元事件调用 after-before 事件
+            if (!$this->isMetaEvent($data)) {
+                logger()->debug('post-before event');
+                $post_before_result = $this->handleBeforeEvent($data, 'post');
+                if ($post_before_result->store === 'block') {
                     EventDispatcher::interrupt();
                 }
             }
 
-            switch ($data['post_type']) {
-                case 'message':
-                    $this->handleMessageEvent($data, $context);
-                    break;
-                case 'meta_event':
-                    $this->handleMetaEvent($data, $context);
-                    break;
-                case 'notice':
-                    $this->handleNoticeEvent($data, $context);
-                    break;
-                case 'request':
-                    $this->handleRequestEvent($data, $context);
-                    break;
-            }
-
-            if ($data['post_type'] !== 'meta_event') {
-                $before_result = $this->handleAfterEvent($data);
-                if ($before_result->store === 'block') {
-                    EventDispatcher::interrupt();
+            // 进入回调、事件分发流程
+            if ($this->isEvent($data)) {
+                // 事件分发
+                switch ($data['post_type']) {
+                    case 'message':
+                        logger()->debug('message event {data}', compact('data'));
+                        $this->handleMessageEvent($data, $context);
+                        break;
+                    case 'meta_event':
+                        logger()->debug('meta event {data}', compact('data'));
+                        $this->handleMetaEvent($data, $context);
+                        break;
+                    case 'notice':
+                        logger()->debug('notice event {data}', compact('data'));
+                        $this->handleNoticeEvent($data, $context);
+                        break;
+                    case 'request':
+                        logger()->debug('request event {data}', compact('data'));
+                        $this->handleRequestEvent($data, $context);
+                        break;
                 }
+            } elseif ($this->isAPIResponse($data)) {
+                logger()->debug('api response {data}', compact('data'));
+                $this->handleAPIResponse($data, $context);
             }
+            logger()->debug('event end {data}', compact('data'));
+            // 回调、事件处理完成
         } catch (WaitTimeoutException $e) {
             $e->module->finalReply($e->getMessage());
         } finally {
-            if (isset($data['post_type']) && $data['post_type'] !== 'meta_event') {
-                $before_result = $this->handleAfterEvent($data);
-                if ($before_result->store === 'block') {
+            // 非元事件调用 after 事件
+            if (!$this->isMetaEvent($data)) {
+                logger()->debug('after event');
+                $after_result = $this->handleAfterEvent($data);
+                if ($after_result->store === 'block') {
                     EventDispatcher::interrupt();
                 }
             }
@@ -271,7 +276,7 @@ class OneBot11Adapter implements AdapterInterface
             } else {
                 $level = $event->level < 200;
             }
-            return $level && ($event->cq_event === $data['post_type']);
+            return $level && ($event->cq_event === ($data['post_type'] ?? ''));
         });
         // 设定返回值处理函数
         $dispatcher->setReturnFunction(function ($result) {
@@ -299,5 +304,31 @@ class OneBot11Adapter implements AdapterInterface
 
         $dispatcher->dispatchEvents($data);
         return $dispatcher;
+    }
+
+    /**
+     * 判断是否为 API 回调
+     */
+    private function isAPIResponse(array $data): bool
+    {
+        // API 响应应带有 echo 字段
+        return !isset($data['post_type']) && isset($data['echo']);
+    }
+
+    /**
+     * 判断是否为事件
+     */
+    private function isEvent(array $data): bool
+    {
+        // 所有事件都应带有 post_type 字段
+        return isset($data['post_type']);
+    }
+
+    /**
+     * 判断是否为元事件
+     */
+    private function isMetaEvent(array $data): bool
+    {
+        return $this->isEvent($data) && $data['post_type'] === 'meta_event';
     }
 }

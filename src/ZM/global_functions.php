@@ -788,10 +788,10 @@ function is_assoc_array(array $array): bool
 /**
  * 返回 Logger 实例
  */
-function logger(...$args): LoggerInterface
+function logger(string $prefix = null): LoggerInterface
 {
-    if (!app()->has(LoggerInterface::class)) {
-        return zm_config('logging.logger')(...$args);
+    if (!is_null($prefix) || !app()->has(LoggerInterface::class)) {
+        return zm_config('logging.logger')($prefix);
     }
     return resolve(LoggerInterface::class);
 }

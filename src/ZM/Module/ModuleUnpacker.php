@@ -197,7 +197,7 @@ class ModuleUnpacker
             $prompt = !is_string($this->module['unpack']['global-config-override']) ? '请根据模块提供者提供的要求进行修改 global.php 中对应的配置项' : $this->module['unpack']['global-config-override'];
             Console::warning('模块作者要求用户手动修改 global.php 配置文件中的项目：');
             Console::warning('*' . $prompt);
-            if (STDIN === false) {
+            if (STDIN === false) { // @phpstan-ignore-line
                 Console::warning('检测到终端无法输入，请手动修改 global.php 配置文件中的项目');
                 return;
             }
