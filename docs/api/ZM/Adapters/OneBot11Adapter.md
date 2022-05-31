@@ -37,7 +37,7 @@ public function getVersion(): string
 ## handleIncomingRequest
 
 ```php
-public function handleIncomingRequest(Swoole\WebSocket\Frame $frame, ZM\Context\ContextInterface $context): void
+public function handleIncomingRequest(ZM\Context\ContextInterface $context): void
 ```
 
 ### 描述
@@ -48,7 +48,6 @@ public function handleIncomingRequest(Swoole\WebSocket\Frame $frame, ZM\Context\
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| frame | Swoole\WebSocket\Frame |  |
 | context | ZM\Context\ContextInterface |  |
 
 ### 返回
@@ -223,3 +222,72 @@ public function handleAfterEvent(array $data): ZM\Event\EventDispatcher
 | 类型 | 描述 |
 | ---- | ----------- |
 | ZM\Event\EventDispatcher |  |
+
+
+## isAPIResponse
+
+```php
+public function isAPIResponse(array $data): bool
+```
+
+### 描述
+
+判断是否为 API 回调
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| data | array |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| bool |  |
+
+
+## isEvent
+
+```php
+public function isEvent(array $data): bool
+```
+
+### 描述
+
+判断是否为事件
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| data | array |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| bool |  |
+
+
+## isMetaEvent
+
+```php
+public function isMetaEvent(array $data): bool
+```
+
+### 描述
+
+判断是否为元事件
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| data | array |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| bool |  |
