@@ -790,10 +790,7 @@ function is_assoc_array(array $array): bool
  */
 function logger(string $prefix = null): LoggerInterface
 {
-    if (!is_null($prefix) || !app()->has(LoggerInterface::class)) {
-        return zm_config('logging.logger')($prefix);
-    }
-    return resolve(LoggerInterface::class);
+    return new ZM\Logger\ConsoleLogger('info');
 }
 
 /**
