@@ -57,7 +57,7 @@ class QQBot
             if (isset($data['post_type'])) {
                 // echo TermColor::ITALIC.json_encode($data, 128|256).TermColor::RESET.PHP_EOL;
                 ctx()->setCache('level', $level);
-                // Console::debug("Calling CQ Event from fd=" . ctx()->getConnection()->getFd());
+                // logger()->debug("Calling CQ Event from fd=" . ctx()->getConnection()->getFd());
                 if ($data['post_type'] != 'meta_event') {
                     $r = $this->dispatchBeforeEvents($data, 'pre'); // before在这里执行，元事件不执行before为减少不必要的调试日志
                     if ($r->store === 'block') {

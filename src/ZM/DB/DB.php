@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace ZM\DB;
 
 use PDOException;
-use ZM\Console\Console;
 use ZM\Exception\DbException;
 use ZM\MySQL\MySQLManager;
 use ZM\Store\MySQL\SqlPoolStorage;
@@ -89,7 +88,7 @@ class DB
         if (!is_array($params)) {
             $params = [$params];
         }
-        Console::debug('MySQL: ' . $line . ' | ' . implode(', ', $params));
+        logger()->debug('MySQL: ' . $line . ' | ' . implode(', ', $params));
         try {
             if (SqlPoolStorage::$sql_pool === null) {
                 throw new DbException('未连接到任何数据库！');
@@ -117,18 +116,18 @@ class DB
         } catch (DbException $e) {
             if (mb_strpos($e->getMessage(), 'has gone away') !== false) {
                 zm_sleep();
-                Console::warning('Gone away of MySQL! retrying!');
+                logger()->warning('Gone away of MySQL! retrying!');
                 return self::rawQuery($line, $params);
             }
-            Console::warning($e->getMessage());
+            logger()->warning($e->getMessage());
             throw $e;
         } catch (PDOException $e) {
             if (mb_strpos($e->getMessage(), 'has gone away') !== false) {
                 zm_sleep();
-                Console::warning('Gone away of MySQL! retrying!');
+                logger()->warning('Gone away of MySQL! retrying!');
                 return self::rawQuery($line, $params);
             }
-            Console::warning($e->getMessage());
+            logger()->warning($e->getMessage());
             throw new DbException($e->getMessage(), $e->getCode(), $e);
         }
     }

@@ -28,26 +28,26 @@ class EventMapIterator implements Iterator
     #[ReturnTypeWillChange]
     public function current()
     {
-        Console::debug('从 [' . $this->offset . '] 开始获取');
+        logger()->debug('从 [' . $this->offset . '] 开始获取');
         return EventManager::$event_map[$this->class][$this->method][$this->offset];
     }
 
     public function next(): void
     {
-        Console::debug('下一个offset为 [' . ++$this->offset . ']');
+        logger()->debug('下一个offset为 [' . ++$this->offset . ']');
         $this->nextToValid();
     }
 
     #[ReturnTypeWillChange]
     public function key()
     {
-        Console::debug('返回key：' . $this->offset);
+        logger()->debug('返回key：' . $this->offset);
         return isset(EventManager::$event_map[$this->class][$this->method][$this->offset]) ? $this->offset : null;
     }
 
     public function valid($s = false): bool
     {
-        Console::debug(
+        logger()->debug(
             "[{$this->offset}] " .
             ($s ? 'valid' : '') . '存在：' .
             (!isset(EventManager::$event_map[$this->class][$this->method][$this->offset]) ? Console::setColor('false', 'red') : ('true' .
@@ -60,7 +60,7 @@ class EventMapIterator implements Iterator
 
     public function rewind(): void
     {
-        Console::debug('回到0');
+        logger()->debug('回到0');
         $this->offset = 0;
         $this->nextToValid();
     }
@@ -73,6 +73,6 @@ class EventMapIterator implements Iterator
         ) {
             ++$this->offset;
         }
-        Console::debug('内部偏移offset为 [' . $this->offset . ']');
+        logger()->debug('内部偏移offset为 [' . $this->offset . ']');
     }
 }

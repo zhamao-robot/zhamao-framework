@@ -32,9 +32,9 @@ class EventManager
     public static function addEvent($event_name, ?AnnotationBase $event_obj)
     {
         if ($event_obj->method instanceof Closure) {
-            Console::debug("Adding event {$event_name} at @Anonymous");
+            logger()->debug("Adding event {$event_name} at @Anonymous");
         } else {
-            Console::debug("Adding event {$event_name} at " . ($event_obj->class) . ':' . ($event_obj->method));
+            logger()->debug("Adding event {$event_name} at " . ($event_obj->class) . ':' . ($event_obj->method));
             self::$event_map[$event_obj->class][$event_obj->method][] = $event_obj;
         }
         self::$events[$event_name][] = $event_obj;
@@ -66,7 +66,7 @@ class EventManager
             }
             // echo server()->worker_id.PHP_EOL;
             $plain_class = $vss->class;
-            Console::debug('Added Middleware-based timer: ' . $plain_class . ' -> ' . $vss->method);
+            logger()->debug('Added Middleware-based timer: ' . $plain_class . ' -> ' . $vss->method);
             Timer::tick($vss->tick_ms, function () use ($vss, $dispatcher) {
                 set_coroutine_params([]);
                 if (ZMAtomic::get('stop_signal')->get() != 0) {

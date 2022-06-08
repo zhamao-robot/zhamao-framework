@@ -18,7 +18,6 @@ use ZM\API\OneBotV11;
 use ZM\API\TuringAPI;
 use ZM\Config\ZMConfig;
 use ZM\ConnectionManager\ConnectionObject;
-use ZM\Console\Console;
 use ZM\Context\Context;
 use ZM\Event\EventDispatcher;
 use ZM\Exception\InterruptException;
@@ -127,7 +126,7 @@ class Hello
         if (MessageUtil::isAtMe(ctx()->getMessage(), ctx()->getRobotId())) {
             $msg = str_replace(CQ::at(ctx()->getRobotId()), '', ctx()->getMessage());
             ctx()->setMessage('机器人' . $msg);
-            Console::info(ctx()->getMessage());
+            logger()->info(ctx()->getMessage());
         }
         return true;
     }
@@ -192,7 +191,7 @@ class Hello
      */
     public function onConnect(ConnectionObject $conn)
     {
-        Console::info('机器人 ' . $conn->getOption('connect_id') . ' 已连接！');
+        logger()->info('机器人 ' . $conn->getOption('connect_id') . ' 已连接！');
     }
 
     /**
@@ -201,7 +200,7 @@ class Hello
      */
     public function onDisconnect(ConnectionObject $conn)
     {
-        Console::info('机器人 ' . $conn->getOption('connect_id') . ' 已断开连接！');
+        logger()->info('机器人 ' . $conn->getOption('connect_id') . ' 已断开连接！');
     }
 
     /**
@@ -221,7 +220,7 @@ class Hello
      */
     public function closeUnknownConn()
     {
-        Console::info('Unknown connection , I will close it.');
+        logger()->info('发现了未知的 Websocket 连接，正在断开');
         server()->disconnect(ctx()->getConnection()->getFd());
     }
 

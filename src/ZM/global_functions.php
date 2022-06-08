@@ -246,14 +246,14 @@ function ctx(): ContextInterface
     if (isset(Context::$context[$cid])) {
         return ZMBuf::$context_class[$cid] ?? (ZMBuf::$context_class[$cid] = new $c_class($cid));
     }
-    Console::debug("未找到当前协程的上下文({$cid})，正在找父进程的上下文");
+    logger()->debug("未找到当前协程的上下文({$cid})，正在找父进程的上下文");
     while (($parent_cid = co::getPcid($cid)) !== -1) {
         $cid = $parent_cid;
         if (isset(Context::$context[$cid])) {
             return ZMBuf::$context_class[$cid] ?? (ZMBuf::$context_class[$cid] = new $c_class($cid));
         }
     }
-    Console::warning('当前环境不是协程环境，将返回独立的非协程的容器');
+    logger()->warning('当前环境不是协程环境，将返回独立的非协程的容器');
     return ZMBuf::$context_class[$cid] ?? (ZMBuf::$context_class[$cid] = new $c_class($cid));
 }
 
@@ -355,7 +355,7 @@ function zm_timer_tick(int $interval, callable $runnable)
 {
     if (zm_cid() === -1) {
         return go(static function () use ($interval, $runnable) {
-            Console::debug('Adding extra timer tick of ' . $interval . ' ms');
+            logger()->debug('Adding extra timer tick of ' . $interval . ' ms');
             Swoole\Timer::tick($interval, static function () use ($runnable) {
                 call_with_catch($runnable);
             });
@@ -514,13 +514,13 @@ function zm_dump($var, ...$moreVars)
 /**
  * 输出info日志
  *
- * 与 {@link Console::info()} 一致
+ * 与 {@link logger()->info()} 一致
  *
  * @param mixed $obj
  */
 function zm_info($obj): void
 {
-    Console::info($obj);
+    logger()->info($obj);
 }
 
 /**
@@ -532,7 +532,7 @@ function zm_info($obj): void
  */
 function zm_warning($obj): void
 {
-    Console::warning($obj);
+    logger()->warning($obj);
 }
 
 /**
@@ -544,31 +544,31 @@ function zm_warning($obj): void
  */
 function zm_success($obj): void
 {
-    Console::success($obj);
+    throw new \RuntimeException('the success level logger has been deprecated.');
 }
 
 /**
  * 输出debug日志
  *
- * 与 {@link Console::debug()} 一致
+ * 与 {@link logger()->debug()} 一致
  *
  * @param mixed $obj
  */
 function zm_debug($obj): void
 {
-    Console::debug($obj);
+    logger()->debug($obj);
 }
 
 /**
  * 输出verbose日志
  *
- * 与 {@link Console::verbose()} 一致
+ * 与 {@link logger()->debug()} 一致
  *
  * @param mixed $obj
  */
 function zm_verbose($obj): void
 {
-    Console::verbose($obj);
+    logger()->debug($obj);
 }
 
 /**
@@ -580,7 +580,7 @@ function zm_verbose($obj): void
  */
 function zm_error($obj): void
 {
-    Console::error($obj);
+    logger()->error($obj);
 }
 
 /**

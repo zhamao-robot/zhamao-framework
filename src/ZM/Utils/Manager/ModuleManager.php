@@ -93,12 +93,12 @@ class ModuleManager
                 continue;
             }
             if (!is_file($file . '/' . $module_config['module-root-path'] . '/zm.json')) {
-                Console::warning(zm_internal_errcode('E00054') . '模块（插件）文件 ' . $pathinfo['basename'] . ' 无法找到模块配置文件（zm.json）！');
+                logger()->warning(zm_internal_errcode('E00054') . '模块（插件）文件 ' . $pathinfo['basename'] . ' 无法找到模块配置文件（zm.json）！');
                 continue;
             }
             $module_file = json_decode(file_get_contents($file . '/' . $module_config['module-root-path'] . '/zm.json'), true);
             if ($module_file === null) {
-                Console::warning(zm_internal_errcode('E000555') . '模块（插件）文件 ' . $pathinfo['basename'] . ' 无法正常读取模块配置文件（zm.json）！');
+                logger()->warning(zm_internal_errcode('E000555') . '模块（插件）文件 ' . $pathinfo['basename'] . ' 无法正常读取模块配置文件（zm.json）！');
                 continue;
             }
             $module_config['phar-path'] = $v;
@@ -187,12 +187,12 @@ class ModuleManager
     {
         $module_root_path = realpath(DataProvider::getSourceRootDir() . '/vendor/composer/' . $v['install-path'] . '/' . $module_path);
         if ($module_root_path === false) {
-            Console::warning(zm_internal_errcode('E00055') . '无法找到Composer发布的插件配置路径在包 `' . $v['name'] . '` 中！');
+            logger()->warning(zm_internal_errcode('E00055') . '无法找到Composer发布的插件配置路径在包 `' . $v['name'] . '` 中！');
             return null;
         }
         $json = json_decode(file_get_contents($module_root_path . '/zm.json'), true);
         if ($json === null) {
-            Console::warning(zm_internal_errcode('E00054') . 'Composer包内无法正常读取 ' . $v['name'] . ' 的内的配置文件（zm.json）！');
+            logger()->warning(zm_internal_errcode('E00054') . 'Composer包内无法正常读取 ' . $v['name'] . ' 的内的配置文件（zm.json）！');
             return null;
         }
         if (!isset($json['name'])) {
@@ -211,7 +211,7 @@ class ModuleManager
             }
         }
         if (!isset($json['namespace'])) {
-            Console::warning(zm_internal_errcode('E00055') . '无法获取Composer发布的模块命名空间！');
+            logger()->warning(zm_internal_errcode('E00055') . '无法获取Composer发布的模块命名空间！');
             return null;
         }
         return $json;

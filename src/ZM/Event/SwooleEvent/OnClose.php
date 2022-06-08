@@ -28,7 +28,7 @@ class OnClose implements SwooleEvent
     public function onCall($server, $fd)
     {
         unset(Context::$context[Coroutine::getCid()]);
-        Console::debug('Calling Swoole "close" event from fd=' . $fd);
+        logger()->debug('Calling Swoole "close" event from fd=' . $fd);
         $conn = ManagerGM::get($fd);
         if ($conn === null) {
             return;

@@ -7,7 +7,6 @@ namespace ZM\Event\SwooleEvent;
 use Swoole\Server;
 use ZM\Annotation\Swoole\SwooleHandler;
 use ZM\Config\ZMConfig;
-use ZM\Console\Console;
 use ZM\Event\SwooleEvent;
 use ZM\Framework;
 use ZM\Utils\Manager\ProcessManager;
@@ -21,7 +20,7 @@ class OnStart implements SwooleEvent
 {
     public function onCall(Server $server)
     {
-        Console::debug('Calling onStart event(1)');
+        logger()->debug('Calling onStart event(1)');
         if (!Framework::$argv['disable-safe-exit']) {
             SignalListener::signalMaster($server);
         }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ZM\Config;
 
-use ZM\Console\Console;
 use ZM\Exception\ConfigException;
 use ZM\Utils\DataProvider;
 
@@ -82,11 +81,11 @@ class ZMConfig
         $head_name = array_shift($separated);
         // 首先判断有没有初始化这个配置文件，因为是只读，所以是懒加载，加载第一次后缓存起来
         if (!isset(self::$config[$head_name])) {
-            Console::debug('配置文件' . $name . ' ' . $additional_key . '没读取过，正在从文件加载 ...');
+            logger()->debug('配置文件' . $name . ' ' . $additional_key . '没读取过，正在从文件加载 ...');
             self::$config[$head_name] = self::loadConfig($head_name);
         }
         // global.remote_terminal
-        Console::debug('根据切分来寻找子配置: ' . $name);
+        logger()->debug('根据切分来寻找子配置: ' . $name);
         $obj = self::$config[$head_name];
         foreach ($separated as $key) {
             if (isset($obj[$key])) {
@@ -190,7 +189,7 @@ class ZMConfig
         $list = [];
         $files = DataProvider::scanDirFiles(self::$path, true, true);
         foreach ($files as $file) {
-            Console::debug('正在从目录' . self::$path . '读取配置文件 ' . $file);
+            logger()->debug('正在从目录' . self::$path . '读取配置文件 ' . $file);
             $info = pathinfo($file);
             $info['extension'] = $info['extension'] ?? '';
 
@@ -225,7 +224,7 @@ class ZMConfig
                     $obj->is_env = false;
                 }
                 if (mb_strpos($info['filename'], '.') !== false) {
-                    Console::warning('文件名 ' . $info['filename'] . ' 不合法(含有".")，请检查文件名是否合法。');
+                    logger()->warning('文件名 ' . $info['filename'] . ' 不合法(含有".")，请检查文件名是否合法。');
                     continue;
                 }
                 $obj->path = realpath(self::$path . '/' . $info['dirname'] . '/' . $info['basename']);
@@ -265,7 +264,7 @@ class ZMConfig
      */
     private static function readConfigFromFile($filename, $ext_name)
     {
-        Console::debug('正加载配置文件 ' . $filename);
+        logger()->debug('正加载配置文件 ' . $filename);
         switch ($ext_name) {
             case 'php':
                 $r = require $filename;

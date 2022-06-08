@@ -35,7 +35,7 @@ class OnRequest implements SwooleEvent
             $response->setHeader($k, $v);
         }
         unset(Context::$context[Coroutine::getCid()]);
-        Console::debug('Calling Swoole "request" event from fd=' . $request->fd);
+        logger()->debug('Calling Swoole "request" event from fd=' . $request->fd);
         set_coroutine_params(['request' => $request, 'response' => $response]);
 
         resolve(ContainerServicesProvider::class)->registerServices('request');
@@ -83,7 +83,7 @@ class OnRequest implements SwooleEvent
             // do nothing
         } catch (Exception $e) {
             $response->status(500);
-            Console::info(
+            logger()->info(
                 $request->server['remote_addr'] . ':' . $request->server['remote_port'] .
                 ' [' . $response->getStatusCode() . '] ' . $request->server['request_uri']
             );
@@ -98,7 +98,7 @@ class OnRequest implements SwooleEvent
             Console::log($e->getTraceAsString(), 'gray');
         } catch (Error $e) {
             $response->status(500);
-            Console::info(
+            logger()->info(
                 $request->server['remote_addr'] . ':' . $request->server['remote_port'] .
                 ' [' . $response->getStatusCode() . '] ' . $request->server['request_uri']
             );

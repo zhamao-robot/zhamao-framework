@@ -79,7 +79,7 @@ class PureHttpCommand extends Command
         $server->on('start', function ($server) {
             Process::signal(SIGINT, function () use ($server) {
                 echo "\r";
-                Console::warning('Server interrupted by keyboard.');
+                logger()->notice('服务器收到中断信号 SIGINT，正在停止');
                 for ($i = 0; $i < 32; ++$i) {
                     $num = ZMAtomic::$atomics['request'][$i]->get();
                     if ($num != 0) {
@@ -89,7 +89,7 @@ class PureHttpCommand extends Command
                 $server->shutdown();
                 $server->stop();
             });
-            Console::success('Server started. Use Ctrl+C to stop.');
+            logger()->notice('服务器已启动，请使用 Ctrl+C 以停止。');
         });
         $server->start();
         // return this if there was no problem running the command

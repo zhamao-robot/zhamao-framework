@@ -7,7 +7,6 @@ namespace ZM\Store;
 use Exception;
 use Swoole\Table;
 use ZM\Annotation\Swoole\OnSave;
-use ZM\Console\Console;
 use ZM\Event\EventDispatcher;
 use ZM\Exception\LightCacheException;
 use ZM\Exception\ZMException;
@@ -45,7 +44,7 @@ class LightCache
                 }
                 foreach ($r as $k => $v) {
                     $write = self::set($k, $v);
-                    Console::verbose('Writing LightCache: ' . $k);
+                    logger()->debug('Writing LightCache: ' . $k);
                     if ($write === false) {
                         self::$last_error = zm_internal_errcode('E00051') . '可能是由于 Hash 冲突过多导致动态空间无法分配内存';
                         return false;
@@ -298,7 +297,7 @@ class LightCache
                 $r = [];
             }
             foreach ($r as $k => $v) {
-                Console::verbose('Saving ' . $k);
+                logger()->debug('Saving ' . $k);
                 $r[$k] = self::get($k);
             }
             file_put_contents(self::$config['persistence_path'], json_encode($r, 64 | 128 | 256));
@@ -321,7 +320,7 @@ class LightCache
             self::unset($v);
         }
         Framework::saveFrameworkState($obj);
-        Console::verbose('Saved.');
+        logger()->debug('Saved.');
     }
 
     private static function checkExpire($key)

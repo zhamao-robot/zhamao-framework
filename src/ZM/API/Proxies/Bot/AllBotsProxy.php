@@ -8,7 +8,6 @@ use ReflectionException;
 use ReflectionMethod;
 use ReflectionNamedType;
 use ZM\API\ZMRobot;
-use ZM\Console\Console;
 
 class AllBotsProxy extends AbstractBotProxy
 {
@@ -26,7 +25,7 @@ class AllBotsProxy extends AbstractBotProxy
         // 一般此情况代表用户进行嵌套代理，即 `->all()->allGroups()` 等情况
         $reflection = new ReflectionMethod(ZMRobot::class, $name);
         if (($return = $reflection->getReturnType()) && $return instanceof ReflectionNamedType && str_contains($return->getName(), 'Proxy')) {
-            Console::debug("Trying to construct proxy {$name} inside proxy, returning nested proxy.");
+            logger()->debug("Trying to construct proxy {$name} inside proxy, returning nested proxy.");
             // 插入当前代理作为第一个参数
             array_unshift($arguments, $this);
             return $this->bot->{$name}(...$arguments);
@@ -35,7 +34,7 @@ class AllBotsProxy extends AbstractBotProxy
         $result = [];
         // 遍历所有机器人实例
         foreach ($this->bot::getAllRobot() as $bot) {
-            Console::debug("Calling {$name} on bot {$bot->getSelfId()}.");
+            logger()->debug("Calling {$name} on bot {$bot->getSelfId()}.");
             $result[$bot->getSelfId()] = $bot->{$name}(...$arguments);
         }
         return $result;

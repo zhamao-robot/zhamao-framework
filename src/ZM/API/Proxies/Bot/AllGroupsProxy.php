@@ -6,7 +6,6 @@ namespace ZM\API\Proxies\Bot;
 
 use ReflectionException;
 use ZM\API\ZMRobot;
-use ZM\Console\Console;
 
 class AllGroupsProxy extends AbstractBotProxy
 {
@@ -24,7 +23,7 @@ class AllGroupsProxy extends AbstractBotProxy
         // 因为目前所有群组方法都是以 `group_id` 作为第一个参数，故以此来判断
         $reflection = new \ReflectionMethod(ZMRobot::class, $name);
         if (!$reflection->getNumberOfParameters() || $reflection->getParameters()[0]->getName() !== 'group_id') {
-            Console::warning("Trying to call non-group method {$name} on AllGroupsProxy, skipped.");
+            logger()->warning("Trying to call non-group method {$name} on AllGroupsProxy, skipped.");
             return $this->bot->{$name}(...$arguments);
         }
 
@@ -34,7 +33,7 @@ class AllGroupsProxy extends AbstractBotProxy
         foreach ($groups as $group) {
             $arguments[0] = $group['group_id'];
             $bot_id = implode_when_necessary($this->bot->getSelfId());
-            Console::debug("Calling {$name} on group {$group['group_id']} on bot {$bot_id}.");
+            logger()->debug("Calling {$name} on group {$group['group_id']} on bot {$bot_id}.");
             // 在群组上调用方法
             $result[$group['group_id']] = $this->bot->{$name}(...$arguments);
         }

@@ -11,7 +11,6 @@ use Doctrine\DBAL\ParameterType;
 use PDO;
 use PDOException;
 use Swoole\Database\PDOProxy;
-use ZM\Console\Console;
 use ZM\Exception\DbException;
 use ZM\Store\MySQL\SqlPoolStorage;
 
@@ -22,13 +21,13 @@ class MySQLConnection implements Connection
 
     public function __construct()
     {
-        Console::debug('Constructing...');
+        logger()->debug('Constructing...');
         $this->conn = SqlPoolStorage::$sql_pool->getConnection();
     }
 
     public function __destruct()
     {
-        Console::debug('Destructing！！！');
+        logger()->debug('Destructing！！！');
         SqlPoolStorage::$sql_pool->putConnection($this->conn);
     }
 
@@ -40,7 +39,7 @@ class MySQLConnection implements Connection
     public function prepare($sql, $options = [])
     {
         try {
-            Console::debug('Running SQL prepare: ' . $sql);
+            logger()->debug('Running SQL prepare: ' . $sql);
             $statement = $this->conn->prepare($sql, $options);
             assert($statement !== false);
         } catch (PDOException $exception) {
@@ -75,7 +74,7 @@ class MySQLConnection implements Connection
     public function exec($sql)
     {
         try {
-            Console::debug('Running SQL exec: ' . $sql);
+            logger()->debug('Running SQL exec: ' . $sql);
             $statement = $this->conn->exec($sql);
             assert($statement !== false);
             return $statement;

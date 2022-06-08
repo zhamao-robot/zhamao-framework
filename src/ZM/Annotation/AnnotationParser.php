@@ -20,7 +20,6 @@ use ZM\Annotation\Interfaces\ErgodicAnnotation;
 use ZM\Annotation\Interfaces\Level;
 use ZM\Annotation\Module\Closed;
 use ZM\Config\ZMConfig;
-use ZM\Console\Console;
 use ZM\Event\EventManager;
 use ZM\Exception\AnnotationException;
 use ZM\Utils\Manager\RouteManager;
@@ -65,7 +64,7 @@ class AnnotationParser
     public function registerMods()
     {
         foreach ($this->path_list as $path) {
-            Console::debug('parsing annotation in ' . $path[0] . ':' . $path[1]);
+            logger()->debug('parsing annotation in ' . $path[0] . ':' . $path[1]);
             $all_class = ZMUtil::getClassesPsr4($path[0], $path[1]);
 
             $conf = ZMConfig::get('global', 'runtime')['annotation_reader_ignore'] ?? [];
@@ -82,7 +81,7 @@ class AnnotationParser
             AnnotationReader::addGlobalIgnoredName('mixin');
             $this->reader = new DualReader(new AnnotationReader(), new AttributeReader());
             foreach ($all_class as $v) {
-                Console::debug('正在检索 ' . $v);
+                logger()->debug('正在检索 ' . $v);
 
                 $reflection_class = new ReflectionClass($v);
                 $methods = $reflection_class->getMethods(ReflectionMethod::IS_PUBLIC);
@@ -132,7 +131,7 @@ class AnnotationParser
                     }
                     if ($vs instanceof MiddlewareClass) {
                         // 注册中间件本身的类，标记到 middlewares 属性中
-                        Console::debug('正在注册中间件 ' . $reflection_class->getName());
+                        logger()->debug('正在注册中间件 ' . $reflection_class->getName());
                         $rs = $this->registerMiddleware($vs, $reflection_class);
                         $this->middlewares[$rs['name']] = $rs;
                     }
@@ -168,7 +167,7 @@ class AnnotationParser
                 }
             }
         }
-        Console::debug('解析注解完毕！');
+        logger()->debug('解析注解完毕！');
     }
 
     public function generateAnnotationEvents(): array
@@ -216,7 +215,7 @@ class AnnotationParser
     public function addRegisterPath(string $path, string $indoor_name)
     {
         if (server()->worker_id === 0) {
-            Console::verbose('Add register path: ' . $path . ' => ' . $indoor_name);
+            logger()->debug('Add register path: ' . $path . ' => ' . $indoor_name);
         }
         $this->path_list[] = [$path, $indoor_name];
     }

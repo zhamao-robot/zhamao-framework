@@ -10,7 +10,6 @@ use Swoole\Coroutine;
 use Swoole\Server;
 use Swoole\Timer;
 use ZM\Annotation\Swoole\SwooleHandler;
-use ZM\Console\Console;
 use ZM\Event\SwooleEvent;
 use ZM\Store\LightCacheInside;
 
@@ -28,6 +27,6 @@ class OnWorkerExit implements SwooleEvent
                 Coroutine::resume($v['coroutine']);
             }
         }
-        Console::verbose('正在结束 Worker #' . $worker_id . '，进程内可能有事务在运行...');
+        logger()->debug('正在结束 Worker #' . $worker_id . '，进程内可能有事务在运行...');
     }
 }

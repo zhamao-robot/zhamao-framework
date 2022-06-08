@@ -9,7 +9,6 @@ use ZM\Annotation\Http\HandleAfter;
 use ZM\Annotation\Http\HandleBefore;
 use ZM\Annotation\Http\HandleException;
 use ZM\Annotation\Http\MiddlewareClass;
-use ZM\Console\Console;
 use ZM\Http\MiddlewareInterface;
 
 /**
@@ -35,7 +34,7 @@ class TimerMiddleware implements MiddlewareInterface
      */
     public function onAfter()
     {
-        Console::info('Using ' . round((microtime(true) - $this->starttime) * 1000, 3) . ' ms.');
+        logger()->info('Using ' . round((microtime(true) - $this->starttime) * 1000, 3) . ' ms.');
     }
 
     /**
@@ -44,7 +43,7 @@ class TimerMiddleware implements MiddlewareInterface
      */
     public function onException(Exception $e)
     {
-        Console::error('Using ' . round((microtime(true) - $this->starttime) * 1000, 3) . ' ms but an Exception occurred.');
+        logger()->error('Using ' . round((microtime(true) - $this->starttime) * 1000, 3) . ' ms but an Exception occurred.');
         throw $e;
     }
 }

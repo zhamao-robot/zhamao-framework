@@ -15,7 +15,6 @@ use ZM\API\ZMRobot;
 use ZM\Config\ZMConfig;
 use ZM\ConnectionManager\ConnectionObject;
 use ZM\ConnectionManager\ManagerGM;
-use ZM\Console\Console;
 use ZM\Event\EventDispatcher;
 use ZM\Exception\InterruptException;
 use ZM\Exception\InvalidArgumentException;
@@ -229,7 +228,7 @@ class Context implements ContextInterface
             throw new InvalidArgumentException('协程等待参数缺失');
         }
 
-        Console::debug('==== 开始等待输入 ====');
+        logger()->debug('==== 开始等待输入 ====');
         if ($prompt != '') {
             $this->reply($prompt);
         }

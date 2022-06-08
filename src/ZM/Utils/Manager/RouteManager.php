@@ -8,7 +8,6 @@ use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use ZM\Annotation\Http\Controller;
 use ZM\Annotation\Http\RequestMapping;
-use ZM\Console\Console;
 use ZM\Http\StaticFileHandler;
 
 /**
@@ -37,7 +36,7 @@ class RouteManager
         }
         $tail = trim($vss->route, '/');
         $route_name = $prefix . ($tail === '' ? '' : '/') . $tail;
-        Console::debug('添加路由：' . $route_name);
+        logger()->debug('添加路由：' . $route_name);
         $route = new Route($route_name, ['_class' => $class, '_method' => $method]);
         $route->setMethods($vss->request_method);
 
@@ -48,7 +47,7 @@ class RouteManager
     {
         $tail = trim($route, '/');
         $route_name = ($tail === '' ? '' : '/') . $tail . '/{filename}';
-        Console::debug('添加静态文件路由：' . $route_name);
+        logger()->debug('添加静态文件路由：' . $route_name);
         $route = new Route($route_name, ['_class' => __CLASS__, '_method' => 'onStaticRoute'], [], compact('path'));
 
         self::$routes->add(md5($route_name), $route);

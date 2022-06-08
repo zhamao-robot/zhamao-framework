@@ -42,13 +42,13 @@ class CronManager
                 $cron = new CronExpression($v->expression);
                 $cron->setMaxIterationCount($v->max_iteration_count);
                 $plain_class = $v->class;
-                Console::debug("Cron task checker starting {$plain_class}:{$v->method}, next run at {$cron->getNextRunDate()->format('Y-m-d H:i:s')}");
+                logger()->debug("Cron task checker starting {$plain_class}:{$v->method}, next run at {$cron->getNextRunDate()->format('Y-m-d H:i:s')}");
                 if ($v->check_delay_time > 60000 || $v->check_delay_time < 1000) {
-                    Console::warning(zm_internal_errcode('E00076') . 'Delay time must be between 1000 and 60000, reset to 20000');
+                    logger()->warning(zm_internal_errcode('E00076') . 'Delay time must be between 1000 and 60000, reset to 20000');
                     $v->check_delay_time = 20000;
                 }
             } catch (InvalidArgumentException $e) {
-                Console::error(zm_internal_errcode('E00075') . 'Invalid cron expression or arguments, please check it!');
+                logger()->error(zm_internal_errcode('E00075') . 'Invalid cron expression or arguments, please check it!');
                 throw $e;
             }
 
@@ -59,7 +59,7 @@ class CronManager
                     return;
                 }
                 try {
-                    Console::debug('Cron: ' . ($cron->isDue() ? 'true' : 'false') . ', last: ' . $cron->getPreviousRunDate()->format('Y-m-d H:i:s') . ', next: ' . $cron->getNextRunDate()->format('Y-m-d H:i:s'));
+                    logger()->debug('Cron: ' . ($cron->isDue() ? 'true' : 'false') . ', last: ' . $cron->getPreviousRunDate()->format('Y-m-d H:i:s') . ', next: ' . $cron->getNextRunDate()->format('Y-m-d H:i:s'));
                     if ($cron->isDue()) {
                         if ($v->getStatus() === 0) {
                             self::startExecute($v, $dispatcher, $cron);
@@ -91,18 +91,18 @@ class CronManager
      */
     private static function startExecute(Cron $v, EventDispatcher $dispatcher, CronExpression $cron)
     {
-        Console::verbose("Cron task {$v->class}:{$v->method} is due, running at " . date('Y-m-d H:i:s') . ($v->getRecordNextTime() === 0 ? '' : (', offset ' . (time() - $v->getRecordNextTime()) . 's')));
+        logger()->debug("Cron task {$v->class}:{$v->method} is due, running at " . date('Y-m-d H:i:s') . ($v->getRecordNextTime() === 0 ? '' : (', offset ' . (time() - $v->getRecordNextTime()) . 's')));
         $v->setStatus(1);
         $starttime = microtime(true);
         $pre_next_time = $cron->getNextRunDate()->getTimestamp();
         $dispatcher->dispatchEvent($v, null, $cron);
-        Console::verbose("Cron task {$v->class}:{$v->method} is done, using " . round(microtime(true) - $starttime, 3) . 's');
+        logger()->debug("Cron task {$v->class}:{$v->method} is done, using " . round(microtime(true) - $starttime, 3) . 's');
         if ($pre_next_time !== $cron->getNextRunDate()->getTimestamp()) { // 这一步用于判断运行的Cron是否已经覆盖到下一个运行区间
             if (time() + round($v->check_delay_time / 1000) >= $pre_next_time) { // 假设检测到下一个周期运行时间已经要超过了预计的时间，则警告运行超时
-                Console::warning(zm_internal_errcode('E00077') . 'Cron task ' . $v->class . ':' . $v->method . ' is timeout');
+                logger()->warning(zm_internal_errcode('E00077') . 'Cron task ' . $v->class . ':' . $v->method . ' is timeout');
             }
         } else {
-            Console::verbose('Next run at ' . date('Y-m-d H:i:s', $cron->getNextRunDate()->getTimestamp()));
+            logger()->debug('Next run at ' . date('Y-m-d H:i:s', $cron->getNextRunDate()->getTimestamp()));
         }
         $v->setRecordNextTime($pre_next_time);
         $v->setStatus(2);

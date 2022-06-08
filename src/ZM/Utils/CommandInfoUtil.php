@@ -9,7 +9,6 @@ use ReflectionException;
 use ReflectionMethod;
 use ZM\Annotation\CQ\CommandArgument;
 use ZM\Annotation\CQ\CQCommand;
-use ZM\Console\Console;
 use ZM\Event\EventManager;
 use ZM\Store\WorkerCache;
 
@@ -70,7 +69,7 @@ class CommandInfoUtil
             if (isset($formats[$trigger])) {
                 $format = $formats[$trigger];
             } else {
-                Console::warning("未知的命令触发条件：{$trigger}");
+                logger()->warning("未知的命令触发条件：{$trigger}");
                 continue;
             }
             foreach ($conditions as $condition) {
@@ -140,7 +139,7 @@ class CommandInfoUtil
             try {
                 $reflection = new ReflectionMethod($annotation->class, $annotation->method);
             } catch (ReflectionException $e) {
-                Console::warning('命令 ' . $id . ' 注解解析错误：' . $e->getMessage());
+                logger()->warning('命令 ' . $id . ' 注解解析错误：' . $e->getMessage());
                 continue;
             }
 
@@ -160,7 +159,7 @@ class CommandInfoUtil
             ];
 
             if (empty($command['descriptions'])) {
-                Console::warning("命令没有描述信息：{$id}");
+                logger()->warning("命令没有描述信息：{$id}");
             }
 
             // 可能的触发条件，顺序会影响命令帮助的生成结果
@@ -178,7 +177,7 @@ class CommandInfoUtil
                 }
             }
             if (empty($command['triggers'])) {
-                Console::warning("命令没有触发条件：{$id}");
+                logger()->warning("命令没有触发条件：{$id}");
                 continue;
             }
 

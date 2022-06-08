@@ -7,7 +7,6 @@ namespace ZM\Event\SwooleEvent;
 use Swoole\Server;
 use ZM\Annotation\Swoole\SwooleHandler;
 use ZM\Config\ZMConfig;
-use ZM\Console\Console;
 use ZM\Event\SwooleEvent;
 use ZM\Store\LightCache;
 use ZM\Utils\Manager\ProcessManager;
@@ -23,7 +22,7 @@ class OnWorkerStop implements SwooleEvent
         if ($worker_id == (ZMConfig::get('global.worker_cache.worker') ?? 0)) {
             LightCache::savePersistence();
         }
-        Console::verbose(($server->taskworker ? 'Task' : '') . "Worker #{$worker_id} 已停止 (Worker 状态码: " . $server->getWorkerStatus($worker_id) . ')');
+        logger()->debug('{worker}#{worker_id} 已停止（状态码：{status}）', ['worker' => ($server->taskworker ? 'Task' : '') . 'Worker', 'worker_id' => $worker_id, 'status' => $server->getWorkerStatus($worker_id)]);
         ProcessManager::removeProcessState($server->taskworker ? ZM_PROCESS_TASKWORKER : ZM_PROCESS_WORKER, $worker_id);
     }
 }

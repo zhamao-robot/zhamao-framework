@@ -11,7 +11,6 @@ use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
 use ZM\Config\ZMConfig;
-use ZM\Console\Console;
 use ZM\Http\Response;
 use ZM\Utils\Manager\RouteManager;
 
@@ -71,19 +70,19 @@ class HttpUtil
             }
             $work = realpath($base_dir) . '/';
             if (strpos($path, $work) !== 0) {
-                Console::info('[403] ' . $uri);
+                logger()->info('[403] ' . $uri);
                 self::responseCodePage($response, 403);
                 return true;
             }
             if (is_dir($path)) {
                 if (mb_substr($uri, -1, 1) != '/') {
-                    Console::info('[302] ' . $uri);
+                    logger()->info('[302] ' . $uri);
                     $response->redirect($uri . '/', 302);
                     return true;
                 }
                 foreach ($base_index as $vp) {
                     if (is_file($path . '/' . $vp)) {
-                        Console::info('[200] ' . $uri);
+                        logger()->info('[200] ' . $uri);
                         $exp = strtolower(pathinfo($path . $vp)['extension'] ?? 'unknown');
                         $response->setHeader('Content-Type', ZMConfig::get('file_header')[$exp] ?? 'application/octet-stream');
                         $response->end(file_get_contents($path . $vp));
@@ -91,14 +90,14 @@ class HttpUtil
                     }
                 }
             } elseif (is_file($path)) {
-                Console::info('[200] ' . $uri);
+                logger()->info('[200] ' . $uri);
                 $exp = strtolower(pathinfo($path)['extension'] ?? 'unknown');
                 $response->setHeader('Content-Type', ZMConfig::get('file_header')[$exp] ?? 'application/octet-stream');
                 $response->end(file_get_contents($path));
                 return true;
             }
         }
-        Console::info('[404] ' . $uri);
+        logger()->info('[404] ' . $uri);
         self::responseCodePage($response, 404);
         return true;
     }

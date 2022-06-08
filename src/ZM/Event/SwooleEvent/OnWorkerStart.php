@@ -50,7 +50,7 @@ class OnWorkerStart implements SwooleEvent
 {
     public function onCall(Server $server, int $worker_id)
     {
-        Console::debug('Calling onWorkerStart event(1)');
+        logger()->debug('Calling onWorkerStart event(1)');
         if (!Framework::$argv['disable-safe-exit']) {
             SignalListener::signalWorker($server, $worker_id);
         }
@@ -79,7 +79,7 @@ class OnWorkerStart implements SwooleEvent
                     $server->shutdown();
                 });
 
-                Console::verbose("Worker #{$server->worker_id} starting");
+                logger()->debug("Worker #{$server->worker_id} starting");
                 // ZMBuf::resetCache(); //清空变量缓存
                 // ZMBuf::set("wait_start", []); //添加队列，在workerStart运行完成前先让其他协程等待执行
 
@@ -107,11 +107,11 @@ class OnWorkerStart implements SwooleEvent
                 });
                 $dispatcher->dispatchEvents($server, $worker_id);
                 if ($dispatcher->status === EventDispatcher::STATUS_NORMAL) {
-                    Console::debug('@OnStart 执行完毕');
+                    logger()->debug('@OnStart 执行完毕');
                 } else {
-                    Console::warning('@OnStart 执行异常！');
+                    logger()->warning('@OnStart 执行异常！');
                 }
-                Console::verbose('Worker #' . $worker_id . ' started');
+                logger()->debug('Worker #' . $worker_id . ' started');
                 $this->gatherWorkerStartStatus();
             } catch (Exception $e) {
                 if ($e->getMessage() === 'swoole exit') {
@@ -134,7 +134,7 @@ class OnWorkerStart implements SwooleEvent
             ProcessManager::saveProcessState(ZM_PROCESS_TASKWORKER, $server->worker_pid, ['worker_id' => $worker_id]);
             try {
                 $this->loadAnnotations();
-                Console::verbose('TaskWorker #' . $server->worker_id . ' started');
+                logger()->debug('TaskWorker #' . $server->worker_id . ' started');
             } catch (Exception $e) {
                 Console::error('TaskWorker #' . $server->worker_id . ' 加载出错！停止服务！');
                 Console::error(zm_internal_errcode('E00030') . $e->getMessage() . "\n" . $e->getTraceAsString());
@@ -159,7 +159,7 @@ class OnWorkerStart implements SwooleEvent
             goto skip;
         }
         // 加载各个模块的注解类，以及反射
-        Console::debug('Mapping annotations');
+        logger()->debug('Mapping annotations');
         $parser = new AnnotationParser();
         $composer = json_decode(file_get_contents(DataProvider::getSourceRootDir() . '/composer.json'), true);
         $merge = array_merge($composer['autoload']['psr-4'] ?? [], $composer['autoload-dev']['psr-4'] ?? []);
@@ -182,7 +182,7 @@ class OnWorkerStart implements SwooleEvent
             $list = ModuleManager::getPackedModules();
             foreach ($list as $k => $v) {
                 if (\server()->worker_id === 0) {
-                    Console::info('Loading packed module: ' . $k);
+                    logger()->info('Loading packed module: ' . $k);
                 }
                 require_once $v['phar-path'];
                 $func = 'loader' . $v['generated-id'];
@@ -195,7 +195,7 @@ class OnWorkerStart implements SwooleEvent
         $list = ModuleManager::getComposerModules();
         foreach ($list as $k => $v) {
             if (\server()->worker_id === 0) {
-                Console::info('Loading composer module: ' . $k);
+                logger()->info('Loading composer module: ' . $k);
             }
             $parser->addRegisterPath($v['module-path'], $v['namespace']);
         }
@@ -205,7 +205,7 @@ class OnWorkerStart implements SwooleEvent
 
         skip:
         // 加载自定义的全局函数
-        Console::debug('Loading context class...');
+        logger()->debug('Loading context class...');
         $context_class = ZMConfig::get('global', 'context_class');
         if (!is_a($context_class, ContextInterface::class, true)) {
             throw new ZMKnownException('E00032', 'Context class must implemented from ContextInterface!');
@@ -215,7 +215,7 @@ class OnWorkerStart implements SwooleEvent
             ZMConfig::get('global', 'modules')['onebot'] ??
             ['status' => true, 'single_bot_mode' => false, 'message_level' => 99999];
         if ($obb_onebot['status']) {
-            Console::debug('OneBot support enabled, listening OneBot event(3).');
+            logger()->debug('OneBot support enabled, listening OneBot event(3).');
             $obj = new OnMessageEvent();
             $obj->connect_type = 'qq';
             $obj->class = AdapterInterface::class;
@@ -240,8 +240,8 @@ class OnWorkerStart implements SwooleEvent
         if (isset(ZMConfig::get('global', 'sql_config')['sql_host'])) {
             if (ZMConfig::get('global', 'sql_config')['sql_host'] != '') {
                 if (\server()->worker_id === 0) {
-                    Console::warning("使用 'sql_config' 配置项和 DB 数据库查询构造器进行查询数据库可能会在下一个大版本中废弃，请使用 'mysql_config' 搭配 doctrine dbal 使用！");
-                    Console::warning('详见: `https://framework.zhamao.xin/`');
+                    logger()->warning("使用 'sql_config' 配置项和 DB 数据库查询构造器进行查询数据库可能会在下一个大版本中废弃，请使用 'mysql_config' 搭配 doctrine dbal 使用！");
+                    logger()->warning('详见: `https://framework.zhamao.xin/`');
                 }
                 $origin_conf = ZMConfig::get('global', 'sql_config');
                 $real_conf = [
@@ -263,7 +263,7 @@ class OnWorkerStart implements SwooleEvent
             }
         }
         if (!empty($real_conf)) {
-            Console::info('Connecting to MySQL pool');
+            logger()->info('Connecting to MySQL pool');
             ob_start();
             phpinfo(); // 这个phpinfo是有用的，不能删除
             $str = ob_get_clean();
@@ -305,7 +305,7 @@ class OnWorkerStart implements SwooleEvent
             SpinLock::unlock('worker_start_status');
             $used = round((microtime(true) - LightCacheInside::get('tmp_kv', 'start_time')) * 1000, 3);
             $worker_count = \server()->setting['worker_num'];
-            Console::success("{$worker_count} 个工作进程成功启动，共用时 {$used} ms");
+            logger()->info("{$worker_count} 个工作进程成功启动，共用时 {$used} ms");
         } else {
             LightCacheInside::set('tmp_kv', 'worker_start_status', $ls);
             SpinLock::unlock('worker_start_status');

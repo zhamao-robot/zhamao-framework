@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace ZM\API;
 
 use Stringable;
-use ZM\Console\Console;
 use ZM\Entity\CQObject;
 
 class CQ
@@ -207,7 +206,7 @@ class CQ
                 return self::buildCQ('music', ['type' => $type, 'id' => $id_or_url]);
             case 'custom':
                 if ($title === null || $audio === null) {
-                    Console::warning(zm_internal_errcode('E00035') . '传入CQ码实例的标题和音频链接不能为空！');
+                    logger()->warning(zm_internal_errcode('E00035') . '传入CQ码实例的标题和音频链接不能为空！');
                     return ' ';
                 }
                 $optional_values = [
@@ -216,7 +215,7 @@ class CQ
                 ];
                 return self::buildCQ('music', ['type' => 'custom', 'url' => $id_or_url, 'audio' => $audio, 'title' => $title], $optional_values);
             default:
-                Console::warning(zm_internal_errcode('E00035') . "传入的music type({$type})错误！");
+                logger()->warning(zm_internal_errcode('E00035') . "传入的music type({$type})错误！");
                 return ' ';
         }
     }
@@ -419,7 +418,7 @@ class CQ
         $str = '[CQ:' . $cq;
         foreach ($array as $k => $v) {
             if ($v === null) {
-                Console::warning('param ' . $k . ' cannot be set with null, empty CQ will returned!');
+                logger()->warning('param ' . $k . ' cannot be set with null, empty CQ will returned!');
                 return ' ';
             }
             $str .= ',' . $k . '=' . self::encode($v);

@@ -29,7 +29,7 @@ class OnOpen implements SwooleEvent
 {
     public function onCall($server, Request $request)
     {
-        Console::debug('Calling Swoole "open" event from fd=' . $request->fd);
+        logger()->debug('Calling Swoole "open" event from fd=' . $request->fd);
         unset(Context::$context[Coroutine::getCid()]);
 
         $type = strtolower($request->header['x-client-role'] ?? $request->get['type'] ?? '');
@@ -38,13 +38,13 @@ class OnOpen implements SwooleEvent
         if ($token instanceof Closure) {
             if (!$token($access_token)) {
                 $server->close($request->fd);
-                Console::warning(zm_internal_errcode('E00018') . 'Unauthorized access_token: ' . $access_token);
+                logger()->warning(zm_internal_errcode('E00018') . 'Unauthorized access_token: ' . $access_token);
                 return;
             }
         } elseif (is_string($token)) {
             if ($access_token !== $token && $token !== '') {
                 $server->close($request->fd);
-                Console::warning(zm_internal_errcode('E00019') . 'Unauthorized access_token: ' . $access_token);
+                logger()->warning(zm_internal_errcode('E00019') . 'Unauthorized access_token: ' . $access_token);
                 return;
             }
         }
