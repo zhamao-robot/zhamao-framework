@@ -177,7 +177,13 @@ public function testUrl() {
 
 如果想要设置允许请求控制器的 HTTP 请求方式，可以使用方法在控制器中的 `@RequestMapping` 注解配置 `method` 参数，可以是 `GET`，`POST`，`PUT`, `PATCH`，`DELETE`，`OPTIONS`，`HEAD` 中的一个或多个。
 
-- 限定 HTTP 方法：`@RequestMapping(method="GET")`，`@RequestMapping(method={"GET","POST"})`
+- 限定 HTTP 方法：`@RequestMapping(request_method="GET")`，`@RequestMapping(request_method={"GET","POST"})`
+
+::: warning 注意
+
+此处是 `request_method`，而不是 `method`，因为炸毛框架的注解 `method` 是保留属性，写错会出现问题。
+
+:::
 
 ## 静态文件服务器
 
