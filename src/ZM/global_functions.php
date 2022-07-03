@@ -156,16 +156,16 @@ function match_args(string $pattern, string $subject)
         $exp = explode('*', $pattern);
         $i = 0;
         foreach ($exp as $k => $v) {
-            if (empty($v) && $k === 0) {
+            if ($v === '' && $k === 0) {
                 continue;
             }
-            if (empty($v) && $k === count($exp) - 1) {
+            if ($v === '' && $k === count($exp) - 1) {
                 $subject .= '^EOL';
                 $v = '^EOL';
             }
             $cur_var = '';
             $ori = $i;
-            while (($a = mb_substr($subject, $i, mb_strlen($v))) !== $v && !empty($a)) {
+            while (($a = mb_substr($subject, $i, mb_strlen($v))) !== $v && $a !== '') {
                 $cur_var .= mb_substr($subject, $i, 1);
                 ++$i;
             }
