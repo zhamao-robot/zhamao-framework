@@ -30,7 +30,7 @@ class ConsoleApplication extends Application
 {
     public const VERSION_ID = 474;
 
-    public const VERSION = '2.8.0';
+    public const VERSION = '2.8.1';
 
     private static $obj;
 
