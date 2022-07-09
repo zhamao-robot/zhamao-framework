@@ -19,7 +19,7 @@ class OnBeforeReload implements SwooleEvent
 {
     public function onCall(Server $server)
     {
-        Console::info(Console::setColor('Reloading server...', 'gold'));
+        logger()->info(Console::setColor('Reloading server...', 'gold'));
         for ($i = 0; $i < ZM_WORKER_NUM; ++$i) {
             Process::kill(zm_atomic('_#worker_' . $i)->get(), SIGUSR1);
         }

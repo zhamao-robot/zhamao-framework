@@ -68,7 +68,7 @@ class TuringAPI
             return '哎呀，我刚才有点走神了，要不一会儿换一种问题试试？';
         }
         $result = $api_return['results'];
-        // Console::info(Console::setColor(json_encode($result, 128 | 256), "green"));
+        // logger()->info(Console::setColor(json_encode($result, 128 | 256), "green"));
         $final = '';
         foreach ($result as $v) {
             switch ($v['resultType']) {

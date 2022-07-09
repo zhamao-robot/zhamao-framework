@@ -6,7 +6,6 @@ namespace ZM\Module;
 
 use Jelix\Version\VersionComparator;
 use ZM\Config\ZMConfig;
-use ZM\Console\Console;
 use ZM\Exception\ModulePackException;
 use ZM\Exception\ZMException;
 use ZM\Store\LightCache;
@@ -130,18 +129,18 @@ class ModuleUnpacker
         if (isset($this->module_config['unpack']['composer-autoload-items'])) {
             $autoload = $this->module_config['unpack']['composer-autoload-items'];
             if (isset($autoload['psr-4'])) {
-                Console::info('Adding extended autoload psr-4 for composer');
+                logger()->info('Adding extended autoload psr-4 for composer');
                 $composer['autoload']['psr-4'] = isset($composer['autoload']['psr-4']) ? array_merge($composer['autoload']['psr-4'], $autoload['psr-4']) : $autoload['psr-4'];
             }
             if (isset($autoload['files'])) {
-                Console::info('Adding extended autoload file for composer');
+                logger()->info('Adding extended autoload file for composer');
                 $composer['autoload']['files'] = isset($composer['autoload']['files']) ? array_merge($composer['autoload']['files'], $autoload['files']) : $autoload['files'];
             }
         }
 
         if (isset($this->module_config['composer-extend-require'])) {
             foreach ($this->module_config['composer-extend-require'] as $k => $v) {
-                Console::info('Adding extended required composer library: ' . $k);
+                logger()->info('Adding extended required composer library: ' . $k);
                 if (!isset($composer[$k])) {
                     $composer[$k] = $v;
                 }
@@ -162,10 +161,10 @@ class ModuleUnpacker
                 @mkdir($pathinfo['dirname'], 0755, true);
             }
             if (is_file($v) && $override_data !== true) {
-                Console::info('Skipping zm_data file (not overwriting): ' . $v);
+                logger()->info('Skipping zm_data file (not overwriting): ' . $v);
                 continue;
             }
-            Console::info('Copying zm_data file: ' . $v);
+            logger()->info('Copying zm_data file: ' . $v);
             if (copy($k, $v) !== true) {
                 throw new ModulePackException(zm_internal_errcode('E00068') . 'Cannot copy file: ' . $v);
             }
@@ -195,25 +194,25 @@ class ModuleUnpacker
     {
         if ($this->module['unpack']['global-config-override'] !== false) {
             $prompt = !is_string($this->module['unpack']['global-config-override']) ? '请根据模块提供者提供的要求进行修改 global.php 中对应的配置项' : $this->module['unpack']['global-config-override'];
-            Console::warning('模块作者要求用户手动修改 global.php 配置文件中的项目：');
-            Console::warning('*' . $prompt);
+            logger()->warning('模块作者要求用户手动修改 global.php 配置文件中的项目：');
+            logger()->warning('*' . $prompt);
             if (STDIN === false) { // @phpstan-ignore-line
-                Console::warning('检测到终端无法输入，请手动修改 global.php 配置文件中的项目');
+                logger()->warning('检测到终端无法输入，请手动修改 global.php 配置文件中的项目');
                 return;
             }
-            echo Console::setColor('请输入修改模式，y(使用vim修改)/e(自行使用其他编辑器修改后确认)/N(默认暂不修改)：[y/e/N] ', 'gold');
+            logger()->notice('请输入修改模式，y(使用vim修改)/e(自行使用其他编辑器修改后确认)/N(默认暂不修改)：[y/e/N] ');
             $r = strtolower(trim(fgets(STDIN)));
             switch ($r) {
                 case 'y':
                     system('vim ' . escapeshellarg(DataProvider::getWorkingDir() . '/config/global.php') . ' > `tty`');
-                    Console::info('已使用 vim 修改！');
+                    logger()->info('已使用 vim 修改！');
                     break;
                 case 'e':
-                    echo Console::setColor('请修改后文件点击回车即可继续 [Enter] ', 'gold');
+                    logger()->notice('请修改后文件点击回车即可继续 [Enter] ');
                     fgets(STDIN);
                     break;
                 case 'n':
-                    Console::info('暂不修改 global.php');
+                    logger()->info('暂不修改 global.php');
                     break;
             }
         }
@@ -230,10 +229,10 @@ class ModuleUnpacker
                 @mkdir($info['dirname'], 0755, true);
             }
             if (is_file($base . '/' . $v) && $override_source !== true) {
-                Console::info('Skipping source file (not overwriting): ' . $v);
+                logger()->info('Skipping source file (not overwriting): ' . $v);
                 continue;
             }
-            Console::info('Releasing source file: ' . $this->module['module-root-path'] . '/' . $v);
+            logger()->info('Releasing source file: ' . $this->module['module-root-path'] . '/' . $v);
 
             if (copy($origin_base . '/' . $v, $base . '/' . $v) !== true) {
                 throw new ModulePackException(zm_internal_errcode('E00068') . 'Cannot copy file: ' . $v);

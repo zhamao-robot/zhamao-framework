@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace ZM\Utils;
 
 use Exception;
+use Psr\Log\LogLevel;
 use Swoole\Process;
-use ZM\Console\Console;
 use ZM\Framework;
 use ZM\Store\Lock\SpinLock;
 use ZM\Store\ZMAtomic;
@@ -32,9 +32,9 @@ class ZMUtil
         if (SpinLock::tryLock('_stop_signal') === false) {
             return;
         }
-        Console::warning(Console::setColor('Stopping server...', 'red'));
-        if (Console::getLevel() >= 4) {
-            Console::trace();
+        logger()->notice('正在停止服务器...');
+        if (zm_config('logging.level') === LogLevel::DEBUG) {
+            debug_print_backtrace();
         }
         ZMAtomic::get('stop_signal')->set($error_exit ? 2 : 1);
         server()->shutdown();

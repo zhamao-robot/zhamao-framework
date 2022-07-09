@@ -10,11 +10,8 @@ use Doctrine\Common\Annotations\AnnotationException;
 use Error;
 use Exception;
 use Throwable;
-use ZM\Adapters\OneBot11Adapter;
 use ZM\Config\ZMConfig;
-use ZM\Console\Console;
 use ZM\Exception\InterruptException;
-use ZM\Module\QQBot;
 use ZM\Store\LightCacheInside;
 use ZM\Store\Lock\SpinLock;
 use ZM\Store\ZMAtomic;
@@ -62,7 +59,7 @@ class EventDispatcher
             $this->log = true;
         }
         if ($this->log) {
-            Console::verbose("[事件分发{$this->eid}] 开始分发事件: " . $class);
+            logger()->debug("[事件分发{$this->eid}] 开始分发事件: " . $class);
         }
     }
 
@@ -96,7 +93,7 @@ class EventDispatcher
     public function setRuleFunction(callable $rule = null): EventDispatcher
     {
         if ($this->log) {
-            Console::verbose("[事件分发{$this->eid}] 设置事件rule: " . $this->class);
+            logger()->debug("[事件分发{$this->eid}] 设置事件rule: " . $this->class);
         }
         $this->rule = $rule;
         return $this;
@@ -105,7 +102,7 @@ class EventDispatcher
     public function setReturnFunction(callable $return_func): EventDispatcher
     {
         if ($this->log) {
-            Console::verbose("[事件分发{$this->eid}] 设置事件returnFunc: " . $this->class);
+            logger()->debug("[事件分发{$this->eid}] 设置事件returnFunc: " . $this->class);
         }
         $this->return_func = $return_func;
         return $this;
@@ -126,14 +123,14 @@ class EventDispatcher
 //                }
                 $this->dispatchEvent($v, $this->rule, ...$params);
                 if ($this->log) {
-                    Console::verbose("[事件分发{$this->eid}] 单一对象 " . $v->class . '::' . (is_string($v->method) ? $v->method : '{closure}') . ' 分发结束。');
+                    logger()->debug("[事件分发{$this->eid}] 单一对象 " . $v->class . '::' . (is_string($v->method) ? $v->method : '{closure}') . ' 分发结束。');
                 }
                 if ($this->status == self::STATUS_BEFORE_FAILED || $this->status == self::STATUS_RULE_FAILED) {
                     continue;
                 }
                 if (is_callable($this->return_func) && $this->status === self::STATUS_NORMAL) {
                     if ($this->log) {
-                        Console::verbose("[事件分发{$this->eid}] 单一对象 " . $v->class . '::' . $v->method . ' 正在执行返回值处理函数 ...');
+                        logger()->debug("[事件分发{$this->eid}] 单一对象 " . $v->class . '::' . $v->method . ' 正在执行返回值处理函数 ...');
                     }
                     ($this->return_func)($this->store);
                 }
@@ -167,11 +164,11 @@ class EventDispatcher
         $q_f = $v->method;
         if (($q_c ?? '') === '' && ($q_f instanceof Closure)) {
             if ($this->log) {
-                Console::verbose("[事件分发{$this->eid}] 闭包函数的事件触发过程！");
+                logger()->debug("[事件分发{$this->eid}] 闭包函数的事件触发过程！");
             }
             if ($rule_func !== null && !$rule_func($v)) {
                 if ($this->log) {
-                    Console::verbose("[事件分发{$this->eid}] 闭包函数下的 ruleFunc 判断为 false, 拒绝执行此方法。");
+                    logger()->debug("[事件分发{$this->eid}] 闭包函数下的 ruleFunc 判断为 false, 拒绝执行此方法。");
                 }
                 $this->status = self::STATUS_RULE_FAILED;
                 return false;
@@ -181,22 +178,22 @@ class EventDispatcher
             return true;
         }
         if ($this->log) {
-            Console::verbose("[事件分发{$this->eid}] 正在判断 " . $q_c . '::' . $q_f . ' 方法下的 ruleFunc ...');
+            logger()->debug("[事件分发{$this->eid}] 正在判断 " . $q_c . '::' . $q_f . ' 方法下的 ruleFunc ...');
         }
         if ($rule_func !== null && !$rule_func($v)) {
             if ($this->log) {
-                Console::verbose("[事件分发{$this->eid}] " . $q_c . '::' . $q_f . ' 方法下的 ruleFunc 判断为 false, 拒绝执行此方法。');
+                logger()->debug("[事件分发{$this->eid}] " . $q_c . '::' . $q_f . ' 方法下的 ruleFunc 判断为 false, 拒绝执行此方法。');
             }
             $this->status = self::STATUS_RULE_FAILED;
             return false;
         }
         if ($this->log) {
-            Console::verbose("[事件分发{$this->eid}] " . $q_c . '::' . $q_f . ' 方法下的 ruleFunc 为真，继续执行方法本身 ...');
+            logger()->debug("[事件分发{$this->eid}] " . $q_c . '::' . $q_f . ' 方法下的 ruleFunc 为真，继续执行方法本身 ...');
         }
         if (isset(EventManager::$middleware_map[$q_c][$q_f])) {
             $middlewares = EventManager::$middleware_map[$q_c][$q_f];
             if ($this->log) {
-                Console::verbose("[事件分发{$this->eid}] " . $q_c . '::' . $q_f . ' 方法还绑定了 Middleware：' . implode(', ', array_map(function ($x) {
+                logger()->debug("[事件分发{$this->eid}] " . $q_c . '::' . $q_f . ' 方法还绑定了 Middleware：' . implode(', ', array_map(function ($x) {
                     return $x->middleware;
                 }, $middlewares)));
             }
@@ -219,18 +216,18 @@ class EventDispatcher
                 $r[$k]->current_event = $v;
                 if (isset($middleware_obj['before'])) {
                     if ($this->log) {
-                        Console::verbose("[事件分发{$this->eid}] Middleware 存在前置事件，执行中 ...");
+                        logger()->debug("[事件分发{$this->eid}] Middleware 存在前置事件，执行中 ...");
                     }
                     $rs = $middleware_obj['before'];
                     $before_result = $r[$k]->{$rs}(...$params);
                     if ($before_result === false) {
                         if ($this->log) {
-                            Console::verbose("[事件分发{$this->eid}] Middleware 前置事件为 false，停止执行原事件，开始执行下一事件。");
+                            logger()->debug("[事件分发{$this->eid}] Middleware 前置事件为 false，停止执行原事件，开始执行下一事件。");
                         }
                         break;
                     }
                     if ($this->log) {
-                        Console::verbose("[事件分发{$this->eid}] Middleware 前置事件为 true，继续执行原事件。");
+                        logger()->debug("[事件分发{$this->eid}] Middleware 前置事件为 true，继续执行原事件。");
                     }
                 }
             }
@@ -239,18 +236,18 @@ class EventDispatcher
                     $q_o = ZMUtil::getModInstance($q_c);
                     $q_o->_running_annotation = $v;
                     if ($this->log) {
-                        Console::verbose("[事件分发{$this->eid}] 正在执行方法 " . $q_c . '::' . $q_f . ' ...');
+                        logger()->debug("[事件分发{$this->eid}] 正在执行方法 " . $q_c . '::' . $q_f . ' ...');
                     }
                     $this->store = container()->call([$q_o, $q_f], $params);
                 } catch (Exception $e) {
                     if ($e instanceof InterruptException) {
                         if ($this->log) {
-                            Console::verbose("[事件分发{$this->eid}] 检测到事件阻断调用，正在跳出事件分发器 ...");
+                            logger()->debug("[事件分发{$this->eid}] 检测到事件阻断调用，正在跳出事件分发器 ...");
                         }
                         throw $e;
                     }
                     if ($this->log) {
-                        Console::verbose("[事件分发{$this->eid}] 方法 " . $q_c . '::' . $q_f . ' 执行过程中抛出了异常，正在倒序查找 Middleware 中的捕获方法 ...');
+                        logger()->debug("[事件分发{$this->eid}] 方法 " . $q_c . '::' . $q_f . ' 执行过程中抛出了异常，正在倒序查找 Middleware 中的捕获方法 ...');
                     }
                     for ($i = count($middlewares) - 1; $i >= 0; --$i) {
                         $middleware_obj = EventManager::$middlewares[$middlewares[$i]->middleware];
@@ -260,7 +257,7 @@ class EventDispatcher
                         foreach ($middleware_obj['exceptions'] as $name => $method) {
                             if ($e instanceof $name) {
                                 if ($this->log) {
-                                    Console::verbose("[事件分发{$this->eid}] 方法 " . $q_c . '::' . $q_f . ' 的异常 ' . get_class($e) . ' 被 Middleware:' . $middlewares[$i] . ' 下的 ' . get_class($r[$i]) . '::' . $method . ' 捕获。');
+                                    logger()->debug("[事件分发{$this->eid}] 方法 " . $q_c . '::' . $q_f . ' 的异常 ' . get_class($e) . ' 被 Middleware:' . $middlewares[$i] . ' 下的 ' . get_class($r[$i]) . '::' . $method . ' 捕获。');
                                 }
                                 $r[$i]->{$method}($e);
                                 self::interrupt();
@@ -274,11 +271,11 @@ class EventDispatcher
                     $middleware_obj = EventManager::$middlewares[$middlewares[$i]->middleware];
                     if (isset($middleware_obj['after'], $r[$i])) {
                         if ($this->log) {
-                            Console::verbose("[事件分发{$this->eid}] Middleware 存在后置事件，执行中 ...");
+                            logger()->debug("[事件分发{$this->eid}] Middleware 存在后置事件，执行中 ...");
                         }
                         $r[$i]->{$middleware_obj['after']}(...$params);
                         if ($this->log) {
-                            Console::verbose("[事件分发{$this->eid}] Middleware 后置事件执行完毕！");
+                            logger()->debug("[事件分发{$this->eid}] Middleware 后置事件执行完毕！");
                         }
                     }
                 }
@@ -291,7 +288,7 @@ class EventDispatcher
         $q_o = ZMUtil::getModInstance($q_c);
         $q_o->_running_annotation = $v;
         if ($this->log) {
-            Console::verbose("[事件分发{$this->eid}] 正在执行方法 " . $q_c . '::' . $q_f . ' ...');
+            logger()->debug("[事件分发{$this->eid}] 正在执行方法 " . $q_c . '::' . $q_f . ' ...');
         }
         $this->store = container()->call([$q_o, $q_f], $params);
         $this->status = self::STATUS_NORMAL;

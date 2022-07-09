@@ -10,7 +10,6 @@ use ZM\Annotation\CQ\CommandArgument;
 use ZM\Annotation\CQ\CQCommand;
 use ZM\API\CQ;
 use ZM\Config\ZMConfig;
-use ZM\Console\Console;
 use ZM\Entity\InputArguments;
 use ZM\Entity\MatchResult;
 use ZM\Event\EventManager;
@@ -37,7 +36,7 @@ class MessageUtil
         }
         $path = realpath($path);
         if ($path === false) {
-            Console::warning(zm_internal_errcode('E00059') . '指定的路径错误不存在！');
+            logger()->warning(zm_internal_errcode('E00059') . '指定的路径错误不存在！');
             return false;
         }
         $files = [];
@@ -46,7 +45,7 @@ class MessageUtil
             if ($v->type == 'image') {
                 $result = ZMRequest::downloadFile($v->params['url'], $path . '/' . $v->params['file']);
                 if ($result === false) {
-                    Console::warning(zm_internal_errcode('E00060') . '图片 ' . $v->params['url'] . ' 下载失败！');
+                    logger()->warning(zm_internal_errcode('E00060') . '图片 ' . $v->params['url'] . ' 下载失败！');
                     return false;
                 }
                 $files[] = $path . '/' . $v->params['file'];

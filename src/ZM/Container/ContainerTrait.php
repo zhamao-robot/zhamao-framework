@@ -731,6 +731,6 @@ trait ContainerTrait
      */
     protected function log(string $message): void
     {
-        Console::debug($this->getLogPrefix() . $message);
+        logger()->debug($this->getLogPrefix() . $message);
     }
 }

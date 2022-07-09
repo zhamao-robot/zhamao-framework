@@ -48,6 +48,7 @@ class ZMConfigTest extends TestCase
      */
     public function testReload()
     {
+        $this->markTestIncomplete('logger level change in need');
         $this->expectOutputRegex('/没读取过，正在从文件加载/');
         $this->assertEquals('0.0.0.0', ZMConfig::get('global.host'));
         ZMConfig::reload();

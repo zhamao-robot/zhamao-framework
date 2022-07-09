@@ -16,6 +16,7 @@ class TerminalTest extends TestCase
 {
     public function testInit()
     {
+        $this->markTestIncomplete('logger level change in need');
         Console::setLevel(4);
         Terminal::init();
         Console::setLevel(0);
@@ -27,6 +28,7 @@ class TerminalTest extends TestCase
      */
     public function testExecuteCommand()
     {
+        $this->markTestIncomplete('logger level change in need');
         Console::setLevel(2);
         Terminal::executeCommand('echo zhamao-framework');
         Console::setLevel(0);

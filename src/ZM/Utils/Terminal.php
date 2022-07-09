@@ -43,7 +43,7 @@ class Terminal
         });
         $dispatcher->dispatchEvents($it);
         if ($dispatcher->store !== 'none' && $cmd !== '') {
-            Console::info('Command not found: ' . $cmd);
+            logger()->info('Command not found: ' . $cmd);
             return true;
         }
         return false;
@@ -67,7 +67,7 @@ class Terminal
 
     public static function init()
     {
-        Console::debug('Initializing Terminal...');
+        logger()->debug('Initializing Terminal...');
         foreach ((EventManager::$events[TerminalCommand::class] ?? []) as $v) {
             if ($v->command == 'help') {
                 self::$default_commands = true;
@@ -80,7 +80,7 @@ class Terminal
         foreach ($reflection->getMethods() as $v) {
             $r = $reader->getMethodAnnotation($v, TerminalCommand::class);
             if ($r !== null) {
-                Console::debug('adding command ' . $r->command);
+                logger()->debug('adding command ' . $r->command);
                 $r->class = Terminal::class;
                 $r->method = $v->getName();
                 EventManager::addEvent(TerminalCommand::class, $r);
@@ -121,7 +121,7 @@ class Terminal
             echo $obj;
             return;
         }
-        Console::warning('你还没有安装 league/climate 组件，无法使用此功能！');
+        logger()->warning('你还没有安装 league/climate 组件，无法使用此功能！');
     }
 
     /**
@@ -129,13 +129,9 @@ class Terminal
      */
     public function testlog()
     {
-        Console::log(date('[H:i:s]') . ' [L] This is normal msg. (0)');
-        Console::error('This is error msg. (0)');
-        Console::warning('This is warning msg. (1)');
-        Console::info('This is info msg. (2)');
-        Console::success('This is success msg. (2)');
-        Console::verbose('This is verbose msg. (3)');
-        Console::debug('This is debug msg. (4)');
+        foreach (['debug', 'info', 'notice', 'warning', 'error', 'critical', 'alert', 'emergency'] as $level) {
+            logger()->log($level, 'This is a {level} message.', compact('level'));
+        }
     }
 
     /**
@@ -157,12 +153,13 @@ class Terminal
      */
     public function level(array $it)
     {
-        $level = intval(is_numeric($it[1] ?? 99) ? ($it[1] ?? 99) : 99);
-        if ($level > 4 || $level < 0) {
-            Console::warning("Usage: 'level 0|1|2|3|4'");
-        } else {
-            Console::setLevel($level) || Console::success('Success!!');
-        }
+        logger()->warning('Sorry, this function is not available yet.');
+//        $level = intval(is_numeric($it[1] ?? 99) ? ($it[1] ?? 99) : 99);
+//        if ($level > 4 || $level < 0) {
+//            Console::warning("Usage: 'level 0|1|2|3|4'");
+//        } else {
+//            Console::setLevel($level) || Console::success('Success!!');
+//        }
     }
 
     /**
@@ -182,7 +179,7 @@ class Terminal
      */
     public function echoI(array $it)
     {
-        Console::info($it[1]);
+        logger()->info($it[1]);
     }
 
     /**

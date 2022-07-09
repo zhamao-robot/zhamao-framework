@@ -26,7 +26,7 @@ class OnMessage implements SwooleEvent
 {
     public function onCall($server, Frame $frame)
     {
-        Console::debug('Calling Swoole "message" from fd=' . $frame->fd . ': ' . TermColor::ITALIC . $frame->data . TermColor::RESET);
+        logger()->debug('Calling Swoole "message" from fd=' . $frame->fd . ': ' . TermColor::ITALIC . $frame->data . TermColor::RESET);
         unset(Context::$context[Coroutine::getCid()]);
         $conn = ManagerGM::get($frame->fd);
         set_coroutine_params(['server' => $server, 'frame' => $frame, 'connection' => $conn]);

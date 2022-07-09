@@ -10,7 +10,6 @@ use JsonSerializable;
 use RuntimeException;
 use Traversable;
 use ZM\Config\ZMConfig;
-use ZM\Console\Console;
 use ZM\Exception\ConfigException;
 
 class DataProvider
@@ -104,7 +103,7 @@ class DataProvider
             }
             $name = $r[1];
         } elseif (count($r) != 1) {
-            Console::warning(zm_internal_errcode('E00057') . '存储失败，文件名只能有一级目录');
+            logger()->warning(zm_internal_errcode('E00057') . '存储失败，文件名只能有一级目录');
             return false;
         } else {
             $name = $r[0];
@@ -164,7 +163,7 @@ class DataProvider
                 } elseif ($relative === false) {
                     $list[] = $sub_file;
                 } else {
-                    Console::warning(zm_internal_errcode('E00058') . "Relative path is not generated: wrong base directory ({$relative})");
+                    logger()->warning(zm_internal_errcode('E00058') . "Relative path is not generated: wrong base directory ({$relative})");
                     return false;
                 }
             }

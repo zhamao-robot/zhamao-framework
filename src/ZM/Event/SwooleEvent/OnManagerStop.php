@@ -6,7 +6,6 @@ namespace ZM\Event\SwooleEvent;
 
 use Swoole\Process;
 use ZM\Annotation\Swoole\SwooleHandler;
-use ZM\Console\Console;
 use ZM\Event\SwooleEvent;
 use ZM\Utils\Manager\ProcessManager;
 
@@ -23,7 +22,7 @@ class OnManagerStop implements SwooleEvent
                 Process::kill($v->pid, SIGTERM);
             }
         }
-        Console::verbose('进程 Manager 已停止！');
+        logger()->debug('进程 Manager 已停止！');
         ProcessManager::removeProcessState(ZM_PROCESS_MANAGER);
     }
 }

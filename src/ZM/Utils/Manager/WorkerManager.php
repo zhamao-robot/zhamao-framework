@@ -8,7 +8,6 @@ use Exception;
 use Swoole\Coroutine;
 use ZM\Annotation\CQ\CQCommand;
 use ZM\Annotation\Swoole\OnPipeMessageEvent;
-use ZM\Console\Console;
 use ZM\Event\EventDispatcher;
 use ZM\Event\EventManager;
 use ZM\Store\LightCache;
@@ -28,7 +27,7 @@ class WorkerManager
         $server = server();
         switch ($data['action'] ?? '') {
             case 'add_short_command':
-                Console::verbose('Adding short command ' . $data['data'][0]);
+                logger()->debug('Adding short command ' . $data['data'][0]);
                 $obj = new CQCommand();
                 $obj->method = quick_reply_closure($data['data'][1]);
                 $obj->match = $data['data'][0];
@@ -115,7 +114,7 @@ class WorkerManager
     {
         $obj = ['action' => $action, 'data' => $data];
         if (server()->worker_id === -1 && server()->getManagerPid() != posix_getpid()) {
-            Console::warning(zm_internal_errcode('E00022') . 'Cannot send worker action from master or manager process!');
+            logger()->warning(zm_internal_errcode('E00022') . 'Cannot send worker action from master or manager process!');
             return;
         }
         if (server()->worker_id == $worker_id) {
@@ -131,7 +130,7 @@ class WorkerManager
     public static function resumeAllWorkerCoroutines()
     {
         if (server()->worker_id === -1) {
-            Console::warning("Cannot call '" . __FUNCTION__ . "' in non-worker process!");
+            logger()->warning("Cannot call '" . __FUNCTION__ . "' in non-worker process!");
             return;
         }
         foreach ((LightCacheInside::get('wait_api', 'wait_api') ?? []) as $v) {

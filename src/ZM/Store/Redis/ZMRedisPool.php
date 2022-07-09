@@ -29,7 +29,7 @@ class ZMRedisPool
         try {
             $r = self::$pool->get()->ping('123');
             if (strpos(strtolower($r), '123') !== false) {
-                Console::debug('成功连接redis连接池！');
+                logger()->debug('成功连接redis连接池！');
             } else {
                 var_dump($r);
             }

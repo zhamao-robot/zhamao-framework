@@ -42,7 +42,7 @@ class OnManagerStart implements SwooleEvent
 
     public function onCall(Server $server)
     {
-        Console::debug('Calling onManagerStart event(1)');
+        logger()->debug('Calling onManagerStart event(1)');
         if (!Framework::$argv['disable-safe-exit']) {
             SignalListener::signalManager();
         }
@@ -54,17 +54,17 @@ class OnManagerStart implements SwooleEvent
             });
             if (Framework::$argv['watch']) {
                 if (extension_loaded('inotify')) {
-                    Console::info('Enabled File watcher, framework will reload automatically.');
+                    logger()->info('Enabled File watcher, framework will reload automatically.');
                     $fd = inotify_init();
                     $this->addWatcher(DataProvider::getSourceRootDir() . '/src', $fd);
                     Event::add($fd, function () use ($fd) {
                         $r = inotify_read($fd);
-                        Console::verbose('File updated: ' . $r[0]['name']);
+                        logger()->debug('File updated: ' . $r[0]['name']);
                         ZMUtil::reload();
                     });
                     Framework::$argv['polling-watch'] = false; // 如果开启了inotify则关闭轮询热更新
                 } else {
-                    Console::warning(zm_internal_errcode('E00024') . '你还没有安装或启用 inotify 扩展，将默认使用轮询检测模式开启热更新！');
+                    logger()->warning(zm_internal_errcode('E00024') . '你还没有安装或启用 inotify 扩展，将默认使用轮询检测模式开启热更新！');
                     Framework::$argv['polling-watch'] = true;
                 }
             }
@@ -84,7 +84,7 @@ class OnManagerStart implements SwooleEvent
                 });
             }
             if (Framework::$argv['interact']) {
-                Console::info('Interact mode');
+                logger()->info('Interact mode');
                 ZMBuf::$terminal = $r = STDIN;
                 Event::add($r, function () use ($r) {
                     $fget = fgets($r);
@@ -116,7 +116,7 @@ class OnManagerStart implements SwooleEvent
         });
         $dispatcher->dispatchEvents($server);
 */
-        Console::verbose('进程 Manager 已启动');
+        logger()->debug('进程 Manager 已启动');
     }
 
     private function addWatcher($maindir, $fd)
@@ -127,7 +127,7 @@ class OnManagerStart implements SwooleEvent
         }
         foreach ($dir as $subdir) {
             if (is_dir($maindir . '/' . $subdir)) {
-                Console::debug('添加监听目录：' . $maindir . '/' . $subdir);
+                logger()->debug('添加监听目录：' . $maindir . '/' . $subdir);
                 inotify_add_watch($fd, $maindir . '/' . $subdir, IN_ATTRIB | IN_ISDIR);
                 $this->addWatcher($maindir . '/' . $subdir, $fd);
             }

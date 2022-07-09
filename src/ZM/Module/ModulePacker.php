@@ -7,7 +7,6 @@ namespace ZM\Module;
 use Exception;
 use Phar;
 use ZM\Config\ZMConfig;
-use ZM\Console\Console;
 use ZM\Exception\ModulePackException;
 use ZM\Exception\ZMException;
 use ZM\Store\LightCache;
@@ -105,14 +104,14 @@ class ModulePacker
         $this->filename .= '.phar';
         if ($this->override) {
             if (file_exists($this->filename)) {
-                Console::info('Overwriting ' . $this->filename);
+                logger()->info('Overwriting ' . $this->filename);
                 unlink($this->filename);
             }
         }
 
         $this->phar = new Phar($this->filename);
         $this->phar->startBuffering();
-        Console::info('模块输出文件：' . $this->filename);
+        logger()->info('模块输出文件：' . $this->filename);
 
         $this->addFiles();                  // 添加文件
         $this->addLightCacheStore();        // 保存light-cache-store指定的项
@@ -184,10 +183,10 @@ class ModulePacker
             foreach ($this->module['light-cache-store'] as $v) {
                 $r = LightCache::get($v);
                 if ($r === null) {
-                    Console::warning(zm_internal_errcode('E00045') . 'LightCache 项：' . $v . ' 不存在或值为null，无法为其保存。');
+                    logger()->warning(zm_internal_errcode('E00045') . 'LightCache 项：' . $v . ' 不存在或值为null，无法为其保存。');
                 } else {
                     $store[$v] = $r;
-                    Console::info('打包LightCache持久化项：' . $v);
+                    logger()->info('打包LightCache持久化项：' . $v);
                 }
             }
             $this->phar->addFromString('light_cache_store.json', json_encode($store, 128 | 256));
@@ -245,13 +244,13 @@ class ModulePacker
             foreach ($this->module['zm-data-store'] as $v) {
                 if (is_dir($base_dir . '/' . $v)) {
                     $v = rtrim($v, '/');
-                    Console::info('Adding external zm_data dir: ' . $v);
+                    logger()->info('Adding external zm_data dir: ' . $v);
                     $files = DataProvider::scanDirFiles($base_dir . '/' . $v, true, true);
                     foreach ($files as $single) {
                         $this->phar->addFile($base_dir . '/' . $v . '/' . $single, 'zm_data/' . $v . '/' . $single);
                     }
                 } elseif (is_file($base_dir . '/' . $v)) {
-                    Console::info('Add external zm_data file: ' . $v);
+                    logger()->info('Add external zm_data file: ' . $v);
                     $this->phar->addFile($base_dir . '/' . $v, 'zm_data/' . $v);
                 } else {
                     throw new ModulePackException(zm_internal_errcode('E00066') . '`zmdata-store` 指定的文件或目录不存在');

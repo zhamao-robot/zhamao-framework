@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace ZM\API;
 
 use Closure;
-use ZM\Console\Console;
 use ZM\Store\LightCacheInside;
 use ZM\Store\Lock\SpinLock;
 use ZM\Store\ZMAtomic;
@@ -65,7 +64,7 @@ trait CQAPI
             }
             return true;
         }
-        Console::warning(zm_internal_errcode('E00036') . 'CQAPI send failed, websocket push error.');
+        logger()->warning(zm_internal_errcode('E00036') . 'CQAPI send failed, websocket push error.');
         $response = [
             'status' => 'failed',
             'retcode' => -1000,

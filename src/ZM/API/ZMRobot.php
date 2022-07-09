@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace ZM\API;
 
 use ZM\API\Proxies\Bot as Proxies;
-use ZM\Console\Console;
 
 /**
  * Class ZMRobot
@@ -21,7 +20,7 @@ class ZMRobot extends OneBotV11
     {
         $bot = $proxy ?: $this;
         $bot_id = implode_when_necessary($bot->getSelfId());
-        Console::debug("Constructing AllBotsProxy for ZMRobot({$bot_id})");
+        logger()->debug("Constructing AllBotsProxy for ZMRobot({$bot_id})");
         return new Proxies\AllBotsProxy($bot);
     }
 
@@ -32,7 +31,7 @@ class ZMRobot extends OneBotV11
     {
         $bot = $proxy ?: $this;
         $bot_id = implode_when_necessary($bot->getSelfId());
-        Console::debug("Constructing AllGroupsProxy for ZMRobot({$bot_id})");
+        logger()->debug("Constructing AllGroupsProxy for ZMRobot({$bot_id})");
         return new Proxies\AllGroupsProxy($bot);
     }
 }

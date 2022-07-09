@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace ZM\Http;
 
 use ZM\Config\ZMConfig;
-use ZM\Console\Console;
 use ZM\Utils\HttpUtil;
 
 class StaticFileHandler
@@ -14,7 +13,7 @@ class StaticFileHandler
     {
         $full_path = realpath($path . '/' . $filename);
         $response = ctx()->getResponse();
-        Console::debug('Full path: ' . $full_path);
+        logger()->debug('Full path: ' . $full_path);
         if ($full_path !== false) {
             if (strpos($full_path, $path) !== 0) {
                 $response->status(403);
