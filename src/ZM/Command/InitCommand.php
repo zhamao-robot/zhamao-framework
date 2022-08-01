@@ -48,7 +48,7 @@ class InitCommand extends Command
                     $info = pathinfo($file);
                     @mkdir($base_path . $info['dirname'], 0777, true);
                     echo 'Copying ' . $file . PHP_EOL;
-                    $package_name = (json_decode(file_get_contents(__DIR__ . '/../../../composer.json'), true)['name']);
+                    $package_name = json_decode(file_get_contents(__DIR__ . '/../../../composer.json'), true)['name'];
                     copy($base_path . '/vendor/' . $package_name . $file, $base_path . $file);
                 } else {
                     echo 'Skipping ' . $file . ' , file exists.' . PHP_EOL;

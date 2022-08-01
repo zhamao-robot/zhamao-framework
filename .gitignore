@@ -78,3 +78,5 @@ package-lock.json
 
 ### ASDF ###
 /.tool-version
+
+.DS_Store

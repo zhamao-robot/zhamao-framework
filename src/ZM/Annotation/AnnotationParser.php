@@ -10,21 +10,20 @@ use Koriym\Attributes\DualReader;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
-use ZM\Annotation\Http\HandleAfter;
-use ZM\Annotation\Http\HandleBefore;
-use ZM\Annotation\Http\HandleException;
-use ZM\Annotation\Http\Middleware;
-use ZM\Annotation\Http\MiddlewareClass;
-use ZM\Annotation\Http\RequestMapping;
+use Symfony\Component\Routing\RouteCollection;
+use ZM\Annotation\Http\Controller;
+use ZM\Annotation\Http\Route;
 use ZM\Annotation\Interfaces\ErgodicAnnotation;
 use ZM\Annotation\Interfaces\Level;
-use ZM\Annotation\Module\Closed;
+use ZM\Annotation\Middleware\HandleAfter;
+use ZM\Annotation\Middleware\HandleBefore;
+use ZM\Annotation\Middleware\HandleException;
+use ZM\Annotation\Middleware\Middleware;
+use ZM\Annotation\Middleware\MiddlewareClass;
 use ZM\Config\ZMConfig;
-use ZM\Event\EventManager;
-use ZM\Exception\AnnotationException;
-use ZM\Utils\Manager\RouteManager;
-use ZM\Utils\ZMUtil;
-use function server;
+use ZM\Exception\ConfigException;
+use ZM\Store\FileSystem;
+use ZM\Store\InternalGlobals;
 
 class AnnotationParser
 {
@@ -60,14 +59,15 @@ class AnnotationParser
     /**
      * 注册各个模块类的注解和模块level的排序
      * @throws ReflectionException
+     * @throws ConfigException
      */
-    public function registerMods()
+    public function parseAll()
     {
         foreach ($this->path_list as $path) {
             logger()->debug('parsing annotation in ' . $path[0] . ':' . $path[1]);
-            $all_class = ZMUtil::getClassesPsr4($path[0], $path[1]);
+            $all_class = FileSystem::getClassesPsr4($path[0], $path[1]);
 
-            $conf = ZMConfig::get('global', 'runtime')['annotation_reader_ignore'] ?? [];
+            $conf = ZMConfig::get('global.runtime.annotation_reader_ignore');
             if (isset($conf['name']) && is_array($conf['name'])) {
                 foreach ($conf['name'] as $v) {
                     AnnotationReader::addGlobalIgnoredName($v);
@@ -145,7 +145,7 @@ class AnnotationParser
                         /* @var AnnotationBase $method_anno */
                         $method_anno->class = $v;
                         $method_anno->method = $method_name;
-                        if (!($method_anno instanceof Middleware) && ($middlewares = ZMConfig::get('global', 'runtime')['global_middleware_binding'][get_class($method_anno)] ?? []) !== []) {
+                        if (!($method_anno instanceof Middleware) && ($middlewares = ZMConfig::get('global.global_middleware_binding')[get_class($method_anno)] ?? []) !== []) {
                             if (!isset($inserted[$v][$method_name])) {
                                 // 在这里在其他中间件前插入插入全局的中间件
                                 foreach ($middlewares as $middleware) {
@@ -156,12 +156,12 @@ class AnnotationParser
                                 }
                                 $inserted[$v][$method_name] = true;
                             }
-                        } elseif ($method_anno instanceof RequestMapping) {
-                            RouteManager::importRouteByAnnotation($method_anno, $method_name, $v, $methods_annotations);
+                        } elseif ($method_anno instanceof Route) {
+                            $this->addRouteAnnotation($method_anno, $method_name, $v, $methods_annotations);
                         } elseif ($method_anno instanceof Middleware) {
                             $this->middleware_map[$method_anno->class][$method_anno->method][] = $method_anno;
                         } else {
-                            EventManager::$event_map[$method_anno->class][$method_anno->method][] = $method_anno;
+                            AnnotationMap::$_map[$method_anno->class][$method_anno->method][] = $method_anno;
                         }
                     }
                 }
@@ -214,9 +214,7 @@ class AnnotationParser
      */
     public function addRegisterPath(string $path, string $indoor_name)
     {
-        if (server()->worker_id === 0) {
-            logger()->debug('Add register path: ' . $path . ' => ' . $indoor_name);
-        }
+        logger()->debug('Add register path: ' . $path . ' => ' . $indoor_name);
         $this->path_list[] = [$path, $indoor_name];
     }
 
@@ -238,26 +236,7 @@ class AnnotationParser
         }
     }
 
-    /**
-     * @throws AnnotationException
-     */
-    public function verifyMiddlewares()
-    {
-        if ((ZMConfig::get('global', 'runtime')['middleware_error_policy'] ?? 1) === 2) {
-            // 我承认套三层foreach很不优雅，但是这个会很快的。
-            foreach ($this->middleware_map as $v) {
-                foreach ($v as $vs) {
-                    foreach ($vs as $mid) {
-                        if (!isset($this->middlewares[$mid->middleware])) {
-                            throw new AnnotationException("Annotation parse error: Unknown MiddlewareClass named \"{$mid->middleware}\"!");
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    public function getRunTime()
+    public function getUsedTime()
     {
         return microtime(true) - $this->start_time;
     }
@@ -286,5 +265,28 @@ class AnnotationParser
             }
         }
         return $result;
+    }
+
+    private function addRouteAnnotation(Route $vss, $method, $class, $methods_annotations)
+    {
+        if (InternalGlobals::$routes === null) {
+            InternalGlobals::$routes = new RouteCollection();
+        }
+
+        // 拿到所属方法的类上面有没有控制器的注解
+        $prefix = '';
+        foreach ($methods_annotations as $annotation) {
+            if ($annotation instanceof Controller) {
+                $prefix = $annotation->prefix;
+                break;
+            }
+        }
+        $tail = trim($vss->route, '/');
+        $route_name = $prefix . ($tail === '' ? '' : '/') . $tail;
+        logger()->debug('添加路由：' . $route_name);
+        $route = new \Symfony\Component\Routing\Route($route_name, ['_class' => $class, '_method' => $method]);
+        $route->setMethods($vss->request_method);
+
+        InternalGlobals::$routes->add(md5($route_name), $route);
     }
 }
