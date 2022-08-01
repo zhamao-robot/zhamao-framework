@@ -15,22 +15,20 @@
     "require": {
         "php": "^7.2 || ^7.3 || ^7.4 || ^8.0 || ^8.1",
         "ext-json": "*",
-        "ext-posix": "*",
         "doctrine/dbal": "^2.13.1",
         "dragonmantank/cron-expression": "^3.3",
         "jelix/version": "^2.0",
         "koriym/attributes": "^1.0",
         "psr/container": "^2.0",
         "psy/psysh": "^0.11.2",
-        "symfony/console": "~6.0 || ~5.0 || ~4.0 || ~3.0",
+        "symfony/console": "~6.0 || ~5.0 || ~4.0",
         "symfony/polyfill-ctype": "^1.19",
         "symfony/polyfill-mbstring": "^1.19",
         "symfony/polyfill-php80": "^1.16",
-        "symfony/routing": "~6.0 || ~5.0 || ~4.0 || ~3.0",
-        "zhamao/connection-manager": "^1.0",
-        "zhamao/console": "^1.0",
+        "symfony/routing": "~6.0 || ~5.0 || ~4.0",
         "zhamao/logger": "dev-master",
-        "zhamao/request": "^1.1"
+        "zhamao/request": "^1.1",
+        "onebot/libonebot": "*@dev"
     },
     "require-dev": {
         "brainmaestro/composer-git-hooks": "^2.8",
@@ -58,7 +56,8 @@
             "ZM\\": "src/ZM"
         },
         "files": [
-            "src/ZM/global_functions.php"
+            "src/Globals/global_functions.php",
+            "src/Globals/global_defines_app.php"
         ]
     },
     "autoload-dev": {
@@ -106,5 +105,11 @@
         "analyse": "phpstan analyse --memory-limit 300M",
         "cs-fix": "php-cs-fixer fix",
         "test": "bin/phpunit-swoole --no-coverage"
-    }
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "/Users/jerry/project/onebot/php-libonebot"
+        }
+    ]
 }

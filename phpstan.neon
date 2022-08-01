@@ -12,3 +12,4 @@ parameters:
     - SWOOLE_VERSION
     - ZM_TEST_LOG_DEBUG
     - _PHAR_STUB_ID
+    - LOAD_MODE

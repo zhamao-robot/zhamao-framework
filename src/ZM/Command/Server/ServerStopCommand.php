@@ -8,8 +8,8 @@ use Swoole\Process;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use ZM\Utils\DataProvider;
-use ZM\Utils\Manager\ProcessManager;
+use ZM\Process\ProcessStateManager;
+use ZM\Store\FileSystem;
 
 class ServerStopCommand extends ServerCommand
 {
@@ -26,8 +26,8 @@ class ServerStopCommand extends ServerCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($input->getOption('force') !== false) {
-            $file_path = _zm_pid_dir();
-            $list = DataProvider::scanDirFiles($file_path, false, true);
+            $file_path = ZM_PID_DIR;
+            $list = FileSystem::scanDirFiles($file_path, false, true);
             foreach ($list as $file) {
                 $name = explode('.', $file);
                 if (end($name) == 'pid') {
@@ -46,7 +46,7 @@ class ServerStopCommand extends ServerCommand
             Process::kill(intval($this->daemon_file['pid']), SIGTERM);
         }
         $i = 10;
-        while (ProcessManager::getProcessState(ZM_PROCESS_MASTER) !== false && $i > 0) {
+        while (ProcessStateManager::getProcessState(ZM_PROCESS_MASTER) !== false && $i > 0) {
             sleep(1);
             --$i;
         }

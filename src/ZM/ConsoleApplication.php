@@ -13,97 +13,61 @@ use ZM\Command\BuildCommand;
 use ZM\Command\CheckConfigCommand;
 use ZM\Command\Generate\SystemdGenerateCommand;
 use ZM\Command\InitCommand;
-use ZM\Command\Module\ModuleListCommand;
-use ZM\Command\Module\ModulePackCommand;
-use ZM\Command\Module\ModuleUnpackCommand;
-use ZM\Command\PureHttpCommand;
 use ZM\Command\Server\ServerReloadCommand;
 use ZM\Command\Server\ServerStartCommand;
 use ZM\Command\Server\ServerStatusCommand;
 use ZM\Command\Server\ServerStopCommand;
 use ZM\Exception\InitException;
 
+/**
+ * 命令行启动的入口文件，用于初始化环境变量，并启动命令行应用
+ *
+ * 这里启动的不是框架，而是框架相关的命令行环境
+ */
 class ConsoleApplication extends Application
 {
-    public const VERSION_ID = 473;
-
-    public const VERSION = '2.8.0';
-
     private static $obj;
 
     /**
      * @throws InitException
      */
-    public function __construct(string $name = 'UNKNOWN')
+    public function __construct(string $name = 'zhamao-framework')
     {
         if (self::$obj !== null) {
             throw new InitException(zm_internal_errcode('E00069') . 'Initializing another Application is not allowed!');
         }
-        define('ZM_VERSION_ID', self::VERSION_ID);
-        define('ZM_VERSION', self::VERSION);
-        self::$obj = $this;
+        // 如果已经有定义了全局的 WORKING_DIR，那么就报错
+        // if (defined('WORKING_DIR')) {
+        //     throw new InitException();
+        // }
+
+        // 启动前检查炸毛运行情况
+        // _zm_env_check();
+
+        // 初始化命令
+        $this->add(new ServerStatusCommand());      // server运行状态
+        $this->add(new ServerReloadCommand());      // server重载
+        $this->add(new ServerStopCommand());        // server停止
+        $this->add(new ServerStartCommand());       // 运行主服务的指令控制器
+        $this->add(new SystemdGenerateCommand());   // 生成systemd文件
+        if (LOAD_MODE === 1) {                      // 如果是 Composer 模式加载的，那么可以输入 check:config 命令，检查配置文件是否需要更新
+            $this->add(new CheckConfigCommand());
+        }
+        if (Phar::running() === '') {               // 不是 Phar 模式的话，可以执行打包解包初始化命令
+            $this->add(new BuildCommand());         // 用于将整个应用打包为一个可执行的 phar
+            $this->add(new InitCommand());          // 用于在 Composer 模式启动下，初始化脚手架文件
+            // $this->add(new PluginPackCommand());    // 用于打包一个子模块为 phar 并进行分发
+            // $this->add(new PluginListCommand());    // 用于列出已配置的子模块列表（存在 zm.json 文件的目录）
+            // $this->add(new PluginUnpackCommand());  // 用于将打包好的 phar 模块解包到 src 目录中
+        }
+
+        self::$obj = $this; // 用于标记已经初始化完成
         parent::__construct($name, ZM_VERSION);
     }
 
     /**
-     * @throws InitException
+     * {@inheritdoc}
      */
-    public function initEnv(string $with_default_cmd = ''): ConsoleApplication
-    {
-        if (defined('WORKING_DIR')) {
-            throw new InitException();
-        }
-
-        _zm_env_check();
-
-        // 定义多进程的全局变量
-        define('ZM_PROCESS_MASTER', 1);
-        define('ZM_PROCESS_MANAGER', 2);
-        define('ZM_PROCESS_WORKER', 4);
-        define('ZM_PROCESS_USER', 8);
-        define('ZM_PROCESS_TASKWORKER', 16);
-
-        define('WORKING_DIR', getcwd());
-
-        if (!is_dir(_zm_pid_dir())) {
-            @mkdir(_zm_pid_dir());
-        }
-
-        if (Phar::running() !== '') {
-            echo "* Running in phar mode.\n";
-            define('SOURCE_ROOT_DIR', Phar::running());
-            define('LOAD_MODE', is_dir(SOURCE_ROOT_DIR . '/src/ZM') ? 0 : 1);
-            define('FRAMEWORK_ROOT_DIR', LOAD_MODE == 1 ? (SOURCE_ROOT_DIR . '/vendor/zhamao/framework') : SOURCE_ROOT_DIR);
-        } else {
-            define('SOURCE_ROOT_DIR', WORKING_DIR);
-            define('LOAD_MODE', is_dir(SOURCE_ROOT_DIR . '/src/ZM') ? 0 : 1);
-            define('FRAMEWORK_ROOT_DIR', realpath(__DIR__ . '/../../'));
-        }
-
-        $this->addCommands([
-            new ServerStatusCommand(),
-            new ServerReloadCommand(),
-            new ServerStopCommand(),
-            new ServerStartCommand(), // 运行主服务的指令控制器
-            new PureHttpCommand(), // 纯HTTP服务器指令
-            new SystemdGenerateCommand(),
-        ]);
-        if (LOAD_MODE === 1) {
-            $this->add(new CheckConfigCommand());
-        }
-        if (Phar::running() === '') {
-            $this->add(new BuildCommand());
-            $this->add(new InitCommand());
-            $this->add(new ModulePackCommand());
-            $this->add(new ModuleListCommand());
-            $this->add(new ModuleUnpackCommand());
-        }
-        if (!empty($with_default_cmd)) {
-            $this->setDefaultCommand($with_default_cmd);
-        }
-        return $this;
-    }
-
     public function run(InputInterface $input = null, OutputInterface $output = null): int
     {
         try {

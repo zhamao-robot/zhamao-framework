@@ -4,380 +4,366 @@ declare(strict_types=1);
 
 namespace ZM;
 
-use Doctrine\Common\Annotations\AnnotationReader;
-use Error;
 use Exception;
-use InvalidArgumentException;
+use OneBot\Driver\Driver;
+use OneBot\Driver\Event\DriverInitEvent;
+use OneBot\Driver\Event\Http\HttpRequestEvent;
+use OneBot\Driver\Event\Process\ManagerStartEvent;
+use OneBot\Driver\Event\Process\ManagerStopEvent;
+use OneBot\Driver\Event\Process\WorkerStartEvent;
+use OneBot\Driver\Event\Process\WorkerStopEvent;
+use OneBot\Driver\Interfaces\DriverInitPolicy;
+use OneBot\Driver\Swoole\SwooleDriver;
+use OneBot\Driver\Workerman\Worker;
+use OneBot\Driver\Workerman\WorkermanDriver;
+use OneBot\Util\Singleton;
 use Phar;
-use ReflectionClass;
-use ReflectionException;
-use Swoole\Runtime;
-use Swoole\Server\Port;
-use Swoole\WebSocket\Server;
-use Throwable;
-use ZM\Annotation\Swoole\SwooleHandler;
+use Swoole\Process;
+use ZM\Command\Server\ServerStartCommand;
 use ZM\Config\ZMConfig;
-use ZM\ConnectionManager\ManagerGM;
-use ZM\Console\Console;
+use ZM\Event\EventProvider;
+use ZM\Event\Listener\HttpEventListener;
+use ZM\Event\Listener\ManagerEventListener;
+use ZM\Event\Listener\MasterEventListener;
+use ZM\Event\Listener\WorkerEventListener;
 use ZM\Exception\ConfigException;
+use ZM\Exception\InitException;
+use ZM\Logger\ConsoleLogger;
 use ZM\Logger\TablePrinter;
-use ZM\Store\LightCache;
-use ZM\Store\LightCacheInside;
-use ZM\Store\Lock\SpinLock;
-use ZM\Store\ZMAtomic;
-use ZM\Utils\DataProvider;
-use ZM\Utils\Manager\ProcessManager;
-use ZM\Utils\Terminal;
-use ZM\Utils\ZMUtil;
+use ZM\Process\ProcessStateManager;
 
+/**
+ * 框架入口类
+ * @since 3.0
+ */
 class Framework
 {
-    public const VERSION_ID = 609;
+    use Singleton;
 
-    public const VERSION = '3.0.0-alpha1';
+    /** @var int 版本ID */
+    public const VERSION_ID = 610;
+
+    /** @var string 版本名称 */
+    public const VERSION = '3.0.0-alpha2';
+
+    /** @var array 传入的参数 */
+    protected $argv;
+
+    /** @var Driver|SwooleDriver|WorkermanDriver OneBot驱动 */
+    protected $driver;
+
+    /** @var array<array<string, string>> 启动注解列表 */
+    protected $setup_annotations = [];
 
     /**
-     * 框架运行的参数
+     * 框架初始化文件
      *
-     * @var array
-     */
-    public static $argv;
-
-    /**
-     * 通信服务器实例
-     *
-     * @var Server
-     */
-    public static $server;
-
-    /**
-     * 框架加载的文件
-     *
-     * @var string[]
-     */
-    public static $loaded_files = [];
-
-    /**
-     * 是否为单文件模式
-     *
-     * @var bool
-     */
-    public static $instant_mode = false;
-
-    /**
-     * Swoole 服务端配置
-     *
-     * @var null|array
-     */
-    private $swoole_server_config;
-
-    /**
-     * @var array
-     */
-    private $setup_events = [];
-
-    /**
-     * 创建一个新的框架实例
-     *
-     * @param  array           $args         运行参数
-     * @param  bool            $instant_mode 是否为单文件模式
+     * @param  array<string, null|bool|string> $argv 传入的参数（见 ServerStartCommand）
+     * @throws InitException
      * @throws ConfigException
+     * @throws Exception
      */
-    public function __construct(array $args = [], bool $instant_mode = false)
+    public function __construct(array $argv = [])
     {
-        self::$instant_mode = $instant_mode;
-        self::$argv = $args;
-        Runtime::enableCoroutine(false);
-
-        // 初始化配置
-        ZMConfig::setDirectory(DataProvider::getSourceRootDir() . '/config');
-        ZMConfig::setEnv($args['env'] ?? 'development');
-        if (ZMConfig::get('global') === false) {
-            echo zm_internal_errcode('E00007') . 'Global config load failed: ' . ZMConfig::$last_error . "\nError path: " . DataProvider::getSourceRootDir() . "\nPlease init first!\nSee: https://github.com/zhamao-robot/zhamao-framework/issues/37\n";
-            exit(1);
+        // 单例化整个Framework类
+        if (self::$instance !== null) {
+            throw new InitException(zm_internal_errcode('E00069') . 'Initializing another Framework in one instance is not allowed!');
         }
+        self::$instance = $this;
 
-        // 定义常量
-        require_once 'global_defines.php';
+        // 初始化必需的args参数，如果没有传入的话，使用默认值
+        $this->argv = empty($argv) ? ServerStartCommand::exportOptionArray() : $argv;
 
-        // 确保目录存在
-        DataProvider::createIfNotExists(ZMConfig::get('global', 'zm_data'));
-        DataProvider::createIfNotExists(ZMConfig::get('global', 'config_dir'));
-        DataProvider::createIfNotExists(ZMConfig::get('global', 'crash_dir'));
+        // 执行一些 Driver 前置条件的内容
+        $this->initDriverPrerequisites();
 
-        // 初始化连接池？
-        try {
-            ManagerGM::init(ZMConfig::get('global', 'swoole')['max_connection'] ?? 2048, 0.5, [
-                [
-                    'key' => 'connect_id',
-                    'type' => 'string',
-                    'size' => 30,
-                ],
-                [
-                    'key' => 'type',
-                    'type' => 'int',
-                ],
-            ]);
-        } catch (ConnectionManager\TableException $e) {
-            logger()->emergency(zm_internal_errcode('E00008') . $e->getMessage());
-            exit(1);
-        }
+        // 初始化 Driver 及框架内部需要监听的事件
+        $this->initDriver();
 
-        try {
-            // 初始化日志
-            Console::init(
-                ZMConfig::get('global', 'info_level') ?? 2,
-                self::$server,
-                $args['log-theme'] ?? 'default',
-                ($o = ZMConfig::get('console_color')) === false ? [] : $o
-            );
-            // 是否同步输出到文件
-            if ((ZMConfig::get('global', 'runtime')['save_console_log_file'] ?? false) !== false) {
-                Console::setOutputFile(ZMConfig::get('global', 'runtime')['save_console_log_file']);
-            }
-
-            // 设置默认时区
-            $timezone = ZMConfig::get('global', 'timezone') ?? 'Asia/Shanghai';
-            date_default_timezone_set($timezone);
-
-            // 读取 Swoole 配置
-            $this->swoole_server_config = ZMConfig::get('global', 'swoole');
-            $this->swoole_server_config['log_level'] = SWOOLE_LOG_DEBUG;
-
-            // 是否启用远程终端
-            $remote_terminal = ZMConfig::get('global', 'remote_terminal')['status'] ?? false;
-
-            // 加载服务器事件
-            if (!$instant_mode) {
-                $this->loadServerEvents();
-            }
-
-            // 解析命令行参数
-            [$coroutine_mode, $terminal_id, $remote_terminal] = $this->parseCliArgs(self::$argv, compact('remote_terminal'));
-
-            // 设置默认最长等待时间
-            if (!isset($this->swoole_server_config['max_wait_time'])) {
-                $this->swoole_server_config['max_wait_time'] = 5;
-            }
-            // 设置最大 worker 进程数
-            $worker = $this->swoole_server_config['worker_num'] ?? swoole_cpu_num();
-            define('ZM_WORKER_NUM', $worker);
-
-            // 初始化原子计数器
-            ZMAtomic::init();
-
-            // 非静默模式下打印启动信息
-            if (!self::$argv['private-mode']) {
-                $this->printProperties($remote_terminal, $args);
-            }
-
-            // 预览模式则直接提出
-            if ($args['preview'] ?? false) {
-                exit();
-            }
-
-            // 初始化服务器
-            self::$server = new Server(
-                ZMConfig::get('global', 'host'),
-                ZMConfig::get('global', 'port'),
-                ZMConfig::get('global', 'runtime')['swoole_server_mode'] ?? SWOOLE_PROCESS
-            );
-
-            // 监听远程终端
-            if ($remote_terminal) {
-                $conf = ZMConfig::get('global', 'remote_terminal') ?? [
-                    'status' => true,
-                    'host' => '127.0.0.1',
-                    'port' => 20002,
-                    'token' => '',
-                ];
-
-                $welcome_msg = capture_output([logger('trm'), 'info'], ['欢迎使用炸毛远程终端！输入 `help` 查看帮助！']);
-                $motd = capture_output(function () {
-                    $this->printMotd();
-                });
-
-                /** @var Port $port */
-                $port = self::$server->listen($conf['host'], $conf['port'], SWOOLE_SOCK_TCP);
-                $port->set([
-                    'open_http_protocol' => false,
-                ]);
-                $port->on('connect', function (\Swoole\Server $serv, $fd) use ($welcome_msg, $conf, $motd) {
-                    ManagerGM::pushConnect($fd, 'terminal');
-                    // 推送欢迎信息
-                    $serv->send($fd, $motd);
-                    // 要求输入令牌
-                    if (!empty($conf['token'])) {
-                        $serv->send($fd, '请输入令牌：');
-                    } else {
-                        $serv->send($fd, $welcome_msg . "\n>>> ");
-                    }
-                });
-
-                $port->on('receive', function ($serv, $fd, $reactor_id, $data) use ($welcome_msg, $conf) {
-                    ob_start();
-                    try {
-                        $arr = LightCacheInside::get('light_array', 'input_token') ?? [];
-                        if (empty($arr[$fd] ?? '') && $conf['token'] !== '') {
-                            $token = trim($data);
-                            if ($token === $conf['token']) {
-                                SpinLock::transaction('input_token', static function () use ($fd, $token) {
-                                    $arr = LightCacheInside::get('light_array', 'input_token');
-                                    $arr[$fd] = $token;
-                                    LightCacheInside::set('light_array', 'input_token', $arr);
-                                });
-                                $serv->send($fd, capture_output([logger('trm'), 'info'], ['令牌验证成功！']));
-                                $serv->send($fd, $welcome_msg . "\n>>> ");
-                            } else {
-                                $serv->send($fd, capture_output([logger('trm'), 'error'], ['令牌验证失败！']));
-                                $serv->close($fd);
-                            }
-                            return;
-                        }
-                        if (trim($data) === 'exit' || trim($data) === 'q') {
-                            $serv->send($fd, capture_output([logger('trm'), 'info'], ['再见！']));
-                            $serv->close($fd);
-                            return;
-                        }
-                        Terminal::executeCommand(trim($data));
-                    } catch (Exception $e) {
-                        $error_msg = $e->getMessage() . ' at ' . $e->getFile() . '(' . $e->getLine() . ')';
-                        logger('trm')->error(zm_internal_errcode('E00009') . 'Uncaught exception ' . get_class($e) . ' when calling "open": ' . $error_msg);
-                        logger('trm')->error($e->getTraceAsString());
-                    } catch (Error $e) {
-                        $error_msg = $e->getMessage() . ' at ' . $e->getFile() . '(' . $e->getLine() . ')';
-                        logger('trm')->error(zm_internal_errcode('E00009') . 'Uncaught ' . get_class($e) . ' when calling "open": ' . $error_msg);
-                        logger('trm')->error($e->getTraceAsString());
-                    }
-
-                    $r = ob_get_clean();
-                    if (!empty($r)) {
-                        $serv->send($fd, $r);
-                    }
-                    if (!in_array(trim($data), ['r', 'reload'])) {
-                        $serv->send($fd, '>>> ');
-                    }
-                });
-
-                $port->on('close', function ($serv, $fd) {
-                    ManagerGM::popConnect($fd);
-                });
-            }
-
-            // 设置服务器配置
-            self::$server->set($this->swoole_server_config);
-            Console::setServer(self::$server);
-
-            // 非静默模式下，打印欢迎信息
-            if (!self::$argv['private-mode']) {
-                $this->printMotd();
-            }
-
-            $global_hook = ZMConfig::get('global', 'runtime')['swoole_coroutine_hook_flags'] ?? (SWOOLE_HOOK_ALL & (~SWOOLE_HOOK_CURL));
-            if ($coroutine_mode) {
-                Runtime::enableCoroutine(true, $global_hook);
-            } else {
-                Runtime::enableCoroutine(false, SWOOLE_HOOK_ALL);
-            }
-
-            // 注册 Swoole Server 的事件
-            $this->registerServerEvents();
-
-            // 初始化缓存
-            $r = ZMConfig::get('global', 'light_cache') ?? [
-                'size' => 512,                     // 最多允许储存的条数（需要2的倍数）
-                'max_strlen' => 32768,               // 单行字符串最大长度（需要2的倍数）
-                'hash_conflict_proportion' => 0.6,   // Hash冲突率（越大越好，但是需要的内存更多）
-                'persistence_path' => DataProvider::getDataFolder() . '_cache.json',
-                'auto_save_interval' => 900,
-            ];
-            LightCache::init($r);
-            LightCacheInside::init();
-
-            // 初始化自旋锁
-            SpinLock::init($r['size']);
-
-            // 注册全局错误处理器
-            set_error_handler(static function ($error_no, $error_msg, $error_file, $error_line) {
-                $tips = [
-                    E_WARNING => ['PHP Warning: ', 'warning'],
-                    E_NOTICE => ['PHP Notice: ', 'notice'],
-                    E_USER_ERROR => ['PHP Error: ', 'error'],
-                    E_USER_WARNING => ['PHP Warning: ', 'warning'],
-                    E_USER_NOTICE => ['PHP Notice: ', 'notice'],
-                    E_STRICT => ['PHP Strict: ', 'notice'],
-                    E_RECOVERABLE_ERROR => ['PHP Recoverable Error: ', 'error'],
-                    E_DEPRECATED => ['PHP Deprecated: ', 'notice'],
-                    E_USER_DEPRECATED => ['PHP User Deprecated: ', 'notice'],
-                ];
-                $level_tip = $tips[$error_no] ?? ['PHP Unknown: ', 'error'];
-                $error = $level_tip[0] . $error_msg . ' in ' . $error_file . ' on ' . $error_line;
-                logger()->{$level_tip[1]}($error);
-                // 如果 return false 则错误会继续递交给 PHP 标准错误处理
-                return true;
-            }, E_ALL | E_STRICT);
-        } catch (Exception $e) {
-            logger()->emergency('框架初始化失败，请检查！');
-            logger()->emergency(zm_internal_errcode('E00010') . $e->getMessage());
-            if (strpos($e->getMessage(), 'Address already in use') !== false) {
-                if (!ProcessManager::isStateEmpty()) {
-                    logger()->alert('检测到可能残留框架的工作进程，请先通过命令杀死：server:stop --force');
-                }
-            }
-            logger()->debug($e);
-            exit;
-        }
+        // 初始化框架的交互以及框架部分自己要监听的事件
+        $this->initFramework();
     }
 
-    public static function loadFrameworkState()
-    {
-        if (!file_exists(DataProvider::getDataFolder() . '.state.json')) {
-            return [];
-        }
-        $r = json_decode(file_get_contents(DataProvider::getDataFolder() . '.state.json'), true);
-        if ($r === null) {
-            $r = [];
-        }
-        return $r;
-    }
-
-    public static function saveFrameworkState($data)
-    {
-        return file_put_contents(DataProvider::getDataFolder() . '.state.json', json_encode($data, 64 | 128 | 256));
-    }
-
+    /**
+     * 启动框架
+     */
     public function start()
     {
-        try {
-            self::$loaded_files = get_included_files();
-            LightCacheInside::set('tmp_kv', 'start_time', microtime(true));
-            self::$server->start();
-            zm_atomic('server_is_stopped')->set(1);
-            if (!self::$argv['private-mode']) {
-                logger()->info('炸毛框架已停止！');
-            }
-        } catch (Throwable $e) {
-            exit(zm_internal_errcode('E00011') . '框架发生未捕获的异常：' . get_class($e) . ': ' . $e->getMessage() . PHP_EOL);
+        // 对多进程有效，记录当前已经加载的所有文件，最后在 Worker 进程中比较可重载的文件，用于排错
+        global $zm_loaded_files;
+        $zm_loaded_files = get_included_files();
+        // 跑！
+        $this->driver->run();
+    }
+
+    /**
+     * 停止框架运行
+     *
+     * 未测试
+     */
+    public function stop()
+    {
+        switch ($this->driver->getName()) {
+            case 'swoole':
+                /* @phpstan-ignore-next-line */
+                Process::kill($this->driver->getSwooleServer()->master_pid, SIGTERM);
+                break;
+            case 'workerman':
+                Worker::stopAll();
+                break;
         }
     }
 
     /**
-     * 打印 MOTD
+     * 重载框架的 worker 进程，重新加载模块及代码
+     *
+     * 此方法仅限于 Unix 环境下的多进程模式（即存在 Worker 进程的模式）使用，Windows 环境、单进程模式使用无效
+     *
+     * 未测试，需要对单进程等特殊情况做判断，因为单进程等模式无法重启
      */
-    private function printMotd(): void
+    public function reload()
     {
-        $tty_width = (new TablePrinter([]))->fetchTerminalSize();
-        if (file_exists(DataProvider::getSourceRootDir() . '/config/motd.txt')) {
-            $motd = file_get_contents(DataProvider::getSourceRootDir() . '/config/motd.txt');
-        } else {
-            $motd = file_get_contents(__DIR__ . '/../../config/motd.txt');
+        switch ($this->driver->getName()) {
+            case 'swoole':
+                /* @phpstan-ignore-next-line */
+                $this->driver->getSwooleServer()->reload();
+                break;
+            case 'workerman':
+                Worker::reloadSelf();
+                break;
         }
-        $motd = explode("\n", $motd);
-        foreach ($motd as $k => $v) {
-            $motd[$k] = substr($v, 0, $tty_width);
+    }
+
+    /**
+     * 获取传入的参数
+     */
+    public function getArgv(): array
+    {
+        return $this->argv;
+    }
+
+    /**
+     * 获取驱动
+     *
+     * @return Driver|SwooleDriver|WorkermanDriver
+     */
+    public function getDriver()
+    {
+        return $this->driver;
+    }
+
+    /**
+     * 在框架的 Driver 层初始化前的一些前提条件
+     *
+     * 大致分为初始化 config、解析一些命令行参数、初始化 Logger 等
+     *
+     * @throws ConfigException
+     */
+    private function initDriverPrerequisites()
+    {
+        // 寻找配置文件目录
+        if ($this->argv['config-dir'] !== null) { // 如果启动参数指定了config寻找目录，那么就在指定的寻找，不在别的地方寻找了
+            $find_dir = [$this->argv['config-dir']];
+            logger()->debug('使用命令参数指定的config-dir：' . $this->argv['config-dir']);
+        } else { // 否则就从默认的工作目录或源码根目录寻找
+            $find_dir = [WORKING_DIR . '/config', SOURCE_ROOT_DIR . '/config'];
         }
-        $motd = implode("\n", $motd);
-        echo $motd;
+        foreach ($find_dir as $v) {
+            if (is_dir($v)) {
+                ZMConfig::setDirectory($v);
+                ZMConfig::setEnv($this->argv['env'] ?? 'development');
+                $config_done = true;
+                break;
+            }
+        }
+        // 找不到的话直接崩溃，因为框架依赖全局配置文件（但其实这个错误在 3.0 开始应该永远无法执行到）
+        if (!isset($config_done)) {
+            echo zm_internal_errcode('E00007') . 'Global config load failed' . "\nPlease init first!\nSee: https://github.com/zhamao-robot/zhamao-framework/issues/37\n";
+            exit(1);
+        }
+
+        // 初始化框架本体运行需要的常量，比如运行时间等
+        require zm_dir(__DIR__ . '/../Globals/global_defines_framework.php');
+
+        // 初始化 Logger，此处为 Master 进程第一次初始化，在后续的多进程环境下，还需要在 Worker 进程中初始化
+        if (!ob_logger_registered()) { // 如果没有注册过 Logger，那么就初始化一个，在启动框架前注册的话，就不会初始化了，可替换为其他 Logger
+            ob_logger_register(new ConsoleLogger($this->argv['log-level'] ?? 'info'));
+        }
+
+        // 注册自己的EventProvider
+        global $ob_event_provider;
+        $ob_event_provider = EventProvider::getInstance();
+
+        // 初始化时区，默认为上海时区
+        date_default_timezone_set(ZMConfig::get('global.runtime.timezone'));
+
+        // 注册全局错误处理器
+        set_error_handler(static function ($error_no, $error_msg, $error_file, $error_line) {
+            $tips = [
+                E_WARNING => ['PHP Warning: ', 'warning'],
+                E_NOTICE => ['PHP Notice: ', 'notice'],
+                E_USER_ERROR => ['PHP Error: ', 'error'],
+                E_USER_WARNING => ['PHP Warning: ', 'warning'],
+                E_USER_NOTICE => ['PHP Notice: ', 'notice'],
+                E_STRICT => ['PHP Strict: ', 'notice'],
+                E_RECOVERABLE_ERROR => ['PHP Recoverable Error: ', 'error'],
+                E_DEPRECATED => ['PHP Deprecated: ', 'notice'],
+                E_USER_DEPRECATED => ['PHP User Deprecated: ', 'notice'],
+            ];
+            $level_tip = $tips[$error_no] ?? ['PHP Unknown: ', 'error'];
+            $error = $level_tip[0] . $error_msg . ' in ' . $error_file . ' on ' . $error_line;
+            logger()->{$level_tip[1]}($error);
+            // 如果 return false 则错误会继续递交给 PHP 标准错误处理
+            return true;
+        }, E_ALL | E_STRICT);
+
+        // 解析命令行参数
+        $this->parseArgs();
+
+        // 初始化 @OnSetup 事件
+        $this->initSetupAnnotations();
+    }
+
+    /**
+     * 初始化驱动及相关事件
+     *
+     * @throws Exception
+     */
+    private function initDriver()
+    {
+        switch ($driver = ZMConfig::get('global.driver')) {
+            case 'swoole':
+                ZMConfig::$config['global']['swoole_options']['driver_init_policy'] = DriverInitPolicy::MULTI_PROCESS_INIT_IN_MASTER;
+                $this->driver = new SwooleDriver(ZMConfig::get('global.swoole_options'));
+                $this->driver->initDriverProtocols(ZMConfig::get('global.servers'));
+                break;
+            case 'workerman':
+                ZMConfig::$config['global']['workerman_options']['driver_init_policy'] = DriverInitPolicy::MULTI_PROCESS_INIT_IN_MASTER;
+                $this->driver = new WorkermanDriver(ZMConfig::get('global.workerman_options'));
+                $this->driver->initDriverProtocols(ZMConfig::get('global.servers'));
+                break;
+            default:
+                logger()->error(zm_internal_errcode('E00081') . '未知的驱动类型 ' . $driver . ' !');
+                exit(1);
+        }
+    }
+
+    /**
+     * 初始化框架并输出一些信息
+     * @throws ConfigException
+     */
+    private function initFramework()
+    {
+        // private-mode 模式下，不输出任何内容
+        if (!$this->argv['private-mode']) {
+            $this->printProperties();
+            $this->printMotd();
+        }
+
+        // 添加框架需要监听的顶层事件监听器
+        // worker 事件
+        ob_event_provider()->addEventListener(WorkerStartEvent::getName(), [WorkerEventListener::getInstance(), 'onWorkerStart'], 999);
+        ob_event_provider()->addEventListener(WorkerStopEvent::getName(), [WorkerEventListener::getInstance(), 'onWorkerStop'], 999);
+        // Http 事件
+        ob_event_provider()->addEventListener(HttpRequestEvent::getName(), [HttpEventListener::getInstance(), 'onRequest'], 999);
+        // manager 事件
+        ob_event_provider()->addEventListener(ManagerStartEvent::getName(), [ManagerEventListener::getInstance(), 'onManagerStart'], 999);
+        ob_event_provider()->addEventListener(ManagerStopEvent::getName(), [ManagerEventListener::getInstance(), 'onManagerStop'], 999);
+        // master 事件
+        ob_event_provider()->addEventListener(DriverInitEvent::getName(), [MasterEventListener::getInstance(), 'onMasterStart'], 999);
+
+        // 框架多进程依赖
+        if (defined('ZM_PID_DIR') && !is_dir(ZM_PID_DIR)) {
+            mkdir(ZM_PID_DIR);
+        }
+    }
+
+    /**
+     * 打印属性表格
+     * @noinspection PhpComposerExtensionStubsInspection
+     * @throws ConfigException
+     */
+    private function printProperties(): void
+    {
+        $properties = [];
+        // 打印工作目录
+        $properties['working_dir'] = WORKING_DIR;
+        // 打印环境信息
+        $properties['environment'] = ($this->argv['env'] ?? null) === null ? 'default' : $this->argv['env'];
+        // 打印驱动
+        $properties['driver'] = ZMConfig::get('global.driver');
+        // 打印logger显示等级
+        $properties['log_level'] = $this->argv['log-level'] ?? ZMConfig::get('global', 'log_level') ?? 'info';
+        // 打印框架版本
+        $properties['version'] = self::VERSION . (LOAD_MODE === 0 ? (' (build ' . ZM_VERSION_ID . ')') : '');
+        // 打印 PHP 版本
+        $properties['php_version'] = PHP_VERSION;
+        // 非 Windows 操作系统打印 master 进程的 pid
+        if (PHP_OS_FAMILY !== 'Windows') {
+            $properties['master_pid'] = posix_getpid();
+        }
+        // 打印进程模型
+        if ($this->driver->getName() === 'swoole') {
+            $properties['process_mode'] = 'MST1';
+            ProcessStateManager::$process_mode['master'] = 1;
+            if (ZMConfig::get('global.swoole_options.swoole_server_mode') === SWOOLE_BASE) {
+                $worker_num = ZMConfig::get('global.swoole_options.swoole_set.worker_num');
+                if ($worker_num === null || $worker_num === 1) {
+                    $properties['process_mode'] .= 'MAN0#0';
+                    ProcessStateManager::$process_mode['manager'] = 0;
+                    ProcessStateManager::$process_mode['worker'] = 0;
+                } elseif ($worker_num === 0) {
+                    $properties['process_mode'] .= 'MAN0#' . swoole_cpu_num();
+                    ProcessStateManager::$process_mode['manager'] = 0;
+                    ProcessStateManager::$process_mode['worker'] = swoole_cpu_num();
+                } else {
+                    $properties['process_mode'] .= 'MAN0#' . ($worker = ZMConfig::get('global.swoole_options.swoole_set.worker_num') ?? swoole_cpu_num());
+                    ProcessStateManager::$process_mode['manager'] = 0;
+                    ProcessStateManager::$process_mode['worker'] = $worker;
+                }
+            } else {
+                $worker = ZMConfig::get('global.swoole_options.swoole_set.worker_num') === 0 ? swoole_cpu_num() : ZMConfig::get('global.swoole_options.swoole_set.worker_num') ?? swoole_cpu_num();
+                $properties['process_mode'] .= 'MAN1#' . $worker;
+                ProcessStateManager::$process_mode['manager'] = 1;
+                ProcessStateManager::$process_mode['worker'] = $worker;
+            }
+        } elseif ($this->driver->getName() === 'workerman') {
+            $properties['process_mode'] = 'MST1';
+            ProcessStateManager::$process_mode['master'] = 1;
+            $worker_num = ZMConfig::get('global.workerman_options.workerman_worker_num');
+            if (DIRECTORY_SEPARATOR === '\\') {
+                $properties['process_mode'] .= '#0';
+                ProcessStateManager::$process_mode['manager'] = 0;
+                ProcessStateManager::$process_mode['worker'] = 0;
+            } else {
+                $worker_num = $worker_num === 0 ? 1 : ($worker_num ?? 1);
+                $properties['process_mode'] .= '#' . $worker_num;
+                ProcessStateManager::$process_mode['manager'] = 0;
+                ProcessStateManager::$process_mode['worker'] = $worker_num;
+            }
+        }
+        // 打印监听端口
+        foreach (ZMConfig::get('global.servers') as $k => $v) {
+            $properties['listen_' . $k] = $v['type'] . '://' . $v['host'] . ':' . $v['port'];
+        }
+        // 打印 MySQL 连接信息
+        if ((ZMConfig::get('global.mysql_config.host') ?? '') !== '') {
+            $conf = ZMConfig::get('global', 'mysql_config');
+            $properties['mysql'] = $conf['dbname'] . '@' . $conf['host'] . ':' . $conf['port'];
+        }
+        // 打印 Redis 连接信息
+        if ((ZMConfig::get('global', 'redis_config')['host'] ?? '') !== '') {
+            $conf = ZMConfig::get('global', 'redis_config');
+            $properties['redis_pool'] = $conf['host'] . ':' . $conf['port'];
+        }
+
+        if (LOAD_MODE === 0) {
+            logger()->info('框架正以源码模式启动');
+        }
+        logger()->debug('Starting framework with properties: ' . json_encode($properties, JSON_UNESCAPED_SLASHES));
+        $this->translateProperties($properties);
+        $printer = new TablePrinter($properties);
+        $printer->setValueColor('random')->printAll();
     }
 
     /**
@@ -387,7 +373,6 @@ class Framework
     {
         $translations = [
             'working_dir' => '工作目录',
-            'listen' => '监听地址',
             'worker' => '工作进程数',
             'environment' => '环境类型',
             'log_level' => '日志级别',
@@ -398,26 +383,84 @@ class Framework
             'mysql_pool' => '数据库',
             'mysql' => '数据库',
             'redis_pool' => 'Redis',
-            'static_file_server' => '静态文件托管',
             'php_version' => 'PHP 版本',
-            'swoole_version' => 'Swoole 版本',
+            'process_mode' => '进程模型',
+            'driver' => '驱动类型',
+            'listen_0' => '监听端口1',
+            'listen_1' => '监听端口2',
+            'listen_2' => '监听端口3',
+            'listen_3' => '监听端口4',
         ];
+        // 更换数组键名
         foreach ($properties as $k => $v) {
             if (isset($translations[$k])) {
-                $this->changeArrayKey($properties, $k, $translations[$k]);
+                $keys = array_keys($properties);
+                $keys[array_search($k, $keys, false)] = $translations[$k];
+                $properties = ($t = array_combine($keys, $properties)) ? $t : $properties;
             }
         }
     }
 
-    private function loadServerEvents()
+    /**
+     * 打印 MOTD
+     */
+    private function printMotd(): void
+    {
+        // 先获取终端宽度，防止超过边界换行
+        $tty_width = (new TablePrinter([]))->fetchTerminalSize();
+        // 从源码目录、框架本身的初始目录寻找 MOTD 文件
+        if (file_exists(SOURCE_ROOT_DIR . '/config/motd.txt')) {
+            $motd = file_get_contents(SOURCE_ROOT_DIR . '/config/motd.txt');
+        } else {
+            $motd = file_get_contents(FRAMEWORK_ROOT_DIR . '/config/motd.txt');
+        }
+        $motd = explode("\n", $motd);
+        foreach ($motd as $k => $v) {
+            $motd[$k] = substr($v, 0, $tty_width);
+        }
+        $motd = implode("\n", $motd);
+        echo $motd;
+    }
+
+    /**
+     * 解析 argv 参数
+     */
+    private function parseArgs()
+    {
+        foreach ($this->argv as $x => $y) {
+            // 当值为 true/false 时，表示该参数为可选参数。当值为 null 时，表示该参数必定会有一个值，如果是 null，说明没指定
+            if ($y === false || is_null($y)) {
+                continue;
+            }
+            switch ($x) {
+                case 'driver':      // 动态设置驱动类型
+                    ZMConfig::$config['global']['driver'] = $y;
+                    break;
+                case 'worker-num':  // 动态设置 Worker 数量
+                    ZMConfig::$config['global']['swoole_options']['swoole_set']['worker_num'] = intval($y);
+                    ZMConfig::$config['global']['workerman_options']['workerman_worker_num'] = intval($y);
+                    break;
+                case 'daemon':      // 启动为守护进程
+                    ZMConfig::$config['global']['swoole_options']['swoole_set']['daemonize'] = 1;
+                    Worker::$daemonize = true;
+                    break;
+            }
+        }
+    }
+
+    /**
+     * 初始化 OnSetup 注解
+     */
+    private function initSetupAnnotations()
     {
         if (Phar::running() !== '') {
-            ob_start();
-            include_once DataProvider::getFrameworkRootDir() . '/src/ZM/script_setup_loader.php';
-            $r = ob_get_clean();
+            // 在 Phar 下，不需要新启动进程了，因为 Phar 没办法重载，自然不需要考虑多进程的加载 reload 问题
+            require FRAMEWORK_ROOT_DIR . '/src/Globals/script_setup_loader.php';
+            $r = _zm_setup_loader();
             $result_code = 0;
         } else {
-            $r = exec(PHP_BINARY . ' ' . DataProvider::getFrameworkRootDir() . '/src/ZM/script_setup_loader.php', $output, $result_code);
+            // 其他情况下，需要启动一个新的进程执行结果后退出内存中加载的内容，以便重载模块
+            $r = exec(PHP_BINARY . ' ' . FRAMEWORK_ROOT_DIR . '/src/Globals/script_setup_loader.php', $output, $result_code);
         }
         if ($result_code !== 0) {
             logger()->emergency('代码解析错误！');
@@ -425,218 +468,16 @@ class Framework
         }
         $json = json_decode($r, true);
         if (!is_array($json)) {
-            logger()->error(zm_internal_errcode('E00012') . '解析 @SwooleHandler 及 @OnSetup 时发生错误，请检查代码！');
+            logger()->error(zm_internal_errcode('E00012') . '解析 @OnSetup 时发生错误，请检查代码！');
+            return;
         }
-        $this->setup_events = $json;
-    }
-
-    /**
-     * 从全局配置文件里读取注入系统事件的类
-     *
-     * @throws ReflectionException
-     * @throws ReflectionException
-     */
-    private function registerServerEvents()
-    {
-        $reader = new AnnotationReader();
-        $all = ZMUtil::getClassesPsr4(FRAMEWORK_ROOT_DIR . '/src/ZM/Event/SwooleEvent/', 'ZM\\Event\\SwooleEvent');
-        foreach ($all as $v) {
-            $class = new $v();
-            $reflection_class = new ReflectionClass($class);
-            $anno_class = $reader->getClassAnnotation($reflection_class, SwooleHandler::class);
-            if ($anno_class !== null) { // 类名形式的注解
-                $this->setup_events['event'][] = [
-                    'class' => $v,
-                    'method' => 'onCall',
-                    'event' => $anno_class->event,
-                ];
-            }
-        }
-
-        foreach (($this->setup_events['setup'] ?? []) as $v) {
+        $this->setup_annotations = $json['setup'];
+        foreach (($this->setup_annotations) as $v) {
             logger()->debug('Calling @OnSetup: ' . $v['class']);
-            $c = ZMUtil::getModInstance($v['class']);
+            $cname = $v['class'];
+            $c = new $cname();
             $method = $v['method'];
             $c->{$method}();
         }
-
-        foreach ($this->setup_events['event'] as $v) {
-            self::$server->on($v['event'], function (...$param) use ($v) {
-                ZMUtil::getModInstance($v['class'])->{$v['method']}(...$param);
-            });
-        }
-    }
-
-    /**
-     * 解析命令行的 $argv 参数
-     *
-     * @param  array                    $args 命令行参数
-     * @throws InvalidArgumentException 参数不正确，框架需要捕获并终止启动
-     * @return array                    解析后并需要处理的参数
-     */
-    private function parseCliArgs(array $args, array $defaults): array
-    {
-        $coroutine_mode = true;
-        global $terminal_id;
-        $terminal_id = uuidgen();
-        $error_occur = false;
-        $remote_terminal = $defaults['remote_terminal'];
-
-        foreach ($args as $x => $y) {
-            if ($y === false || is_null($y)) {
-                continue;
-            }
-            switch ($x) {
-                case 'worker-num':
-                    if ((int) $y >= 1 && (int) $y <= 1024) {
-                        $this->swoole_server_config['worker_num'] = (int) $y;
-                    } else {
-                        logger()->emergency(zm_internal_errcode('E00013') . '传入的 worker_num 参数不合法！必须在 1-1024 之间！');
-                        $error_occur = true;
-                    }
-                    break;
-                case 'task-worker-num':
-                    if ((int) $y >= 1 && (int) $y <= 1024) {
-                        $this->swoole_server_config['task_worker_num'] = (int) $y;
-                        $this->swoole_server_config['task_enable_coroutine'] = true;
-                    } else {
-                        logger()->emergency(zm_internal_errcode('E00013') . '传入的 task_worker_num 参数不合法！必须在 1-1024 之间！');
-                        $error_occur = true;
-                    }
-                    break;
-                case 'disable-coroutine':
-                    $coroutine_mode = false;
-                    break;
-                case 'debug-mode':
-                    self::$argv['disable-safe-exit'] = true;
-                    $coroutine_mode = false;
-                    $terminal_id = null;
-                    self::$argv['watch'] = true;
-                    logger()->notice('已进入调试模式，请勿在生产环境中使用！');
-                    break;
-                case 'daemon':
-                    $this->swoole_server_config['daemonize'] = 1;
-                    Console::$theme = 'no-color';
-                    Console::log('已启用守护进程，输出重定向到 ' . $this->swoole_server_config['log_file']);
-                    $terminal_id = null;
-                    break;
-                case 'disable-console-input':
-                case 'no-interaction':
-                    $terminal_id = null;
-                    break;
-                case 'log-error':
-                    Console::setLevel(0);
-                    break;
-                case 'log-warning':
-                    Console::setLevel(1);
-                    break;
-                case 'log-info':
-                    Console::setLevel(2);
-                    break;
-                case 'log-verbose':
-                case 'verbose':
-                    Console::setLevel(3);
-                    break;
-                case 'log-debug':
-                    Console::setLevel(4);
-                    break;
-                case 'audit-mode':
-                    logger()->notice('审计模式已开启，请正常执行需要审计的流程，然后Ctrl+C正常结束框架');
-                    logger()->notice('审计的日志文件将存放到：' . DataProvider::getWorkingDir() . '/audit.log');
-                    if (file_exists(DataProvider::getWorkingDir() . '/audit.log')) {
-                        unlink(DataProvider::getWorkingDir() . '/audit.log');
-                    }
-                    logger()->notice('框架将于5秒后开始启动...');
-                    Console::setOutputFile(DataProvider::getWorkingDir() . '/audit.log');
-                    Console::setLevel(4);
-                    sleep(5);
-                    break;
-                case 'log-theme':
-                    Console::$theme = $y;
-                    break;
-                case 'remote-terminal':
-                    $remote_terminal = true;
-                    break;
-                case 'show-php-ver':
-                default:
-                    break;
-            }
-        }
-        if ($error_occur) {
-            throw new InvalidArgumentException('命令行参数解析错误，请参阅上方日志！');
-        }
-        return [$coroutine_mode, $terminal_id, $remote_terminal];
-    }
-
-    /**
-     * 更换数组键名
-     *
-     * @param mixed $old_key
-     * @param mixed $new_key
-     */
-    private function changeArrayKey(array &$arr, $old_key, $new_key): void
-    {
-        $keys = array_keys($arr);
-        $keys[array_search($old_key, $keys, false)] = $new_key;
-        $arr = ($t = array_combine($keys, $arr)) ? $t : $arr;
-    }
-
-    /**
-     * 打印属性表格
-     */
-    private function printProperties(bool $remote_terminal, array $args): void
-    {
-        $properties = [];
-        $properties['working_dir'] = DataProvider::getWorkingDir();
-        $properties['listen'] = ZMConfig::get('global', 'host') . ':' . ZMConfig::get('global', 'port');
-        if (!isset($this->swoole_server_config['worker_num'])) {
-            if ((ZMConfig::get('global', 'runtime')['swoole_server_mode'] ?? SWOOLE_PROCESS) === SWOOLE_PROCESS) {
-                $properties['worker'] = swoole_cpu_num() . ' (auto)';
-            } else {
-                $properties['single_proc_mode'] = 'true';
-            }
-        } else {
-            $properties['worker'] = $this->swoole_server_config['worker_num'];
-        }
-        $properties['environment'] = ($args['env'] ?? null) === null ? 'default' : $args['env'];
-        $properties['log_level'] = strtoupper(zm_config('logging.level'));
-        $properties['version'] = self::VERSION . (LOAD_MODE === 0 ? (' (build ' . ZM_VERSION_ID . ')') : '');
-        $properties['master_pid'] = posix_getpid();
-        if (APP_VERSION !== 'unknown') {
-            $properties['app_version'] = APP_VERSION;
-        }
-        if (isset($this->swoole_server_config['task_worker_num'])) {
-            $properties['task_worker'] = $this->swoole_server_config['task_worker_num'];
-        }
-        if ((ZMConfig::get('global', 'sql_config')['sql_host'] ?? '') !== '') {
-            $conf = ZMConfig::get('global', 'sql_config');
-            $properties['mysql_pool'] = $conf['sql_database'] . '@' . $conf['sql_host'] . ':' . $conf['sql_port'];
-        }
-        if ((ZMConfig::get('global', 'mysql_config')['host'] ?? '') !== '') {
-            $conf = ZMConfig::get('global', 'mysql_config');
-            $properties['mysql'] = $conf['dbname'] . '@' . $conf['host'] . ':' . $conf['port'];
-        }
-        if (ZMConfig::get('global', 'redis_config')['host'] !== '') {
-            $conf = ZMConfig::get('global', 'redis_config');
-            $properties['redis_pool'] = $conf['host'] . ':' . $conf['port'];
-        }
-        if (ZMConfig::get('global', 'static_file_server')['status'] !== false) {
-            $properties['static_file_server'] = 'enabled';
-        }
-        if (self::$argv['show-php-ver'] !== false) {
-            $properties['php_version'] = PHP_VERSION;
-            $properties['swoole_version'] = SWOOLE_VERSION;
-        }
-
-        if ($remote_terminal) {
-            $conf = ZMConfig::get('global', 'remote_terminal');
-            $properties['terminal'] = $conf['host'] . ':' . $conf['port'];
-        }
-        if (LOAD_MODE === 0) {
-            logger()->info('框架正以源码模式启动');
-        }
-        $this->translateProperties($properties);
-        $printer = new TablePrinter($properties);
-        $printer->setValueColor('random')->printAll();
     }
 }

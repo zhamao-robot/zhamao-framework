@@ -27,7 +27,7 @@ class CheckConfigCommand extends Command
             return 1;
         }
         $current_cfg = getcwd() . '/config/';
-        $remote_cfg = include_once FRAMEWORK_ROOT_DIR . '/config/global.php';
+        $remote_cfg = include_once FRAMEWORK_ROOT_DIR . '/config/global_old.php';
         if (file_exists($current_cfg . 'global.php')) {
             $this->check($remote_cfg, 'global.php', $output);
         }

@@ -4,15 +4,10 @@ declare(strict_types=1);
 
 namespace ZM\Command;
 
-use ArrayIterator;
-use League\CLImate\CLImate;
-use Phar;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use ZM\Console\TermColor;
-use ZM\Utils\DataProvider;
 
 class BuildCommand extends Command
 {
@@ -20,10 +15,8 @@ class BuildCommand extends Command
     protected static $defaultName = 'build';
 
     /**
-     * @var OutputInterface
+     * 配置
      */
-    private $output;
-
     protected function configure()
     {
         $this->setDescription('Build an ".phar" file | 将项目构建一个phar包');
@@ -34,8 +27,9 @@ class BuildCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        /* TODO
         $this->output = $output;
-        $target_dir = $input->getOption('target') ?? (WORKING_DIR);
+        $target_dir = $input->getOption('target') ?? WORKING_DIR;
         if (mb_strpos($target_dir, '../')) {
             $target_dir = realpath($target_dir);
         }
@@ -58,47 +52,49 @@ class BuildCommand extends Command
         }
         $filename = 'server.phar';
         $this->build($target_dir, $filename);
-
-        return 0;
+        */
+        $output->writeln('<error>Not implemented.</error>');
+        return 1;
     }
+    /*
+        private function build($target_dir, $filename)
+        {
+            @unlink($target_dir . $filename);
+            $phar = new Phar($target_dir . $filename);
+            $phar->startBuffering();
 
-    private function build($target_dir, $filename)
-    {
-        @unlink($target_dir . $filename);
-        $phar = new Phar($target_dir . $filename);
-        $phar->startBuffering();
+            $all = DataProvider::scanDirFiles(DataProvider::getSourceRootDir(), true, true);
 
-        $all = DataProvider::scanDirFiles(DataProvider::getSourceRootDir(), true, true);
+            $all = array_filter($all, function ($x) {
+                $dirs = preg_match('/(^(bin|config|resources|src|vendor)\\/|^(composer\\.json|README\\.md)$)/', $x);
+                return !($dirs !== 1);
+            });
 
-        $all = array_filter($all, function ($x) {
-            $dirs = preg_match('/(^(bin|config|resources|src|vendor)\\/|^(composer\\.json|README\\.md)$)/', $x);
-            return !($dirs !== 1);
-        });
+            sort($all);
 
-        sort($all);
+            $archive_dir = DataProvider::getSourceRootDir();
+            $map = [];
 
-        $archive_dir = DataProvider::getSourceRootDir();
-        $map = [];
-
-        if (class_exists('\\League\\CLImate\\CLImate')) {
-            $climate = new CLImate();
-            $progress = $climate->progress()->total(count($all));
-        }
-        foreach ($all as $k => $v) {
-            $map[$v] = $archive_dir . '/' . $v;
-            if (isset($progress)) {
-                $progress->current($k + 1, 'Adding ' . $v);
+            if (class_exists('\\League\\CLImate\\CLImate')) {
+                $climate = new CLImate();
+                $progress = $climate->progress()->total(count($all));
             }
+            foreach ($all as $k => $v) {
+                $map[$v] = $archive_dir . '/' . $v;
+                if (isset($progress)) {
+                    $progress->current($k + 1, 'Adding ' . $v);
+                }
+            }
+            $this->output->write('<info>Building...</info>');
+            $phar->buildFromIterator(new ArrayIterator($map));
+            $phar->setStub(
+                "#!/usr/bin/env php\n" .
+                $phar->createDefaultStub(LOAD_MODE == 0 ? 'src/entry.php' : 'vendor/zhamao/framework/src/entry.php')
+            );
+            $phar->stopBuffering();
+            $this->output->writeln('');
+            $this->output->writeln('Successfully built. Location: ' . $target_dir . "{$filename}");
+            $this->output->writeln('<info>You may use `chmod +x server.phar` to let phar executable with `./` command</info>');
         }
-        $this->output->write('<info>Building...</info>');
-        $phar->buildFromIterator(new ArrayIterator($map));
-        $phar->setStub(
-            "#!/usr/bin/env php\n" .
-            $phar->createDefaultStub(LOAD_MODE == 0 ? 'src/entry.php' : 'vendor/zhamao/framework/src/entry.php')
-        );
-        $phar->stopBuffering();
-        $this->output->writeln('');
-        $this->output->writeln('Successfully built. Location: ' . $target_dir . "{$filename}");
-        $this->output->writeln('<info>You may use `chmod +x server.phar` to let phar executable with `./` command</info>');
-    }
+    */
 }

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ZM\Config;
 
 use ZM\Exception\ConfigException;
-use ZM\Utils\DataProvider;
+use ZM\Store\FileSystem;
 
 class ZMConfig
 {
@@ -22,7 +22,7 @@ class ZMConfig
     public static $config = [];
 
     /** @var string 配置文件 */
-    private static $path = '.';
+    private static $path = 'config';
 
     /** @var string 上次的路径 */
     private static $last_path = '.';
@@ -187,7 +187,7 @@ class ZMConfig
     private static function parseList(string $name): void
     {
         $list = [];
-        $files = DataProvider::scanDirFiles(self::$path, true, true);
+        $files = FileSystem::scanDirFiles(self::$path, true, true);
         foreach ($files as $file) {
             logger()->debug('正在从目录' . self::$path . '读取配置文件 ' . $file);
             $info = pathinfo($file);
@@ -227,15 +227,15 @@ class ZMConfig
                     logger()->warning('文件名 ' . $info['filename'] . ' 不合法(含有".")，请检查文件名是否合法。');
                     continue;
                 }
-                $obj->path = realpath(self::$path . '/' . $info['dirname'] . '/' . $info['basename']);
+                $obj->path = zm_dir(self::$path . '/' . $info['dirname'] . '/' . $info['basename']);
                 $obj->extension = $ext;
-                $obj->data = self::readConfigFromFile(realpath(self::$path . '/' . $info['dirname'] . '/' . $info['basename']), $info['extension']);
+                $obj->data = self::readConfigFromFile(zm_dir(self::$path . '/' . $info['dirname'] . '/' . $info['basename']), $info['extension']);
                 $list[] = $obj;
             }
         }
         // 如果是源码模式，config目录和default目录相同，所以不需要继续采摘default目录下的文件
         if (realpath(self::$path) !== realpath(self::DEFAULT_PATH)) {
-            $files = DataProvider::scanDirFiles(self::DEFAULT_PATH, true, true);
+            $files = FileSystem::scanDirFiles(self::DEFAULT_PATH, true, true);
             foreach ($files as $file) {
                 $info = pathinfo($file);
                 $info['extension'] = $info['extension'] ?? '';
@@ -249,7 +249,7 @@ class ZMConfig
                     $obj->is_env = false;
                     $obj->path = realpath(self::DEFAULT_PATH . '/' . $info['dirname'] . '/' . $info['basename']);
                     $obj->extension = $info['extension'];
-                    $obj->data = self::readConfigFromFile(realpath(self::DEFAULT_PATH . '/' . $info['dirname'] . '/' . $info['basename']), $info['extension']);
+                    $obj->data = self::readConfigFromFile(zm_dir(self::DEFAULT_PATH . '/' . $info['dirname'] . '/' . $info['basename']), $info['extension']);
                     $list[] = $obj;
                 }
             }
