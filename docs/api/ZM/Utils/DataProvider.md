@@ -158,12 +158,12 @@ public function loadFromJson(string $filename): null|mixed
 ## scanDirFiles
 
 ```php
-public function scanDirFiles(string $dir, bool $recursive, bool|string $relative): array|false
+public function scanDirFiles(string $dir, bool $recursive, bool|string $relative, bool $include_dir): array|false
 ```
 
 ### 描述
 
-递归或非递归扫描目录，可返回相对目录的文件列表或绝对目录的文件列表
+递归或非递归扫描目录，可返回相对目录或绝对目录的文件或目录列表
 
 ### 参数
 
@@ -172,6 +172,7 @@ public function scanDirFiles(string $dir, bool $recursive, bool|string $relative
 | dir | string | 目录 |
 | recursive | bool | 是否递归扫描子目录 |
 | relative | bool|string | 是否返回相对目录，如果为true则返回相对目录，如果为false则返回绝对目录 |
+| $include_dir | bool | 如果为true则返回目录，为false则只返回文件
 
 ### 返回
 
