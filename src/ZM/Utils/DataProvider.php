@@ -127,13 +127,14 @@ class DataProvider
     /**
      * 递归或非递归扫描目录，可返回相对目录的文件列表或绝对目录的文件列表
      *
-     * @param  string      $dir       目录
-     * @param  bool        $recursive 是否递归扫描子目录
-     * @param  bool|string $relative  是否返回相对目录，如果为true则返回相对目录，如果为false则返回绝对目录
+     * @param  string      $dir         目录
+     * @param  bool        $recursive   是否递归扫描子目录
+     * @param  bool|string $relative    是否返回相对目录，如果为true则返回相对目录，如果为false则返回绝对目录
+     * @param  bool        $include_dir 是否包含目录
      * @return array|false
      * @since 2.5
      */
-    public static function scanDirFiles(string $dir, bool $recursive = true, $relative = false)
+    public static function scanDirFiles(string $dir, bool $recursive = true, $relative = false, $include_dir = false)
     {
         $dir = rtrim($dir, '/');
         if (!is_dir($dir)) {
@@ -153,8 +154,10 @@ class DataProvider
             }
             $sub_file = $dir . '/' . $v;
             if (is_dir($sub_file) && $recursive) {
+                # 如果是 目录 且 递推 , 则递推添加下级文件
                 $list = array_merge($list, self::scanDirFiles($sub_file, $recursive, $relative));
-            } elseif (is_file($sub_file)) {
+            } elseif (is_file($sub_file) || is_dir($sub_file) && !$recursive && $include_dir) {
+                # 如果是 文件 或 (是 目录 且 不递推 且 包含目录)
                 if (is_string($relative) && mb_strpos($sub_file, $relative) === 0) {
                     $list[] = ltrim(mb_substr($sub_file, mb_strlen($relative)), '/');
                 } elseif ($relative === false) {
