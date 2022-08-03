@@ -54,9 +54,11 @@ DataProvider::getDataFolder("TestModule"); // 例如返回 /root/zhamao-framewor
 
 递归或非递归扫描目录，返回相对目录的文件列表或绝对目录的文件列表。（非常好用）
 
-定义：`scanDirFiles($dir, $recursive = true, $relative = false)`
+定义：`scanDirFiles($dir, $recursive = true, $relative = false, $include_dir = false)`
 
 `$dir` 为要扫描的目录，`$recursive` 为是否递归，`$relative` 为是否返回相对目录的文件列表。
+
+`$include_dir` 只有在 `$recursive === false` 的情况才生效，当 `$include_dir` 为 `true` 时，返回的非递归文件列表会包含目录，否则只包含文件。
 
 从给定的目录下开始遍历整个目录，如果将 `$recursive` 设置为 `true`，则会递归扫描子目录，否则将返回包含目录的文件列表。
 

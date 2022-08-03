@@ -4,6 +4,10 @@
 
 同时此处将只使用 build 版本号进行区分。
 
+## build 476 (2022-8-3)
+
+- `DataProvider::scanDirFiles()` 新增参数 `$include_dir`，用于控制非递归模式下是否包含目录
+
 ## build 475 (2022-7-3)
 
 - 修复 `match_args` 全局方法对于 `0` 字符串处理的 Bug（#136）
