@@ -57,7 +57,7 @@ function _zm_env_check()
     }
     if (version_compare(SWOOLE_VERSION, '4.6.7') < 0 && !extension_loaded('pcntl')) {
         Console::error(zm_internal_errcode('E00004') . 'Swoole 版本必须不低于 4.6.7 或 PHP 安装加载了 pcntl 扩展！');
-        exit();
+        exit;
     }
 }
 

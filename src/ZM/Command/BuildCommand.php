@@ -35,7 +35,7 @@ class BuildCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->output = $output;
-        $target_dir = $input->getOption('target') ?? (WORKING_DIR);
+        $target_dir = $input->getOption('target') ?? WORKING_DIR;
         if (mb_strpos($target_dir, '../')) {
             $target_dir = realpath($target_dir);
         }

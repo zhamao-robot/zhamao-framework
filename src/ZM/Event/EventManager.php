@@ -34,7 +34,7 @@ class EventManager
         if ($event_obj->method instanceof Closure) {
             Console::debug("Adding event {$event_name} at @Anonymous");
         } else {
-            Console::debug("Adding event {$event_name} at " . ($event_obj->class) . ':' . ($event_obj->method));
+            Console::debug("Adding event {$event_name} at " . $event_obj->class . ':' . $event_obj->method);
             self::$event_map[$event_obj->class][$event_obj->method][] = $event_obj;
         }
         self::$events[$event_name][] = $event_obj;

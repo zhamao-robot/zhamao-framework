@@ -391,7 +391,7 @@ class CQ
     {
         $cqs = [];
         $offset = 0;
-        while (($head = mb_strpos(($submsg = mb_substr($msg, $offset)), '[CQ:')) !== false) {
+        while (($head = mb_strpos($submsg = mb_substr($msg, $offset), '[CQ:')) !== false) {
             $key_offset = mb_substr($submsg, $head);
             $tmpmsg = mb_strpos($key_offset, ']');
             if ($tmpmsg === false) {

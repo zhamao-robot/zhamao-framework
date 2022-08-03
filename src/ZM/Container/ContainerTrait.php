@@ -262,7 +262,7 @@ trait ContainerTrait
                 $this->log(sprintf(
                     '[%s] resolved (shared)%s',
                     $abstract,
-                    ($needs_contextual_build ? ' with ' . implode(', ', $parameters) : '')
+                    $needs_contextual_build ? ' with ' . implode(', ', $parameters) : ''
                 ));
             }
             return $this->shared[$abstract];
@@ -307,7 +307,7 @@ trait ContainerTrait
             $this->log(sprintf(
                 '[%s] resolved%s',
                 $abstract,
-                ($needs_contextual_build ? ' with ' . implode(', ', $parameters) : '')
+                $needs_contextual_build ? ' with ' . implode(', ', $parameters) : ''
             ));
         }
 
@@ -383,7 +383,7 @@ trait ContainerTrait
             $this->log(sprintf(
                 'Called %s%s(%s)',
                 ReflectionUtil::variableToString($callback),
-                ($default_method ? '@' . $default_method : ''),
+                $default_method ? '@' . $default_method : '',
                 $str_parameters
             ));
         }

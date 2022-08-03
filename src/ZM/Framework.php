@@ -211,7 +211,7 @@ class Framework
 
             // 预览模式则直接提出
             if ($args['preview'] ?? false) {
-                exit();
+                exit;
             }
 
             // 初始化服务器

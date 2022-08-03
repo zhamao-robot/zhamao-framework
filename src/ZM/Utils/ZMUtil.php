@@ -11,6 +11,7 @@ use ZM\Framework;
 use ZM\Store\Lock\SpinLock;
 use ZM\Store\ZMAtomic;
 use ZM\Store\ZMBuf;
+
 use function file_get_contents;
 use function get_included_files;
 use function is_callable;
@@ -124,7 +125,7 @@ class ZMUtil
                             continue 2;
                         }
                     }
-                } elseif (is_callable($rule) && !($rule($dir, $pathinfo))) {
+                } elseif (is_callable($rule) && !$rule($dir, $pathinfo)) {
                     continue;
                 }
                 $dirname = $pathinfo['dirname'] == '.' ? '' : (str_replace('/', '\\', $pathinfo['dirname']) . '\\');

@@ -70,7 +70,7 @@ class OnManagerStart implements SwooleEvent
             }
             if (Framework::$argv['polling-watch']) {
                 self::$watch_tick_id = swoole_timer_tick(3000, function () use ($server) {
-                    $data = (DataProvider::scanDirFiles(DataProvider::getSourceRootDir() . '/src/'));
+                    $data = DataProvider::scanDirFiles(DataProvider::getSourceRootDir() . '/src/');
                     $hash = md5('');
                     foreach ($data as $file) {
                         $hash = md5($hash . md5_file($file));
