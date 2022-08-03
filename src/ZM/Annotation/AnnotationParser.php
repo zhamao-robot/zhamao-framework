@@ -26,8 +26,6 @@ use ZM\Exception\AnnotationException;
 use ZM\Utils\Manager\RouteManager;
 use ZM\Utils\ZMUtil;
 
-use function server;
-
 class AnnotationParser
 {
     private $path_list = [];

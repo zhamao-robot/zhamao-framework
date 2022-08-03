@@ -12,17 +12,6 @@ use ZM\Store\Lock\SpinLock;
 use ZM\Store\ZMAtomic;
 use ZM\Store\ZMBuf;
 
-use function file_get_contents;
-use function get_included_files;
-use function is_callable;
-use function is_string;
-use function json_decode;
-use function mb_substr;
-use function md5_file;
-use function pathinfo;
-use function server;
-use function str_replace;
-
 class ZMUtil
 {
     /**
