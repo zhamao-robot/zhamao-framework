@@ -28,9 +28,9 @@ use ZM\Exception\InitException;
 
 class ConsoleApplication extends Application
 {
-    public const VERSION_ID = 475;
+    public const VERSION_ID = 476;
 
-    public const VERSION = '2.8.1';
+    public const VERSION = '2.8.2';
 
     private static $obj;
 
