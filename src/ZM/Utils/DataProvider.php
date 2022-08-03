@@ -127,10 +127,10 @@ class DataProvider
     /**
      * 递归或非递归扫描目录，可返回相对目录的文件列表或绝对目录的文件列表
      *
-     * @param  string      $dir         目录
-     * @param  bool        $recursive   是否递归扫描子目录
-     * @param  bool|string $relative    是否返回相对目录，如果为true则返回相对目录，如果为false则返回绝对目录
-     * @param  bool        $include_dir 非递归模式下，是否包含目录
+     * @param  string            $dir         目录
+     * @param  bool              $recursive   是否递归扫描子目录
+     * @param  bool|mixed|string $relative    是否返回相对目录，如果为true则返回相对目录，如果为false则返回绝对目录
+     * @param  bool              $include_dir 非递归模式下，是否包含目录
      * @return array|false
      * @since 2.5
      */
@@ -147,6 +147,9 @@ class DataProvider
         $list = [];
         if ($relative === true) {
             $relative = $dir;
+        } elseif ($relative !== false && !is_string($relative)) {
+            Console::warning(zm_internal_errcode('E00058') . "Relative path is not generated: wrong base directory ({$relative})");
+            return false;
         }
         foreach ($r as $v) {
             if ($v == '.' || $v == '..') {
@@ -162,9 +165,6 @@ class DataProvider
                     $list[] = ltrim(mb_substr($sub_file, mb_strlen($relative)), '/');
                 } elseif ($relative === false) {
                     $list[] = $sub_file;
-                } else {
-                    Console::warning(zm_internal_errcode('E00058') . "Relative path is not generated: wrong base directory ({$relative})");
-                    return false;
                 }
             }
         }
