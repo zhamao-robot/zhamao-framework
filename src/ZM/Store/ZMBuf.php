@@ -33,7 +33,7 @@ class ZMBuf
     /**
      * 上下文容器
      *
-     * @var array<int, ContextInterface>
+     * @var ContextInterface[]
      */
     public static $context_class = [];
 
