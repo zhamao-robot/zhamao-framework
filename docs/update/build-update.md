@@ -4,6 +4,10 @@
 
 同时此处将只使用 build 版本号进行区分。
 
+## build 477 (2022-8-5)
+
+- 修复了 `@CQNotice`、`@CQRequest` 注解无法正常激活的 Bug (#140)
+
 ## build 476 (2022-8-3)
 
 - `DataProvider::scanDirFiles()` 新增参数 `$include_dir`，用于控制非递归模式下是否包含目录
