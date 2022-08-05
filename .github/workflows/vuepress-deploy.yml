@@ -31,6 +31,7 @@ jobs:
           ARGS: "-rltgoDzvO --delete"
           SOURCE: "deploy/"
           REMOTE_HOST: ${{ secrets.ZHAMAO_XIN_HOST }}
+          REMOTE_PORT: 2022
           REMOTE_USER: ${{ secrets.ZHAMAO_XIN_USER }}
           TARGET: ${{ secrets.ZHAMAO_XIN_TARGET }}
       - name: deploy script file
