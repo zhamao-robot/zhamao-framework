@@ -176,6 +176,7 @@ class QQBot
                         switch ($policy) {
                             case 'interrupt':
                                 EventDispatcher::interrupt();
+                                // no break
                             case 'continue':
                                 break;
                             default:
