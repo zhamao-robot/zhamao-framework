@@ -176,7 +176,6 @@ class QQBot
                         switch ($policy) {
                             case 'interrupt':
                                 EventDispatcher::interrupt();
-                                break;
                             case 'continue':
                                 break;
                             default:
@@ -189,8 +188,8 @@ class QQBot
                 $msg_dispatcher = new EventDispatcher(CQMessage::class);
                 $msg_dispatcher->setRuleFunction(function ($v) {
                     return ($v->message == '' || ($v->message == ctx()->getMessage()))
-                        && ($v->user_id == 0 || ($v->user_id == ctx()->getUserId()))
-                        && ($v->group_id == 0 || ($v->group_id == (ctx()->getGroupId() ?? 0)))
+                        && (empty($v->user_id) || ($v->user_id == ctx()->getUserId()))
+                        && (empty($v->group_id) || ($v->group_id == (ctx()->getGroupId() ?? 0)))
                         && ($v->message_type == '' || ($v->message_type == ctx()->getMessageType()))
                         && ($v->raw_message == '' || ($v->raw_message == context()->getData()['raw_message']));
                 });
@@ -216,8 +215,8 @@ class QQBot
                     return
                         ($v->notice_type == '' || ($v->notice_type == ctx()->getData()['notice_type']))
                         && ($v->sub_type == '' || ($v->sub_type == ctx()->getData()['sub_type']))
-                        && ($v->group_id == '' || ($v->group_id == ctx()->getData()['group_id']))
-                        && ($v->operator_id == '' || ($v->operator_id == ctx()->getData()['operator_id']));
+                        && (empty($v->group_id) || ($v->group_id == ctx()->getData()['group_id']))
+                        && (empty($v->group_id) || ($v->operator_id == ctx()->getData()['operator_id']));
                 });
                 $dispatcher->dispatchEvents(ctx()->getData());
                 return;
@@ -226,7 +225,7 @@ class QQBot
                 $dispatcher->setRuleFunction(function (CQRequest $v) {
                     return ($v->request_type == '' || ($v->request_type == ctx()->getData()['request_type']))
                         && ($v->sub_type == '' || ($v->sub_type == ctx()->getData()['sub_type']))
-                        && ($v->user_id == 0 || ($v->user_id == ctx()->getData()['user_id']))
+                        && (empty($v->user_id) || ($v->user_id == ctx()->getData()['user_id']))
                         && ($v->comment == '' || ($v->comment == ctx()->getData()['comment']));
                 });
                 $dispatcher->dispatchEvents(ctx()->getData());
