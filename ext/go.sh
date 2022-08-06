@@ -49,7 +49,7 @@ function download_file() {
 
 # 安装下载内建PHP
 function install_native_php() {
-    ZM_PHP_VERSION="8.0"
+    ZM_PHP_VERSION="8.1"
     if [ "$ZM_DOWN_PHP_VERSION" != "" ]; then
         ZM_PHP_VERSION="$ZM_DOWN_PHP_VERSION"
     fi
