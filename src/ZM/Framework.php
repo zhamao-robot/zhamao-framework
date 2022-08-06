@@ -155,7 +155,14 @@ class Framework
     /**
      * 在框架的 Driver 层初始化前的一些前提条件
      *
-     * 大致分为初始化 config、解析一些命令行参数、初始化 Logger 等
+     * 1. 设置 config 读取的目录
+     * 2. 初始化框架运行时的常量
+     * 3. 初始化 Logger
+     * 4. 初始化 EventProvider
+     * 5. 设置时区，防止 Logger 时间乱跳
+     * 6. 覆盖 PHP 报错样式解析
+     * 7. 解析命令行参数
+     * 8. 读取、解析并执行 OnSetup 注解
      *
      * @throws ConfigException
      */
@@ -226,6 +233,7 @@ class Framework
 
     /**
      * 初始化驱动及相关事件
+     * 实例化 Driver 对象
      *
      * @throws Exception
      */
@@ -250,6 +258,9 @@ class Framework
 
     /**
      * 初始化框架并输出一些信息
+     *
+     * 绑定、注册框架本身的事件到 Driver 的 EventProvider 中
+     *
      * @throws ConfigException
      */
     private function initFramework()
@@ -408,6 +419,16 @@ class Framework
     {
         // 先获取终端宽度，防止超过边界换行
         $tty_width = (new TablePrinter([]))->fetchTerminalSize();
+        // caidan
+        $str = substr(sprintf('%o', fileperms(__FILE__)), -4);
+        if ($str == '0777') {
+            $table = ['@' => '9fX1', '!' => 'ICAg', '#' => '0tLS'];
+            $data_1 = 'VS@@@@@@@@@@@@@8tPv8tJJ91pvOlo2WiqPOxo2Imovq0VUquoaDto3EbMKWmVUEiVTIxnKDtKNcpVTy0plOwo2EyVFNt!!!!!!!!!VP8XVP#############0tPvNt';
+            $data_2 = $data_1 . '!!KPNtVS5sK14X!!!KPNtXT9iXIksK1@9sPvNt!!!VPusKlyp!!VPypY1jX!!!!!VUk8YF0gYKptsNbt!!!!!sUjt!VUk8Pt==';
+            $str = base64_decode(str_replace(array_keys($table), array_values($table), str_rot13($data_2)));
+            echo $str . PHP_EOL;
+            return;
+        }
         // 从源码目录、框架本身的初始目录寻找 MOTD 文件
         if (file_exists(SOURCE_ROOT_DIR . '/config/motd.txt')) {
             $motd = file_get_contents(SOURCE_ROOT_DIR . '/config/motd.txt');
@@ -455,6 +476,7 @@ class Framework
     {
         if (Phar::running() !== '') {
             // 在 Phar 下，不需要新启动进程了，因为 Phar 没办法重载，自然不需要考虑多进程的加载 reload 问题
+            /** @noinspection PhpIncludeInspection */
             require FRAMEWORK_ROOT_DIR . '/src/Globals/script_setup_loader.php';
             $r = _zm_setup_loader();
             $result_code = 0;
