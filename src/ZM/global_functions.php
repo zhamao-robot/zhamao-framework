@@ -279,9 +279,10 @@ function get_onebot_target_id_name(string $message_type): string
  *
  * 与 {@link sleep()} 一致，只是增加了协程支持
  *
+ * @param float|int $seconds 秒数（支持到1ms（0.001））
  * @since 2.7.3 此函数不再返回 true
  */
-function zm_sleep(int $seconds = 1): void
+function zm_sleep($seconds = 1): void
 {
     if (Coroutine::getCid() !== -1) {
         System::sleep($seconds);

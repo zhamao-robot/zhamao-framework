@@ -76,4 +76,11 @@ class GlobalFunctionsTest extends TestCase
     {
         $this->assertEquals(['code' => 0, 'signal' => 0, 'output' => "foo\n"], zm_exec('echo foo'));
     }
+
+    public function testZmSleep(): void
+    {
+        $starttime = microtime(true);
+        zm_sleep(0.001);
+        $this->assertGreaterThanOrEqual(0.001, microtime(true) - $starttime);
+    }
 }
