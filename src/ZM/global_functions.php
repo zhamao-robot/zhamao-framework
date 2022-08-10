@@ -75,7 +75,7 @@ function explode_msg(string $msg, array $includes = [' ', "\t"]): array
     $msg_seg = explode("\n", $msg);
     $ls = [];
     foreach ($msg_seg as $v) {
-        if (empty(trim($v))) {
+        if (empty(trim($v)) && trim($v) != 0) {
             continue;
         }
         $ls[] = trim($v);
