@@ -28,7 +28,7 @@
         "symfony/routing": "~6.0 || ~5.0 || ~4.0",
         "zhamao/logger": "dev-master",
         "zhamao/request": "^1.1",
-        "onebot/libonebot": "*@dev"
+        "onebot/libonebot": "dev-develop"
     },
     "require-dev": {
         "brainmaestro/composer-git-hooks": "^2.8",
@@ -70,7 +70,7 @@
     "bin": [
         "bin/gendoc",
         "bin/phpunit-swoole",
-        "bin/start"
+        "bin/zhamao"
     ],
     "config": {
         "optimize-autoloader": true,
@@ -105,11 +105,5 @@
         "analyse": "phpstan analyse --memory-limit 300M",
         "cs-fix": "php-cs-fixer fix",
         "test": "bin/phpunit-swoole --no-coverage"
-    },
-    "repositories": [
-        {
-            "type": "path",
-            "url": "/Users/jerry/project/onebot/php-libonebot"
-        }
-    ]
+    }
 }
