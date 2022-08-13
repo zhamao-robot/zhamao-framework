@@ -39,6 +39,17 @@ abstract class AnnotationBase implements IteratorAggregate
         return $str;
     }
 
+    /**
+     * 在 InstantPlugin 下调用，设置回调或匿名函数
+     *
+     * @param Closure|string $method
+     */
+    public function withMethod($method): AnnotationBase
+    {
+        $this->method = $method;
+        return $this;
+    }
+
     public function getIterator(): Traversable
     {
         return new ArrayIterator($this);

@@ -63,9 +63,6 @@ jobs:
       - name: Run Static Analysis
         run: "composer analyse"
 
-      - name: Run PHPUnit
-        run: "composer test"
-
   cs-check:
     name: PHP CS Fixer Check
     runs-on: ubuntu-latest

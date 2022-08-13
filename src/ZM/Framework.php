@@ -60,7 +60,6 @@ class Framework
      *
      * @param  array<string, null|bool|string> $argv 传入的参数（见 ServerStartCommand）
      * @throws InitException
-     * @throws ConfigException
      * @throws Exception
      */
     public function __construct(array $argv = [])
@@ -73,7 +72,13 @@ class Framework
 
         // 初始化必需的args参数，如果没有传入的话，使用默认值
         $this->argv = empty($argv) ? ServerStartCommand::exportOptionArray() : $argv;
+    }
 
+    /**
+     * @throws Exception
+     */
+    public function init(): Framework
+    {
         // 执行一些 Driver 前置条件的内容
         $this->initDriverPrerequisites();
 
@@ -82,6 +87,8 @@ class Framework
 
         // 初始化框架的交互以及框架部分自己要监听的事件
         $this->initFramework();
+
+        return $this;
     }
 
     /**
@@ -166,7 +173,7 @@ class Framework
      *
      * @throws ConfigException
      */
-    private function initDriverPrerequisites()
+    public function initDriverPrerequisites()
     {
         // 寻找配置文件目录
         if ($this->argv['config-dir'] !== null) { // 如果启动参数指定了config寻找目录，那么就在指定的寻找，不在别的地方寻找了
@@ -178,7 +185,7 @@ class Framework
         foreach ($find_dir as $v) {
             if (is_dir($v)) {
                 ZMConfig::setDirectory($v);
-                ZMConfig::setEnv($this->argv['env'] ?? 'development');
+                ZMConfig::setEnv($this->argv['env'] = $this->argv['env'] ?? 'development');
                 $config_done = true;
                 break;
             }
@@ -237,7 +244,7 @@ class Framework
      *
      * @throws Exception
      */
-    private function initDriver()
+    public function initDriver()
     {
         switch ($driver = ZMConfig::get('global.driver')) {
             case 'swoole':
@@ -263,7 +270,7 @@ class Framework
      *
      * @throws ConfigException
      */
-    private function initFramework()
+    public function initFramework()
     {
         // private-mode 模式下，不输出任何内容
         if (!$this->argv['private-mode']) {
@@ -276,7 +283,16 @@ class Framework
         ob_event_provider()->addEventListener(WorkerStartEvent::getName(), [WorkerEventListener::getInstance(), 'onWorkerStart'], 999);
         ob_event_provider()->addEventListener(WorkerStopEvent::getName(), [WorkerEventListener::getInstance(), 'onWorkerStop'], 999);
         // Http 事件
-        ob_event_provider()->addEventListener(HttpRequestEvent::getName(), [HttpEventListener::getInstance(), 'onRequest'], 999);
+        ob_event_provider()->addEventListener(HttpRequestEvent::getName(), function () {
+            global $starttime;
+            $starttime = microtime(true);
+        }, 1000);
+        ob_event_provider()->addEventListener(HttpRequestEvent::getName(), function () {
+            global $starttime;
+            logger()->error('Finally used ' . round((microtime(true) - $starttime) * 1000, 4) . ' ms');
+        }, 0);
+        ob_event_provider()->addEventListener(HttpRequestEvent::getName(), [HttpEventListener::getInstance(), 'onRequest999'], 999);
+        ob_event_provider()->addEventListener(HttpRequestEvent::getName(), [HttpEventListener::getInstance(), 'onRequest1'], 1);
         // manager 事件
         ob_event_provider()->addEventListener(ManagerStartEvent::getName(), [ManagerEventListener::getInstance(), 'onManagerStart'], 999);
         ob_event_provider()->addEventListener(ManagerStopEvent::getName(), [ManagerEventListener::getInstance(), 'onManagerStop'], 999);
@@ -300,7 +316,7 @@ class Framework
         // 打印工作目录
         $properties['working_dir'] = WORKING_DIR;
         // 打印环境信息
-        $properties['environment'] = ($this->argv['env'] ?? null) === null ? 'default' : $this->argv['env'];
+        $properties['environment'] = $this->argv['env'];
         // 打印驱动
         $properties['driver'] = ZMConfig::get('global.driver');
         // 打印logger显示等级
@@ -476,7 +492,6 @@ class Framework
     {
         if (Phar::running() !== '') {
             // 在 Phar 下，不需要新启动进程了，因为 Phar 没办法重载，自然不需要考虑多进程的加载 reload 问题
-            /** @noinspection PhpIncludeInspection */
             require FRAMEWORK_ROOT_DIR . '/src/Globals/script_setup_loader.php';
             $r = _zm_setup_loader();
             $result_code = 0;

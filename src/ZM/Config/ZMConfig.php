@@ -108,6 +108,13 @@ class ZMConfig
         self::$config_meta_list = [];
     }
 
+    /**
+     * 智能patch，将patch数组内的数据合并更新到data中
+     *
+     * @param  array|mixed $data  原数据
+     * @param  array|mixed $patch 要patch的数据
+     * @return array|mixed
+     */
     public static function smartPatch($data, $patch)
     {
         /* patch 样例：
@@ -143,6 +150,8 @@ class ZMConfig
     }
 
     /**
+     * 加载配置文件
+     *
      * @throws ConfigException
      * @return array|int|string
      */
@@ -182,6 +191,7 @@ class ZMConfig
 
     /**
      * 通过名称将所有该名称的配置文件路径和信息读取到列表中
+     *
      * @throws ConfigException
      */
     private static function parseList(string $name): void
@@ -243,7 +253,7 @@ class ZMConfig
                 if (!in_array($info['extension'], self::SUPPORTED_EXTENSIONS)) {
                     continue;
                 }
-                if ($info['filename'] === $name) { // 如果文件名与配置文件名一致
+                if ($info['filename'] === $name) { // 如果文件名与配置文件名一致，就创建一个配置文件的元数据对象
                     $obj = new ConfigMetadata();
                     $obj->is_patch = false;
                     $obj->is_env = false;
@@ -258,11 +268,13 @@ class ZMConfig
     }
 
     /**
-     * @param  mixed           $filename
-     * @param  mixed           $ext_name
+     * 根据不同的扩展类型读取配置文件数组
+     *
+     * @param  mixed|string    $filename 文件名
+     * @param  mixed|string    $ext_name 扩展名
      * @throws ConfigException
      */
-    private static function readConfigFromFile($filename, $ext_name)
+    private static function readConfigFromFile($filename, $ext_name): array
     {
         logger()->debug('正加载配置文件 ' . $filename);
         switch ($ext_name) {

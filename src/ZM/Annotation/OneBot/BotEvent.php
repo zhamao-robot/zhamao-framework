@@ -10,12 +10,14 @@ use Doctrine\Common\Annotations\Annotation\Target;
 use ZM\Annotation\AnnotationBase;
 
 /**
+ * 机器人相关事件注解
+ *
  * @Annotation
  * @Target("METHOD")
- * @NamedArgumentConstructor
+ * @NamedArgumentConstructor()
  */
 #[Attribute(Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE)]
-class OnOneBotEvent extends AnnotationBase
+class BotEvent extends AnnotationBase
 {
     /** @var null|string */
     public $type;
@@ -49,5 +51,16 @@ class OnOneBotEvent extends AnnotationBase
         $this->platform = $platform;
         $this->self_id = $self_id;
         $this->sub_type = $sub_type;
+    }
+
+    public static function make(
+        ?string $type = null,
+        ?string $detail_type = null,
+        ?string $impl = null,
+        ?string $platform = null,
+        ?string $self_id = null,
+        ?string $sub_type = null
+    ): BotEvent {
+        return new static(...func_get_args());
     }
 }

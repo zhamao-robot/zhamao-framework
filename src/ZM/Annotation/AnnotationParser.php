@@ -10,64 +10,90 @@ use Koriym\Attributes\DualReader;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
-use Symfony\Component\Routing\RouteCollection;
 use ZM\Annotation\Http\Controller;
 use ZM\Annotation\Http\Route;
 use ZM\Annotation\Interfaces\ErgodicAnnotation;
 use ZM\Annotation\Interfaces\Level;
-use ZM\Annotation\Middleware\HandleAfter;
-use ZM\Annotation\Middleware\HandleBefore;
-use ZM\Annotation\Middleware\HandleException;
 use ZM\Annotation\Middleware\Middleware;
-use ZM\Annotation\Middleware\MiddlewareClass;
 use ZM\Config\ZMConfig;
 use ZM\Exception\ConfigException;
 use ZM\Store\FileSystem;
-use ZM\Store\InternalGlobals;
+use ZM\Utils\HttpUtil;
 
+/**
+ * 注解解析器
+ */
 class AnnotationParser
 {
+    /**
+     * @var array 要解析的路径列表
+     */
     private $path_list = [];
 
+    /**
+     * @var float 用于计算解析时间用的
+     */
     private $start_time;
 
+    /**
+     * @var array 用于解析的注解解析树，格式见下方的注释
+     */
+    private $annotation_tree = [];
+
+    /**
+     * @var array 用于生成"类-方法"对应"注解列表"的数组
+     */
     private $annotation_map = [];
 
-    private $middleware_map = [];
-
-    private $middlewares = [];
-
-    /** @var null|AnnotationReader|DualReader */
-    private $reader;
-
-    private $req_mapping = [];
+    /**
+     * @var array 特殊的注解解析器回调列表
+     */
+    private $special_parsers = [];
 
     /**
      * AnnotationParser constructor.
      */
-    public function __construct()
+    public function __construct(bool $with_internal_parsers = true)
     {
         $this->start_time = microtime(true);
-        // $this->loadAnnotationClasses();
-        $this->req_mapping[0] = [
-            'id' => 0,
-            'pid' => -1,
-            'name' => '/',
-        ];
+
+        if ($with_internal_parsers) {
+            $this->special_parsers = [
+                Middleware::class => [function (Middleware $middleware) { \middleware()->bindMiddleware([resolve($middleware->class), $middleware->method], $middleware->name, $middleware->params); }],
+                Route::class => [[$this, 'addRouteAnnotation']],
+            ];
+        }
+    }
+
+    /**
+     * 设置自定义的注解解析方法
+     *
+     * @param string   $class_name 注解类名
+     * @param callable $callback   回调函数
+     */
+    public function addSpecialParser(string $class_name, callable $callback)
+    {
+        $this->special_parsers[$class_name][] = $callback;
     }
 
     /**
      * 注册各个模块类的注解和模块level的排序
+     *
      * @throws ReflectionException
      * @throws ConfigException
      */
     public function parseAll()
     {
+        // 对每个设置的路径依次解析
         foreach ($this->path_list as $path) {
             logger()->debug('parsing annotation in ' . $path[0] . ':' . $path[1]);
+
+            // 首先获取路径下所有的类（通过 PSR-4 标准解析）
             $all_class = FileSystem::getClassesPsr4($path[0], $path[1]);
 
+            // 读取配置文件中配置的忽略解析的注解名，防止误解析一些别的地方需要的注解，比如@mixin
             $conf = ZMConfig::get('global.runtime.annotation_reader_ignore');
+            // 有两种方式，第一种是通过名称，第二种是通过命名空间
             if (isset($conf['name']) && is_array($conf['name'])) {
                 foreach ($conf['name'] as $v) {
                     AnnotationReader::addGlobalIgnoredName($v);
@@ -78,14 +104,18 @@ class AnnotationParser
                     AnnotationReader::addGlobalIgnoredNamespace($v);
                 }
             }
+            // 因为mixin常用，且框架默认不需要解析，则全局忽略
             AnnotationReader::addGlobalIgnoredName('mixin');
-            $this->reader = new DualReader(new AnnotationReader(), new AttributeReader());
+
+            // 声明一个既可以解析注解又可以解析Attribute的双reader来读取注解和Attribute
+            $reader = new DualReader(new AnnotationReader(), new AttributeReader());
             foreach ($all_class as $v) {
                 logger()->debug('正在检索 ' . $v);
 
+                // 通过反射实现注解读取
                 $reflection_class = new ReflectionClass($v);
                 $methods = $reflection_class->getMethods(ReflectionMethod::IS_PUBLIC);
-                $class_annotations = $this->reader->getClassAnnotations($reflection_class);
+                $class_annotations = $reader->getClassAnnotations($reflection_class);
                 // 这段为新加的:start
                 // 这里将每个类里面所有的类注解、方法注解通通加到一颗大树上，后期解析
                 /*
@@ -105,64 +135,85 @@ class AnnotationParser
                 }
                 */
 
-                // 生成主树
-                $this->annotation_map[$v]['class_annotations'] = $class_annotations;
-                $this->annotation_map[$v]['methods'] = $methods;
+                // 保存对class的注解
+                $this->annotation_tree[$v]['class_annotations'] = $class_annotations;
+                // 保存类成员的方法的对应反射对象们
+                $this->annotation_tree[$v]['methods'] = $methods;
+                // 保存对每个方法获取到的注解们
                 foreach ($methods as $method) {
-                    $this->annotation_map[$v]['methods_annotations'][$method->getName()] = $this->reader->getMethodAnnotations($method);
+                    $this->annotation_tree[$v]['methods_annotations'][$method->getName()] = $reader->getMethodAnnotations($method);
                 }
 
-                foreach ($this->annotation_map[$v]['class_annotations'] as $vs) {
+                // 因为适用于类的注解有一些比较特殊，比如有向下注入的，有控制行为的，所以需要遍历一下下放到方法里
+                foreach ($this->annotation_tree[$v]['class_annotations'] as $vs) {
                     $vs->class = $v;
 
-                    // 预处理1：将适用于每一个函数的注解到类注解重新注解到每个函数下面
-                    if (($vs instanceof ErgodicAnnotation) && ($vs instanceof AnnotationBase)) {
-                        foreach (($this->annotation_map[$v]['methods'] ?? []) as $method) {
+                    // 预处理0：排除所有非继承于 AnnotationBase 的注解
+                    if (!$vs instanceof AnnotationBase) {
+                        logger()->notice(get_class($vs) . ' is not extended from ' . AnnotationBase::class);
+                        continue;
+                    }
+
+                    // 预处理1：如果类包含了@Closed注解，则跳过这个类
+                    if ($vs instanceof Closed) {
+                        unset($this->annotation_tree[$v]);
+                        continue 2;
+                    }
+
+                    // 预处理2：将适用于每一个函数的注解到类注解重新注解到每个函数下面
+                    if ($vs instanceof ErgodicAnnotation) {
+                        foreach (($this->annotation_tree[$v]['methods'] ?? []) as $method) {
+                            // 用 clone 的目的是生成个独立的对象，避免和 class 以及方法之间互相冲突
                             $copy = clone $vs;
                             $copy->method = $method->getName();
-                            $this->annotation_map[$v]['methods_annotations'][$method->getName()][] = $copy;
+                            $this->annotation_tree[$v]['methods_annotations'][$method->getName()][] = $copy;
                         }
                     }
 
-                    // 预处理2：处理 class 下面的注解
-                    if ($vs instanceof Closed) {
-                        unset($this->annotation_map[$v]);
-                        continue 2;
-                    }
-                    if ($vs instanceof MiddlewareClass) {
-                        // 注册中间件本身的类，标记到 middlewares 属性中
-                        logger()->debug('正在注册中间件 ' . $reflection_class->getName());
-                        $rs = $this->registerMiddleware($vs, $reflection_class);
-                        $this->middlewares[$rs['name']] = $rs;
+                    // 预处理3：调用自定义解析器
+                    foreach (($this->special_parsers[get_class($vs)] ?? []) as $parser) {
+                        $result = $parser($vs);
+                        if ($result === true) {
+                            continue 2;
+                        }
+                        if ($result === false) {
+                            continue 3;
+                        }
                     }
                 }
 
-                $inserted = [];
-
                 // 预处理3：处理每个函数上面的特殊注解，就是需要操作一些东西的
-                foreach (($this->annotation_map[$v]['methods_annotations'] ?? []) as $method_name => $methods_annotations) {
+                foreach (($this->annotation_tree[$v]['methods_annotations'] ?? []) as $method_name => $methods_annotations) {
                     foreach ($methods_annotations as $method_anno) {
-                        /* @var AnnotationBase $method_anno */
+                        // 预处理3.0：排除所有非继承于 AnnotationBase 的注解
+                        if (!$method_anno instanceof AnnotationBase) {
+                            logger()->notice('Binding annotation ' . get_class($method_anno) . ' to ' . $v . '::' . $method_name . ' is not extended from ' . AnnotationBase::class);
+                            continue;
+                        }
+
+                        // 预处理3.1：给所有注解对象绑定当前的类名和方法名
                         $method_anno->class = $v;
                         $method_anno->method = $method_name;
-                        if (!($method_anno instanceof Middleware) && ($middlewares = ZMConfig::get('global.global_middleware_binding')[get_class($method_anno)] ?? []) !== []) {
-                            if (!isset($inserted[$v][$method_name])) {
-                                // 在这里在其他中间件前插入插入全局的中间件
-                                foreach ($middlewares as $middleware) {
-                                    $mid_class = new Middleware($middleware);
-                                    $mid_class->class = $v;
-                                    $mid_class->method = $method_name;
-                                    $this->middleware_map[$v][$method_name][] = $mid_class;
-                                }
-                                $inserted[$v][$method_name] = true;
-                            }
-                        } elseif ($method_anno instanceof Route) {
-                            $this->addRouteAnnotation($method_anno, $method_name, $v, $methods_annotations);
-                        } elseif ($method_anno instanceof Middleware) {
-                            $this->middleware_map[$method_anno->class][$method_anno->method][] = $method_anno;
-                        } else {
-                            AnnotationMap::$_map[$method_anno->class][$method_anno->method][] = $method_anno;
+
+                        // 预处理3.2：如果包含了@Closed注解，则跳过这个方法的注解解析
+                        if ($method_anno instanceof Closed) {
+                            unset($this->annotation_tree[$v]['methods_annotations'][$method_name]);
+                            continue 2;
                         }
+
+                        // 预处理3.3：调用自定义解析器
+                        foreach (($this->special_parsers[get_class($method_anno)] ?? []) as $parser) {
+                            $result = $parser($method_anno);
+                            if ($result === true) {
+                                continue 2;
+                            }
+                            if ($result === false) {
+                                continue 3;
+                            }
+                        }
+
+                        // 如果上方没有解析或返回了 true，则添加到注解解析列表中
+                        $this->annotation_map[$v][$method_name][] = $method_anno;
                     }
                 }
             }
@@ -170,10 +221,13 @@ class AnnotationParser
         logger()->debug('解析注解完毕！');
     }
 
-    public function generateAnnotationEvents(): array
+    /**
+     * 生成排序后的注解列表
+     */
+    public function generateAnnotationList(): array
     {
         $o = [];
-        foreach ($this->annotation_map as $obj) {
+        foreach ($this->annotation_tree as $obj) {
             // 这里的ErgodicAnnotation是为了解决类上的注解可穿透到方法上的问题
             foreach (($obj['class_annotations'] ?? []) as $class_annotation) {
                 if ($class_annotation instanceof ErgodicAnnotation) {
@@ -193,22 +247,9 @@ class AnnotationParser
         return $o;
     }
 
-    public function getMiddlewares(): array
-    {
-        return $this->middlewares;
-    }
-
-    public function getMiddlewareMap(): array
-    {
-        return $this->middleware_map;
-    }
-
-    public function getReqMapping(): array
-    {
-        return $this->req_mapping;
-    }
-
     /**
+     * 添加解析的路径
+     *
      * @param string $path        注册解析注解的路径
      * @param string $indoor_name 起始命名空间的名称
      */
@@ -219,6 +260,8 @@ class AnnotationParser
     }
 
     /**
+     * 排序注解列表
+     *
      * @param array  $events     需要排序的
      * @param string $class_name 排序的类名
      * @param string $prefix     前缀
@@ -229,53 +272,37 @@ class AnnotationParser
         if (is_a($class_name, Level::class, true)) {
             $class_name .= $prefix;
             usort($events[$class_name], function ($a, $b) {
-                $left = $a->level;
-                $right = $b->level;
+                $left = $a->getLevel();
+                $right = $b->getLevel();
                 return $left > $right ? -1 : ($left == $right ? 0 : 1);
             });
         }
     }
 
-    public function getUsedTime()
+    /**
+     * 获取解析器调用的时间（秒）
+     */
+    public function getUsedTime(): float
     {
         return microtime(true) - $this->start_time;
     }
 
-    // private function below
-
-    private function registerMiddleware(MiddlewareClass $vs, ReflectionClass $reflection_class): array
+    /**
+     * 获取注解的注册map
+     */
+    public function getAnnotationMap(): array
     {
-        $result = [
-            'class' => '\\' . $reflection_class->getName(),
-            'name' => $vs->name,
-        ];
-
-        foreach ($reflection_class->getMethods() as $vss) {
-            $method_annotations = $this->reader->getMethodAnnotations($vss);
-            foreach ($method_annotations as $vsss) {
-                if ($vsss instanceof HandleBefore) {
-                    $result['before'] = $vss->getName();
-                }
-                if ($vsss instanceof HandleAfter) {
-                    $result['after'] = $vss->getName();
-                }
-                if ($vsss instanceof HandleException) {
-                    $result['exceptions'][$vsss->class_name] = $vss->getName();
-                }
-            }
-        }
-        return $result;
+        return $this->annotation_map;
     }
 
-    private function addRouteAnnotation(Route $vss, $method, $class, $methods_annotations)
+    /**
+     * 添加注解路由
+     */
+    private function addRouteAnnotation(Route $vss)
     {
-        if (InternalGlobals::$routes === null) {
-            InternalGlobals::$routes = new RouteCollection();
-        }
-
         // 拿到所属方法的类上面有没有控制器的注解
         $prefix = '';
-        foreach ($methods_annotations as $annotation) {
+        foreach (($this->annotation_tree[$vss->class]['methods_annotations'][$vss->method] ?? []) as $annotation) {
             if ($annotation instanceof Controller) {
                 $prefix = $annotation->prefix;
                 break;
@@ -284,9 +311,9 @@ class AnnotationParser
         $tail = trim($vss->route, '/');
         $route_name = $prefix . ($tail === '' ? '' : '/') . $tail;
         logger()->debug('添加路由：' . $route_name);
-        $route = new \Symfony\Component\Routing\Route($route_name, ['_class' => $class, '_method' => $method]);
+        $route = new \Symfony\Component\Routing\Route($route_name, ['_class' => $vss->class, '_method' => $vss->method]);
         $route->setMethods($vss->request_method);
 
-        InternalGlobals::$routes->add(md5($route_name), $route);
+        HttpUtil::getRouteCollection()->add(md5($route_name), $route);
     }
 }

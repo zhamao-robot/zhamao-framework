@@ -48,4 +48,9 @@ class Route extends AnnotationBase
         $this->request_method = $request_method;
         $this->params = $params;
     }
+
+    public static function make($route, $name = '', $request_method = ['GET', 'POST'], $params = [])
+    {
+        return new static($route, $name, $request_method, $params);
+    }
 }

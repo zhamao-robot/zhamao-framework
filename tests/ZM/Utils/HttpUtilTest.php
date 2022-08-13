@@ -6,11 +6,9 @@ namespace Tests\ZM\Utils;
 
 use PHPUnit\Framework\TestCase;
 use Swoole\Http\Request;
-use Swoole\Http\Response;
 use Symfony\Component\Routing\RouteCollection;
 use ZM\Annotation\Http\RequestMapping;
 use ZM\Annotation\Http\RequestMethod;
-use ZM\Config\ZMConfig;
 use ZM\Utils\HttpUtil;
 use ZM\Utils\Manager\RouteManager;
 
@@ -19,34 +17,12 @@ use ZM\Utils\Manager\RouteManager;
  */
 class HttpUtilTest extends TestCase
 {
-    /**
-     * @dataProvider providerTestHandleStaticPage
-     */
-    public function testHandleStaticPage(string $page, bool $expected): void
-    {
-        $swoole_response = $this->getMockClass(Response::class);
-        $r = new \ZM\Http\Response(new $swoole_response());
-        HttpUtil::handleStaticPage($page, $r, ZMConfig::get('global', 'static_file_server'));
-        $this->assertEquals($expected, $r->getStatusCode() === 200);
-    }
-
     public function providerTestHandleStaticPage(): array
     {
         return [
             'exists page' => ['/static.html', true],
             'not exists page' => ['/not_exists.html', false],
         ];
-    }
-
-    /**
-     * @covers       \ZM\Utils\HttpUtil::getHttpCodePage
-     * @covers       \ZM\Utils\HttpUtil::responseCodePage
-     * @dataProvider providerTestGetHttpCodePage
-     */
-    public function testGetHttpCodePage(int $code, bool $expected): void
-    {
-        $has_response = !empty(HttpUtil::getHttpCodePage($code));
-        $this->assertSame($expected, $has_response);
     }
 
     public function providerTestGetHttpCodePage(): array
