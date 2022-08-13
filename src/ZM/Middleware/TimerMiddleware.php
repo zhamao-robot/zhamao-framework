@@ -4,25 +4,13 @@ declare(strict_types=1);
 
 namespace ZM\Middleware;
 
-class TimerMiddleware implements MiddlewareInterface
+class TimerMiddleware implements MiddlewareInterface, PipelineInterface
 {
-    /** @var float */
-    private $starttime = 0;
-
-    public function __construct()
+    public function handle(callable $callback, ...$params)
     {
-        middleware()->registerBefore(static::class, [$this, 'onBefore']);
-        middleware()->registerAfter(static::class, [$this, 'onAfter']);
-    }
-
-    public function onBefore(): bool
-    {
-        $this->starttime = microtime(true);
-        return true;
-    }
-
-    public function onAfter()
-    {
-        logger()->info('Using ' . round((microtime(true) - $this->starttime) * 1000, 4) . ' ms');
+        $starttime = microtime(true);
+        $result = $callback(...$params);
+        logger()->info('Pipeline using ' . round((microtime(true) - $starttime) * 1000, 4) . ' ms');
+        return $result;
     }
 }
