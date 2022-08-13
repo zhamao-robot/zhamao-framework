@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace ZM\Annotation;
 
-use Generator;
 use Throwable;
-use ZM\Annotation\Middleware\Middleware;
 use ZM\Exception\InterruptException;
+use ZM\Middleware\MiddlewareHandler;
 
 /**
  * 注解调用器，原 EventDispatcher
@@ -39,17 +38,34 @@ class AnnotationHandler
     /** @var mixed */
     private $return_val;
 
+    /**
+     * 注解调用器构造函数
+     *
+     * @param string $annotation_class 注解类名
+     */
     public function __construct(string $annotation_class)
     {
         $this->annotation_class = $annotation_class;
         logger()->debug('开始分发注解 {annotation}', ['annotation' => $annotation_class]);
     }
 
+    /**
+     * 立刻中断注解调用器执行
+     *
+     * @param  mixed              $return_var 中断执行返回值，传入null则代表无返回值
+     * @throws InterruptException
+     */
     public static function interrupt($return_var = null)
     {
         throw new InterruptException($return_var);
     }
 
+    /**
+     * 设置执行前判断注解是否应该被执行的检查回调函数
+     *
+     * @param  callable $rule 回调函数
+     * @return $this
+     */
     public function setRuleCallback(callable $rule): AnnotationHandler
     {
         logger()->debug('注解调用器设置事件ruleFunc: {annotation}', ['annotation' => $this->annotation_class]);
@@ -57,6 +73,12 @@ class AnnotationHandler
         return $this;
     }
 
+    /**
+     * 设置成功执行后有返回值时执行的返回值后续逻辑回调函数
+     *
+     * @param  callable $return 回调函数
+     * @return $this
+     */
     public function setReturnCallback(callable $return): AnnotationHandler
     {
         logger()->debug('注解调用器设置事件returnFunc: {annotation}', ['annotation' => $this->annotation_class]);
@@ -65,119 +87,97 @@ class AnnotationHandler
     }
 
     /**
-     * @param  mixed     ...$params
+     * 调用注册了该注解的所有函数们
+     * 此处会遍历所有注册了当前注解的函数，并支持中间件插入
+     *
+     * @param  mixed     ...$params 传入的参数们
      * @throws Throwable
      */
     public function handleAll(...$params)
     {
         try {
+            // 遍历注册的注解
             foreach ((AnnotationMap::$_list[$this->annotation_class] ?? []) as $v) {
+                // 调用单个注解
                 $this->handle($v, $this->rule_callback, ...$params);
+                // 执行完毕后检查状态，如果状态是规则判断或中间件before不通过，则重置状态后继续执行别的注解函数
                 if ($this->status == self::STATUS_BEFORE_FAILED || $this->status == self::STATUS_RULE_FAILED) {
                     $this->status = self::STATUS_NORMAL;
                     continue;
                 }
+                // 如果执行完毕，且设置了返回值后续逻辑的回调函数，那么就调用返回值回调的逻辑
                 if (is_callable($this->return_callback) && $this->status === self::STATUS_NORMAL) {
                     ($this->return_callback)($this->return_val);
                 }
             }
         } catch (InterruptException $e) {
+            // InterruptException 用于中断，这里必须 catch，并标记状态
             $this->return_val = $e->return_var;
             $this->status = self::STATUS_INTERRUPTED;
         } catch (Throwable $e) {
+            // 其他类型的异常就顺势再抛出到外层，此层不做处理
             $this->status = self::STATUS_EXCEPTION;
             throw $e;
         }
     }
 
+    /**
+     * 调用单个注解
+     *
+     * @param  mixed              ...$params 传入的参数们
+     * @throws InterruptException
+     * @throws Throwable
+     */
     public function handle(AnnotationBase $v, ?callable $rule_callback = null, ...$params): bool
     {
-        $target_class = resolve($v->class);
+        // 由于3.0有额外的插件模式支持，所以注解就不再提供独立的闭包函数调用支持了
+        // 提取要调用的目标类和方法名称
+        $target_class = new ($v->class)();
         $target_method = $v->method;
-        // 先执行规则
-        if ($rule_callback !== null && !$rule_callback($this, $params)) {
+        // 先执行规则，失败就返回false
+        if ($rule_callback !== null && !$rule_callback($v, $params)) {
             $this->status = self::STATUS_RULE_FAILED;
             return false;
         }
-
-        // 检查中间件
-        $mid_obj = [];
-        $before_result = true;
-        foreach ($this->getRegisteredMiddlewares($target_class, $target_method) as $v) {
-            $mid_obj[] = $v[0]; // 投喂中间件
-            if ($v[1] !== '') { // 顺带执行before
-                if (function_exists('container')) {
-                    $before_result = container()->call([$v[0], $v[1]], $params);
-                } else {
-                    $before_result = call_user_func([$v[0], $v[1]], $params);
-                }
-                if ($before_result === false) {
-                    break;
-                }
+        $callback = [$target_class, $target_method];
+        try {
+            // 这块代码几乎等同于 middleware()->process() 中的内容，但由于注解调用器内含有一些特殊的特性（比如返回值回调），所以需要拆开来
+            $before_result = middleware()->processBefore($callback, $params);
+            if ($before_result) {
+                // before都通过了，就执行本身，通过依赖注入执行
+                // $this->return_val = container()->call($callback, $params);
+                $this->return_val = $callback(...$params);
+            } else {
+                // 没通过就标记是BEFORE_FAILED，然后接着执行after
+                $this->status = self::STATUS_BEFORE_FAILED;
             }
-        }
-        $mid_obj_cnt1 = count($mid_obj) - 1;
-        if ($before_result) { // before全部通过了
-            try {
-                // 执行注解绑定的方法
-                // TODO: 记得完善好容器后把这里的这个if else去掉
-                if (function_exists('container')) {
-                    $this->return_val = container()->call([$target_class, $target_method], $params);
-                } else {
-                    $this->return_val = call_user_func([$target_class, $target_method], $params);
-                }
-            } catch (Throwable $e) {
-                if ($e instanceof InterruptException) {
-                    throw $e;
-                }
-                for ($i = $mid_obj_cnt1; $i >= 0; --$i) {
-                    $obj = $mid_obj[$i];
-                    foreach ($obj[3] as $name => $method) {
-                        if ($e instanceof $name) {
-                            $obj[0]->{$method}($e);
-                            return false;
-                        }
-                    }
-                }
-                throw $e;
-            }
-        } else {
-            $this->status = self::STATUS_BEFORE_FAILED;
-        }
-        for ($i = $mid_obj_cnt1; $i >= 0; --$i) {
-            if ($mid_obj[$i][2] !== '') {
-                $mid_obj[$i][0]->{$mid_obj[$i][2]}($this->return_val);
-            }
+            middleware()->processAfter($callback, $params);
+        } /* @noinspection PhpRedundantCatchClauseInspection */ catch (InterruptException $e) {
+            // 这里直接抛出这个异常的目的就是给上层handleAll()捕获
+            throw $e;
+        } catch (Throwable $e) {
+            // 其余的异常就交给中间件的异常捕获器过一遍，没捕获的则继续抛出
+            $this->status = self::STATUS_EXCEPTION;
+            MiddlewareHandler::getInstance()->processException($callback, $params, $e);
         }
         return true;
     }
 
     /**
-     * 获取注册过的中间件
-     *
-     * @param object|string $class  类对象
-     * @param string        $method 方法名称
+     * 获取分发的状态
      */
-    private function getRegisteredMiddlewares($class, string $method): Generator
+    public function getStatus(): int
     {
-        foreach (AnnotationMap::$_map[get_class($class)][$method] ?? [] as $annotation) {
-            if ($annotation instanceof Middleware) {
-                $name = $annotation->name;
-                $reg_mid = AnnotationMap::$_middleware_map[$name]['class'] ?? null;
-                if ($reg_mid === null) {
-                    logger()->error('Not a valid middleware name: {name}', ['name' => $name]);
-                    continue;
-                }
+        return $this->status;
+    }
 
-                $obj = new $reg_mid($annotation->params);
-                yield [
-                    $obj,
-                    AnnotationMap::$_middleware_map[$name]['before'] ?? '',
-                    AnnotationMap::$_middleware_map[$name]['after'] ?? '',
-                    AnnotationMap::$_middleware_map[$name]['exceptions'] ?? [],
-                ];
-            }
-        }
-        return [];
+    /**
+     * 获取运行的返回值
+     *
+     * @return mixed
+     */
+    public function getReturnVal()
+    {
+        return $this->return_val;
     }
 }

@@ -2,60 +2,43 @@
 
 declare(strict_types=1);
 
-use Doctrine\Common\Annotations\AnnotationReader;
-use Koriym\Attributes\AttributeReader;
-use Koriym\Attributes\DualReader;
-use ZM\Annotation\Framework\OnSetup;
-use ZM\ConsoleApplication;
-use ZM\Exception\InitException;
-use ZM\Store\FileSystem;
+use ZM\Annotation\AnnotationParser;
+use ZM\Annotation\Framework\Setup;
+use ZM\Utils\ZMUtil;
 
 function _zm_setup_loader()
 {
     try {
-        try {
-            new ConsoleApplication('zhamao');
-        } catch (InitException $e) {
-        }
-        $base_path = SOURCE_ROOT_DIR;
-        $scan_paths = [];
-        $composer = json_decode(file_get_contents($base_path . '/composer.json'), true);
-        $exclude_annotations = array_merge($composer['extra']['exclude_annotate'] ?? [], $composer['extra']['zm']['exclude-annotation-path'] ?? []);
-        foreach (($composer['autoload']['psr-4'] ?? []) as $k => $v) {
-            if (is_dir($base_path . '/' . $v) && !in_array($v, $exclude_annotations)) {
-                $scan_paths[trim($k, '\\')] = $base_path . '/' . $v;
+        global $_tmp_setup_list;
+        $_tmp_setup_list = [];
+        $parser = new AnnotationParser(false);
+        $composer = ZMUtil::getComposerMetadata();
+        // 合并 dev 和 非 dev 的 psr-4 加载目录
+        $merge_psr4 = array_merge($composer['autoload']['psr-4'] ?? [], $composer['autoload-dev']['psr-4'] ?? []);
+        // 排除 composer.json 中指定需要排除的目录
+        $excludes = $composer['extra']['zm']['exclude-annotation-path'] ?? [];
+        foreach ($merge_psr4 as $k => $v) {
+            // 如果在排除表就排除，否则就解析注解
+            if (is_dir(SOURCE_ROOT_DIR . '/' . $v) && !in_array($v, $excludes)) {
+                // 添加解析路径，对应Base命名空间也贴出来
+                $parser->addRegisterPath(SOURCE_ROOT_DIR . '/' . $v . '/', trim($k, '\\'));
             }
         }
-        foreach (($composer['autoload-dev']['psr-4'] ?? []) as $k => $v) {
-            if (is_dir($base_path . '/' . $v) && !in_array($v, $exclude_annotations)) {
-                $scan_paths[trim($k, '\\')] = $base_path . '/' . $v;
-            }
-        }
-        $all_event_class = [];
-        foreach ($scan_paths as $namespace => $autoload_path) {
-            $all_event_class = array_merge($all_event_class, FileSystem::getClassesPsr4($autoload_path, $namespace));
-        }
+        $parser->addSpecialParser(Setup::class, function (Setup $setup) {
+            global $_tmp_setup_list;
+            $_tmp_setup_list[] = [
+                'class' => $setup->class,
+                'method' => $setup->method,
+            ];
+            return true;
+        });
 
-        $reader = new DualReader(new AnnotationReader(), new AttributeReader());
-        $event_list = [];
-        $setup_list = [];
-        foreach ($all_event_class as $v) {
-            $reflection_class = new ReflectionClass($v);
-            $methods = $reflection_class->getMethods(ReflectionMethod::IS_PUBLIC);
-            foreach ($methods as $vs) {
-                $method_annotations = $reader->getMethodAnnotations($vs);
-                if ($method_annotations != []) {
-                    $annotation = $method_annotations[0];
-                    if ($annotation instanceof OnSetup) {
-                        $setup_list[] = [
-                            'class' => $v,
-                            'method' => $vs->getName(),
-                        ];
-                    }
-                }
-            }
-        }
-        return json_encode(['setup' => $setup_list, 'event' => $event_list]);
+        // TODO: 然后加载插件目录下的插件
+
+        // 解析所有注册路径的文件，获取注解
+        $parser->parseAll();
+
+        return json_encode(['setup' => $_tmp_setup_list]);
     } catch (Throwable $e) {
         $stderr = fopen('php://stderr', 'w');
         fwrite($stderr, zm_internal_errcode('E00031') . $e->getMessage() . ' in ' . $e->getFile() . ' at line ' . $e->getLine() . PHP_EOL);

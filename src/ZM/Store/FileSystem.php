@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ZM\Store;
 
 use RuntimeException;
+use ZM\Utils\ZMUtil;
 
 class FileSystem
 {
@@ -113,7 +114,7 @@ class FileSystem
     public static function getClassesPsr4(string $dir, string $base_namespace, $rule = null, $return_path_value = false): array
     {
         // 预先读取下composer的file列表
-        $composer = json_decode(file_get_contents(zm_dir(SOURCE_ROOT_DIR . '/composer.json')), true);
+        $composer = ZMUtil::getComposerMetadata();
         $classes = [];
         // 扫描目录，使用递归模式，相对路径模式，因为下面此路径要用作转换成namespace
         $files = FileSystem::scanDirFiles($dir, true, true);
@@ -142,7 +143,7 @@ class FileSystem
                     /*if (substr(file_get_contents($dir . '/' . $v), 6, 6) == '#plain') {
                         continue;
                     }*/
-                    if (file_exists($dir . '/' . $pathinfo['basename'] . '.plain')) {
+                    if (file_exists($dir . '/' . $pathinfo['basename'] . '.ignore')) {
                         continue;
                     }
                     if (mb_substr($pathinfo['basename'], 0, 7) == 'global_' || mb_substr($pathinfo['basename'], 0, 7) == 'script_') {

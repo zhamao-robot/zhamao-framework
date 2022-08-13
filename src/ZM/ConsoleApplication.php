@@ -24,7 +24,7 @@ use ZM\Exception\InitException;
  *
  * 这里启动的不是框架，而是框架相关的命令行环境
  */
-class ConsoleApplication extends Application
+final class ConsoleApplication extends Application
 {
     private static $obj;
 
@@ -36,13 +36,6 @@ class ConsoleApplication extends Application
         if (self::$obj !== null) {
             throw new InitException(zm_internal_errcode('E00069') . 'Initializing another Application is not allowed!');
         }
-        // 如果已经有定义了全局的 WORKING_DIR，那么就报错
-        // if (defined('WORKING_DIR')) {
-        //     throw new InitException();
-        // }
-
-        // 启动前检查炸毛运行情况
-        // _zm_env_check();
 
         // 初始化命令
         $this->add(new ServerStatusCommand());      // server运行状态

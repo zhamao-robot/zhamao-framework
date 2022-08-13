@@ -25,9 +25,11 @@ const ZM_PROCESS_WORKER = ONEBOT_PROCESS_WORKER;
 const ZM_PROCESS_USER = ONEBOT_PROCESS_USER;
 const ZM_PROCESS_TASKWORKER = ONEBOT_PROCESS_TASKWORKER;
 
-const ZM_PARSE_BEFORE_DRIVER = 0;
-const ZM_PARSE_AFTER_DRIVER = 1;
-const ZM_PARSE_BEFORE_START = 2;
+/** 定义一些内部引用的错误ID */
+const ZM_ERR_NONE = 0;                  // 正常
+const ZM_ERR_METHOD_NOT_FOUND = 1;      // 找不到方法
+const ZM_ERR_ROUTE_NOT_FOUND = 2;       // 找不到路由
+const ZM_ERR_ROUTE_METHOD_NOT_ALLOWED = 3; // 路由方法不允许
 
 /* 定义工作目录 */
 define('WORKING_DIR', getcwd());
@@ -52,7 +54,6 @@ if (DIRECTORY_SEPARATOR !== '\\') {
 
 /* 对 global.php 在 Windows 下的兼容性考虑，因为 Windows 或者无 Swoole 环境时候无法运行 */
 !defined('SWOOLE_BASE') && define('SWOOLE_BASE', 1) && define('SWOOLE_PROCESS', 2);
-
 !defined('SWOOLE_HOOK_ALL') && (
     define('SWOOLE_HOOK_TCP', 2)
     && define('SWOOLE_HOOK_UDP', 4)

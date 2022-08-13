@@ -45,6 +45,9 @@ $config['swoole_options'] = [
     'swoole_server_mode' => SWOOLE_PROCESS,        // Swoole Server 启动模式，默认为 SWOOLE_PROCESS
 ];
 
+/* 默认存取炸毛数据的目录（相对目录时，代表WORKING_DIR下的目录，绝对目录按照绝对目录来） */
+$config['data_dir'] = 'zm_data';
+
 /* 框架本体运行时的一些可调配置 */
 $config['runtime'] = [
     'reload_delay_time' => 800,
@@ -55,6 +58,26 @@ $config['runtime'] = [
         'namespace' => [],
     ],
     'timezone' => 'Asia/Shanghai',
+];
+
+/* 上下文接口类 implemented from ContextInterface */
+$config['context_class'] = \ZM\Context\Context::class;
+
+/* 允许加载插件形式 */
+$config['plugin'] = [
+    'enable' => true,
+    'load_dir' => 'plugins',
+];
+
+/* 静态文件读取器 */
+$config['file_server'] = [
+    'enable' => true,
+    'document_root' => $config['data_dir'] . '/public/',
+    'document_index' => 'index.html',
+    'document_code_page' => [
+        '404' => '404.html',
+        '500' => '500.html',
+    ],
 ];
 
 return $config;
