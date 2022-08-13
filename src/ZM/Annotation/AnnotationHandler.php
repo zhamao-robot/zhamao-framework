@@ -6,7 +6,6 @@ namespace ZM\Annotation;
 
 use Throwable;
 use ZM\Exception\InterruptException;
-use ZM\Middleware\MiddlewareHandler;
 
 /**
  * 注解调用器，原 EventDispatcher
@@ -124,41 +123,30 @@ class AnnotationHandler
     /**
      * 调用单个注解
      *
-     * @param  mixed              ...$params 传入的参数们
      * @throws InterruptException
      * @throws Throwable
      */
-    public function handle(AnnotationBase $v, ?callable $rule_callback = null, ...$params): bool
+    public function handle(AnnotationBase $v, ?callable $rule_callback = null): bool
     {
         // 由于3.0有额外的插件模式支持，所以注解就不再提供独立的闭包函数调用支持了
         // 提取要调用的目标类和方法名称
         $target_class = new ($v->class)();
         $target_method = $v->method;
         // 先执行规则，失败就返回false
-        if ($rule_callback !== null && !$rule_callback($v, $params)) {
+        if ($rule_callback !== null && !$rule_callback($v)) {
             $this->status = self::STATUS_RULE_FAILED;
             return false;
         }
         $callback = [$target_class, $target_method];
         try {
-            // 这块代码几乎等同于 middleware()->process() 中的内容，但由于注解调用器内含有一些特殊的特性（比如返回值回调），所以需要拆开来
-            $before_result = middleware()->processBefore($callback, $params);
-            if ($before_result) {
-                // before都通过了，就执行本身，通过依赖注入执行
-                // $this->return_val = container()->call($callback, $params);
-                $this->return_val = $callback(...$params);
-            } else {
-                // 没通过就标记是BEFORE_FAILED，然后接着执行after
-                $this->status = self::STATUS_BEFORE_FAILED;
-            }
-            middleware()->processAfter($callback, $params);
-        } /* @noinspection PhpRedundantCatchClauseInspection */ catch (InterruptException $e) {
+            $this->return_val = middleware()->process($callback);
+        } catch (InterruptException $e) {
             // 这里直接抛出这个异常的目的就是给上层handleAll()捕获
             throw $e;
         } catch (Throwable $e) {
             // 其余的异常就交给中间件的异常捕获器过一遍，没捕获的则继续抛出
             $this->status = self::STATUS_EXCEPTION;
-            MiddlewareHandler::getInstance()->processException($callback, $params, $e);
+            throw $e;
         }
         return true;
     }

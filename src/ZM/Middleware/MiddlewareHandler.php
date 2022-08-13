@@ -73,54 +73,85 @@ class MiddlewareHandler
         $this->reg_map[$stack_id][] = [$name, $params];
     }
 
+    public function getPipeClosure(callable $callback, $stack_id)
+    {
+        unset($this->stack[$stack_id]);
+        /** @noinspection PhpUnnecessaryLocalVariableInspection */
+        $pipe_func = function (array $mid_list, ...$args) use ($callback, $stack_id, &$pipe_func) {
+            $return = true;
+            try {
+                while (($item = array_shift($mid_list)) !== null) {
+                    $this->stack[$stack_id][] = $item;
+                    // 如果是 pipeline 形式的中间件，则使用闭包回去
+                    if (class_exists($item[0]) && is_a($item[0], PipelineInterface::class, true)) {
+                        return resolve($item[0])->handle(function (...$args) use ($mid_list, &$pipe_func) {
+                            return $pipe_func($mid_list, ...$args);
+                        }, ...$args);
+                    } elseif (isset($this->middlewares[$item[0]]['before'])) {
+                        $return = container()->call($this->middlewares[$item[0]]['before'], $args);
+                        // before 没执行完，直接跳出，不执行本体
+                        if ($return === false) {
+                            array_pop($this->callable_stack);
+                            $mid_list = [];
+                            break;
+                        }
+                    }
+                }
+                if ($return !== false) {
+                    $result = container()->call($callback, $args);
+                }
+                while (isset($this->stack[$stack_id]) && ($item = array_pop($this->stack[$stack_id])) !== null) {
+                    // 如果是 pipeline 形式的中间件，则使用闭包回去
+                    if (class_exists($item[0]) && is_a($item[0], PipelineInterface::class, true)) {
+                        continue;
+                    }
+                    if (isset($this->middlewares[$item[0]]['after'])) {
+                        $after_result = container()->call($this->middlewares[$item[0]]['after'], $args);
+                    }
+                }
+            } catch (Throwable $e) {
+                while (isset($this->stack[$stack_id]) && ($item = array_pop($this->stack[$stack_id])) !== null) {
+                    // 如果是 pipeline 形式的中间件，则使用闭包回去
+                    if (class_exists($item[0]) && is_a($item[0], PipelineInterface::class, true)) {
+                        throw $e;
+                    }
+
+                    foreach (($this->middlewares[$item[0]]['exception'] ?? []) as $k => $v) {
+                        if (is_a($e, $k)) {
+                            $exception_result = $v($e);
+                            unset($this->stack[$stack_id]);
+                            break 2;
+                        }
+                    }
+                }
+                if (!isset($exception_result)) {
+                    throw $e;
+                }
+            }
+            return $result ?? $after_result ?? $exception_result ?? null;
+        };
+        return $pipe_func;
+    }
+
     /**
      * @throws InvalidArgumentException
      * @throws Throwable
      */
-    public function process(callable $callback, array $args)
+    public function process(callable $callback)
     {
-        try {
-            $before_result = MiddlewareHandler::getInstance()->processBefore($callback, $args);
-            if ($before_result) {
-                $result = container()->call($callback, $args);
-            }
-            MiddlewareHandler::getInstance()->processAfter($callback, $args);
-        } catch (Throwable $e) {
-            MiddlewareHandler::getInstance()->processException($callback, $args, $e);
-        }
-        return $result ?? null;
-    }
-
-    /**
-     * 调用中间件的前
-     *
-     * @param  callable                 $callback 必须是数组形式的动态调用
-     * @param  array                    $args     参数列表
-     * @throws InvalidArgumentException
-     */
-    public function processBefore(callable $callback, array $args): bool
-    {
-        // 压栈ID
         $stack_id = $this->getStackId($callback);
-        // 清除之前的
         unset($this->stack[$stack_id]);
+
         $this->callable_stack[] = $callback;
+
         // 遍历执行before并压栈，并在遇到返回false后停止
         try {
-            foreach (($this->reg_map[$stack_id] ?? []) as $item) {
-                $this->stack[$stack_id][] = $item;
-                if (isset($this->middlewares[$item[0]]['before'])) {
-                    $return = container()->call($this->middlewares[$item[0]]['before'], $args);
-                    if ($return === false) {
-                        array_pop($this->callable_stack);
-                        return false;
-                    }
-                }
-            }
+            $mid_list = ($this->reg_map[$stack_id] ?? []);
+            $final_result = ($this->getPipeClosure($callback, $stack_id))($mid_list);
         } finally {
             array_pop($this->callable_stack);
         }
-        return true;
+        return $final_result ?? null;
     }
 
     /**
@@ -134,59 +165,10 @@ class MiddlewareHandler
     }
 
     /**
-     * TODO: 调用中间件的后
-     *
-     * @param  callable                 $callback 必须是数组形式的动态调用
-     * @param  array                    $args     参数列表
-     * @throws InvalidArgumentException
-     */
-    public function processAfter(callable $callback, array $args)
-    {
-        // 压栈ID
-        $stack_id = $this->getStackId($callback);
-        // 从栈内倒序取出已经执行过的中间件，并执行after
-        $this->callable_stack[] = $callback;
-        try {
-            while (isset($this->stack[$stack_id]) && ($item = array_pop($this->stack[$stack_id])) !== null) {
-                if (isset($this->middlewares[$item[0]]['after'])) {
-                    container()->call($this->middlewares[$item[0]]['after'], $args);
-                }
-            }
-        } finally {
-            array_pop($this->callable_stack);
-        }
-    }
-
-    /**
-     * TODO: 调用中间件的异常捕获处理
-     *
-     * @param  callable                 $callback 必须是数组形式的动态调用
-     * @param  array                    $args     参数列表
-     * @throws InvalidArgumentException
-     * @throws Throwable
-     */
-    public function processException(callable $callback, array $args, Throwable $throwable)
-    {
-        // 压栈ID
-        $stack_id = $this->getStackId($callback);
-        // 从栈内倒序取出已经执行过的中间件，并执行after
-        while (isset($this->stack[$stack_id]) && ($item = array_pop($this->stack[$stack_id])) !== null) {
-            foreach ($this->middlewares[$item[0]]['exception'] as $k => $v) {
-                if (is_a($throwable, $k)) {
-                    $v($throwable, ...$args);
-                    unset($this->stack[$stack_id]);
-                    return;
-                }
-            }
-        }
-        throw $throwable;
-    }
-
-    /**
      * @param  callable                 $callback 可执行的方法
      * @throws InvalidArgumentException
      */
-    private function getStackId(callable $callback): string
+    public function getStackId(callable $callback): string
     {
         if ($callback instanceof Closure) {
             // 闭包情况下，直接根据闭包的ID号来找stack

@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace ZM\Command\Server;
 
+use Exception;
+use OneBot\Driver\Process\ProcessManager;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use ZM\Exception\ConfigException;
 use ZM\Exception\InitException;
 use ZM\Exception\ZMKnownException;
 use ZM\Framework;
@@ -45,7 +46,8 @@ class ServerStartCommand extends ServerCommand
 
     /**
      * @throws ZMKnownException
-     * @throws ConfigException|InitException
+     * @throws InitException
+     * @throws Exception
      * @noinspection PhpComposerExtensionStubsInspection
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -57,7 +59,8 @@ class ServerStartCommand extends ServerCommand
                 return 1;
             }
         }*/
-        if (\OneBot\Driver\Process\ProcessManager::isSupportedMultiProcess()) {
+        // 如果是支持多进程模式的，那么就检查框架进程的状态
+        if (ProcessManager::isSupportedMultiProcess()) {
             $state = ProcessStateManager::getProcessState(ZM_PROCESS_MASTER);
             if (!$input->getOption('no-state-check')) {
                 if (is_array($state) && posix_getsid($state['pid'] ?? -1) !== false) {
@@ -67,6 +70,7 @@ class ServerStartCommand extends ServerCommand
                 }
             }
         }
+        // 框架启动的入口
         (new Framework($input->getOptions()))->init()->start();
         return 0;
     }
