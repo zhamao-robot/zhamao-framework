@@ -137,7 +137,7 @@ class MiddlewareHandler
      * @throws InvalidArgumentException
      * @throws Throwable
      */
-    public function process(callable $callback)
+    public function process(callable $callback, ...$args)
     {
         $stack_id = $this->getStackId($callback);
         unset($this->stack[$stack_id]);
@@ -147,7 +147,7 @@ class MiddlewareHandler
         // 遍历执行before并压栈，并在遇到返回false后停止
         try {
             $mid_list = ($this->reg_map[$stack_id] ?? []);
-            $final_result = ($this->getPipeClosure($callback, $stack_id))($mid_list);
+            $final_result = ($this->getPipeClosure($callback, $stack_id))($mid_list, ...$args);
         } finally {
             array_pop($this->callable_stack);
         }

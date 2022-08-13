@@ -126,7 +126,7 @@ class AnnotationHandler
      * @throws InterruptException
      * @throws Throwable
      */
-    public function handle(AnnotationBase $v, ?callable $rule_callback = null): bool
+    public function handle(AnnotationBase $v, ?callable $rule_callback = null, ...$args): bool
     {
         // 由于3.0有额外的插件模式支持，所以注解就不再提供独立的闭包函数调用支持了
         // 提取要调用的目标类和方法名称
@@ -139,7 +139,7 @@ class AnnotationHandler
         }
         $callback = [$target_class, $target_method];
         try {
-            $this->return_val = middleware()->process($callback);
+            $this->return_val = middleware()->process($callback, ...$args);
         } catch (InterruptException $e) {
             // 这里直接抛出这个异常的目的就是给上层handleAll()捕获
             throw $e;
