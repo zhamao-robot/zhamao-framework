@@ -114,8 +114,8 @@ class HttpUtil
                             ->withBody(HttpFactory::getInstance()->createStream(file_get_contents($path . '/' . $vp)));
                     }
                 }
-            // 如果文件存在，则直接返回文件内容
             } elseif (is_file($path)) {
+                // 如果文件存在，则直接返回文件内容
                 logger()->info('[200] ' . $uri);
                 $exp = strtolower(pathinfo($path)['extension'] ?? 'unknown');
                 return HttpFactory::getInstance()->createResponse()
