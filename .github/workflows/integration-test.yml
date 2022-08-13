@@ -70,10 +70,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Setup PHP 7.2
+      - name: Setup PHP 8.1
         uses: "shivammathur/setup-php@v2"
         with:
-          php-version: "7.2"
+          php-version: "8.1"
           extensions: swoole, posix, json
 
       - name: Setup problem matchers for PHP
