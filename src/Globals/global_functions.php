@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use OneBot\Driver\Coroutine\Adaptive;
+use OneBot\Driver\Coroutine\CoroutineInterface;
+use OneBot\Driver\Process\ExecutionResult;
 use OneBot\V12\Object\MessageSegment;
 use Psr\Log\LoggerInterface;
 use ZM\Container\Container;
@@ -26,6 +29,34 @@ function zm_dir(string $dir): string
         return $dir;
     }
     return str_replace('/', DIRECTORY_SEPARATOR, $dir);
+}
+
+/**
+ * 执行shell指令
+ *
+ * @param string $cmd 命令行
+ */
+function zm_exec(string $cmd): ExecutionResult
+{
+    return Adaptive::exec($cmd);
+}
+
+/**
+ * sleep 指定时间，单位为秒（最小单位为1毫秒，即0.001）
+ *
+ * @param float|int $time
+ */
+function zm_sleep($time)
+{
+    Adaptive::sleep($time);
+}
+
+/**
+ * 获取协程接口
+ */
+function coroutine(): ?CoroutineInterface
+{
+    return Adaptive::getCoroutine();
 }
 
 /**

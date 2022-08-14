@@ -8,6 +8,7 @@ parameters:
     - '#PHPDoc tag @throws with type Psr\\Container\\ContainerExceptionInterface is not subtype of Throwable#'
     - '#Unsafe usage of new static#'
     - '#Call to method initTableList\(\) of deprecated class ZM\\DB\\DB#'
+    - '#class Fiber#'
   dynamicConstantNames:
     - SWOOLE_VERSION
     - ZM_TEST_LOG_DEBUG
