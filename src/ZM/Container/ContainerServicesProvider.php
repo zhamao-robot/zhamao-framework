@@ -90,9 +90,9 @@ class ContainerServicesProvider
     {
         // $context = Context::$context[zm_cid()];
         $container->instance(HttpRequestEvent::class, $event);
-        $container->alias('http.request.event', HttpRequestEvent::class);
+        $container->alias(HttpRequestEvent::class, 'http.request.event');
         $container->instance(ServerRequestInterface::class, $event->getRequest());
-        $container->alias('http.request', ServerRequestInterface::class);
+        $container->alias(ServerRequestInterface::class, 'http.request');
         // $container->instance(Request::class, $context['request']);
         // $container->instance(Response::class, $context['response']);
         $container->bind(ContextInterface::class, Context::class);

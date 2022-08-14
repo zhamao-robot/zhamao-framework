@@ -8,9 +8,10 @@ class ZMUtil
 {
     /**
      * 获取 composer.json 并转为数组进行读取使用
+     * @param null|string $path 路径
      */
-    public static function getComposerMetadata(): ?array
+    public static function getComposerMetadata(?string $path = null): ?array
     {
-        return json_decode(file_get_contents(SOURCE_ROOT_DIR . '/composer.json'), true);
+        return json_decode(file_get_contents(($path ?? SOURCE_ROOT_DIR) . '/composer.json'), true);
     }
 }

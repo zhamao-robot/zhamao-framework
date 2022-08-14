@@ -32,6 +32,7 @@ class HttpEventListener
     {
         // 注册容器
         resolve(ContainerServicesProvider::class)->registerServices('request', $event);
+        // TODO: 这里有个bug，如果是用的Workerman+Fiber协程的话，有个前置协程挂起，这里获取到的Event是被挂起的Event对象，触发两次事件才能归正
         // 跑一遍 BindEvent 绑定了 HttpRequestEvent 的注解
         $handler = new AnnotationHandler(BindEvent::class);
         $handler->setRuleCallback(function (BindEvent $anno) {
