@@ -1,0 +1,207 @@
+<?php
+
+declare(strict_types=1);
+
+namespace ZM\Config;
+
+use Onebot\V12\Config\Config;
+use ZM\Exception\ConfigException;
+
+class RefactoredConfig
+{
+    /**
+     * @var array 支持的文件扩展名
+     */
+    public const ALLOWED_FILE_EXTENSIONS = ['php', 'yaml', 'yml', 'json', 'toml'];
+
+    /**
+     * @var array 已加载的配置文件
+     */
+    private $loaded_files = [];
+
+    /**
+     * @var array 配置文件路径
+     */
+    private $config_paths;
+
+    /**
+     * @var string 当前环境
+     */
+    private $environment;
+
+    /**
+     * @var Config 内部配置容器
+     */
+    private $holder;
+
+    /**
+     * 构造配置实例
+     *
+     * @param array  $config_paths 配置文件路径
+     * @param string $environment  环境
+     *
+     * @throws ConfigException 配置文件加载出错
+     */
+    public function __construct(array $config_paths, string $environment = 'development')
+    {
+        $this->config_paths = $config_paths;
+        $this->environment = $environment;
+        $this->holder = new Config([]);
+        $this->loadFiles();
+    }
+
+    /**
+     * 获取内部配置容器
+     */
+    public function getHolder(): Config
+    {
+        return $this->holder;
+    }
+
+    /**
+     * 获取配置项
+     *
+     * @param string $key     配置项名称，可使用.访问数组
+     * @param mixed  $default 默认值
+     *
+     * @return null|array|mixed
+     */
+    public function get(string $key, $default = null)
+    {
+        return $this->holder->get($key, $default);
+    }
+
+    /**
+     * 设置配置项
+     * 仅在本次运行期间生效，不会保存到配置文件中哦
+     *
+     * @param string $key   配置项名称，可使用.访问数组
+     * @param mixed  $value 要写入的值，传入 null 会进行删除
+     */
+    public function set(string $key, $value)
+    {
+        $this->holder->set($key, $value);
+    }
+
+    /**
+     * 合并传入的配置数组至指定的配置项
+     *
+     * @param string $key    目标配置项，必须为数组
+     * @param array  $config 要合并的配置数组
+     */
+    public function merge(string $key, array $config)
+    {
+        $original = $this->get($key, []);
+        $this->set($key, array_merge($original, $config));
+    }
+
+    /**
+     * 加载配置文件
+     *
+     * @throws ConfigException
+     */
+    public function loadFiles()
+    {
+        foreach ($this->config_paths as $config_path) {
+            $files = scandir($config_path);
+            foreach ($files as $file) {
+                if (!in_array(pathinfo($file, PATHINFO_EXTENSION), self::ALLOWED_FILE_EXTENSIONS)) {
+                    continue;
+                }
+                $file_path = $config_path . '/' . $file;
+                if (is_dir($file_path)) {
+                    // TODO: 支持子目录（待定）
+                    continue;
+                }
+                $this->loadConfigFromPath($file_path);
+            }
+        }
+    }
+
+    /**
+     * 重载配置文件
+     * 运行期间新增的配置文件不会被加载哟~
+     *
+     * @throws ConfigException
+     */
+    public function reload()
+    {
+        $this->holder = new Config([]);
+        $this->loadFiles();
+    }
+
+    /**
+     * 从传入的路径加载配置文件
+     *
+     * @param string $path 配置文件路径
+     *
+     * @throws ConfigException 传入的配置文件不支持
+     */
+    private function loadConfigFromPath(string $path)
+    {
+        if (in_array($path, $this->loaded_files)) {
+            return;
+        }
+        $this->loaded_files[] = $path;
+
+        // 判断文件格式是否支持
+        $info = pathinfo($path);
+        $name = $info['filename'];
+        $ext = $info['extension'];
+        if (!in_array($ext, self::ALLOWED_FILE_EXTENSIONS)) {
+            throw new ConfigException('E00079', "不支持的配置文件格式：{$ext}");
+        }
+
+        // 判断是否应该加载
+        if (!$this->shouldLoadFile($name)) {
+            return;
+        }
+
+        // 读取并解析配置
+        $content = file_get_contents($path);
+        $config = [];
+        switch ($ext) {
+            case 'php':
+                $config = require $path;
+                break;
+            case 'json':
+                $config = json_decode($content, true);
+                break;
+            case 'yaml':
+            case 'yml':
+                // TODO: 实现yaml解析
+                break;
+            case 'toml':
+                // TODO: 实现toml解析
+                break;
+            default:
+                throw new ConfigException('E00079', "不支持的配置文件格式：{$ext}");
+        }
+
+        // 加入配置
+        $this->merge($name, $config);
+    }
+
+    /**
+     * 判断是否应该加载配置文件
+     *
+     * @param string $name 文件名
+     */
+    private function shouldLoadFile(string $name): bool
+    {
+        // 传入此处的 name 参数有两种可能的格式：
+        // 1. 纯文件名：如 test
+        // 2. 文件名.环境：如 test.development
+        // 对于第一种格式，在任何情况下均应该加载
+        // 对于第二种格式，只有当环境与当前环境相同时才加载
+        // 至于其他的格式，则为未定义行为
+        if (strpos($name, '.') === false) {
+            return true;
+        }
+        $name_and_env = explode('.', $name);
+        if (count($name_and_env) !== 2) {
+            return false;
+        }
+        return $name_and_env[1] === $this->environment;
+    }
+}
