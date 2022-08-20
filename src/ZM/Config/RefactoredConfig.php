@@ -15,6 +15,11 @@ class RefactoredConfig
     public const ALLOWED_FILE_EXTENSIONS = ['php', 'yaml', 'yml', 'json', 'toml'];
 
     /**
+     * @var array 配置文件加载顺序，后覆盖前
+     */
+    public const LOAD_ORDER = ['global', 'environment', 'patch'];
+
+    /**
      * @var array 已加载的配置文件
      */
     private $loaded_files = [];
@@ -51,11 +56,61 @@ class RefactoredConfig
     }
 
     /**
-     * 获取内部配置容器
+     * 加载配置文件
+     *
+     * @throws ConfigException
      */
-    public function getHolder(): Config
+    public function loadFiles(): void
     {
-        return $this->holder;
+        $stages = [
+            'global' => [],
+            'environment' => [],
+            'patch' => [],
+        ];
+
+        // 遍历所有需加载的文件，并按加载类型进行分组
+        foreach ($this->config_paths as $config_path) {
+            $files = scandir($config_path);
+            foreach ($files as $file) {
+                if (!in_array(pathinfo($file, PATHINFO_EXTENSION), self::ALLOWED_FILE_EXTENSIONS, true)) {
+                    continue;
+                }
+                $file_path = $config_path . '/' . $file;
+                if (is_dir($file_path)) {
+                    // TODO: 支持子目录（待定）
+                    continue;
+                }
+
+                $load_type = $this->getFileLoadType($file);
+                if (!in_array($load_type, self::LOAD_ORDER, true)) {
+                    continue;
+                }
+
+                $stages[$load_type][] = $file_path;
+            }
+        }
+
+        // 按照加载顺序加载配置文件
+        foreach (self::LOAD_ORDER as $load_type) {
+            foreach ($stages[$load_type] as $file_path) {
+                $file = pathinfo($file_path, PATHINFO_FILENAME);
+                if ($this->shouldLoadFile($file)) {
+                    $this->loadConfigFromPath($file);
+                }
+            }
+        }
+    }
+
+    /**
+     * 合并传入的配置数组至指定的配置项
+     *
+     * @param string $key    目标配置项，必须为数组
+     * @param array  $config 要合并的配置数组
+     */
+    public function merge(string $key, array $config): void
+    {
+        $original = $this->get($key, []);
+        $this->set($key, array_merge($original, $config));
     }
 
     /**
@@ -78,44 +133,17 @@ class RefactoredConfig
      * @param string $key   配置项名称，可使用.访问数组
      * @param mixed  $value 要写入的值，传入 null 会进行删除
      */
-    public function set(string $key, $value)
+    public function set(string $key, $value): void
     {
         $this->holder->set($key, $value);
     }
 
     /**
-     * 合并传入的配置数组至指定的配置项
-     *
-     * @param string $key    目标配置项，必须为数组
-     * @param array  $config 要合并的配置数组
+     * 获取内部配置容器
      */
-    public function merge(string $key, array $config)
+    public function getHolder(): Config
     {
-        $original = $this->get($key, []);
-        $this->set($key, array_merge($original, $config));
-    }
-
-    /**
-     * 加载配置文件
-     *
-     * @throws ConfigException
-     */
-    public function loadFiles()
-    {
-        foreach ($this->config_paths as $config_path) {
-            $files = scandir($config_path);
-            foreach ($files as $file) {
-                if (!in_array(pathinfo($file, PATHINFO_EXTENSION), self::ALLOWED_FILE_EXTENSIONS)) {
-                    continue;
-                }
-                $file_path = $config_path . '/' . $file;
-                if (is_dir($file_path)) {
-                    // TODO: 支持子目录（待定）
-                    continue;
-                }
-                $this->loadConfigFromPath($file_path);
-            }
-        }
+        return $this->holder;
     }
 
     /**
@@ -124,10 +152,60 @@ class RefactoredConfig
      *
      * @throws ConfigException
      */
-    public function reload()
+    public function reload(): void
     {
         $this->holder = new Config([]);
         $this->loadFiles();
+    }
+
+    /**
+     * 获取文件加载类型
+     *
+     * @param string $name 文件名
+     *
+     * @return string 可能为：global, environment, patch
+     */
+    private function getFileLoadType(string $name): string
+    {
+        // 传入此处的 name 参数有三种可能的格式：
+        // 1. 纯文件名：如 test，此时加载类型为 global
+        // 2. 文件名.环境：如 test.development，此时加载类型为 environment
+        // 3. 文件名.patch：如 test.patch，此时加载类型为 patch
+        // 至于其他的格式，则为未定义行为
+        if (strpos($name, '.') === false) {
+            return 'global';
+        }
+        $name_and_env = explode('.', $name);
+        if (count($name_and_env) !== 2) {
+            return 'undefined';
+        }
+        if ($name_and_env[1] === 'patch') {
+            return 'patch';
+        }
+        return 'environment';
+    }
+
+    /**
+     * 判断是否应该加载配置文件
+     *
+     * @param string $name 文件名
+     */
+    private function shouldLoadFile(string $name): bool
+    {
+        // 传入此处的 name 参数有两种可能的格式：
+        // 1. 纯文件名：如 test
+        // 2. 文件名.环境：如 test.development
+        // 对于第一种格式，在任何情况下均应该加载
+        // 对于第二种格式，只有当环境与当前环境相同时才加载
+        // 至于其他的格式，则为未定义行为
+        if (strpos($name, '.') === false) {
+            return true;
+        }
+        $name_and_env = explode('.', $name);
+        if (count($name_and_env) !== 2) {
+            return false;
+        }
+        return $name_and_env[1] === $this->environment;
     }
 
     /**
@@ -137,9 +215,9 @@ class RefactoredConfig
      *
      * @throws ConfigException 传入的配置文件不支持
      */
-    private function loadConfigFromPath(string $path)
+    private function loadConfigFromPath(string $path): void
     {
-        if (in_array($path, $this->loaded_files)) {
+        if (in_array($path, $this->loaded_files, true)) {
             return;
         }
         $this->loaded_files[] = $path;
@@ -148,13 +226,8 @@ class RefactoredConfig
         $info = pathinfo($path);
         $name = $info['filename'];
         $ext = $info['extension'];
-        if (!in_array($ext, self::ALLOWED_FILE_EXTENSIONS)) {
+        if (!in_array($ext, self::ALLOWED_FILE_EXTENSIONS, true)) {
             throw new ConfigException('E00079', "不支持的配置文件格式：{$ext}");
-        }
-
-        // 判断是否应该加载
-        if (!$this->shouldLoadFile($name)) {
-            return;
         }
 
         // 读取并解析配置
@@ -180,28 +253,5 @@ class RefactoredConfig
 
         // 加入配置
         $this->merge($name, $config);
-    }
-
-    /**
-     * 判断是否应该加载配置文件
-     *
-     * @param string $name 文件名
-     */
-    private function shouldLoadFile(string $name): bool
-    {
-        // 传入此处的 name 参数有两种可能的格式：
-        // 1. 纯文件名：如 test
-        // 2. 文件名.环境：如 test.development
-        // 对于第一种格式，在任何情况下均应该加载
-        // 对于第二种格式，只有当环境与当前环境相同时才加载
-        // 至于其他的格式，则为未定义行为
-        if (strpos($name, '.') === false) {
-            return true;
-        }
-        $name_and_env = explode('.', $name);
-        if (count($name_and_env) !== 2) {
-            return false;
-        }
-        return $name_and_env[1] === $this->environment;
     }
 }
