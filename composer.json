@@ -67,7 +67,7 @@
     },
     "bin": [
         "bin/gendoc",
-        "bin/phpunit-swoole",
+        "bin/phpunit-zm",
         "bin/zhamao"
     ],
     "config": {
