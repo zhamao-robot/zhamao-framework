@@ -42,8 +42,8 @@ class RefactoredConfig
     /**
      * 构造配置实例
      *
-     * @param array $config_paths 配置文件路径
-     * @param string $environment 环境
+     * @param array  $config_paths 配置文件路径
+     * @param string $environment  环境
      *
      * @throws ConfigException 配置文件加载出错
      */
@@ -105,6 +105,63 @@ class RefactoredConfig
                 $this->loadConfigFromPath($file_path);
             }
         }
+    }
+
+    /**
+     * 合并传入的配置数组至指定的配置项
+     *
+     * @param string $key    目标配置项，必须为数组
+     * @param array  $config 要合并的配置数组
+     */
+    public function merge(string $key, array $config): void
+    {
+        $original = $this->get($key, []);
+        $this->set($key, array_merge($original, $config));
+    }
+
+    /**
+     * 获取配置项
+     *
+     * @param string $key     配置项名称，可使用.访问数组
+     * @param mixed  $default 默认值
+     *
+     * @return null|array|mixed
+     */
+    public function get(string $key, $default = null)
+    {
+        return $this->holder->get($key, $default);
+    }
+
+    /**
+     * 设置配置项
+     * 仅在本次运行期间生效，不会保存到配置文件中哦
+     *
+     * @param string $key   配置项名称，可使用.访问数组
+     * @param mixed  $value 要写入的值，传入 null 会进行删除
+     */
+    public function set(string $key, $value): void
+    {
+        $this->holder->set($key, $value);
+    }
+
+    /**
+     * 获取内部配置容器
+     */
+    public function getHolder(): Config
+    {
+        return $this->holder;
+    }
+
+    /**
+     * 重载配置文件
+     * 运行期间新增的配置文件不会被加载哟~
+     *
+     * @throws ConfigException
+     */
+    public function reload(): void
+    {
+        $this->holder = new Config([]);
+        $this->loadFiles();
     }
 
     /**
@@ -223,62 +280,5 @@ class RefactoredConfig
 
         // 加入配置
         $this->merge($group, $config);
-    }
-
-    /**
-     * 合并传入的配置数组至指定的配置项
-     *
-     * @param string $key 目标配置项，必须为数组
-     * @param array $config 要合并的配置数组
-     */
-    public function merge(string $key, array $config): void
-    {
-        $original = $this->get($key, []);
-        $this->set($key, array_merge($original, $config));
-    }
-
-    /**
-     * 获取配置项
-     *
-     * @param string $key 配置项名称，可使用.访问数组
-     * @param mixed $default 默认值
-     *
-     * @return null|array|mixed
-     */
-    public function get(string $key, $default = null)
-    {
-        return $this->holder->get($key, $default);
-    }
-
-    /**
-     * 设置配置项
-     * 仅在本次运行期间生效，不会保存到配置文件中哦
-     *
-     * @param string $key 配置项名称，可使用.访问数组
-     * @param mixed $value 要写入的值，传入 null 会进行删除
-     */
-    public function set(string $key, $value): void
-    {
-        $this->holder->set($key, $value);
-    }
-
-    /**
-     * 获取内部配置容器
-     */
-    public function getHolder(): Config
-    {
-        return $this->holder;
-    }
-
-    /**
-     * 重载配置文件
-     * 运行期间新增的配置文件不会被加载哟~
-     *
-     * @throws ConfigException
-     */
-    public function reload(): void
-    {
-        $this->holder = new Config([]);
-        $this->loadFiles();
     }
 }
