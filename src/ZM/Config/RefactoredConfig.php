@@ -72,20 +72,31 @@ class RefactoredConfig
         foreach ($this->config_paths as $config_path) {
             $files = scandir($config_path);
             foreach ($files as $file) {
+                // 略过不支持的文件
                 if (!in_array(pathinfo($file, PATHINFO_EXTENSION), self::ALLOWED_FILE_EXTENSIONS, true)) {
                     continue;
                 }
+
                 $file_path = $config_path . '/' . $file;
                 if (is_dir($file_path)) {
                     // TODO: 支持子目录（待定）
                     continue;
                 }
 
+                $file = pathinfo($file, PATHINFO_FILENAME);
+
+                // 略过不应加载的文件
+                if (!$this->shouldLoadFile($file)) {
+                    continue;
+                }
+
+                // 略过加载顺序未知的文件
                 $load_type = $this->getFileLoadType($file);
                 if (!in_array($load_type, self::LOAD_ORDER, true)) {
                     continue;
                 }
 
+                // 将文件加入到对应的加载阶段
                 $stages[$load_type][] = $file_path;
             }
         }
@@ -93,10 +104,7 @@ class RefactoredConfig
         // 按照加载顺序加载配置文件
         foreach (self::LOAD_ORDER as $load_type) {
             foreach ($stages[$load_type] as $file_path) {
-                $file = pathinfo($file_path, PATHINFO_FILENAME);
-                if ($this->shouldLoadFile($file)) {
-                    $this->loadConfigFromPath($file);
-                }
+                $this->loadConfigFromPath($file_path);
             }
         }
     }
