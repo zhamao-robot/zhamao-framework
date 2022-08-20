@@ -42,8 +42,8 @@ class RefactoredConfig
     /**
      * 构造配置实例
      *
-     * @param array  $config_paths 配置文件路径
-     * @param string $environment  环境
+     * @param array $config_paths 配置文件路径
+     * @param string $environment 环境
      *
      * @throws ConfigException 配置文件加载出错
      */
@@ -72,8 +72,9 @@ class RefactoredConfig
         foreach ($this->config_paths as $config_path) {
             $files = scandir($config_path);
             foreach ($files as $file) {
+                [, $ext, $load_type,] = $this->getFileMeta($file);
                 // 略过不支持的文件
-                if (!in_array(pathinfo($file, PATHINFO_EXTENSION), self::ALLOWED_FILE_EXTENSIONS, true)) {
+                if (!in_array($ext, self::ALLOWED_FILE_EXTENSIONS, true)) {
                     continue;
                 }
 
@@ -83,15 +84,12 @@ class RefactoredConfig
                     continue;
                 }
 
-                $file = pathinfo($file, PATHINFO_FILENAME);
-
                 // 略过不应加载的文件
                 if (!$this->shouldLoadFile($file)) {
                     continue;
                 }
 
                 // 略过加载顺序未知的文件
-                $load_type = $this->getFileLoadType($file);
                 if (!in_array($load_type, self::LOAD_ORDER, true)) {
                     continue;
                 }
@@ -110,60 +108,25 @@ class RefactoredConfig
     }
 
     /**
-     * 合并传入的配置数组至指定的配置项
+     * 获取文件元信息
      *
-     * @param string $key    目标配置项，必须为数组
-     * @param array  $config 要合并的配置数组
-     */
-    public function merge(string $key, array $config): void
-    {
-        $original = $this->get($key, []);
-        $this->set($key, array_merge($original, $config));
-    }
-
-    /**
-     * 获取配置项
+     * @param string $name 文件名
      *
-     * @param string $key     配置项名称，可使用.访问数组
-     * @param mixed  $default 默认值
-     *
-     * @return null|array|mixed
+     * @return array 文件元信息，数组元素按次序为：配置组名/扩展名/加载类型/环境类型
      */
-    public function get(string $key, $default = null)
+    private function getFileMeta(string $name): array
     {
-        return $this->holder->get($key, $default);
-    }
-
-    /**
-     * 设置配置项
-     * 仅在本次运行期间生效，不会保存到配置文件中哦
-     *
-     * @param string $key   配置项名称，可使用.访问数组
-     * @param mixed  $value 要写入的值，传入 null 会进行删除
-     */
-    public function set(string $key, $value): void
-    {
-        $this->holder->set($key, $value);
-    }
-
-    /**
-     * 获取内部配置容器
-     */
-    public function getHolder(): Config
-    {
-        return $this->holder;
-    }
-
-    /**
-     * 重载配置文件
-     * 运行期间新增的配置文件不会被加载哟~
-     *
-     * @throws ConfigException
-     */
-    public function reload(): void
-    {
-        $this->holder = new Config([]);
-        $this->loadFiles();
+        $basename = pathinfo($name, PATHINFO_BASENAME);
+        $parts = explode('.', $basename);
+        $ext = array_pop($parts);
+        $load_type = $this->getFileLoadType(implode('.', $parts));
+        if ($load_type === 'global') {
+            $env = null;
+        } else {
+            $env = array_pop($parts);
+        }
+        $group = implode('.', $parts);
+        return [$group, $ext, $load_type, $env];
     }
 
     /**
@@ -196,10 +159,11 @@ class RefactoredConfig
     /**
      * 判断是否应该加载配置文件
      *
-     * @param string $name 文件名
+     * @param string $path 文件名，包含扩展名
      */
-    private function shouldLoadFile(string $name): bool
+    private function shouldLoadFile(string $path): bool
     {
+        $name = pathinfo($path, PATHINFO_FILENAME);
         // 传入此处的 name 参数有两种可能的格式：
         // 1. 纯文件名：如 test
         // 2. 文件名.环境：如 test.development
@@ -231,9 +195,7 @@ class RefactoredConfig
         $this->loaded_files[] = $path;
 
         // 判断文件格式是否支持
-        $info = pathinfo($path);
-        $name = $info['filename'];
-        $ext = $info['extension'];
+        [$group, $ext, $load_type, $env] = $this->getFileMeta($path);
         if (!in_array($ext, self::ALLOWED_FILE_EXTENSIONS, true)) {
             throw new ConfigException('E00079', "不支持的配置文件格式：{$ext}");
         }
@@ -260,6 +222,63 @@ class RefactoredConfig
         }
 
         // 加入配置
-        $this->merge($name, $config);
+        $this->merge($group, $config);
+    }
+
+    /**
+     * 合并传入的配置数组至指定的配置项
+     *
+     * @param string $key 目标配置项，必须为数组
+     * @param array $config 要合并的配置数组
+     */
+    public function merge(string $key, array $config): void
+    {
+        $original = $this->get($key, []);
+        $this->set($key, array_merge($original, $config));
+    }
+
+    /**
+     * 获取配置项
+     *
+     * @param string $key 配置项名称，可使用.访问数组
+     * @param mixed $default 默认值
+     *
+     * @return null|array|mixed
+     */
+    public function get(string $key, $default = null)
+    {
+        return $this->holder->get($key, $default);
+    }
+
+    /**
+     * 设置配置项
+     * 仅在本次运行期间生效，不会保存到配置文件中哦
+     *
+     * @param string $key 配置项名称，可使用.访问数组
+     * @param mixed $value 要写入的值，传入 null 会进行删除
+     */
+    public function set(string $key, $value): void
+    {
+        $this->holder->set($key, $value);
+    }
+
+    /**
+     * 获取内部配置容器
+     */
+    public function getHolder(): Config
+    {
+        return $this->holder;
+    }
+
+    /**
+     * 重载配置文件
+     * 运行期间新增的配置文件不会被加载哟~
+     *
+     * @throws ConfigException
+     */
+    public function reload(): void
+    {
+        $this->holder = new Config([]);
+        $this->loadFiles();
     }
 }

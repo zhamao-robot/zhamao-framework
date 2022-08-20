@@ -43,9 +43,9 @@ class RefactoredConfigTest extends TestCase
         // 下方测试需要临时写入的文件
         file_put_contents($mock_dir . '/test.php', '<?php return ' . var_export($test_config, true) . ';');
         file_put_contents($mock_dir . '/test.development.php',
-            '<?php return ["from" => "environment", "env" => "dev"];');
+            '<?php return ["from" => "environment", "env" => "development"];');
         file_put_contents($mock_dir . '/test.production.php',
-            '<?php return ["from" => "environment", "env" => "prod"];');
+            '<?php return ["from" => "environment", "env" => "production"];');
         file_put_contents($mock_dir . '/test.invalid.php', '<?php return ["from" => "invalid"];');
 
         $config = new RefactoredConfig([
@@ -97,5 +97,11 @@ class RefactoredConfigTest extends TestCase
         self::$config->set('array', ['a', 'b']);
         $this->assertSame(['a', 'b'], self::$config->get('array'));
         $this->assertSame('a', self::$config->get('array.0'));
+    }
+
+    public function testGetEnvironmentSpecifiedValue(): void
+    {
+        $this->assertSame('environment', self::$config->get('test.from'));
+        $this->assertSame('development', self::$config->get('test.env'));
     }
 }
