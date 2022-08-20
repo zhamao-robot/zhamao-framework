@@ -1,0 +1,46 @@
+#!/usr/bin/env php
+<?php
+/** For Swoole coroutine tests */
+
+// 如果改成 true，则会在终端显示所有炸毛框架的 Log
+const ZM_TEST_LOG_DEBUG = false;
+
+use OneBot\Driver\Event\Process\WorkerStartEvent;
+use PHPUnit\TextUI\Command;
+use ZM\Command\Server\ServerStartCommand;
+use ZM\Framework;
+use ZM\Logger\ConsoleLogger;
+
+$root = dirname(__DIR__);
+
+require $root . '/vendor/autoload.php';
+
+global $_swoole_atomic;
+$_swoole_atomic = new \Swoole\Atomic();
+
+ob_logger_register(new ConsoleLogger('error'));
+global $ob_event_provider;
+$ob_event_provider = new \ZM\Event\EventProvider();
+
+ob_event_provider()->addEventListener(WorkerStartEvent::getName(), function () {
+    try {
+        $retcode = Command::main(false);
+    } finally {
+        global $_swoole_atomic;
+        $_swoole_atomic->set($retcode ?? 0);
+        Framework::getInstance()->stop();
+    }
+}, 1);
+
+try {
+    $options = ServerStartCommand::exportOptionArray();
+    $options['driver'] = 'swoole';
+    $options['worker-num'] = 1;
+    $options['private-mode'] = true;
+    (new Framework($options))->init()->start();
+
+    exit($_swoole_atomic->get());
+} catch (Throwable $e) {
+    echo $e->getMessage() . PHP_EOL;
+    exit(1);
+}

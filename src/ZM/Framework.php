@@ -18,7 +18,6 @@ use OneBot\Driver\Workerman\Worker;
 use OneBot\Driver\Workerman\WorkermanDriver;
 use OneBot\Util\Singleton;
 use Phar;
-use Swoole\Process;
 use ZM\Command\Server\ServerStartCommand;
 use ZM\Config\ZMConfig;
 use ZM\Event\EventProvider;
@@ -28,6 +27,7 @@ use ZM\Event\Listener\MasterEventListener;
 use ZM\Event\Listener\WorkerEventListener;
 use ZM\Exception\ConfigException;
 use ZM\Exception\InitException;
+use ZM\Exception\ZMKnownException;
 use ZM\Logger\ConsoleLogger;
 use ZM\Logger\TablePrinter;
 use ZM\Process\ProcessStateManager;
@@ -107,16 +107,21 @@ class Framework
      * 停止框架运行
      *
      * 未测试
+     * @throws ZMKnownException
      */
     public function stop()
     {
         switch ($this->driver->getName()) {
             case 'swoole':
                 /* @phpstan-ignore-next-line */
-                Process::kill($this->driver->getSwooleServer()->master_pid, SIGTERM);
+                $this->driver->getSwooleServer()->shutdown();
                 break;
             case 'workerman':
-                Worker::stopAll();
+                if (extension_loaded('posix')) {
+                    posix_kill(ProcessStateManager::getProcessState(ZM_PROCESS_MASTER)['pid'], SIGTERM);
+                } else {
+                    Worker::stopAll();
+                }
                 break;
         }
     }

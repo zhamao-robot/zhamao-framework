@@ -6,11 +6,7 @@ namespace Tests\ZM\Utils;
 
 use Closure;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
-use ReflectionFunction;
 use ReflectionFunctionAbstract;
-use ReflectionMethod;
-use stdClass;
 use ZM\Utils\ReflectionUtil;
 
 /**
@@ -30,7 +26,7 @@ class ReflectionUtilTest extends TestCase
 
     public function testGetParameterClassName(): void
     {
-        $class = new ReflectionClass(ReflectionUtilTestClass::class);
+        $class = new \ReflectionClass(ReflectionUtilTestClass::class);
         $method = $class->getMethod('method');
         [$string_parameter, $object_parameter] = $method->getParameters();
 
@@ -55,7 +51,7 @@ class ReflectionUtilTest extends TestCase
             'closure' => [Closure::fromCallable([$this, 'testVariableToString']), 'closure'],
             'string' => ['string', 'string'],
             'array' => [['123', '42', 'hello', 122], 'array["123","42","hello",122]'],
-            'object' => [new stdClass(), 'stdClass'],
+            'object' => [new \stdClass(), 'stdClass'],
             'resource' => [fopen('php://memory', 'rb'), 'resource(stream)'],
             'null' => [null, 'null'],
             'boolean 1' => [true, 'true'],
@@ -80,11 +76,11 @@ class ReflectionUtilTest extends TestCase
         };
 
         return [
-            'callable' => [[new ReflectionUtilTestClass(), 'method'], new ReflectionMethod(ReflectionUtilTestClass::class, 'method')],
-            'static callable' => [[ReflectionUtilTestClass::class, 'staticMethod'], new ReflectionMethod(ReflectionUtilTestClass::class, 'staticMethod')],
-            'class::method' => [ReflectionUtilTestClass::class . '::staticMethod', new ReflectionMethod(ReflectionUtilTestClass::class, 'staticMethod')],
-            'invokable class' => [new InvokableClass(), new ReflectionMethod(InvokableClass::class, '__invoke')],
-            'closure' => [$closure, new ReflectionFunction($closure)],
+            'callable' => [[new ReflectionUtilTestClass(), 'method'], new \ReflectionMethod(ReflectionUtilTestClass::class, 'method')],
+            'static callable' => [[ReflectionUtilTestClass::class, 'staticMethod'], new \ReflectionMethod(ReflectionUtilTestClass::class, 'staticMethod')],
+            'class::method' => [ReflectionUtilTestClass::class . '::staticMethod', new \ReflectionMethod(ReflectionUtilTestClass::class, 'staticMethod')],
+            'invokable class' => [new InvokableClass(), new \ReflectionMethod(InvokableClass::class, '__invoke')],
+            'closure' => [$closure, new \ReflectionFunction($closure)],
         ];
     }
 }
