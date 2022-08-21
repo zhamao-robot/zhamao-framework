@@ -11,10 +11,14 @@ use ZM\Annotation\AnnotationHandler;
 use ZM\Annotation\AnnotationMap;
 use ZM\Annotation\AnnotationParser;
 use ZM\Annotation\Framework\Init;
+use ZM\Config\ZMConfig;
 use ZM\Container\ContainerServicesProvider;
+use ZM\Exception\ConfigException;
 use ZM\Exception\ZMKnownException;
 use ZM\Framework;
 use ZM\Process\ProcessStateManager;
+use ZM\Store\MySQL\MySQLException;
+use ZM\Store\MySQL\MySQLPool;
 use ZM\Utils\ZMUtil;
 
 class WorkerEventListener
@@ -26,7 +30,7 @@ class WorkerEventListener
      *
      * @throws Throwable
      */
-    public function onWorkerStart()
+    public function onWorkerStart999()
     {
         // 自注册一下，刷新当前进程的logger进程banner
         ob_logger_register(ob_logger());
@@ -46,6 +50,18 @@ class WorkerEventListener
             ProcessStateManager::saveProcessState(ZM_PROCESS_WORKER, posix_getpid(), ['worker_id' => ProcessManager::getProcessId()]);
         }
 
+        // 打印进程ID
+        if (Framework::getInstance()->getArgv()['print-process-pid'] && ProcessManager::getProcessId() === 0) {
+            logger()->info("MASTER:\t" . ProcessStateManager::getProcessState(ZM_PROCESS_MASTER)['pid']);
+            if (ProcessStateManager::$process_mode['manager'] > 0) {
+                logger()->info("MANAGER:\t" . ProcessStateManager::getProcessState(ZM_PROCESS_MANAGER));
+            }
+        }
+        if (Framework::getInstance()->getArgv()['print-process-pid']) {
+            $i = ProcessManager::getProcessId();
+            logger()->info('WORKER#' . $i . ":\t" . ProcessStateManager::getProcessState(ZM_PROCESS_WORKER, $i));
+        }
+
         // 设置容器，注册容器提供商
         resolve(ContainerServicesProvider::class)->registerServices('global');
 
@@ -61,13 +77,14 @@ class WorkerEventListener
             Framework::getInstance()->stop();
         });
 
-        // TODO: 注册各种池子
+        // 注册各种池子
+        $this->initConnectionPool();
 
         // 加载用户代码资源
-        $this->loadUserSources();
+        $this->initUserPlugins();
 
         // handle @Init annotation
-        $this->handleInit();
+        $this->dispatchInit();
 
         // 回显 debug 日志：进程占用的内存
         $memory_total = memory_get_usage() / 1024 / 1024;
@@ -77,7 +94,7 @@ class WorkerEventListener
     /**
      * @throws ZMKnownException
      */
-    public function onWorkerStop()
+    public function onWorkerStop999()
     {
         logger()->debug('Worker #' . ProcessManager::getProcessId() . ' stopping');
         ProcessStateManager::removeProcessState(ZM_PROCESS_WORKER, ProcessManager::getProcessId());
@@ -87,7 +104,7 @@ class WorkerEventListener
      * 加载用户代码资源，包括普通插件、单文件插件、Composer 插件等
      * @throws Throwable
      */
-    private function loadUserSources()
+    private function initUserPlugins()
     {
         logger()->debug('Loading user sources');
 
@@ -114,7 +131,10 @@ class WorkerEventListener
         AnnotationMap::loadAnnotationByParser($parser);
     }
 
-    private function handleInit()
+    /**
+     * @throws Throwable
+     */
+    private function dispatchInit()
     {
         $handler = new AnnotationHandler(Init::class);
         $handler->setRuleCallback(function (Init $anno) {
