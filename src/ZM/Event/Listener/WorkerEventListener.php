@@ -142,4 +142,36 @@ class WorkerEventListener
         });
         $handler->handleAll();
     }
+
+    /**
+     * 初始化各种连接池
+     *
+     * TODO：未来新增其他db的连接池
+     *
+     * @throws ConfigException
+     * @throws MySQLException
+     */
+    private function initConnectionPool()
+    {
+        // 清空 MySQL 的连接池
+        foreach (MySQLPool::getAllPools() as $name => $pool) {
+            MySQLPool::destroyPool($name);
+        }
+
+        // 读取 MySQL 配置文件
+        $conf = ZMConfig::get('global.mysql');
+        if (is_array($conf) && !is_assoc_array($conf)) {
+            // 如果有多个数据库连接，则遍历
+            foreach ($conf as $conn_conf) {
+                if ($conn_conf['host'] !== '') {
+                    MySQLPool::create($conn_conf['pool_name'], $conn_conf);
+                }
+            }
+        } elseif (is_assoc_array($conf)) {
+            // 这种情况也支持，但是不推荐
+            if ($conf['host'] !== '') {
+                MySQLPool::create($conf['pool_name'], $conf);
+            }
+        }
+    }
 }

@@ -12,6 +12,8 @@ use ZM\Container\ContainerInterface;
 use ZM\Context\Context;
 use ZM\Logger\ConsoleLogger;
 use ZM\Middleware\MiddlewareHandler;
+use ZM\Store\MySQL\MySQLException;
+use ZM\Store\MySQL\MySQLWrapper;
 
 // 防止重复引用引发报错
 if (function_exists('zm_internal_errcode')) {
@@ -164,4 +166,24 @@ function app(string $abstract = null, array $parameters = [])
     }
 
     return resolve($abstract, $parameters);
+}
+
+/**
+ * 获取 MySQL 调用的类
+ *
+ * @throws MySQLException
+ */
+function mysql(string $name = '')
+{
+    return new MySQLWrapper($name);
+}
+
+/**
+ * 获取构建 MySQL 的类
+ *
+ * @throws MySQLException
+ */
+function mysql_builder(string $name = '')
+{
+    return (new MySQLWrapper($name))->createQueryBuilder();
 }

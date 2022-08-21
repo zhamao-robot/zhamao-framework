@@ -1,10 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\ZM\Utils;
 
+use PHPUnit\Framework\TestCase;
 use ZM\Utils\ZMUtil;
 
-class ZMUtilTest extends \PHPUnit\Framework\TestCase
+/**
+ * @internal
+ */
+class ZMUtilTest extends TestCase
 {
     public function testComposer()
     {
