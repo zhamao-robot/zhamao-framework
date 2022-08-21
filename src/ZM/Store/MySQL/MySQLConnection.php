@@ -33,8 +33,9 @@ class MySQLConnection implements Connection
     }
 
     /**
-     * @param mixed $sql
-     * @param mixed $options
+     * @param  mixed          $sql
+     * @param  mixed          $options
+     * @throws MySQLException
      */
     public function prepare($sql, $options = [])
     {

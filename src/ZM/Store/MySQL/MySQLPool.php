@@ -18,7 +18,7 @@ use RuntimeException;
 class MySQLPool
 {
     /**
-     * @var array<string, PoolInterface> 连接池列表
+     * @var array<string, SwooleObjectPool|WorkermanObjectPool> 连接池列表
      */
     private static $pools = [];
 
@@ -51,9 +51,10 @@ class MySQLPool
     /**
      * 获取一个数据库连接池
      *
-     * @param string $name 连接池名称
+     * @param  string                               $name 连接池名称
+     * @return SwooleObjectPool|WorkermanObjectPool
      */
-    public static function pool(string $name): PoolInterface
+    public static function pool(string $name)
     {
         if (!isset(self::$pools[$name])) {
             throw new RuntimeException("Pool {$name} not found");
