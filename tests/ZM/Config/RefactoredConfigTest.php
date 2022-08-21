@@ -85,9 +85,23 @@ class RefactoredConfigTest extends TestCase
         $this->assertTrue(self::$config->get('test.boolean'));
     }
 
-    public function testGetValue(): void
+    /**
+     * @dataProvider providerTestGetValue
+     */
+    public function testGetValue(string $key, $expected): void
     {
-        $this->assertSame('bar', self::$config->get('test.foo'));
+        $this->assertSame($expected, self::$config->get($key));
+    }
+
+    public function providerTestGetValue(): array
+    {
+        return [
+            'null' => ['test.null', null],
+            'boolean' => ['test.boolean', true],
+            'associate' => ['test.associate', ['x' => 'xxx', 'y' => 'yyy']],
+            'array' => ['test.array', ['aaa', 'zzz']],
+            'dot access' => ['test.x.z', 'zoo'],
+        ];
     }
 
     public function testGetWithDefault(): void
