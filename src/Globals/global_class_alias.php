@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 class_alias(\ZM\Annotation\Framework\BindEvent::class, 'BindEvent');
 class_alias(\ZM\Annotation\Framework\Init::class, 'Init');
 class_alias(\ZM\Annotation\Framework\Setup::class, 'Setup');
