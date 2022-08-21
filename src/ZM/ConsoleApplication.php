@@ -9,6 +9,7 @@ use Phar;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use ZM\Command\BotCraft\BotCraftCommand;
 use ZM\Command\BuildCommand;
 use ZM\Command\CheckConfigCommand;
 use ZM\Command\Generate\SystemdGenerateCommand;
@@ -43,6 +44,7 @@ final class ConsoleApplication extends Application
         $this->add(new ServerStopCommand());        // server停止
         $this->add(new ServerStartCommand());       // 运行主服务的指令控制器
         $this->add(new SystemdGenerateCommand());   // 生成systemd文件
+        $this->add(new BotCraftCommand());          // 用于从命令行创建插件
         if (LOAD_MODE === 1) {                      // 如果是 Composer 模式加载的，那么可以输入 check:config 命令，检查配置文件是否需要更新
             $this->add(new CheckConfigCommand());
         }

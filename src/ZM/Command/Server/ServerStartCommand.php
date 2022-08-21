@@ -39,6 +39,7 @@ class ServerStartCommand extends ServerCommand
             new InputOption('disable-safe-exit', null, null, '关闭安全退出（关闭后按CtrlC时直接杀死进程）'),
             new InputOption('no-state-check', null, null, '关闭启动前框架运行状态检查'),
             new InputOption('private-mode', null, null, '启动时隐藏MOTD和敏感信息'),
+            new InputOption('print-process-pid', null, null, '打印所有进程的PID'),
         ]);
         $this->setDescription('Run zhamao-framework | 启动框架');
         $this->setHelp('直接运行可以启动');

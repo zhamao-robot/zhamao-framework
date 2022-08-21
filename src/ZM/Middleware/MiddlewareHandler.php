@@ -75,8 +75,6 @@ class MiddlewareHandler
 
     public function getPipeClosure(callable $callback, $stack_id)
     {
-        unset($this->stack[$stack_id]);
-        /** @noinspection PhpUnnecessaryLocalVariableInspection */
         $pipe_func = function (array $mid_list, ...$args) use ($callback, $stack_id, &$pipe_func) {
             $return = true;
             try {
@@ -130,6 +128,7 @@ class MiddlewareHandler
             }
             return $result ?? $after_result ?? $exception_result ?? null;
         };
+        unset($this->stack[$stack_id]);
         return $pipe_func;
     }
 

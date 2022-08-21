@@ -285,8 +285,8 @@ class Framework
 
         // 添加框架需要监听的顶层事件监听器
         // worker 事件
-        ob_event_provider()->addEventListener(WorkerStartEvent::getName(), [WorkerEventListener::getInstance(), 'onWorkerStart'], 999);
-        ob_event_provider()->addEventListener(WorkerStopEvent::getName(), [WorkerEventListener::getInstance(), 'onWorkerStop'], 999);
+        ob_event_provider()->addEventListener(WorkerStartEvent::getName(), [WorkerEventListener::getInstance(), 'onWorkerStart999'], 999);
+        ob_event_provider()->addEventListener(WorkerStopEvent::getName(), [WorkerEventListener::getInstance(), 'onWorkerStop999'], 999);
         // Http 事件
         ob_event_provider()->addEventListener(HttpRequestEvent::getName(), function () {
             global $starttime;
