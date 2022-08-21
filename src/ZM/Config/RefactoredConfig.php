@@ -102,6 +102,7 @@ class RefactoredConfig
         // 按照加载顺序加载配置文件
         foreach (self::LOAD_ORDER as $load_type) {
             foreach ($stages[$load_type] as $file_path) {
+                logger()->info('Loading config file: ' . $file_path);
                 $this->loadConfigFromPath($file_path);
             }
         }
@@ -189,12 +190,13 @@ class RefactoredConfig
     /**
      * 获取文件加载类型
      *
-     * @param string $name 文件名
+     * @param string $name 文件名，不带扩展名
      *
      * @return string 可能为：global, environment, patch
      */
     private function getFileLoadType(string $name): string
     {
+        // TODO: 对于多段名称的处理，如 test.patch.development
         // 传入此处的 name 参数有三种可能的格式：
         // 1. 纯文件名：如 test，此时加载类型为 global
         // 2. 文件名.环境：如 test.development，此时加载类型为 environment

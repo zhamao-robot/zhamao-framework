@@ -6,6 +6,7 @@ namespace Tests\ZM\Config;
 
 use PHPUnit\Framework\TestCase;
 use ZM\Config\RefactoredConfig;
+use ZM\Utils\ReflectionUtil;
 
 /**
  * @internal
@@ -87,6 +88,7 @@ class RefactoredConfigTest extends TestCase
 
     /**
      * @dataProvider providerTestGetValue
+     * @param mixed $expected
      */
     public function testGetValue(string $key, $expected): void
     {
@@ -126,5 +128,26 @@ class RefactoredConfigTest extends TestCase
     {
         $this->assertSame('environment', self::$config->get('test.from'));
         $this->assertSame('development', self::$config->get('test.env'));
+    }
+
+    /**
+     * @dataProvider providerTestGetFileLoadType
+     */
+    public function testGetFileLoadType(string $name, string $type): void
+    {
+        $method = ReflectionUtil::getMethod(RefactoredConfig::class, 'getFileLoadType');
+        $actual = $method->invokeArgs(self::$config, [$name]);
+        $this->assertSame($type, $actual);
+    }
+
+    public function providerTestGetFileLoadType(): array
+    {
+        return [
+            'global' => ['test', 'global'],
+            'environment' => ['test.development', 'environment'],
+            'undefined' => ['test.dev.inv', 'undefined'],
+            'patch' => ['test.patch', 'patch'],
+            //            'complex' => ['test.patch.development', 'patch'],
+        ];
     }
 }
