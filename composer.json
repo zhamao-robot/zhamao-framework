@@ -56,7 +56,8 @@
         },
         "files": [
             "src/Globals/global_functions.php",
-            "src/Globals/global_defines_app.php"
+            "src/Globals/global_defines_app.php",
+            "src/GLobals/global_class_alias.php"
         ]
     },
     "autoload-dev": {
@@ -102,6 +103,6 @@
         ],
         "analyse": "phpstan analyse --memory-limit 300M",
         "cs-fix": "php-cs-fixer fix",
-        "test": "bin/phpunit-swoole --no-coverage"
+        "test": "bin/phpunit-zm --no-coverage"
     }
 }
