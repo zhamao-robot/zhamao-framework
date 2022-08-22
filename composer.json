@@ -17,7 +17,6 @@
         "ext-json": "*",
         "doctrine/dbal": "^2.13.1",
         "dragonmantank/cron-expression": "^3.3",
-        "jasny/phpdoc-parser": "^1.0",
         "jelix/version": "^2.0",
         "koriym/attributes": "^1.0",
         "onebot/libonebot": "dev-develop",

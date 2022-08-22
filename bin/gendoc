@@ -82,6 +82,20 @@ if (file_exists($root . '/vendor/jasny/phpdoc-parser/composer.json')) {
     }
 }
 
+function remove_temp_phpdoc_package()
+{
+    if ($GLOBALS['phpdoc_package_temp_installed']) {
+        echo '正在移除 PHPDoc 解析库，请稍候...' . PHP_EOL;
+        passthru('composer remove --quiet jasny/phpdoc-parser', $exit_code);
+        if ($exit_code !== 0) {
+            echo '移除失败，请手动移除：composer remove jasny/phpdoc-parser' . PHP_EOL;
+        }
+        echo '移除完成';
+    }
+}
+
+register_shutdown_function('remove_temp_phpdoc_package');
+
 // 从这里开始是主要生成逻辑
 
 require_once $root . '/vendor/autoload.php';
@@ -89,7 +103,7 @@ require_once $root . '/vendor/autoload.php';
 use Jasny\PhpdocParser\PhpdocParser;
 use Jasny\PhpdocParser\Set\PhpDocumentor;
 use Jasny\PhpdocParser\Tag\Summery;
-use ZM\Console\Console;
+use ZM\Logger\ConsoleLogger;
 
 $opts = getopt('', ['show-warnings', 'show-debug']);
 
@@ -99,7 +113,7 @@ if (array_key_exists('show-warnings', $opts)) {
     $show_warnings = false;
 }
 
-Console::init(array_key_exists('show-debug', $opts) ? 4 : 2);
+ob_logger_register(new ConsoleLogger(array_key_exists('show-debug', $opts) ? 'debug' : 'info'));
 
 $errors = [];
 $warnings = [];
@@ -120,7 +134,7 @@ function error(string $message)
 {
     global $errors;
     $errors[] = $message;
-    Console::error($message);
+    logger()->error($message);
 }
 
 function warning(string $message)
@@ -128,7 +142,7 @@ function warning(string $message)
     global $warnings, $show_warnings;
     $warnings[] = $message;
     if ($show_warnings) {
-        Console::warning($message);
+        logger()->warning($message);
     }
 }
 
@@ -160,7 +174,7 @@ function get_class_metas(string $class_name, PhpdocParser $parser): array
             continue;
         }
 
-        Console::verbose('正在解析方法：' . $class_name . '::' . $method->getName());
+        logger()->debug('正在解析方法：' . $class_name . '::' . $method->getName());
 
         // 获取方法的注释并解析
         $doc = $method->getDocComment();
@@ -169,6 +183,8 @@ function get_class_metas(string $class_name, PhpdocParser $parser): array
             continue;
         }
         try {
+            // 解析器对于多余空格的解析似乎有问题，这里去除一下多余的空格
+            $doc = preg_replace('/\s(?=\s)/', '\\1', $doc);
             $meta = $parser->parse($doc);
         } catch (\Exception $e) {
             error('解析失败：' . $class_name . '::' . $method->getName() . '，' . $e->getMessage());
@@ -231,7 +247,7 @@ function get_class_metas(string $class_name, PhpdocParser $parser): array
  * 将方法的元数据转换为 Markdown 格式
  *
  * @param string $method 方法名
- * @param array  $meta   元数据
+ * @param array $meta 元数据
  */
 function convert_meta_to_markdown(string $method, array $meta): string
 {
@@ -285,7 +301,7 @@ function generate_sidebar_config(string $title, array $items): array
     ];
 }
 
-Console::info('开始生成！');
+logger()->info('开始生成！');
 
 // 遍历类并将元数据添加至数组中
 foreach (new \RecursiveIteratorIterator($fs) as $file) {
@@ -314,9 +330,9 @@ foreach (new \RecursiveIteratorIterator($fs) as $file) {
     }
 
     // 获取完整类名
-    $path = ltrim($path, $root . '/');
+    $path = str_replace($root . '/', '', $path);
     $class = str_replace(['.php', 'src/', '/'], ['', '', '\\'], $path);
-    Console::verbose('正在解析类：' . $class);
+    logger()->debug('正在解析类：' . $class);
     $meta = get_class_metas($class, $parser);
     // 忽略不包含任何方法的类
     if (empty($meta)) {
@@ -346,7 +362,7 @@ foreach ($markdown as $class => $methods) {
     if (!file_exists(dirname($file)) && !mkdir($concurrent_directory = dirname($file), 0777, true) && !is_dir($concurrent_directory)) {
         throw new \RuntimeException(sprintf('无法建立目录 %s', $concurrent_directory));
     }
-    Console::verbose('正在生成文档：' . $file);
+    logger()->debug('正在生成文档：' . $file);
     $text = implode("\n\n", $methods);
     file_put_contents($file, $text);
 }
@@ -373,29 +389,21 @@ $file = $root . '/docs/.vuepress/api.js';
 file_put_contents($file, $config);
 
 if (count($warnings)) {
-    Console::warning('生成过程中发现 ' . count($warnings) . ' 次警告');
+    logger()->warning('生成过程中发现 ' . count($warnings) . ' 次警告');
     if (!$show_warnings) {
-        Console::info('生成器默认忽略了警告，你可以通过 gendoc --show-warnings 来查看警告');
+        logger()->info('生成器默认忽略了警告，你可以通过 gendoc --show-warnings 来查看警告');
     }
 }
 if (count($errors)) {
-    Console::error('生成过程中发现错误：');
+    logger()->error('生成过程中发现错误：');
     foreach ($errors as $error) {
-        Console::error($error);
+        logger()->error($error);
     }
 }
 
-Console::success('API 文档生成完毕');
-Console::success(sprintf('共生成 %d 个类，共 %d 个方法', $class_count, $method_count));
+logger()->notice('API 文档生成完毕');
+logger()->notice(sprintf('共生成 %d 个类，共 %d 个方法', $class_count, $method_count));
 
 // 完成生成，进行善后
 
-if ($phpdoc_package_temp_installed) {
-    echo '正在移除 PHPDoc 解析库，请稍候...' . PHP_EOL;
-    passthru('composer remove --quiet jasny/phpdoc-parser', $exit_code);
-    if ($exit_code !== 0) {
-        echo '移除失败，请手动移除：composer remove jasny/phpdoc-parser' . PHP_EOL;
-    }
-    echo '移除完成';
-}
 exit(0);
