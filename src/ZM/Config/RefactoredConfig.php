@@ -22,22 +22,22 @@ class RefactoredConfig
     /**
      * @var array 已加载的配置文件
      */
-    private $loaded_files = [];
+    private array $loaded_files = [];
 
     /**
      * @var array 配置文件路径
      */
-    private $config_paths;
+    private array $config_paths;
 
     /**
      * @var string 当前环境
      */
-    private $environment;
+    private string $environment;
 
     /**
      * @var Config 内部配置容器
      */
-    private $holder;
+    private Config $holder;
 
     /**
      * 构造配置实例
@@ -256,7 +256,7 @@ class RefactoredConfig
         // 判断文件格式是否支持
         [$group, $ext, $load_type, $env] = $this->getFileMeta($path);
         if (!in_array($ext, self::ALLOWED_FILE_EXTENSIONS, true)) {
-            throw new ConfigException('E00079', "不支持的配置文件格式：{$ext}");
+            throw ConfigException::unsupportedFileType($path);
         }
 
         // 读取并解析配置
@@ -267,7 +267,11 @@ class RefactoredConfig
                 $config = require $path;
                 break;
             case 'json':
-                $config = json_decode($content, true);
+                try {
+                    $config = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+                } catch (\JsonException $e) {
+                    throw ConfigException::loadConfigFailed($path, $e->getMessage());
+                }
                 break;
             case 'yaml':
             case 'yml':
@@ -277,7 +281,7 @@ class RefactoredConfig
                 // TODO: 实现toml解析
                 break;
             default:
-                throw new ConfigException('E00079', "不支持的配置文件格式：{$ext}");
+                throw ConfigException::unsupportedFileType($path);
         }
 
         // 加入配置

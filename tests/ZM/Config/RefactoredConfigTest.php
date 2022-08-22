@@ -13,7 +13,7 @@ use ZM\Utils\ReflectionUtil;
  */
 class RefactoredConfigTest extends TestCase
 {
-    private static $config;
+    private static RefactoredConfig $config;
 
     public static function setUpBeforeClass(): void
     {
