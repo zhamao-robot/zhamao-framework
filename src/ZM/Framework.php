@@ -44,7 +44,7 @@ class Framework
     public const VERSION_ID = 615;
 
     /** @var string 版本名称 */
-    public const VERSION = '3.0.0-alpha2';
+    public const VERSION = '3.0.0-alpha3';
 
     /** @var array 传入的参数 */
     protected $argv;
@@ -253,6 +253,10 @@ class Framework
     {
         switch ($driver = ZMConfig::get('global.driver')) {
             case 'swoole':
+                if (DIRECTORY_SEPARATOR === '\\') {
+                    logger()->emergency('Windows does not support swoole driver!');
+                    exit(1);
+                }
                 ZMConfig::$config['global']['swoole_options']['driver_init_policy'] = DriverInitPolicy::MULTI_PROCESS_INIT_IN_MASTER;
                 $this->driver = new SwooleDriver(ZMConfig::get('global.swoole_options'));
                 $this->driver->initDriverProtocols(ZMConfig::get('global.servers'));
