@@ -5,12 +5,18 @@ declare(strict_types=1);
 namespace ZM;
 
 use Exception;
+use ZM\Command\Server\ServerStartCommand;
+use ZM\Config\ZMConfig;
 use ZM\Exception\InitException;
 use ZM\Plugin\InstantPlugin;
 
 class InstantApplication extends InstantPlugin
 {
-    private static $obj;
+    /** @var null|InstantApplication 存储单例类的变量 */
+    private static ?InstantApplication $obj;
+
+    /** @var array 存储要传入的args */
+    private array $args = [];
 
     /**
      * @param  null|mixed    $dir
@@ -22,7 +28,20 @@ class InstantApplication extends InstantPlugin
             throw new InitException(zm_internal_errcode('E00069') . 'Initializing another Application is not allowed!');
         }
         self::$obj = $this; // 用于标记已经初始化完成
-        parent::__construct($dir ?? __DIR__);
+        parent::__construct($dir ?? (__DIR__ . '/../..'));
+        $this->args = ServerStartCommand::exportOptionArray();
+    }
+
+    public function withConfig(array $config): InstantApplication
+    {
+        // TODO: 完成patch config
+        return $this;
+    }
+
+    public function withArgs(array $args): InstantApplication
+    {
+        $this->args = ZMConfig::smartPatch($this->args, $args);
+        return $this;
     }
 
     /**
@@ -30,6 +49,6 @@ class InstantApplication extends InstantPlugin
      */
     public function run()
     {
-        (new Framework())->init()->start();
+        (new Framework($this->args))->init()->start();
     }
 }

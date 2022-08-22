@@ -11,9 +11,14 @@ use Traversable;
 
 abstract class AnnotationBase implements IteratorAggregate
 {
-    public $method = '';
+    public string $method = '';
 
+    /**
+     * @var Closure|string
+     */
     public $class = '';
+
+    public array $group = [];
 
     public function __toString()
     {
@@ -44,7 +49,7 @@ abstract class AnnotationBase implements IteratorAggregate
      *
      * @param Closure|string $method
      */
-    public function withMethod($method): AnnotationBase
+    public function on($method): AnnotationBase
     {
         $this->method = $method;
         return $this;
@@ -53,5 +58,20 @@ abstract class AnnotationBase implements IteratorAggregate
     public function getIterator(): Traversable
     {
         return new ArrayIterator($this);
+    }
+
+    public function isInGroup(string $name): bool
+    {
+        return in_array($name, $this->group);
+    }
+
+    public function addGroup(string $name)
+    {
+        $this->group[] = $name;
+    }
+
+    public function getGroups(): array
+    {
+        return $this->group;
     }
 }
