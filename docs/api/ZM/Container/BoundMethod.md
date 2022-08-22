@@ -3,19 +3,19 @@
 ## call
 
 ```php
-public function call(Container $container, callable|string $callback, array $parameters, string $default_method): mixed
+public function call(ZM\Container\ContainerInterface $container, mixed $callback, array $parameters, string $default_method): mixed
 ```
 
 ### 描述
 
-调用指定闭包、类方法并注入依赖
+作者很懒，什么也没有说
 
 ### 参数
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| container | Container |  |
-| callback | callable|string |  |
+| container | ZM\Container\ContainerInterface |  |
+| callback | mixed |  |
 | parameters | array |  |
 | default_method | string |  |
 
@@ -29,19 +29,19 @@ public function call(Container $container, callable|string $callback, array $par
 ## getMethodDependencies
 
 ```php
-public function getMethodDependencies(callable|string $callback, ZM\Container\ContainerInterface $container, array $parameters): array
+public function getMethodDependencies(ZM\Container\ContainerInterface $container, mixed $callback, array $parameters): array
 ```
 
 ### 描述
 
-Get all dependencies for a given method.
+作者很懒，什么也没有说
 
 ### 参数
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| callback | callable|string |  |
 | container | ZM\Container\ContainerInterface |  |
+| callback | mixed |  |
 | parameters | array |  |
 
 ### 返回
@@ -59,7 +59,7 @@ public function addDependencyForCallParameter(ZM\Container\ContainerInterface $c
 
 ### 描述
 
-Get the dependency for the given call parameter.
+作者很懒，什么也没有说
 
 ### 参数
 

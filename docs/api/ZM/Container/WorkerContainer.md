@@ -3,18 +3,24 @@
 ## getInstance
 
 ```php
-public function getInstance(): static
+public function getInstance(mixed $args): object
 ```
 
 ### 描述
 
-获取类实例
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| args | mixed |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| static |  |
+| object |  |
 
 
 ## bound
@@ -25,13 +31,13 @@ public function bound(string $abstract): bool
 
 ### 描述
 
-判断对应的类或接口是否已经注册
+作者很懒，什么也没有说
 
 ### 参数
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| abstract | string | 类或接口名 |
+| abstract | string |  |
 
 ### 返回
 
@@ -48,19 +54,19 @@ public function getAlias(string $abstract): string
 
 ### 描述
 
-获取类别名（如存在）
+作者很懒，什么也没有说
 
 ### 参数
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| abstract | string | 类或接口名 |
+| abstract | string |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| string | 别名，不存在时返回传入的类或接口名 |
+| string |  |
 
 
 ## alias
@@ -71,14 +77,14 @@ public function alias(string $abstract, string $alias): void
 
 ### 描述
 
-注册一个类别名
+作者很懒，什么也没有说
 
 ### 参数
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| abstract | string | 类或接口名 |
-| alias | string | 别名 |
+| abstract | string |  |
+| alias | string |  |
 
 ### 返回
 
@@ -90,20 +96,20 @@ public function alias(string $abstract, string $alias): void
 ## bind
 
 ```php
-public function bind(string $abstract, null|Closure|string $concrete, bool $shared): void
+public function bind(string $abstract, mixed $concrete, bool $shared): void
 ```
 
 ### 描述
 
-注册绑定
+作者很懒，什么也没有说
 
 ### 参数
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| abstract | string | 类或接口名 |
-| concrete | null|Closure|string | 返回类实例的闭包，或是类名 |
-| shared | bool | 是否共享 |
+| abstract | string |  |
+| concrete | mixed |  |
+| shared | bool |  |
 
 ### 返回
 
@@ -115,21 +121,20 @@ public function bind(string $abstract, null|Closure|string $concrete, bool $shar
 ## bindIf
 
 ```php
-public function bindIf(string $abstract, null|Closure|string $concrete, bool $shared): void
+public function bindIf(string $abstract, mixed $concrete, bool $shared): void
 ```
 
 ### 描述
 
-注册绑定
-在已经绑定时不会重复注册
+作者很懒，什么也没有说
 
 ### 参数
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| abstract | string | 类或接口名 |
-| concrete | null|Closure|string | 返回类实例的闭包，或是类名 |
-| shared | bool | 是否共享 |
+| abstract | string |  |
+| concrete | mixed |  |
+| shared | bool |  |
 
 ### 返回
 
@@ -141,19 +146,19 @@ public function bindIf(string $abstract, null|Closure|string $concrete, bool $sh
 ## singleton
 
 ```php
-public function singleton(string $abstract, null|Closure|string $concrete): void
+public function singleton(string $abstract, mixed $concrete): void
 ```
 
 ### 描述
 
-注册一个单例绑定
+作者很懒，什么也没有说
 
 ### 参数
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| abstract | string | 类或接口名 |
-| concrete | null|Closure|string | 返回类实例的闭包，或是类名 |
+| abstract | string |  |
+| concrete | mixed |  |
 
 ### 返回
 
@@ -165,20 +170,19 @@ public function singleton(string $abstract, null|Closure|string $concrete): void
 ## singletonIf
 
 ```php
-public function singletonIf(string $abstract, null|Closure|string $concrete): void
+public function singletonIf(string $abstract, mixed $concrete): void
 ```
 
 ### 描述
 
-注册一个单例绑定
-在已经绑定时不会重复注册
+作者很懒，什么也没有说
 
 ### 参数
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| abstract | string | 类或接口名 |
-| concrete | null|Closure|string | 返回类实例的闭包，或是类名 |
+| abstract | string |  |
+| concrete | mixed |  |
 
 ### 返回
 
@@ -195,14 +199,14 @@ public function instance(string $abstract, mixed $instance): mixed
 
 ### 描述
 
-注册一个已有的实例，效果等同于单例绑定
+作者很懒，什么也没有说
 
 ### 参数
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| abstract | string | 类或接口名 |
-| instance | mixed | 实例 |
+| abstract | string |  |
+| instance | mixed |  |
 
 ### 返回
 
@@ -219,13 +223,13 @@ public function factory(string $abstract): Closure
 
 ### 描述
 
-获取一个解析对应类实例的闭包
+作者很懒，什么也没有说
 
 ### 参数
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| abstract | string | 类或接口名 |
+| abstract | string |  |
 
 ### 返回
 
@@ -242,7 +246,7 @@ public function flush(): void
 
 ### 描述
 
-清除所有绑定和实例
+作者很懒，什么也没有说
 
 ### 返回
 
@@ -254,42 +258,42 @@ public function flush(): void
 ## make
 
 ```php
-public function make(class-string<T> $abstract, array $parameters): Closure|mixed|T
+public function make(string $abstract, array $parameters): mixed
 ```
 
 ### 描述
 
-获取一个绑定的实例
+作者很懒，什么也没有说
 
 ### 参数
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| abstract | class-string<T> | 类或接口名 |
-| parameters | array | 参数 |
+| abstract | string |  |
+| parameters | array |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| Closure|mixed|T | 实例 |
+| mixed |  |
 
 
 ## build
 
 ```php
-public function build(Closure|string $concrete): mixed
+public function build(mixed $concrete): mixed
 ```
 
 ### 描述
 
-实例化具体的类实例
+作者很懒，什么也没有说
 
 ### 参数
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| concrete | Closure|string | 类名或对应的闭包 |
+| concrete | mixed |  |
 
 ### 返回
 
@@ -301,20 +305,20 @@ public function build(Closure|string $concrete): mixed
 ## call
 
 ```php
-public function call(callable|string $callback, array $parameters, null|string $default_method): mixed
+public function call(mixed $callback, array $parameters, string $default_method): mixed
 ```
 
 ### 描述
 
-调用对应的方法，并自动注入依赖
+作者很懒，什么也没有说
 
 ### 参数
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| callback | callable|string | 对应的方法 |
-| parameters | array | 参数 |
-| default_method | null|string | 默认方法 |
+| callback | mixed |  |
+| parameters | array |  |
+| default_method | string |  |
 
 ### 返回
 
@@ -331,19 +335,19 @@ public function get(string $id): mixed
 
 ### 描述
 
-Finds an entry of the container by its identifier and returns it.
+作者很懒，什么也没有说
 
 ### 参数
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| id | string | identifier of the entry to look for * |
+| id | string |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| mixed | entry |
+| mixed |  |
 
 
 ## has
@@ -354,16 +358,13 @@ public function has(string $id): bool
 
 ### 描述
 
-Returns true if the container can return an entry for the given identifier.
-Returns false otherwise.
-`has($id)` returning true does not mean that `get($id)` will not throw an exception.
-It does however mean that `get($id)` will not throw a `NotFoundExceptionInterface`.
+作者很懒，什么也没有说
 
 ### 参数
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| id | string | identifier of the entry to look for |
+| id | string |  |
 
 ### 返回
 
@@ -380,14 +381,14 @@ public function extend(string $abstract, Closure $closure): void
 
 ### 描述
 
-扩展一个类或接口
+作者很懒，什么也没有说
 
 ### 参数
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| abstract | string | 类或接口名 |
-| closure | Closure | 扩展闭包 |
+| abstract | string |  |
+| closure | Closure |  |
 
 ### 返回
 
@@ -404,7 +405,7 @@ public function getLogPrefix(): string
 
 ### 描述
 
-获取日志前缀
+作者很懒，什么也没有说
 
 ### 返回
 
@@ -421,7 +422,7 @@ public function setLogPrefix(string $prefix): void
 
 ### 描述
 
-设置日志前缀
+作者很懒，什么也没有说
 
 ### 参数
 
@@ -439,24 +440,24 @@ public function setLogPrefix(string $prefix): void
 ## getExtenders
 
 ```php
-public function getExtenders(string $abstract): Closure[]
+public function getExtenders(string $abstract): array
 ```
 
 ### 描述
 
-获取对应类型的所有扩展器
+作者很懒，什么也没有说
 
 ### 参数
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| abstract | string | 类或接口名 |
+| abstract | string |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| Closure[] |  |
+| array |  |
 
 
 ## isAlias
@@ -467,7 +468,7 @@ public function isAlias(string $name): bool
 
 ### 描述
 
-判断传入的是否为别名
+作者很懒，什么也没有说
 
 ### 参数
 
@@ -490,13 +491,13 @@ public function dropStaleInstances(string $abstract): void
 
 ### 描述
 
-抛弃所有过时的实例和别名
+作者很懒，什么也没有说
 
 ### 参数
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| abstract | string | 类或接口名 |
+| abstract | string |  |
 
 ### 返回
 
@@ -513,14 +514,14 @@ public function getClosure(string $abstract, string $concrete): Closure
 
 ### 描述
 
-获取一个解析对应类的闭包
+作者很懒，什么也没有说
 
 ### 参数
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| abstract | string | 类或接口名 |
-| concrete | string | 实际类名 |
+| abstract | string |  |
+| concrete | string |  |
 
 ### 返回
 
@@ -537,7 +538,7 @@ public function getLastParameterOverride(): array
 
 ### 描述
 
-获取最后一次的覆盖参数
+作者很懒，什么也没有说
 
 ### 返回
 
@@ -554,7 +555,7 @@ public function notInstantiable(string $concrete, string $reason): void
 
 ### 描述
 
-抛出实例化异常
+作者很懒，什么也没有说
 
 ### 参数
 
@@ -573,18 +574,18 @@ public function notInstantiable(string $concrete, string $reason): void
 ## resolveDependencies
 
 ```php
-public function resolveDependencies(ReflectionParameter[] $dependencies): array
+public function resolveDependencies(array $dependencies): array
 ```
 
 ### 描述
 
-解析依赖
+作者很懒，什么也没有说
 
 ### 参数
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| dependencies | ReflectionParameter[] |  |
+| dependencies | array |  |
 
 ### 返回
 
@@ -601,7 +602,7 @@ public function hasParameterOverride(ReflectionParameter $parameter): bool
 
 ### 描述
 
-判断传入的参数是否存在覆盖参数
+作者很懒，什么也没有说
 
 ### 参数
 
@@ -624,7 +625,7 @@ public function getParameterOverride(ReflectionParameter $parameter): mixed
 
 ### 描述
 
-获取覆盖参数
+作者很懒，什么也没有说
 
 ### 参数
 
@@ -647,7 +648,7 @@ public function hasParameterTypeOverride(ReflectionParameter $parameter): bool
 
 ### 描述
 
-判断传入的参数是否存在临时注入的参数
+作者很懒，什么也没有说
 
 ### 参数
 
@@ -670,7 +671,7 @@ public function getParameterTypeOverride(ReflectionParameter $parameter): mixed
 
 ### 描述
 
-获取临时注入的参数
+作者很懒，什么也没有说
 
 ### 参数
 
@@ -693,7 +694,7 @@ public function resolvePrimitive(ReflectionParameter $parameter): mixed
 
 ### 描述
 
-解析基本类型
+作者很懒，什么也没有说
 
 ### 参数
 
@@ -705,7 +706,7 @@ public function resolvePrimitive(ReflectionParameter $parameter): mixed
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| mixed | 对应类型的默认值 |
+| mixed |  |
 
 
 ## resolveClass
@@ -716,7 +717,7 @@ public function resolveClass(ReflectionParameter $parameter): mixed
 
 ### 描述
 
-解析类
+作者很懒，什么也没有说
 
 ### 参数
 
@@ -734,24 +735,24 @@ public function resolveClass(ReflectionParameter $parameter): mixed
 ## getConcrete
 
 ```php
-public function getConcrete(string $abstract): Closure|string
+public function getConcrete(string $abstract): mixed
 ```
 
 ### 描述
 
-获取类名的实际类型
+作者很懒，什么也没有说
 
 ### 参数
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| abstract | string | 类或接口名 |
+| abstract | string |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| Closure|string |  |
+| mixed |  |
 
 
 ## isBuildable
@@ -762,14 +763,14 @@ public function isBuildable(mixed $concrete, string $abstract): bool
 
 ### 描述
 
-判断传入的实际类型是否可以构造
+作者很懒，什么也没有说
 
 ### 参数
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| concrete | mixed | 实际类型 |
-| abstract | string | 类或接口名 |
+| concrete | mixed |  |
+| abstract | string |  |
 
 ### 返回
 
@@ -786,13 +787,13 @@ public function isShared(string $abstract): bool
 
 ### 描述
 
-判断传入的类型是否为共享实例
+作者很懒，什么也没有说
 
 ### 参数
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| abstract | string | 类或接口名 |
+| abstract | string |  |
 
 ### 返回
 
@@ -809,7 +810,7 @@ public function shouldLog(): bool
 
 ### 描述
 
-判断是否输出日志
+作者很懒，什么也没有说
 
 ### 返回
 
@@ -826,7 +827,7 @@ public function log(string $message): void
 
 ### 描述
 
-记录日志（自动附加容器日志前缀）
+作者很懒，什么也没有说
 
 ### 参数
 

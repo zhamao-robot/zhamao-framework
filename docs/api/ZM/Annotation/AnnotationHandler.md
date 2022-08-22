@@ -1,9 +1,9 @@
-# ZM\Annotation\AnnotationParser
+# ZM\Annotation\AnnotationHandler
 
 ## __construct
 
 ```php
-public function __construct(bool $with_internal_parsers): mixed
+public function __construct(string $annotation_class): mixed
 ```
 
 ### 描述
@@ -14,7 +14,7 @@ public function __construct(bool $with_internal_parsers): mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| with_internal_parsers | bool |  |
+| annotation_class | string |  |
 
 ### 返回
 
@@ -23,10 +23,10 @@ public function __construct(bool $with_internal_parsers): mixed
 | mixed |  |
 
 
-## addSpecialParser
+## interrupt
 
 ```php
-public function addSpecialParser(string $class_name, callable $callback): mixed
+public function interrupt(mixed $return_var): mixed
 ```
 
 ### 描述
@@ -37,8 +37,7 @@ public function addSpecialParser(string $class_name, callable $callback): mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| class_name | string |  |
-| callback | callable |  |
+| return_var | mixed |  |
 
 ### 返回
 
@@ -47,44 +46,10 @@ public function addSpecialParser(string $class_name, callable $callback): mixed
 | mixed |  |
 
 
-## parseAll
+## setRuleCallback
 
 ```php
-public function parseAll(): mixed
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| mixed |  |
-
-
-## generateAnnotationList
-
-```php
-public function generateAnnotationList(): array
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| array |  |
-
-
-## addRegisterPath
-
-```php
-public function addRegisterPath(string $path, string $indoor_name): mixed
+public function setRuleCallback(callable $rule): ZM\Annotation\AnnotationHandler
 ```
 
 ### 描述
@@ -95,20 +60,19 @@ public function addRegisterPath(string $path, string $indoor_name): mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| path | string |  |
-| indoor_name | string |  |
+| rule | callable |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| mixed |  |
+| ZM\Annotation\AnnotationHandler |  |
 
 
-## sortByLevel
+## setReturnCallback
 
 ```php
-public function sortByLevel(array $events, string $class_name, string $prefix): mixed
+public function setReturnCallback(callable $return): ZM\Annotation\AnnotationHandler
 ```
 
 ### 描述
@@ -119,55 +83,19 @@ public function sortByLevel(array $events, string $class_name, string $prefix): 
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| events | array |  |
-| class_name | string |  |
-| prefix | string |  |
+| return | callable |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| mixed |  |
+| ZM\Annotation\AnnotationHandler |  |
 
 
-## getUsedTime
-
-```php
-public function getUsedTime(): float
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| float |  |
-
-
-## getAnnotationMap
+## handleAll
 
 ```php
-public function getAnnotationMap(): array
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| array |  |
-
-
-## addRouteAnnotation
-
-```php
-public function addRouteAnnotation(ZM\Annotation\Http\Route $vss): mixed
+public function handleAll(mixed $params): mixed
 ```
 
 ### 描述
@@ -178,7 +106,66 @@ public function addRouteAnnotation(ZM\Annotation\Http\Route $vss): mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| vss | ZM\Annotation\Http\Route |  |
+| params | mixed |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| mixed |  |
+
+
+## handle
+
+```php
+public function handle(ZM\Annotation\AnnotationBase $v, callable $rule_callback, mixed $args): bool
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| v | ZM\Annotation\AnnotationBase |  |
+| rule_callback | callable |  |
+| args | mixed |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| bool |  |
+
+
+## getStatus
+
+```php
+public function getStatus(): int
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| int |  |
+
+
+## getReturnVal
+
+```php
+public function getReturnVal(): mixed
+```
+
+### 描述
+
+作者很懒，什么也没有说
 
 ### 返回
 

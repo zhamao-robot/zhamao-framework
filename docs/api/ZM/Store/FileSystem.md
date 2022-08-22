@@ -1,26 +1,9 @@
-# ZM\Config\ZMConfig
+# ZM\Store\FileSystem
 
-## restoreDirectory
-
-```php
-public function restoreDirectory(): mixed
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| mixed |  |
-
-
-## get
+## scanDirFiles
 
 ```php
-public function get(string $name, mixed $additional_key): mixed
+public function scanDirFiles(string $dir, bool $recursive, mixed $relative, bool $include_dir): mixed
 ```
 
 ### 描述
@@ -31,8 +14,10 @@ public function get(string $name, mixed $additional_key): mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| name | string |  |
-| additional_key | mixed |  |
+| dir | string |  |
+| recursive | bool |  |
+| relative | mixed |  |
+| include_dir | bool |  |
 
 ### 返回
 
@@ -41,10 +26,10 @@ public function get(string $name, mixed $additional_key): mixed
 | mixed |  |
 
 
-## smartPatch
+## isRelativePath
 
 ```php
-public function smartPatch(mixed $data, mixed $patch): mixed
+public function isRelativePath(string $path): bool
 ```
 
 ### 描述
@@ -55,20 +40,19 @@ public function smartPatch(mixed $data, mixed $patch): mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| data | mixed |  |
-| patch | mixed |  |
+| path | string |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| mixed |  |
+| bool |  |
 
 
-## loadConfig
+## createDir
 
 ```php
-public function loadConfig(string $name): mixed
+public function createDir(string $path): void
 ```
 
 ### 描述
@@ -79,30 +63,7 @@ public function loadConfig(string $name): mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| name | string |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| mixed |  |
-
-
-## parseList
-
-```php
-public function parseList(string $name): void
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| name | string |  |
+| path | string |  |
 
 ### 返回
 
@@ -111,10 +72,27 @@ public function parseList(string $name): void
 | void |  |
 
 
-## readConfigFromFile
+## getReloadableFiles
 
 ```php
-public function readConfigFromFile(mixed $filename, mixed $ext_name): array
+public function getReloadableFiles(): array
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| array |  |
+
+
+## getClassesPsr4
+
+```php
+public function getClassesPsr4(string $dir, string $base_namespace, mixed $rule, mixed $return_path_value): array
 ```
 
 ### 描述
@@ -125,8 +103,10 @@ public function readConfigFromFile(mixed $filename, mixed $ext_name): array
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| filename | mixed |  |
-| ext_name | mixed |  |
+| dir | string |  |
+| base_namespace | string |  |
+| rule | mixed |  |
+| return_path_value | mixed |  |
 
 ### 返回
 

@@ -1,9 +1,9 @@
-# ZM\Utils\ReflectionUtil
+# ZM\Store\MySQL\MySQLPool
 
-## getParameterClassName
+## create
 
 ```php
-public function getParameterClassName(ReflectionParameter $parameter): string
+public function create(string $name, array $config): mixed
 ```
 
 ### 描述
@@ -14,19 +14,20 @@ public function getParameterClassName(ReflectionParameter $parameter): string
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| parameter | ReflectionParameter |  |
+| name | string |  |
+| config | array |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| string |  |
+| mixed |  |
 
 
-## variableToString
+## pool
 
 ```php
-public function variableToString(mixed $var): string
+public function pool(string $name): mixed
 ```
 
 ### 描述
@@ -37,19 +38,36 @@ public function variableToString(mixed $var): string
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| var | mixed |  |
+| name | string |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| string |  |
+| mixed |  |
 
 
-## isNonStaticMethod
+## getAllPools
 
 ```php
-public function isNonStaticMethod(mixed $callback): bool
+public function getAllPools(): array
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| array |  |
+
+
+## destroyPool
+
+```php
+public function destroyPool(string $name): mixed
 ```
 
 ### 描述
@@ -60,33 +78,27 @@ public function isNonStaticMethod(mixed $callback): bool
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| callback | mixed |  |
+| name | string |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| bool |  |
+| mixed |  |
 
 
-## getCallReflector
+## checkExtension
 
 ```php
-public function getCallReflector(mixed $callback): ReflectionFunctionAbstract
+public function checkExtension(): mixed
 ```
 
 ### 描述
 
 作者很懒，什么也没有说
 
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| callback | mixed |  |
-
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| ReflectionFunctionAbstract |  |
+| mixed |  |

@@ -1,14 +1,22 @@
-# ZM\Config\ZMConfig
+# ZM\Event\EventProvider
 
-## restoreDirectory
+## addEventListener
 
 ```php
-public function restoreDirectory(): mixed
+public function addEventListener(mixed $event, callable $callback, int $level): mixed
 ```
 
 ### 描述
 
 作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| event | mixed |  |
+| callback | callable |  |
+| level | int |  |
 
 ### 返回
 
@@ -17,10 +25,10 @@ public function restoreDirectory(): mixed
 | mixed |  |
 
 
-## get
+## getEventListeners
 
 ```php
-public function get(string $name, mixed $additional_key): mixed
+public function getEventListeners(string $event_name): array
 ```
 
 ### 描述
@@ -31,105 +39,79 @@ public function get(string $name, mixed $additional_key): mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| name | string |  |
-| additional_key | mixed |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| mixed |  |
-
-
-## smartPatch
-
-```php
-public function smartPatch(mixed $data, mixed $patch): mixed
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| data | mixed |  |
-| patch | mixed |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| mixed |  |
-
-
-## loadConfig
-
-```php
-public function loadConfig(string $name): mixed
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| name | string |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| mixed |  |
-
-
-## parseList
-
-```php
-public function parseList(string $name): void
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| name | string |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| void |  |
-
-
-## readConfigFromFile
-
-```php
-public function readConfigFromFile(mixed $filename, mixed $ext_name): array
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| filename | mixed |  |
-| ext_name | mixed |  |
+| event_name | string |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
 | array |  |
+
+
+## getListenersForEvent
+
+```php
+public function getListenersForEvent(object $event): iterable
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| event | object |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| iterable |  |
+
+
+## sortEvents
+
+```php
+public function sortEvents(mixed $name): mixed
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| name | mixed |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| mixed |  |
+
+
+## getInstance
+
+```php
+public function getInstance(mixed $args): object
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| args | mixed |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| object |  |

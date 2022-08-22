@@ -3,7 +3,7 @@
 ## parseUri
 
 ```php
-public function parseUri(mixed $request, mixed $response, mixed $uri, mixed $node, mixed $params): mixed
+public function parseUri(OneBot\Http\ServerRequest $request, mixed $node, mixed $params): int
 ```
 
 ### 描述
@@ -14,9 +14,7 @@ public function parseUri(mixed $request, mixed $response, mixed $uri, mixed $nod
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| request | mixed |  |
-| response | mixed |  |
-| uri | mixed |  |
+| request | OneBot\Http\ServerRequest |  |
 | node | mixed |  |
 | params | mixed |  |
 
@@ -24,13 +22,13 @@ public function parseUri(mixed $request, mixed $response, mixed $uri, mixed $nod
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| mixed |  |
+| int |  |
 
 
 ## handleStaticPage
 
 ```php
-public function handleStaticPage(Response|\Swoole\Http\Response $response, string $uri, array $settings): bool
+public function handleStaticPage(string $uri, array $settings): Psr\Http\Message\ResponseInterface
 ```
 
 ### 描述
@@ -41,7 +39,6 @@ public function handleStaticPage(Response|\Swoole\Http\Response $response, strin
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| response | Response|\Swoole\Http\Response |  |
 | uri | string |  |
 | settings | array |  |
 
@@ -49,4 +46,52 @@ public function handleStaticPage(Response|\Swoole\Http\Response $response, strin
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| bool |  |
+| Psr\Http\Message\ResponseInterface |  |
+
+
+## handleHttpCodePage
+
+```php
+public function handleHttpCodePage(int $code): Psr\Http\Message\ResponseInterface
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| code | int |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| Psr\Http\Message\ResponseInterface |  |
+
+
+## createJsonResponse
+
+```php
+public function createJsonResponse(array $data, int $http_code, int $json_flag): Psr\Http\Message\ResponseInterface
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| data | array |  |
+| http_code | int |  |
+| json_flag | int |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| Psr\Http\Message\ResponseInterface |  |

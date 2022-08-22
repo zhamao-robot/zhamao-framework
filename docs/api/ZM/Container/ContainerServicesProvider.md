@@ -3,25 +3,19 @@
 ## registerServices
 
 ```php
-public function registerServices(string $scope): void
+public function registerServices(string $scope, mixed $params): void
 ```
 
 ### 描述
 
-注册服务
-```
-作用域：
-global: worker start
-request: request
-message: message
-connection: open, close, message
-```
+作者很懒，什么也没有说
 
 ### 参数
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| scope | string | 作用域 |
+| scope | string |  |
+| params | mixed |  |
 
 ### 返回
 
@@ -38,7 +32,7 @@ public function cleanup(): void
 
 ### 描述
 
-清理服务
+作者很懒，什么也没有说
 
 ### 返回
 
@@ -55,7 +49,7 @@ public function registerGlobalServices(ZM\Container\ContainerInterface $containe
 
 ### 描述
 
-注册全局服务
+作者很懒，什么也没有说
 
 ### 参数
 
@@ -73,18 +67,19 @@ public function registerGlobalServices(ZM\Container\ContainerInterface $containe
 ## registerRequestServices
 
 ```php
-public function registerRequestServices(ZM\Container\ContainerInterface $container): void
+public function registerRequestServices(ZM\Container\ContainerInterface $container, OneBot\Driver\Event\Http\HttpRequestEvent $event): void
 ```
 
 ### 描述
 
-注册请求服务（HTTP请求）
+作者很懒，什么也没有说
 
 ### 参数
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | container | ZM\Container\ContainerInterface |  |
+| event | OneBot\Driver\Event\Http\HttpRequestEvent |  |
 
 ### 返回
 
@@ -101,7 +96,7 @@ public function registerMessageServices(ZM\Container\ContainerInterface $contain
 
 ### 描述
 
-注册消息服务（WS消息）
+作者很懒，什么也没有说
 
 ### 参数
 
@@ -124,7 +119,7 @@ public function registerConnectionServices(ZM\Container\ContainerInterface $cont
 
 ### 描述
 
-注册链接服务
+作者很懒，什么也没有说
 
 ### 参数
 

@@ -1,9 +1,9 @@
 # ZM\Utils\ZMUtil
 
-## stop
+## getComposerMetadata
 
 ```php
-public function stop(mixed $error_exit): mixed
+public function getComposerMetadata(string $path): array
 ```
 
 ### 描述
@@ -14,70 +14,10 @@ public function stop(mixed $error_exit): mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| error_exit | mixed |  |
+| path | string |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| mixed |  |
-
-
-## reload
-
-```php
-public function reload(): mixed
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| mixed |  |
-
-
-## getReloadableFiles
-
-```php
-public function getReloadableFiles(): string[]|string[][]
-```
-
-### 描述
-
-在工作进程中返回可以通过reload重新加载的php文件列表
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| string[]|string[][] |  |
-
-
-## getClassesPsr4
-
-```php
-public function getClassesPsr4(string $dir, string $base_namespace, null|mixed $rule, bool|string $return_path_value): string[]
-```
-
-### 描述
-
-使用Psr-4标准获取目录下的所有类
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| dir | string | 目录 |
-| base_namespace | string | 基础命名空间 |
-| rule | null|mixed | 规则 |
-| return_path_value | bool|string | 是否返回文件路径，返回文件路径的话传入字符串 |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| string[] |  |
+| array |  |

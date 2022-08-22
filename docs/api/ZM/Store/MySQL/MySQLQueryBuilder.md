@@ -1,9 +1,9 @@
-# ZM\Command\BuildCommand
+# ZM\Store\MySQL\MySQLQueryBuilder
 
-## configure
+## execute
 
 ```php
-public function configure(): mixed
+public function execute(): mixed
 ```
 
 ### 描述

@@ -1,9 +1,9 @@
-# ZM\ConsoleApplication
+# ZM\Store\Lock\FileLock
 
-## __construct
+## lock
 
 ```php
-public function __construct(string $name): mixed
+public function lock(string $name): mixed
 ```
 
 ### 描述
@@ -23,10 +23,10 @@ public function __construct(string $name): mixed
 | mixed |  |
 
 
-## run
+## unlock
 
 ```php
-public function run(Symfony\Component\Console\Input\InputInterface $input, Symfony\Component\Console\Output\OutputInterface $output): int
+public function unlock(string $name): mixed
 ```
 
 ### 描述
@@ -37,11 +37,10 @@ public function run(Symfony\Component\Console\Input\InputInterface $input, Symfo
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| input | Symfony\Component\Console\Input\InputInterface |  |
-| output | Symfony\Component\Console\Output\OutputInterface |  |
+| name | string |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| int |  |
+| mixed |  |

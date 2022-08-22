@@ -1,9 +1,9 @@
-# ZM\Utils\ReflectionUtil
+# ZM\Store\MySQL\MySQLConnection
 
-## getParameterClassName
+## prepare
 
 ```php
-public function getParameterClassName(ReflectionParameter $parameter): string
+public function prepare(mixed $sql, mixed $options): mixed
 ```
 
 ### 描述
@@ -14,19 +14,20 @@ public function getParameterClassName(ReflectionParameter $parameter): string
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| parameter | ReflectionParameter |  |
+| sql | mixed |  |
+| options | mixed |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| string |  |
+| mixed |  |
 
 
-## variableToString
+## query
 
 ```php
-public function variableToString(mixed $var): string
+public function query(mixed $args): mixed
 ```
 
 ### 描述
@@ -37,19 +38,19 @@ public function variableToString(mixed $var): string
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| var | mixed |  |
+| args | mixed |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| string |  |
+| mixed |  |
 
 
-## isNonStaticMethod
+## exec
 
 ```php
-public function isNonStaticMethod(mixed $callback): bool
+public function exec(mixed $sql): mixed
 ```
 
 ### 描述
@@ -60,19 +61,19 @@ public function isNonStaticMethod(mixed $callback): bool
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| callback | mixed |  |
+| sql | mixed |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| bool |  |
+| mixed |  |
 
 
-## getCallReflector
+## lastInsertId
 
 ```php
-public function getCallReflector(mixed $callback): ReflectionFunctionAbstract
+public function lastInsertId(mixed $name): mixed
 ```
 
 ### 描述
@@ -83,10 +84,27 @@ public function getCallReflector(mixed $callback): ReflectionFunctionAbstract
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| callback | mixed |  |
+| name | mixed |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| ReflectionFunctionAbstract |  |
+| mixed |  |
+
+
+## getPoolName
+
+```php
+public function getPoolName(): mixed
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| mixed |  |

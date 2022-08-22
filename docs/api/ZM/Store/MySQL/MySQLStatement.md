@@ -1,9 +1,9 @@
-# ZM\Command\BuildCommand
+# ZM\Store\MySQL\MySQLStatement
 
-## configure
+## current
 
 ```php
-public function configure(): mixed
+public function current(): mixed
 ```
 
 ### 描述

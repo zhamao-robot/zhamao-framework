@@ -1,510 +1,9 @@
-# ZM\Container\Container
+# ZM\Store\MySQL\MySQLWrapper
 
-## getParent
-
-```php
-public function getParent(): ZM\Container\ContainerInterface
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| ZM\Container\ContainerInterface |  |
-
-
-## has
+## __construct
 
 ```php
-public function has(string $id): bool
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| id | string |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| bool |  |
-
-
-## make
-
-```php
-public function make(string $abstract, array $parameters): mixed
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| abstract | string |  |
-| parameters | array |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| mixed |  |
-
-
-## getInstance
-
-```php
-public function getInstance(mixed $args): object
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| args | mixed |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| object |  |
-
-
-## bound
-
-```php
-public function bound(string $abstract): bool
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| abstract | string |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| bool |  |
-
-
-## getAlias
-
-```php
-public function getAlias(string $abstract): string
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| abstract | string |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| string |  |
-
-
-## alias
-
-```php
-public function alias(string $abstract, string $alias): void
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| abstract | string |  |
-| alias | string |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| void |  |
-
-
-## bind
-
-```php
-public function bind(string $abstract, mixed $concrete, bool $shared): void
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| abstract | string |  |
-| concrete | mixed |  |
-| shared | bool |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| void |  |
-
-
-## bindIf
-
-```php
-public function bindIf(string $abstract, mixed $concrete, bool $shared): void
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| abstract | string |  |
-| concrete | mixed |  |
-| shared | bool |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| void |  |
-
-
-## singleton
-
-```php
-public function singleton(string $abstract, mixed $concrete): void
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| abstract | string |  |
-| concrete | mixed |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| void |  |
-
-
-## singletonIf
-
-```php
-public function singletonIf(string $abstract, mixed $concrete): void
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| abstract | string |  |
-| concrete | mixed |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| void |  |
-
-
-## instance
-
-```php
-public function instance(string $abstract, mixed $instance): mixed
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| abstract | string |  |
-| instance | mixed |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| mixed |  |
-
-
-## factory
-
-```php
-public function factory(string $abstract): Closure
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| abstract | string |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| Closure |  |
-
-
-## flush
-
-```php
-public function flush(): void
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| void |  |
-
-
-## traitMake
-
-```php
-public function traitMake(string $abstract, array $parameters): mixed
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| abstract | string |  |
-| parameters | array |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| mixed |  |
-
-
-## build
-
-```php
-public function build(mixed $concrete): mixed
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| concrete | mixed |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| mixed |  |
-
-
-## call
-
-```php
-public function call(mixed $callback, array $parameters, string $default_method): mixed
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| callback | mixed |  |
-| parameters | array |  |
-| default_method | string |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| mixed |  |
-
-
-## get
-
-```php
-public function get(string $id): mixed
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| id | string |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| mixed |  |
-
-
-## extend
-
-```php
-public function extend(string $abstract, Closure $closure): void
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| abstract | string |  |
-| closure | Closure |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| void |  |
-
-
-## getLogPrefix
-
-```php
-public function getLogPrefix(): string
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| string |  |
-
-
-## setLogPrefix
-
-```php
-public function setLogPrefix(string $prefix): void
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| prefix | string |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| void |  |
-
-
-## getExtenders
-
-```php
-public function getExtenders(string $abstract): array
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| abstract | string |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| array |  |
-
-
-## isAlias
-
-```php
-public function isAlias(string $name): bool
+public function __construct(string $name): mixed
 ```
 
 ### 描述
@@ -521,13 +20,47 @@ public function isAlias(string $name): bool
 
 | 类型 | 描述 |
 | ---- | ----------- |
+| mixed |  |
+
+
+## getDatabase
+
+```php
+public function getDatabase(): string
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| string |  |
+
+
+## isAutoCommit
+
+```php
+public function isAutoCommit(): bool
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
 | bool |  |
 
 
-## dropStaleInstances
+## setAutoCommit
 
 ```php
-public function dropStaleInstances(string $abstract): void
+public function setAutoCommit(bool $auto_commit): mixed
 ```
 
 ### 描述
@@ -538,19 +71,19 @@ public function dropStaleInstances(string $abstract): void
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| abstract | string |  |
+| auto_commit | bool |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| void |  |
+| mixed |  |
 
 
-## getClosure
+## fetchAssociative
 
 ```php
-public function getClosure(string $abstract, string $concrete): Closure
+public function fetchAssociative(string $query, array $params, array $types): mixed
 ```
 
 ### 描述
@@ -561,25 +94,264 @@ public function getClosure(string $abstract, string $concrete): Closure
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| abstract | string |  |
-| concrete | string |  |
+| query | string |  |
+| params | array |  |
+| types | array |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| Closure |  |
+| mixed |  |
 
 
-## getLastParameterOverride
+## fetchNumeric
 
 ```php
-public function getLastParameterOverride(): array
+public function fetchNumeric(string $query, array $params, array $types): mixed
 ```
 
 ### 描述
 
 作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| query | string |  |
+| params | array |  |
+| types | array |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| mixed |  |
+
+
+## fetchOne
+
+```php
+public function fetchOne(string $query, array $params, array $types): mixed
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| query | string |  |
+| params | array |  |
+| types | array |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| mixed |  |
+
+
+## isTransactionActive
+
+```php
+public function isTransactionActive(): bool
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| bool |  |
+
+
+## delete
+
+```php
+public function delete(string $table, array $criteria, array $types): int
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| table | string |  |
+| criteria | array |  |
+| types | array |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| int |  |
+
+
+## setTransactionIsolation
+
+```php
+public function setTransactionIsolation(int $level): int
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| level | int |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| int |  |
+
+
+## getTransactionIsolation
+
+```php
+public function getTransactionIsolation(): int
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| int |  |
+
+
+## update
+
+```php
+public function update(string $table, array $data, array $criteria, array $types): int
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| table | string |  |
+| data | array |  |
+| criteria | array |  |
+| types | array |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| int |  |
+
+
+## insert
+
+```php
+public function insert(string $table, array $data, array $types): int
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| table | string |  |
+| data | array |  |
+| types | array |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| int |  |
+
+
+## quoteIdentifier
+
+```php
+public function quoteIdentifier(string $str): string
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| str | string |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| string |  |
+
+
+## quote
+
+```php
+public function quote(mixed $value, mixed $type): mixed
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| value | mixed |  |
+| type | mixed |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| mixed |  |
+
+
+## fetchAllNumeric
+
+```php
+public function fetchAllNumeric(string $query, array $params, array $types): array
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| query | string |  |
+| params | array |  |
+| types | array |  |
 
 ### 返回
 
@@ -588,10 +360,10 @@ public function getLastParameterOverride(): array
 | array |  |
 
 
-## notInstantiable
+## fetchAllAssociative
 
 ```php
-public function notInstantiable(string $concrete, string $reason): void
+public function fetchAllAssociative(string $query, array $params, array $types): array
 ```
 
 ### 描述
@@ -602,31 +374,9 @@ public function notInstantiable(string $concrete, string $reason): void
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| concrete | string |  |
-| reason | string |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| void |  |
-
-
-## resolveDependencies
-
-```php
-public function resolveDependencies(array $dependencies): array
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| dependencies | array |  |
+| query | string |  |
+| params | array |  |
+| types | array |  |
 
 ### 返回
 
@@ -635,10 +385,10 @@ public function resolveDependencies(array $dependencies): array
 | array |  |
 
 
-## hasParameterOverride
+## fetchAllKeyValue
 
 ```php
-public function hasParameterOverride(ReflectionParameter $parameter): bool
+public function fetchAllKeyValue(string $query, array $params, array $types): array
 ```
 
 ### 描述
@@ -649,19 +399,21 @@ public function hasParameterOverride(ReflectionParameter $parameter): bool
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| parameter | ReflectionParameter |  |
+| query | string |  |
+| params | array |  |
+| types | array |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| bool |  |
+| array |  |
 
 
-## getParameterOverride
+## fetchAllAssociativeIndexed
 
 ```php
-public function getParameterOverride(ReflectionParameter $parameter): mixed
+public function fetchAllAssociativeIndexed(string $query, array $params, array $types): array
 ```
 
 ### 描述
@@ -672,7 +424,236 @@ public function getParameterOverride(ReflectionParameter $parameter): mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| parameter | ReflectionParameter |  |
+| query | string |  |
+| params | array |  |
+| types | array |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| array |  |
+
+
+## fetchFirstColumn
+
+```php
+public function fetchFirstColumn(string $query, array $params, array $types): array
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| query | string |  |
+| params | array |  |
+| types | array |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| array |  |
+
+
+## iterateNumeric
+
+```php
+public function iterateNumeric(string $query, array $params, array $types): Traversable
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| query | string |  |
+| params | array |  |
+| types | array |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| Traversable |  |
+
+
+## iterateAssociative
+
+```php
+public function iterateAssociative(string $query, array $params, array $types): Traversable
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| query | string |  |
+| params | array |  |
+| types | array |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| Traversable |  |
+
+
+## iterateKeyValue
+
+```php
+public function iterateKeyValue(string $query, array $params, array $types): Traversable
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| query | string |  |
+| params | array |  |
+| types | array |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| Traversable |  |
+
+
+## iterateAssociativeIndexed
+
+```php
+public function iterateAssociativeIndexed(string $query, array $params, array $types): Traversable
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| query | string |  |
+| params | array |  |
+| types | array |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| Traversable |  |
+
+
+## iterateColumn
+
+```php
+public function iterateColumn(string $query, array $params, array $types): Traversable
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| query | string |  |
+| params | array |  |
+| types | array |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| Traversable |  |
+
+
+## executeQuery
+
+```php
+public function executeQuery(string $sql, array $params, array $types, Doctrine\DBAL\Cache\QueryCacheProfile $qcp): ZM\Store\MySQL\MySQLStatementWrapper
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| sql | string |  |
+| params | array |  |
+| types | array |  |
+| qcp | Doctrine\DBAL\Cache\QueryCacheProfile |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| ZM\Store\MySQL\MySQLStatementWrapper |  |
+
+
+## executeCacheQuery
+
+```php
+public function executeCacheQuery(string $sql, array $params, array $types, Doctrine\DBAL\Cache\QueryCacheProfile $qcp): ZM\Store\MySQL\MySQLStatementWrapper
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| sql | string |  |
+| params | array |  |
+| types | array |  |
+| qcp | Doctrine\DBAL\Cache\QueryCacheProfile |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| ZM\Store\MySQL\MySQLStatementWrapper |  |
+
+
+## executeStatement
+
+```php
+public function executeStatement(string $sql, array $params, array $types): mixed
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| sql | string |  |
+| params | array |  |
+| types | array |  |
 
 ### 返回
 
@@ -681,33 +662,27 @@ public function getParameterOverride(ReflectionParameter $parameter): mixed
 | mixed |  |
 
 
-## hasParameterTypeOverride
+## getTransactionNestingLevel
 
 ```php
-public function hasParameterTypeOverride(ReflectionParameter $parameter): bool
+public function getTransactionNestingLevel(): int
 ```
 
 ### 描述
 
 作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| parameter | ReflectionParameter |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| bool |  |
+| int |  |
 
 
-## getParameterTypeOverride
+## lastInsertId
 
 ```php
-public function getParameterTypeOverride(ReflectionParameter $parameter): mixed
+public function lastInsertId(string $name): mixed
 ```
 
 ### 描述
@@ -718,7 +693,7 @@ public function getParameterTypeOverride(ReflectionParameter $parameter): mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| parameter | ReflectionParameter |  |
+| name | string |  |
 
 ### 返回
 
@@ -727,10 +702,10 @@ public function getParameterTypeOverride(ReflectionParameter $parameter): mixed
 | mixed |  |
 
 
-## resolvePrimitive
+## transactional
 
 ```php
-public function resolvePrimitive(ReflectionParameter $parameter): mixed
+public function transactional(Closure $func): mixed
 ```
 
 ### 描述
@@ -741,7 +716,7 @@ public function resolvePrimitive(ReflectionParameter $parameter): mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| parameter | ReflectionParameter |  |
+| func | Closure |  |
 
 ### 返回
 
@@ -750,10 +725,10 @@ public function resolvePrimitive(ReflectionParameter $parameter): mixed
 | mixed |  |
 
 
-## resolveClass
+## setNestTransactionsWithSavepoints
 
 ```php
-public function resolveClass(ReflectionParameter $parameter): mixed
+public function setNestTransactionsWithSavepoints(bool $nest_transactions_with_savepoints): mixed
 ```
 
 ### 描述
@@ -764,7 +739,7 @@ public function resolveClass(ReflectionParameter $parameter): mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| parameter | ReflectionParameter |  |
+| nest_transactions_with_savepoints | bool |  |
 
 ### 返回
 
@@ -773,80 +748,10 @@ public function resolveClass(ReflectionParameter $parameter): mixed
 | mixed |  |
 
 
-## getConcrete
+## getNestTransactionsWithSavepoints
 
 ```php
-public function getConcrete(string $abstract): mixed
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| abstract | string |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| mixed |  |
-
-
-## isBuildable
-
-```php
-public function isBuildable(mixed $concrete, string $abstract): bool
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| concrete | mixed |  |
-| abstract | string |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| bool |  |
-
-
-## isShared
-
-```php
-public function isShared(string $abstract): bool
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| abstract | string |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| bool |  |
-
-
-## shouldLog
-
-```php
-public function shouldLog(): bool
+public function getNestTransactionsWithSavepoints(): bool
 ```
 
 ### 描述
@@ -860,10 +765,61 @@ public function shouldLog(): bool
 | bool |  |
 
 
-## log
+## beginTransaction
 
 ```php
-public function log(string $message): void
+public function beginTransaction(): bool
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| bool |  |
+
+
+## commit
+
+```php
+public function commit(): bool
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| bool |  |
+
+
+## rollBack
+
+```php
+public function rollBack(): bool
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| bool |  |
+
+
+## createSavepoint
+
+```php
+public function createSavepoint(string $savepoint): mixed
 ```
 
 ### 描述
@@ -874,10 +830,107 @@ public function log(string $message): void
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| message | string |  |
+| savepoint | string |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| void |  |
+| mixed |  |
+
+
+## releaseSavepoint
+
+```php
+public function releaseSavepoint(string $savepoint): mixed
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| savepoint | string |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| mixed |  |
+
+
+## rollbackSavepoint
+
+```php
+public function rollbackSavepoint(string $savepoint): mixed
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| savepoint | string |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| mixed |  |
+
+
+## setRollbackOnly
+
+```php
+public function setRollbackOnly(): mixed
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| mixed |  |
+
+
+## isRollbackOnly
+
+```php
+public function isRollbackOnly(): bool
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| bool |  |
+
+
+## createQueryBuilder
+
+```php
+public function createQueryBuilder(): ZM\Store\MySQL\MySQLQueryBuilder
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| ZM\Store\MySQL\MySQLQueryBuilder |  |
