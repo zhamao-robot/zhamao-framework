@@ -7,38 +7,49 @@ const ZM_TEST_LOG_DEBUG = false;
 
 use OneBot\Driver\Event\Process\WorkerStartEvent;
 use PHPUnit\TextUI\Command;
+use Swoole\Atomic;
 use ZM\Command\Server\ServerStartCommand;
+use ZM\Event\EventProvider;
 use ZM\Framework;
 use ZM\Logger\ConsoleLogger;
+use ZM\Store\MockAtomic;
 
-$root = dirname(__DIR__);
+// 引入自动加载
+require dirname(__DIR__) . '/vendor/autoload.php';
 
-require $root . '/vendor/autoload.php';
-
+// 声明一个全局的原子计数，用于保存整个进程的退出状态码
 global $_swoole_atomic;
-$_swoole_atomic = new \Swoole\Atomic();
+// Windows 没有 Swoole，所以就使用了一个假的原子计数器，反正 Windows 只有单进程
+$_swoole_atomic = class_exists('\\Swoole\\Atomic') ? new Atomic() : new MockAtomic();
 
-ob_logger_register(new ConsoleLogger('error'));
+// 注册 Logger 等级
+ob_logger_register(new ConsoleLogger(ZM_TEST_LOG_DEBUG ? 'debug' : 'error'));
+
+// 使用框架自身的 EventProvider
 global $ob_event_provider;
-$ob_event_provider = new \ZM\Event\EventProvider();
+$ob_event_provider = new EventProvider();
 
+// 注册一个最低级别的 WorkerStart 事件，用于在框架的事件初始化之后开始运行 PHPUnit
 ob_event_provider()->addEventListener(WorkerStartEvent::getName(), function () {
     try {
+        // 不退出，而是返回 code
         $retcode = Command::main(false);
     } finally {
         global $_swoole_atomic;
         $_swoole_atomic->set($retcode ?? 0);
+        if (DIRECTORY_SEPARATOR === '\\') {
+            exit($retcode ?? 0);
+        }
         Framework::getInstance()->stop();
     }
 }, 1);
 
 try {
     $options = ServerStartCommand::exportOptionArray();
-    $options['driver'] = 'swoole';
+    $options['driver'] = DIRECTORY_SEPARATOR === '/' ? 'swoole' : 'workerman';
     $options['worker-num'] = 1;
     $options['private-mode'] = true;
     (new Framework($options))->init()->start();
-
     exit($_swoole_atomic->get());
 } catch (Throwable $e) {
     echo $e->getMessage() . PHP_EOL;
