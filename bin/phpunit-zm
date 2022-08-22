@@ -37,10 +37,7 @@ ob_event_provider()->addEventListener(WorkerStartEvent::getName(), function () {
     } finally {
         global $_swoole_atomic;
         $_swoole_atomic->set($retcode ?? 0);
-        if (DIRECTORY_SEPARATOR === '\\') {
-            exit($retcode ?? 0);
-        }
-        Framework::getInstance()->stop();
+        Framework::getInstance()->stop($retcode ?? 0);
     }
 }, 1);
 

@@ -109,7 +109,7 @@ class Framework
      * 未测试
      * @throws ZMKnownException
      */
-    public function stop()
+    public function stop(int $retcode = 0)
     {
         switch ($this->driver->getName()) {
             case 'swoole':
@@ -120,7 +120,7 @@ class Framework
                 if (extension_loaded('posix')) {
                     posix_kill(ProcessStateManager::getProcessState(ZM_PROCESS_MASTER)['pid'], SIGTERM);
                 } else {
-                    Worker::stopAll();
+                    Worker::stopAll($retcode);
                 }
                 break;
         }
