@@ -130,7 +130,8 @@ class AnnotationHandler
     {
         // 由于3.0有额外的插件模式支持，所以注解就不再提供独立的闭包函数调用支持了
         // 提取要调用的目标类和方法名称
-        $target_class = new ($v->class)();
+        $class = $v->class;
+        $target_class = new $class();
         $target_method = $v->method;
         // 先执行规则，失败就返回false
         if ($rule_callback !== null && !$rule_callback($v)) {

@@ -97,7 +97,9 @@ class WorkerEventListener
     public function onWorkerStop999()
     {
         logger()->debug('Worker #' . ProcessManager::getProcessId() . ' stopping');
-        ProcessStateManager::removeProcessState(ZM_PROCESS_WORKER, ProcessManager::getProcessId());
+        if (DIRECTORY_SEPARATOR !== '\\') {
+            ProcessStateManager::removeProcessState(ZM_PROCESS_WORKER, ProcessManager::getProcessId());
+        }
     }
 
     /**
