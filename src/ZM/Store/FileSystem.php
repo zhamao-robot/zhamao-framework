@@ -52,7 +52,7 @@ class FileSystem
             } elseif (is_file($sub_file) || is_dir($sub_file) && !$recursive && $include_dir) {
                 # 如果是 文件 或 (是 目录 且 不递推 且 包含目录)
                 if (is_string($relative) && mb_strpos($sub_file, $relative) === 0) {
-                    $list[] = ltrim(mb_substr($sub_file, mb_strlen($relative)), '/');
+                    $list[] = ltrim(mb_substr($sub_file, mb_strlen($relative)), '/\\');
                 } elseif ($relative === false) {
                     $list[] = $sub_file;
                 }
