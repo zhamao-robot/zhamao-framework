@@ -9,9 +9,6 @@ use ZM\Store\FileSystem;
 
 class ProcessStateManager
 {
-    /**
-     * @var array
-     */
     public static array $process_mode = [];
 
     /**
