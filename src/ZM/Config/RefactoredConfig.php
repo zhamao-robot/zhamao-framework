@@ -274,10 +274,26 @@ class RefactoredConfig
                 break;
             case 'yaml':
             case 'yml':
-                // TODO: 实现yaml解析
+                $yaml_parser_class = 'Symfony\Component\Yaml\Yaml';
+                if (!class_exists($yaml_parser_class)) {
+                    throw ConfigException::loadConfigFailed($path, 'YAML 解析器未安装');
+                }
+                try {
+                    $config = $yaml_parser_class::parse($content);
+                } catch (\RuntimeException $e) {
+                    throw ConfigException::loadConfigFailed($path, $e->getMessage());
+                }
                 break;
             case 'toml':
-                // TODO: 实现toml解析
+                $toml_parser_class = 'Yosymfony\Toml\Toml';
+                if (!class_exists($toml_parser_class)) {
+                    throw ConfigException::loadConfigFailed($path, 'TOML 解析器未安装');
+                }
+                try {
+                    $config = $toml_parser_class::parse($content);
+                } catch (\RuntimeException $e) {
+                    throw ConfigException::loadConfigFailed($path, $e->getMessage());
+                }
                 break;
             default:
                 throw ConfigException::unsupportedFileType($path);
