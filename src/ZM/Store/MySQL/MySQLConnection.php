@@ -10,11 +10,10 @@ use Doctrine\DBAL\Driver\Connection;
 use Doctrine\DBAL\ParameterType;
 use PDO;
 use PDOException;
-use Swoole\Database\PDOProxy;
 
 class MySQLConnection implements Connection
 {
-    /** @var PDO|PDOProxy */
+    /** @var PDO */
     private $conn;
 
     private $pool_name;
