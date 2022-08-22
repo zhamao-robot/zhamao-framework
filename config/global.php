@@ -84,7 +84,7 @@ $config['file_server'] = [
 $config['mysql'] = [
     [
         'pool_name' => '', // 默认只有一个空名称的连接池，如果需要多个连接池，请复制此段配置并修改参数和名称
-        'host' => '127.0.0.1', // 填写数据库服务器地址后才会创建数据库连接
+        'host' => '', // 填写数据库服务器地址后才会创建数据库连接
         'port' => 3306,
         'username' => 'root',
         'password' => 'ZhamaoTEST',
