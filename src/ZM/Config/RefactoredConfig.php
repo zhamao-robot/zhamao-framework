@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ZM\Config;
 
-use Onebot\V12\Config\Config;
+use OneBot\V12\Config\Config;
 use ZM\Exception\ConfigException;
 
 class RefactoredConfig
