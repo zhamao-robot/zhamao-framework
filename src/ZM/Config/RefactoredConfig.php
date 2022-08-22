@@ -102,7 +102,7 @@ class RefactoredConfig
         // 按照加载顺序加载配置文件
         foreach (self::LOAD_ORDER as $load_type) {
             foreach ($stages[$load_type] as $file_path) {
-                logger()->info('Loading config file: ' . $file_path);
+                logger()->info("加载配置文件：{$file_path}");
                 $this->loadConfigFromPath($file_path);
             }
         }
@@ -196,7 +196,6 @@ class RefactoredConfig
      */
     private function getFileLoadType(string $name): string
     {
-        // TODO: 对于多段名称的处理，如 test.patch.development
         // 传入此处的 name 参数有三种可能的格式：
         // 1. 纯文件名：如 test，此时加载类型为 global
         // 2. 文件名.环境：如 test.development，此时加载类型为 environment
@@ -223,20 +222,20 @@ class RefactoredConfig
     private function shouldLoadFile(string $path): bool
     {
         $name = pathinfo($path, PATHINFO_FILENAME);
-        // 传入此处的 name 参数有两种可能的格式：
-        // 1. 纯文件名：如 test
-        // 2. 文件名.环境：如 test.development
-        // 对于第一种格式，在任何情况下均应该加载
-        // 对于第二种格式，只有当环境与当前环境相同时才加载
-        // 至于其他的格式，则为未定义行为
-        if (strpos($name, '.') === false) {
+        // 对于 `global` 和 `patch`，任何情况下均应加载
+        // 对于 `environment`，只有当环境与当前环境相同时才加载
+        // 对于其他情况，则不加载
+        $type = $this->getFileLoadType($name);
+        if ($type === 'global' || $type === 'patch') {
             return true;
         }
-        $name_and_env = explode('.', $name);
-        if (count($name_and_env) !== 2) {
-            return false;
+        if ($type === 'environment') {
+            $name_and_env = explode('.', $name);
+            if ($name_and_env[1] === $this->environment) {
+                return true;
+            }
         }
-        return $name_and_env[1] === $this->environment;
+        return false;
     }
 
     /**

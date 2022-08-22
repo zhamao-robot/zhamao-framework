@@ -43,20 +43,23 @@ class RefactoredConfigTest extends TestCase
             'a' => [
                 'b.c' => 'd',
             ],
-            'from' => 'global',
+            'global' => 'yes',
         ];
 
         // 下方测试需要临时写入的文件
         file_put_contents($mock_dir . '/test.php', '<?php return ' . var_export($test_config, true) . ';');
         file_put_contents(
             $mock_dir . '/test.development.php',
-            '<?php return ["from" => "environment", "env" => "development"];'
+            '<?php return ["environment" => "yes", "env" => "development"];'
         );
         file_put_contents(
             $mock_dir . '/test.production.php',
-            '<?php return ["from" => "environment", "env" => "production"];'
+            '<?php return ["environment" => "yes", "env" => "production"];'
         );
-        file_put_contents($mock_dir . '/test.invalid.php', '<?php return ["from" => "invalid"];');
+        file_put_contents(
+            $mock_dir . '/test.patch.php',
+            '<?php return ["patch" => "yes"];'
+        );
 
         $config = new RefactoredConfig([
             __DIR__ . '/config_mock',
@@ -126,8 +129,13 @@ class RefactoredConfigTest extends TestCase
 
     public function testGetEnvironmentSpecifiedValue(): void
     {
-        $this->assertSame('environment', self::$config->get('test.from'));
+        $this->assertSame('yes', self::$config->get('test.environment'));
         $this->assertSame('development', self::$config->get('test.env'));
+    }
+
+    public function testGetPatchSpecifiedValue(): void
+    {
+        $this->assertSame('yes', self::$config->get('test.patch'));
     }
 
     /**
@@ -145,9 +153,9 @@ class RefactoredConfigTest extends TestCase
         return [
             'global' => ['test', 'global'],
             'environment' => ['test.development', 'environment'],
-            'undefined' => ['test.dev.inv', 'undefined'],
             'patch' => ['test.patch', 'patch'],
-            //            'complex' => ['test.patch.development', 'patch'],
+            // complex case are not supported yet
+            'invalid' => ['test.patch.development', 'undefined'],
         ];
     }
 }
