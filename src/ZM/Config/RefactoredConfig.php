@@ -78,7 +78,7 @@ class RefactoredConfig
                     continue;
                 }
 
-                $file_path = $config_path . '/' . $file;
+                $file_path = zm_dir($config_path . '/' . $file);
                 if (is_dir($file_path)) {
                     // TODO: 支持子目录（待定）
                     continue;
