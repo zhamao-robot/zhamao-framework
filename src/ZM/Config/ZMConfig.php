@@ -7,7 +7,7 @@ namespace ZM\Config;
 use OneBot\V12\Config\Config;
 use ZM\Exception\ConfigException;
 
-class RefactoredConfig
+class ZMConfig
 {
     /**
      * @var array 支持的文件扩展名

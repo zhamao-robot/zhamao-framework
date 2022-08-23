@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace Tests\ZM\Config;
 
 use PHPUnit\Framework\TestCase;
-use ZM\Config\RefactoredConfig;
+use ZM\Config\ZMConfig;
 use ZM\Utils\ReflectionUtil;
 
 /**
  * @internal
  */
-class RefactoredConfigTest extends TestCase
+class ZMConfigTest extends TestCase
 {
-    private static RefactoredConfig $config;
+    private static ZMConfig $config;
 
     public static function setUpBeforeClass(): void
     {
@@ -64,7 +64,7 @@ class RefactoredConfigTest extends TestCase
             '<?php return ["patch" => "yes", "another array" => ["far", "baz"]];'
         );
 
-        $config = new RefactoredConfig([
+        $config = new ZMConfig([
             __DIR__ . '/config_mock',
         ], 'development');
         self::$config = $config;
@@ -146,7 +146,7 @@ class RefactoredConfigTest extends TestCase
      */
     public function testGetFileLoadType(string $name, string $type): void
     {
-        $method = ReflectionUtil::getMethod(RefactoredConfig::class, 'getFileLoadType');
+        $method = ReflectionUtil::getMethod(ZMConfig::class, 'getFileLoadType');
         $actual = $method->invokeArgs(self::$config, [$name]);
         $this->assertSame($type, $actual);
     }

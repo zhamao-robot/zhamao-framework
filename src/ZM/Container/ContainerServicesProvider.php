@@ -29,7 +29,7 @@ class ContainerServicesProvider
      * connection: open, close, message
      * ```
      *
-     * @param  string          $scope 作用域
+     * @param string $scope 作用域
      * @throws ConfigException
      */
     public function registerServices(string $scope, ...$params): void
@@ -81,6 +81,12 @@ class ContainerServicesProvider
 
         // 注册logger
         $container->instance(LoggerInterface::class, logger());
+
+        // 注册config
+        $container->instance(ZMConfig::class, new ZMConfig([
+            SOURCE_ROOT_DIR . '/config',
+        ]));
+        $container->alias(ZMConfig::class, 'config');
     }
 
     /**
