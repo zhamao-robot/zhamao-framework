@@ -120,4 +120,21 @@ class ReflectionUtil
             ? new ReflectionMethod($callback[0], $callback[1])
             : new ReflectionFunction($callback);
     }
+
+    /**
+     * 获取传入的类方法，并确保其可访问
+     *
+     * 请不要滥用此方法！！！
+     *
+     * @param  string              $class  类名
+     * @param  string              $method 方法名
+     * @throws ReflectionException
+     */
+    public static function getMethod(string $class, string $method): ReflectionMethod
+    {
+        $class = new \ReflectionClass($class);
+        $method = $class->getMethod($method);
+        $method->setAccessible(true);
+        return $method;
+    }
 }

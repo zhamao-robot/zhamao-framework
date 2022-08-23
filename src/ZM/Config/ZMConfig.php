@@ -4,293 +4,366 @@ declare(strict_types=1);
 
 namespace ZM\Config;
 
+use OneBot\Util\Singleton;
+use OneBot\V12\Config\Config;
 use ZM\Exception\ConfigException;
-use ZM\Store\FileSystem;
 
-class ZMConfig
+class ZMConfig implements \ArrayAccess
 {
-    public const SUPPORTED_EXTENSIONS = ['php', 'json'];
-
-    public const SUPPORTED_ENVIRONMENTS = ['development', 'production', 'staging'];
-
-    private const DEFAULT_PATH = __DIR__ . '/../../../config';
-
-    /** @var string 上次报错 */
-    public static $last_error = '';
-
-    /** @var array 配置文件 */
-    public static $config = [];
-
-    /** @var string 配置文件 */
-    private static $path = 'config';
-
-    /** @var string 上次的路径 */
-    private static $last_path = '.';
-
-    /** @var string 配置文件环境变量 */
-    private static $env = 'development';
-
-    /** @var array 配置文件元数据 */
-    private static $config_meta_list = [];
-
-    public static function setDirectory($path)
-    {
-        self::$last_path = self::$path;
-        return self::$path = $path;
-    }
+    use Singleton;
 
     /**
-     * @internal
+     * @var array 支持的文件扩展名
      */
-    public static function restoreDirectory()
-    {
-        self::$path = self::$last_path;
-        self::$last_path = '.';
-    }
-
-    public static function getDirectory(): string
-    {
-        return self::$path;
-    }
-
-    public static function setEnv($env = 'development'): bool
-    {
-        if (!in_array($env, self::SUPPORTED_ENVIRONMENTS)) {
-            throw new ConfigException('E00079', 'Unsupported environment: ' . $env);
-        }
-        self::$env = $env;
-        return true;
-    }
-
-    public static function getEnv(): string
-    {
-        return self::$env;
-    }
+    public const ALLOWED_FILE_EXTENSIONS = ['php', 'yaml', 'yml', 'json', 'toml'];
 
     /**
-     * @param  mixed                  $additional_key
-     * @throws ConfigException
-     * @return null|array|false|mixed
+     * @var array 配置文件加载顺序，后覆盖前
      */
-    public static function get(string $name, $additional_key = '')
-    {
-        $separated = explode('.', $name);
-        if ($additional_key !== '') {
-            $separated = array_merge($separated, explode('.', $additional_key));
-        }
-        $head_name = array_shift($separated);
-        // 首先判断有没有初始化这个配置文件，因为是只读，所以是懒加载，加载第一次后缓存起来
-        if (!isset(self::$config[$head_name])) {
-            logger()->debug('配置文件' . $name . ' ' . $additional_key . '没读取过，正在从文件加载 ...');
-            self::$config[$head_name] = self::loadConfig($head_name);
-        }
-        // global.remote_terminal
-        logger()->debug('根据切分来寻找子配置: ' . $name);
-        $obj = self::$config[$head_name];
-        foreach ($separated as $key) {
-            if (isset($obj[$key])) {
-                $obj = $obj[$key];
-            } else {
-                return null;
-            }
-        }
-        return $obj;
-    }
-
-    public static function trace(string $name)
-    {
-        // TODO: 调试配置文件搜寻路径
-    }
-
-    public static function reload()
-    {
-        self::$config = [];
-        self::$config_meta_list = [];
-    }
+    public const LOAD_ORDER = ['default', 'environment', 'patch'];
 
     /**
-     * 智能patch，将patch数组内的数据合并更新到data中
+     * @var string 默认配置文件路径
+     */
+    public const DEFAULT_CONFIG_PATH = SOURCE_ROOT_DIR . '/config';
+
+    /**
+     * @var array 已加载的配置文件
+     */
+    private array $loaded_files = [];
+
+    /**
+     * @var array 配置文件路径
+     */
+    private array $config_paths;
+
+    /**
+     * @var string 当前环境
+     */
+    private string $environment;
+
+    /**
+     * @var Config 内部配置容器
+     */
+    private Config $holder;
+
+    /**
+     * 构造配置实例
      *
-     * @param  array|mixed $data  原数据
-     * @param  array|mixed $patch 要patch的数据
-     * @return array|mixed
+     * @param array  $config_paths 配置文件路径
+     * @param string $environment  环境
+     *
+     * @throws ConfigException 配置文件加载出错
      */
-    public static function smartPatch($data, $patch)
+    public function __construct(array $config_paths = [], string $environment = 'development')
     {
-        /* patch 样例：
-        [patch]
-        runtime:
-            annotation_reader_ignore: ["牛逼"]
-        custom: "非常酷的patch模式"
+        $this->config_paths = $config_paths ?: [self::DEFAULT_CONFIG_PATH];
+        $this->environment = $environment;
+        $this->holder = new Config([]);
+        $this->loadFiles();
+    }
 
-        [base]
-        runtime:
-            annotation_reader_ignore: []
-            reload_delay_time: 800
-
-        [result]
-        runtime:
-            annotation_reader_ignore: ["牛逼"]
-            reload_delay_time: 800
-        custom: "非常酷的patch模式"
-        */
-        if (is_array($data) && is_array($patch)) { // 两者必须是数组才行
-            if (is_assoc_array($patch) && is_assoc_array($data)) { // 两者必须都是kv数组才能递归merge，如果是顺序数组，则直接覆盖
-                foreach ($patch as $k => $v) {
-                    if (!isset($data[$k])) { // 如果项目不在基类存在，则直接写入
-                        $data[$k] = $v;
-                    } else { // 如果base存在的话，则递归patch覆盖
-                        $data[$k] = self::smartPatch($data[$k], $v);
-                    }
-                }
-                return $data;
-            }
+    /**
+     * 添加配置文件路径
+     *
+     * @param string $path 路径
+     */
+    public function addConfigPath(string $path): void
+    {
+        if (!in_array($path, $this->config_paths, true)) {
+            $this->config_paths[] = $path;
         }
-        return $patch;
+    }
+
+    /**
+     * 设置当前环境
+     *
+     * 变更环境后，将会自动调用 `reload` 方法重载配置
+     *
+     * @param string $environment 目标环境
+     */
+    public function setEnvironment(string $environment): void
+    {
+        if ($this->environment !== $environment) {
+            $this->environment = $environment;
+            $this->reload();
+        }
     }
 
     /**
      * 加载配置文件
      *
      * @throws ConfigException
-     * @return array|int|string
      */
-    private static function loadConfig(string $name)
+    public function loadFiles(): void
     {
-        // 首先获取此名称的所有配置文件的路径
-        self::parseList($name);
+        $stages = [
+            'default' => [],
+            'environment' => [],
+            'patch' => [],
+        ];
 
-        $env1_patch0 = null;
-        $env1_patch1 = null;
-        $env0_patch0 = null;
-        $env0_patch1 = null;
-        foreach (self::$config_meta_list[$name] as $v) {
-            /** @var ConfigMetadata $v */
-            if ($v->is_env && !$v->is_patch) {
-                $env1_patch0 = $v->data;
-            } elseif ($v->is_env && $v->is_patch) {
-                $env1_patch1 = $v->data;
-            } elseif (!$v->is_env && !$v->is_patch) {
-                $env0_patch0 = $v->data;
-            } else {
-                $env0_patch1 = $v->data;
-            }
-        }
-        // 优先级：无env无patch < 无env有patch < 有env无patch < 有env有patch
-        // 但是无patch的版本必须有一个，否则会报错
-        if ($env1_patch0 === null && $env0_patch0 === null) {
-            throw new ConfigException('E00078', '未找到配置文件 ' . $name . ' !');
-        }
-        $data = $env1_patch0 ?? $env0_patch0;
-        if (is_array($patch = $env1_patch1 ?? $env0_patch1) && is_assoc_array($patch)) {
-            $data = self::smartPatch($data, $patch);
-        }
-
-        return $data;
-    }
-
-    /**
-     * 通过名称将所有该名称的配置文件路径和信息读取到列表中
-     *
-     * @throws ConfigException
-     */
-    private static function parseList(string $name): void
-    {
-        $list = [];
-        $files = FileSystem::scanDirFiles(self::$path, true, true);
-        foreach ($files as $file) {
-            logger()->debug('正在从目录' . self::$path . '读取配置文件 ' . $file);
-            $info = pathinfo($file);
-            $info['extension'] = $info['extension'] ?? '';
-
-            // 排除子文件夹名字带点的文件
-            if ($info['dirname'] !== '.' && strpos($info['dirname'], '.') !== false) {
-                continue;
-            }
-
-            // 判断文件名是否为配置文件
-            if (!in_array($info['extension'], self::SUPPORTED_EXTENSIONS)) {
-                continue;
-            }
-
-            $ext = $info['extension'];
-            $dot_separated = explode('.', $info['filename']);
-
-            // 将配置文件加进来
-            $obj = new ConfigMetadata();
-            if ($dot_separated[0] === $name) { // 如果文件名与配置文件名一致
-                // 首先检测该文件是否为补丁版本儿
-                if (str_ends_with($info['filename'], '.patch')) {
-                    $obj->is_patch = true;
-                    $info['filename'] = substr($info['filename'], 0, -6);
-                } else {
-                    $obj->is_patch = false;
-                }
-                // 其次检测该文件是不是带有环境参数的版本儿
-                if (str_ends_with($info['filename'], '.' . self::$env)) {
-                    $obj->is_env = true;
-                    $info['filename'] = substr($info['filename'], 0, -(strlen(self::$env) + 1));
-                } else {
-                    $obj->is_env = false;
-                }
-                if (mb_strpos($info['filename'], '.') !== false) {
-                    logger()->warning('文件名 ' . $info['filename'] . ' 不合法(含有".")，请检查文件名是否合法。');
-                    continue;
-                }
-                $obj->path = zm_dir(self::$path . '/' . $info['dirname'] . '/' . $info['basename']);
-                $obj->extension = $ext;
-                $obj->data = self::readConfigFromFile(zm_dir(self::$path . '/' . $info['dirname'] . '/' . $info['basename']), $info['extension']);
-                $list[] = $obj;
-            }
-        }
-        // 如果是源码模式，config目录和default目录相同，所以不需要继续采摘default目录下的文件
-        if (realpath(self::$path) !== realpath(self::DEFAULT_PATH)) {
-            $files = FileSystem::scanDirFiles(self::DEFAULT_PATH, true, true);
+        // 遍历所有需加载的文件，并按加载类型进行分组
+        foreach ($this->config_paths as $config_path) {
+            $files = scandir($config_path);
             foreach ($files as $file) {
-                $info = pathinfo($file);
-                $info['extension'] = $info['extension'] ?? '';
-                // 判断文件名是否为配置文件
-                if (!in_array($info['extension'], self::SUPPORTED_EXTENSIONS)) {
+                [, $ext, $load_type,] = $this->getFileMeta($file);
+                // 略过不支持的文件
+                if (!in_array($ext, self::ALLOWED_FILE_EXTENSIONS, true)) {
                     continue;
                 }
-                if ($info['filename'] === $name) { // 如果文件名与配置文件名一致，就创建一个配置文件的元数据对象
-                    $obj = new ConfigMetadata();
-                    $obj->is_patch = false;
-                    $obj->is_env = false;
-                    $obj->path = realpath(self::DEFAULT_PATH . '/' . $info['dirname'] . '/' . $info['basename']);
-                    $obj->extension = $info['extension'];
-                    $obj->data = self::readConfigFromFile(zm_dir(self::DEFAULT_PATH . '/' . $info['dirname'] . '/' . $info['basename']), $info['extension']);
-                    $list[] = $obj;
+
+                $file_path = zm_dir($config_path . '/' . $file);
+                if (is_dir($file_path)) {
+                    // TODO: 支持子目录（待定）
+                    continue;
                 }
+
+                // 略过不应加载的文件
+                if (!$this->shouldLoadFile($file)) {
+                    continue;
+                }
+
+                // 略过加载顺序未知的文件
+                if (!in_array($load_type, self::LOAD_ORDER, true)) {
+                    continue;
+                }
+
+                // 将文件加入到对应的加载阶段
+                $stages[$load_type][] = $file_path;
             }
         }
-        self::$config_meta_list[$name] = $list;
+
+        // 按照加载顺序加载配置文件
+        foreach (self::LOAD_ORDER as $load_type) {
+            foreach ($stages[$load_type] as $file_path) {
+                logger()->info("加载配置文件：{$file_path}");
+                $this->loadConfigFromPath($file_path);
+            }
+        }
     }
 
     /**
-     * 根据不同的扩展类型读取配置文件数组
+     * 合并传入的配置数组至指定的配置项
      *
-     * @param  mixed|string    $filename 文件名
-     * @param  mixed|string    $ext_name 扩展名
+     * 请注意内部实现是 array_replace_recursive，而不是 array_merge
+     *
+     * @param string $key    目标配置项，必须为数组
+     * @param array  $config 要合并的配置数组
+     */
+    public function merge(string $key, array $config): void
+    {
+        $original = $this->get($key, []);
+        $this->set($key, array_replace_recursive($original, $config));
+    }
+
+    /**
+     * 获取配置项
+     *
+     * @param string $key     配置项名称，可使用.访问数组
+     * @param mixed  $default 默认值
+     *
+     * @return null|array|mixed
+     */
+    public function get(string $key, $default = null)
+    {
+        return $this->holder->get($key, $default);
+    }
+
+    /**
+     * 设置配置项
+     * 仅在本次运行期间生效，不会保存到配置文件中哦
+     *
+     * 如果传入的是数组，则会将键名作为配置项名称，并将值作为配置项的值
+     * 顺带一提，数组支持批量设置
+     *
+     * @param array|string $key   配置项名称，可使用.访问数组
+     * @param mixed        $value 要写入的值，传入 null 会进行删除
+     */
+    public function set($key, $value = null): void
+    {
+        $keys = is_array($key) ? $key : [$key => $value];
+        foreach ($keys as $i_key => $i_val) {
+            $this->holder->set($i_key, $i_val);
+        }
+    }
+
+    /**
+     * 获取内部配置容器
+     */
+    public function getHolder(): Config
+    {
+        return $this->holder;
+    }
+
+    /**
+     * 重载配置文件
+     * 运行期间新增的配置文件不会被加载哟~
+     *
      * @throws ConfigException
      */
-    private static function readConfigFromFile($filename, $ext_name): array
+    public function reload(): void
     {
-        logger()->debug('正加载配置文件 ' . $filename);
-        switch ($ext_name) {
-            case 'php':
-                $r = require $filename;
-                if (is_array($r)) {
-                    return $r;
-                }
-                throw new ConfigException('E00079', 'php配置文件include失败，请检查终端warning错误');
-            case 'json':
-            default:
-                $r = json_decode(file_get_contents($filename), true);
-                if (is_array($r)) {
-                    return $r;
-                }
-                throw new ConfigException('E00079', 'json反序列化失败，请检查文件内容');
+        $this->holder = new Config([]);
+        $this->loadFiles();
+    }
+
+    public function offsetExists($offset): bool
+    {
+        return $this->get($offset) !== null;
+    }
+
+    #[\ReturnTypeWillChange]
+    public function offsetGet($offset)
+    {
+        return $this->get($offset);
+    }
+
+    public function offsetSet($offset, $value): void
+    {
+        $this->set($offset, $value);
+    }
+
+    public function offsetUnset($offset): void
+    {
+        $this->set($offset, null);
+    }
+
+    /**
+     * 获取文件元信息
+     *
+     * @param string $name 文件名
+     *
+     * @return array 文件元信息，数组元素按次序为：配置组名/扩展名/加载类型/环境类型
+     */
+    private function getFileMeta(string $name): array
+    {
+        $basename = pathinfo($name, PATHINFO_BASENAME);
+        $parts = explode('.', $basename);
+        $ext = array_pop($parts);
+        $load_type = $this->getFileLoadType(implode('.', $parts));
+        if ($load_type === 'default') {
+            $env = null;
+        } else {
+            $env = array_pop($parts);
         }
+        $group = implode('.', $parts);
+        return [$group, $ext, $load_type, $env];
+    }
+
+    /**
+     * 获取文件加载类型
+     *
+     * @param string $name 文件名，不带扩展名
+     *
+     * @return string 可能为：default, environment, patch
+     */
+    private function getFileLoadType(string $name): string
+    {
+        // 传入此处的 name 参数有三种可能的格式：
+        // 1. 纯文件名：如 test，此时加载类型为 default
+        // 2. 文件名.环境：如 test.development，此时加载类型为 environment
+        // 3. 文件名.patch：如 test.patch，此时加载类型为 patch
+        // 至于其他的格式，则为未定义行为
+        if (strpos($name, '.') === false) {
+            return 'default';
+        }
+        $name_and_env = explode('.', $name);
+        if (count($name_and_env) !== 2) {
+            return 'undefined';
+        }
+        if ($name_and_env[1] === 'patch') {
+            return 'patch';
+        }
+        return 'environment';
+    }
+
+    /**
+     * 判断是否应该加载配置文件
+     *
+     * @param string $path 文件名，包含扩展名
+     */
+    private function shouldLoadFile(string $path): bool
+    {
+        $name = pathinfo($path, PATHINFO_FILENAME);
+        // 对于 `default` 和 `patch`，任何情况下均应加载
+        // 对于 `environment`，只有当环境与当前环境相同时才加载
+        // 对于其他情况，则不加载
+        $type = $this->getFileLoadType($name);
+        if ($type === 'default' || $type === 'patch') {
+            return true;
+        }
+        if ($type === 'environment') {
+            $name_and_env = explode('.', $name);
+            if ($name_and_env[1] === $this->environment) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 从传入的路径加载配置文件
+     *
+     * @param string $path 配置文件路径
+     *
+     * @throws ConfigException 传入的配置文件不支持
+     */
+    private function loadConfigFromPath(string $path): void
+    {
+        if (in_array($path, $this->loaded_files, true)) {
+            return;
+        }
+        $this->loaded_files[] = $path;
+
+        // 判断文件格式是否支持
+        [$group, $ext, $load_type, $env] = $this->getFileMeta($path);
+        if (!in_array($ext, self::ALLOWED_FILE_EXTENSIONS, true)) {
+            throw ConfigException::unsupportedFileType($path);
+        }
+
+        // 读取并解析配置
+        $content = file_get_contents($path);
+        $config = [];
+        switch ($ext) {
+            case 'php':
+                $config = require $path;
+                break;
+            case 'json':
+                try {
+                    $config = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+                } catch (\JsonException $e) {
+                    throw ConfigException::loadConfigFailed($path, $e->getMessage());
+                }
+                break;
+            case 'yaml':
+            case 'yml':
+                $yaml_parser_class = 'Symfony\Component\Yaml\Yaml';
+                if (!class_exists($yaml_parser_class)) {
+                    throw ConfigException::loadConfigFailed($path, 'YAML 解析器未安装');
+                }
+                try {
+                    $config = $yaml_parser_class::parse($content);
+                } catch (\RuntimeException $e) {
+                    throw ConfigException::loadConfigFailed($path, $e->getMessage());
+                }
+                break;
+            case 'toml':
+                $toml_parser_class = 'Yosymfony\Toml\Toml';
+                if (!class_exists($toml_parser_class)) {
+                    throw ConfigException::loadConfigFailed($path, 'TOML 解析器未安装');
+                }
+                try {
+                    $config = $toml_parser_class::parse($content);
+                } catch (\RuntimeException $e) {
+                    throw ConfigException::loadConfigFailed($path, $e->getMessage());
+                }
+                break;
+            default:
+                throw ConfigException::unsupportedFileType($path);
+        }
+
+        // 加入配置
+        $this->merge($group, $config);
     }
 }

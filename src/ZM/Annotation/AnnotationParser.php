@@ -15,7 +15,6 @@ use ZM\Annotation\Http\Route;
 use ZM\Annotation\Interfaces\ErgodicAnnotation;
 use ZM\Annotation\Interfaces\Level;
 use ZM\Annotation\Middleware\Middleware;
-use ZM\Config\ZMConfig;
 use ZM\Exception\ConfigException;
 use ZM\Store\FileSystem;
 use ZM\Utils\HttpUtil;
@@ -92,7 +91,7 @@ class AnnotationParser
             $all_class = FileSystem::getClassesPsr4($path[0], $path[1]);
 
             // 读取配置文件中配置的忽略解析的注解名，防止误解析一些别的地方需要的注解，比如@mixin
-            $conf = ZMConfig::get('global.runtime.annotation_reader_ignore');
+            $conf = config('global.runtime.annotation_reader_ignore');
             // 有两种方式，第一种是通过名称，第二种是通过命名空间
             if (isset($conf['name']) && is_array($conf['name'])) {
                 foreach ($conf['name'] as $v) {

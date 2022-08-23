@@ -7,6 +7,7 @@ use OneBot\Driver\Coroutine\CoroutineInterface;
 use OneBot\Driver\Process\ExecutionResult;
 use OneBot\V12\Object\MessageSegment;
 use Psr\Log\LoggerInterface;
+use ZM\Config\ZMConfig;
 use ZM\Container\Container;
 use ZM\Container\ContainerInterface;
 use ZM\Context\Context;
@@ -141,7 +142,7 @@ function container(): ContainerInterface
 /**
  * 解析类实例（使用容器）
  *
- * @template T
+ * @template     T
  * @param  class-string<T> $abstract
  * @return Closure|mixed|T
  * @noinspection PhpDocMissingThrowsInspection
@@ -186,4 +187,28 @@ function mysql(string $name = '')
 function mysql_builder(string $name = '')
 {
     return (new MySQLWrapper($name))->createQueryBuilder();
+}
+
+/**
+ * 获取 / 设置配置项
+ *
+ * 传入键名和（或）默认值，获取配置项
+ * 传入数组，设置配置项
+ * 不传参数，返回配置容器
+ *
+ * @param  null|array|string   $key     键名
+ * @param  mixed               $default 默认值
+ * @return mixed|void|ZMConfig
+ */
+function config($key = null, $default = null)
+{
+    $config = ZMConfig::getInstance();
+    if (is_null($key)) {
+        return $config;
+    }
+    if (is_array($key)) {
+        $config->set($key);
+        return;
+    }
+    return $config->get($key, $default);
 }
