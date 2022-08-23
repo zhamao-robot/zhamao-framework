@@ -43,7 +43,7 @@ class RefactoredConfigTest extends TestCase
             'a' => [
                 'b.c' => 'd',
             ],
-            'global' => 'yes',
+            'default' => 'yes',
             'another array' => [
                 'foo', 'bar',
             ],
@@ -154,7 +154,7 @@ class RefactoredConfigTest extends TestCase
     public function providerTestGetFileLoadType(): array
     {
         return [
-            'global' => ['test', 'global'],
+            'default' => ['test', 'default'],
             'environment' => ['test.development', 'environment'],
             'patch' => ['test.patch', 'patch'],
             // complex case are not supported yet

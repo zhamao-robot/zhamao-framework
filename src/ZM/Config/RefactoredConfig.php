@@ -17,7 +17,7 @@ class RefactoredConfig
     /**
      * @var array 配置文件加载顺序，后覆盖前
      */
-    public const LOAD_ORDER = ['global', 'environment', 'patch'];
+    public const LOAD_ORDER = ['default', 'environment', 'patch'];
 
     /**
      * @var array 已加载的配置文件
@@ -63,7 +63,7 @@ class RefactoredConfig
     public function loadFiles(): void
     {
         $stages = [
-            'global' => [],
+            'default' => [],
             'environment' => [],
             'patch' => [],
         ];
@@ -180,7 +180,7 @@ class RefactoredConfig
         $parts = explode('.', $basename);
         $ext = array_pop($parts);
         $load_type = $this->getFileLoadType(implode('.', $parts));
-        if ($load_type === 'global') {
+        if ($load_type === 'default') {
             $env = null;
         } else {
             $env = array_pop($parts);
@@ -194,17 +194,17 @@ class RefactoredConfig
      *
      * @param string $name 文件名，不带扩展名
      *
-     * @return string 可能为：global, environment, patch
+     * @return string 可能为：default, environment, patch
      */
     private function getFileLoadType(string $name): string
     {
         // 传入此处的 name 参数有三种可能的格式：
-        // 1. 纯文件名：如 test，此时加载类型为 global
+        // 1. 纯文件名：如 test，此时加载类型为 default
         // 2. 文件名.环境：如 test.development，此时加载类型为 environment
         // 3. 文件名.patch：如 test.patch，此时加载类型为 patch
         // 至于其他的格式，则为未定义行为
         if (strpos($name, '.') === false) {
-            return 'global';
+            return 'default';
         }
         $name_and_env = explode('.', $name);
         if (count($name_and_env) !== 2) {
@@ -224,11 +224,11 @@ class RefactoredConfig
     private function shouldLoadFile(string $path): bool
     {
         $name = pathinfo($path, PATHINFO_FILENAME);
-        // 对于 `global` 和 `patch`，任何情况下均应加载
+        // 对于 `default` 和 `patch`，任何情况下均应加载
         // 对于 `environment`，只有当环境与当前环境相同时才加载
         // 对于其他情况，则不加载
         $type = $this->getFileLoadType($name);
-        if ($type === 'global' || $type === 'patch') {
+        if ($type === 'default' || $type === 'patch') {
             return true;
         }
         if ($type === 'environment') {
