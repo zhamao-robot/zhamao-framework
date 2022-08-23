@@ -196,17 +196,19 @@ function mysql_builder(string $name = '')
  * 传入数组，设置配置项
  * 不传参数，返回配置容器
  *
- * @param  null|array|string $key     键名
- * @param  mixed             $default 默认值
- * @return mixed|ZMConfig
+ * @param  null|array|string   $key     键名
+ * @param  mixed               $default 默认值
+ * @return mixed|void|ZMConfig
  */
 function config($key = null, $default = null)
 {
+    $config = ZMConfig::getInstance();
     if (is_null($key)) {
-        return resolve('config');
+        return $config;
     }
     if (is_array($key)) {
-        return resolve('config')->set(...$key);
+        $config->set($key);
+        return;
     }
-    return resolve('config')->get($key, $default);
+    return $config->get($key, $default);
 }

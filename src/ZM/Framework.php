@@ -328,7 +328,7 @@ class Framework
         // 打印驱动
         $properties['driver'] = config('global.driver');
         // 打印logger显示等级
-        $properties['log_level'] = $this->argv['log-level'] ?? config('global', 'log_level') ?? 'info';
+        $properties['log_level'] = $this->argv['log-level'] ?? config('global.log_level') ?? 'info';
         // 打印框架版本
         $properties['version'] = self::VERSION . (LOAD_MODE === 0 ? (' (build ' . ZM_VERSION_ID . ')') : '');
         // 打印 PHP 版本

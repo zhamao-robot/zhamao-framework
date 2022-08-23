@@ -10,10 +10,8 @@ use OneBot\Driver\Event\Http\HttpRequestEvent;
 use OneBot\Driver\Process\ProcessManager;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
-use ZM\Config\ZMConfig;
 use ZM\Context\Context;
 use ZM\Context\ContextInterface;
-use ZM\Exception\ConfigException;
 use ZM\Framework;
 
 class ContainerServicesProvider
@@ -29,8 +27,7 @@ class ContainerServicesProvider
      * connection: open, close, message
      * ```
      *
-     * @param  string          $scope 作用域
-     * @throws ConfigException
+     * @param string $scope 作用域
      */
     public function registerServices(string $scope, ...$params): void
     {
@@ -63,8 +60,6 @@ class ContainerServicesProvider
 
     /**
      * 注册全局服务
-     *
-     * @throws ConfigException
      */
     private function registerGlobalServices(ContainerInterface $container): void
     {
@@ -81,12 +76,6 @@ class ContainerServicesProvider
 
         // 注册logger
         $container->instance(LoggerInterface::class, logger());
-
-        // 注册config
-        $container->instance(ZMConfig::class, new ZMConfig([
-            SOURCE_ROOT_DIR . '/config',
-        ]));
-        $container->alias(ZMConfig::class, 'config');
     }
 
     /**

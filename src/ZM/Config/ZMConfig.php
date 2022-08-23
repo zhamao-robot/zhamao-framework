@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace ZM\Config;
 
+use OneBot\Util\Singleton;
 use OneBot\V12\Config\Config;
 use ZM\Exception\ConfigException;
 
 class ZMConfig implements \ArrayAccess
 {
+    use Singleton;
+
     /**
      * @var array 支持的文件扩展名
      */
@@ -18,6 +21,11 @@ class ZMConfig implements \ArrayAccess
      * @var array 配置文件加载顺序，后覆盖前
      */
     public const LOAD_ORDER = ['default', 'environment', 'patch'];
+
+    /**
+     * @var string 默认配置文件路径
+     */
+    public const DEFAULT_CONFIG_PATH = SOURCE_ROOT_DIR . '/config';
 
     /**
      * @var array 已加载的配置文件
@@ -47,9 +55,9 @@ class ZMConfig implements \ArrayAccess
      *
      * @throws ConfigException 配置文件加载出错
      */
-    public function __construct(array $config_paths, string $environment = 'development')
+    public function __construct(array $config_paths = [], string $environment = 'development')
     {
-        $this->config_paths = $config_paths;
+        $this->config_paths = $config_paths ?: [self::DEFAULT_CONFIG_PATH];
         $this->environment = $environment;
         $this->holder = new Config([]);
         $this->loadFiles();
@@ -166,12 +174,18 @@ class ZMConfig implements \ArrayAccess
      * 设置配置项
      * 仅在本次运行期间生效，不会保存到配置文件中哦
      *
-     * @param string $key   配置项名称，可使用.访问数组
-     * @param mixed  $value 要写入的值，传入 null 会进行删除
+     * 如果传入的是数组，则会将键名作为配置项名称，并将值作为配置项的值
+     * 顺带一提，数组支持批量设置
+     *
+     * @param array|string $key   配置项名称，可使用.访问数组
+     * @param mixed        $value 要写入的值，传入 null 会进行删除
      */
-    public function set(string $key, $value): void
+    public function set($key, $value = null): void
     {
-        $this->holder->set($key, $value);
+        $keys = is_array($key) ? $key : [$key => $value];
+        foreach ($keys as $i_key => $i_val) {
+            $this->holder->set($i_key, $i_val);
+        }
     }
 
     /**
@@ -199,6 +213,7 @@ class ZMConfig implements \ArrayAccess
         return $this->get($offset) !== null;
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->get($offset);
