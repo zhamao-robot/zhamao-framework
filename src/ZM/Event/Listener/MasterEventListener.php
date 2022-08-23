@@ -7,7 +7,6 @@ namespace ZM\Event\Listener;
 use OneBot\Driver\Workerman\Worker;
 use OneBot\Util\Singleton;
 use Swoole\Server;
-use ZM\Config\ZMConfig;
 use ZM\Exception\ZMKnownException;
 use ZM\Framework;
 use ZM\Process\ProcessStateManager;
@@ -27,7 +26,7 @@ class MasterEventListener
                     SignalListener::getInstance()->signalMaster();
                 }
                 ProcessStateManager::saveProcessState(ONEBOT_PROCESS_MASTER, $server->master_pid, [
-                    'stdout' => ZMConfig::get('global.swoole_options.swoole_set.log_file'),
+                    'stdout' => config('global.swoole_options.swoole_set.log_file'),
                     'daemon' => (bool) Framework::getInstance()->getArgv()['daemon'],
                 ]);
             });

@@ -19,7 +19,6 @@ use OneBot\Driver\Workerman\WorkermanDriver;
 use OneBot\Util\Singleton;
 use Phar;
 use ZM\Command\Server\ServerStartCommand;
-use ZM\Config\ZMConfig;
 use ZM\Event\EventProvider;
 use ZM\Event\Listener\HttpEventListener;
 use ZM\Event\Listener\ManagerEventListener;
@@ -189,8 +188,8 @@ class Framework
         }
         foreach ($find_dir as $v) {
             if (is_dir($v)) {
-                ZMConfig::setDirectory($v);
-                ZMConfig::setEnv($this->argv['env'] = $this->argv['env'] ?? 'development');
+                config()->addConfigPath($v);
+                config()->setEnvironment($this->argv['env'] = ($this->argv['env'] ?? 'development'));
                 $config_done = true;
                 break;
             }
@@ -214,7 +213,7 @@ class Framework
         $ob_event_provider = EventProvider::getInstance();
 
         // 初始化时区，默认为上海时区
-        date_default_timezone_set(ZMConfig::get('global.runtime.timezone'));
+        date_default_timezone_set(config('global.runtime.timezone'));
 
         // 注册全局错误处理器
         set_error_handler(static function ($error_no, $error_msg, $error_file, $error_line) {
@@ -251,20 +250,20 @@ class Framework
      */
     public function initDriver()
     {
-        switch ($driver = ZMConfig::get('global.driver')) {
+        switch ($driver = config('global.driver')) {
             case 'swoole':
                 if (DIRECTORY_SEPARATOR === '\\') {
                     logger()->emergency('Windows does not support swoole driver!');
                     exit(1);
                 }
-                ZMConfig::$config['global']['swoole_options']['driver_init_policy'] = DriverInitPolicy::MULTI_PROCESS_INIT_IN_MASTER;
-                $this->driver = new SwooleDriver(ZMConfig::get('global.swoole_options'));
-                $this->driver->initDriverProtocols(ZMConfig::get('global.servers'));
+                config(['global.swoole_options.driver_init_policy' => DriverInitPolicy::MULTI_PROCESS_INIT_IN_MASTER]);
+                $this->driver = new SwooleDriver(config('global.swoole_options'));
+                $this->driver->initDriverProtocols(config('global.servers'));
                 break;
             case 'workerman':
-                ZMConfig::$config['global']['workerman_options']['driver_init_policy'] = DriverInitPolicy::MULTI_PROCESS_INIT_IN_MASTER;
-                $this->driver = new WorkermanDriver(ZMConfig::get('global.workerman_options'));
-                $this->driver->initDriverProtocols(ZMConfig::get('global.servers'));
+                config(['global.workerman_options.driver_init_policy' => DriverInitPolicy::MULTI_PROCESS_INIT_IN_MASTER]);
+                $this->driver = new WorkermanDriver(config('global.workerman_options'));
+                $this->driver->initDriverProtocols(config('global.servers'));
                 break;
             default:
                 logger()->error(zm_internal_errcode('E00081') . '未知的驱动类型 ' . $driver . ' !');
@@ -327,9 +326,9 @@ class Framework
         // 打印环境信息
         $properties['environment'] = $this->argv['env'];
         // 打印驱动
-        $properties['driver'] = ZMConfig::get('global.driver');
+        $properties['driver'] = config('global.driver');
         // 打印logger显示等级
-        $properties['log_level'] = $this->argv['log-level'] ?? ZMConfig::get('global', 'log_level') ?? 'info';
+        $properties['log_level'] = $this->argv['log-level'] ?? config('global', 'log_level') ?? 'info';
         // 打印框架版本
         $properties['version'] = self::VERSION . (LOAD_MODE === 0 ? (' (build ' . ZM_VERSION_ID . ')') : '');
         // 打印 PHP 版本
@@ -342,8 +341,8 @@ class Framework
         if ($this->driver->getName() === 'swoole') {
             $properties['process_mode'] = 'MST1';
             ProcessStateManager::$process_mode['master'] = 1;
-            if (ZMConfig::get('global.swoole_options.swoole_server_mode') === SWOOLE_BASE) {
-                $worker_num = ZMConfig::get('global.swoole_options.swoole_set.worker_num');
+            if (config('global.swoole_options.swoole_server_mode') === SWOOLE_BASE) {
+                $worker_num = config('global.swoole_options.swoole_set.worker_num');
                 if ($worker_num === null || $worker_num === 1) {
                     $properties['process_mode'] .= 'MAN0#0';
                     ProcessStateManager::$process_mode['manager'] = 0;
@@ -353,12 +352,12 @@ class Framework
                     ProcessStateManager::$process_mode['manager'] = 0;
                     ProcessStateManager::$process_mode['worker'] = swoole_cpu_num();
                 } else {
-                    $properties['process_mode'] .= 'MAN0#' . ($worker = ZMConfig::get('global.swoole_options.swoole_set.worker_num') ?? swoole_cpu_num());
+                    $properties['process_mode'] .= 'MAN0#' . ($worker = config('global.swoole_options.swoole_set.worker_num') ?? swoole_cpu_num());
                     ProcessStateManager::$process_mode['manager'] = 0;
                     ProcessStateManager::$process_mode['worker'] = $worker;
                 }
             } else {
-                $worker = ZMConfig::get('global.swoole_options.swoole_set.worker_num') === 0 ? swoole_cpu_num() : ZMConfig::get('global.swoole_options.swoole_set.worker_num') ?? swoole_cpu_num();
+                $worker = config('global.swoole_options.swoole_set.worker_num') === 0 ? swoole_cpu_num() : config('global.swoole_options.swoole_set.worker_num') ?? swoole_cpu_num();
                 $properties['process_mode'] .= 'MAN1#' . $worker;
                 ProcessStateManager::$process_mode['manager'] = 1;
                 ProcessStateManager::$process_mode['worker'] = $worker;
@@ -366,7 +365,7 @@ class Framework
         } elseif ($this->driver->getName() === 'workerman') {
             $properties['process_mode'] = 'MST1';
             ProcessStateManager::$process_mode['master'] = 1;
-            $worker_num = ZMConfig::get('global.workerman_options.workerman_worker_num');
+            $worker_num = config('global.workerman_options.workerman_worker_num');
             if (DIRECTORY_SEPARATOR === '\\') {
                 $properties['process_mode'] .= '#0';
                 ProcessStateManager::$process_mode['manager'] = 0;
@@ -379,17 +378,17 @@ class Framework
             }
         }
         // 打印监听端口
-        foreach (ZMConfig::get('global.servers') as $k => $v) {
+        foreach (config('global.servers') as $k => $v) {
             $properties['listen_' . $k] = $v['type'] . '://' . $v['host'] . ':' . $v['port'];
         }
         // 打印 MySQL 连接信息
-        if ((ZMConfig::get('global.mysql_config.host') ?? '') !== '') {
-            $conf = ZMConfig::get('global', 'mysql_config');
+        if ((config('global.mysql_config.host') ?? '') !== '') {
+            $conf = config('global', 'mysql_config');
             $properties['mysql'] = $conf['dbname'] . '@' . $conf['host'] . ':' . $conf['port'];
         }
         // 打印 Redis 连接信息
-        if ((ZMConfig::get('global', 'redis_config')['host'] ?? '') !== '') {
-            $conf = ZMConfig::get('global', 'redis_config');
+        if ((config('global', 'redis_config')['host'] ?? '') !== '') {
+            $conf = config('global', 'redis_config');
             $properties['redis_pool'] = $conf['host'] . ':' . $conf['port'];
         }
 
@@ -480,14 +479,14 @@ class Framework
             }
             switch ($x) {
                 case 'driver':      // 动态设置驱动类型
-                    ZMConfig::$config['global']['driver'] = $y;
+                    config()['global']['driver'] = $y;
                     break;
                 case 'worker-num':  // 动态设置 Worker 数量
-                    ZMConfig::$config['global']['swoole_options']['swoole_set']['worker_num'] = intval($y);
-                    ZMConfig::$config['global']['workerman_options']['workerman_worker_num'] = intval($y);
+                    config()['global']['swoole_options']['swoole_set']['worker_num'] = intval($y);
+                    config()['global']['workerman_options']['workerman_worker_num'] = intval($y);
                     break;
                 case 'daemon':      // 启动为守护进程
-                    ZMConfig::$config['global']['swoole_options']['swoole_set']['daemonize'] = 1;
+                    config()['global']['swoole_options']['swoole_set']['daemonize'] = 1;
                     Worker::$daemonize = true;
                     break;
             }

@@ -7,7 +7,6 @@ namespace ZM\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use ZM\Config\ZMConfig;
 
 class CheckConfigCommand extends Command
 {
@@ -57,7 +56,7 @@ class CheckConfigCommand extends Command
     {
         $local_file = include_once WORKING_DIR . '/config/' . $local;
         if ($local_file === true) {
-            $local_file = ZMConfig::get('global');
+            $local_file = config('global');
         }
         foreach ($remote as $k => $v) {
             if (!isset($local_file[$k])) {

@@ -6,7 +6,6 @@ namespace ZM;
 
 use Exception;
 use ZM\Command\Server\ServerStartCommand;
-use ZM\Config\ZMConfig;
 use ZM\Exception\InitException;
 use ZM\Plugin\InstantPlugin;
 
@@ -40,7 +39,7 @@ class InstantApplication extends InstantPlugin
 
     public function withArgs(array $args): InstantApplication
     {
-        $this->args = ZMConfig::smartPatch($this->args, $args);
+        $this->args = array_replace_recursive($this->args, $args);
         return $this;
     }
 

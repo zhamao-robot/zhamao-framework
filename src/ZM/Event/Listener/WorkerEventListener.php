@@ -11,7 +11,6 @@ use ZM\Annotation\AnnotationHandler;
 use ZM\Annotation\AnnotationMap;
 use ZM\Annotation\AnnotationParser;
 use ZM\Annotation\Framework\Init;
-use ZM\Config\ZMConfig;
 use ZM\Container\ContainerServicesProvider;
 use ZM\Exception\ConfigException;
 use ZM\Exception\ZMKnownException;
@@ -159,7 +158,7 @@ class WorkerEventListener
         }
 
         // 读取 MySQL 配置文件
-        $conf = ZMConfig::get('global.mysql');
+        $conf = config('global.mysql');
         if (is_array($conf) && !is_assoc_array($conf)) {
             // 如果有多个数据库连接，则遍历
             foreach ($conf as $conn_conf) {

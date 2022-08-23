@@ -13,7 +13,6 @@ use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
-use ZM\Config\ZMConfig;
 use ZM\Exception\ConfigException;
 use ZM\Store\FileSystem;
 
@@ -80,13 +79,13 @@ class HttpUtil
     public static function handleStaticPage(string $uri, array $settings = []): ResponseInterface
     {
         // 确定根目录
-        $base_dir = $settings['document_root'] ?? ZMConfig::get('global.file_server.document_root');
+        $base_dir = $settings['document_root'] ?? config('global.file_server.document_root');
         // 将相对路径转换为绝对路径
         if (FileSystem::isRelativePath($base_dir)) {
             $base_dir = SOURCE_ROOT_DIR . '/' . $base_dir;
         }
         // 支持默认缺省搜索的文件名（如index.html）
-        $base_index = $settings['document_index'] ?? ZMConfig::get('global.file_server.document_index');
+        $base_index = $settings['document_index'] ?? config('global.file_server.document_index');
         if (is_string($base_index)) {
             $base_index = [$base_index];
         }
@@ -110,7 +109,7 @@ class HttpUtil
                         logger()->info('[200] ' . $uri);
                         $exp = strtolower(pathinfo($path . $vp)['extension'] ?? 'unknown');
                         return HttpFactory::getInstance()->createResponse()
-                            ->withAddedHeader('Content-Type', ZMConfig::get('file_header')[$exp] ?? 'application/octet-stream')
+                            ->withAddedHeader('Content-Type', config('file_header')[$exp] ?? 'application/octet-stream')
                             ->withBody(HttpFactory::getInstance()->createStream(file_get_contents($path . '/' . $vp)));
                     }
                 }
@@ -119,7 +118,7 @@ class HttpUtil
                 logger()->info('[200] ' . $uri);
                 $exp = strtolower(pathinfo($path)['extension'] ?? 'unknown');
                 return HttpFactory::getInstance()->createResponse()
-                    ->withAddedHeader('Content-Type', ZMConfig::get('file_header')[$exp] ?? 'application/octet-stream')
+                    ->withAddedHeader('Content-Type', config('file_header')[$exp] ?? 'application/octet-stream')
                     ->withBody(HttpFactory::getInstance()->createStream(file_get_contents($path)));
             }
         }
@@ -136,14 +135,14 @@ class HttpUtil
     public static function handleHttpCodePage(int $code): ResponseInterface
     {
         // 获取有没有规定 code page
-        $code_page = ZMConfig::get('global.file_server.document_code_page')[$code] ?? null;
-        if ($code_page !== null && !file_exists((ZMConfig::get('global.file_server.document_root') ?? '/not/exist/') . '/' . $code_page)) {
+        $code_page = config('global.file_server.document_code_page')[$code] ?? null;
+        if ($code_page !== null && !file_exists((config('global.file_server.document_root') ?? '/not/exist/') . '/' . $code_page)) {
             $code_page = null;
         }
         if ($code_page === null) {
             return HttpFactory::getInstance()->createResponse($code);
         }
-        return HttpFactory::getInstance()->createResponse($code, null, [], file_get_contents(ZMConfig::get('global.file_server.document_root') . '/' . $code_page));
+        return HttpFactory::getInstance()->createResponse($code, null, [], file_get_contents(config('global.file_server.document_root') . '/' . $code_page));
     }
 
     /**

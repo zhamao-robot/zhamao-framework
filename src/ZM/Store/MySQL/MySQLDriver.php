@@ -7,7 +7,6 @@ namespace ZM\Store\MySQL;
 use Doctrine\DBAL\Driver as DoctrineDriver;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Schema\MySqlSchemaManager;
-use ZM\Config\ZMConfig;
 
 class MySQLDriver implements DoctrineDriver
 {
@@ -34,7 +33,7 @@ class MySQLDriver implements DoctrineDriver
 
     public function getDatabase($conn)
     {
-        $conf = ZMConfig::get('global.mysql');
+        $conf = config('global.mysql');
 
         if ($conn instanceof MySQLConnection) {
             foreach ($conf as $v) {

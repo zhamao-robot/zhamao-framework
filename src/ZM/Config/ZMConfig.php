@@ -7,7 +7,7 @@ namespace ZM\Config;
 use OneBot\V12\Config\Config;
 use ZM\Exception\ConfigException;
 
-class ZMConfig
+class ZMConfig implements \ArrayAccess
 {
     /**
      * @var array 支持的文件扩展名
@@ -53,6 +53,33 @@ class ZMConfig
         $this->environment = $environment;
         $this->holder = new Config([]);
         $this->loadFiles();
+    }
+
+    /**
+     * 添加配置文件路径
+     *
+     * @param string $path 路径
+     */
+    public function addConfigPath(string $path): void
+    {
+        if (!in_array($path, $this->config_paths, true)) {
+            $this->config_paths[] = $path;
+        }
+    }
+
+    /**
+     * 设置当前环境
+     *
+     * 变更环境后，将会自动调用 `reload` 方法重载配置
+     *
+     * @param string $environment 目标环境
+     */
+    public function setEnvironment(string $environment): void
+    {
+        if ($this->environment !== $environment) {
+            $this->environment = $environment;
+            $this->reload();
+        }
     }
 
     /**
@@ -165,6 +192,26 @@ class ZMConfig
     {
         $this->holder = new Config([]);
         $this->loadFiles();
+    }
+
+    public function offsetExists($offset): bool
+    {
+        return $this->get($offset) !== null;
+    }
+
+    public function offsetGet($offset)
+    {
+        return $this->get($offset);
+    }
+
+    public function offsetSet($offset, $value): void
+    {
+        $this->set($offset, $value);
+    }
+
+    public function offsetUnset($offset): void
+    {
+        $this->set($offset, null);
     }
 
     /**

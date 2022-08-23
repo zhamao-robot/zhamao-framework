@@ -7,7 +7,6 @@ namespace ZM\Command\Generate;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use ZM\Config\ZMConfig;
 
 class SystemdGenerateCommand extends Command
 {
@@ -21,7 +20,7 @@ class SystemdGenerateCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        ZMConfig::setDirectory(SOURCE_ROOT_DIR . '/config');
+        config()->addConfigPath(SOURCE_ROOT_DIR . '/config');
         $path = $this->generate();
         $output->writeln('<info>成功生成 systemd 文件，位置：' . $path . '</info>');
         $output->writeln('<info>有关如何使用 systemd 配置文件，请访问 `https://github.com/zhamao-robot/zhamao-framework/issues/36`</info>');

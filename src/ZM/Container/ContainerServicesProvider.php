@@ -29,7 +29,7 @@ class ContainerServicesProvider
      * connection: open, close, message
      * ```
      *
-     * @param string $scope 作用域
+     * @param  string          $scope 作用域
      * @throws ConfigException
      */
     public function registerServices(string $scope, ...$params): void
@@ -72,7 +72,7 @@ class ContainerServicesProvider
         $container->instance('path.working', WORKING_DIR);
         $container->instance('path.source', SOURCE_ROOT_DIR);
         $container->alias('path.source', 'path.base');
-        $container->instance('path.data', ZMConfig::get('global.data_dir'));
+        $container->instance('path.data', config('global.data_dir'));
         $container->instance('path.framework', FRAMEWORK_ROOT_DIR);
 
         // 注册worker和驱动
