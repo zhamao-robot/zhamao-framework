@@ -90,3 +90,27 @@ public function getCallReflector(mixed $callback): ReflectionFunctionAbstract
 | 类型 | 描述 |
 | ---- | ----------- |
 | ReflectionFunctionAbstract |  |
+
+
+## getMethod
+
+```php
+public function getMethod(string $class, string $method): ReflectionMethod
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| class | string |  |
+| method | string |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| ReflectionMethod |  |

@@ -1,26 +1,9 @@
 # ZM\Config\ZMConfig
 
-## restoreDirectory
+## __construct
 
 ```php
-public function restoreDirectory(): mixed
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| mixed |  |
-
-
-## get
-
-```php
-public function get(string $name, mixed $additional_key): mixed
+public function __construct(array $config_paths, string $environment): mixed
 ```
 
 ### 描述
@@ -31,8 +14,8 @@ public function get(string $name, mixed $additional_key): mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| name | string |  |
-| additional_key | mixed |  |
+| config_paths | array |  |
+| environment | string |  |
 
 ### 返回
 
@@ -41,10 +24,10 @@ public function get(string $name, mixed $additional_key): mixed
 | mixed |  |
 
 
-## smartPatch
+## addConfigPath
 
 ```php
-public function smartPatch(mixed $data, mixed $patch): mixed
+public function addConfigPath(string $path): void
 ```
 
 ### 描述
@@ -55,54 +38,7 @@ public function smartPatch(mixed $data, mixed $patch): mixed
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| data | mixed |  |
-| patch | mixed |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| mixed |  |
-
-
-## loadConfig
-
-```php
-public function loadConfig(string $name): mixed
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| name | string |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| mixed |  |
-
-
-## parseList
-
-```php
-public function parseList(string $name): void
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| name | string |  |
+| path | string |  |
 
 ### 返回
 
@@ -111,10 +47,10 @@ public function parseList(string $name): void
 | void |  |
 
 
-## readConfigFromFile
+## setEnvironment
 
 ```php
-public function readConfigFromFile(mixed $filename, mixed $ext_name): array
+public function setEnvironment(string $environment): void
 ```
 
 ### 描述
@@ -125,11 +61,248 @@ public function readConfigFromFile(mixed $filename, mixed $ext_name): array
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| filename | mixed |  |
-| ext_name | mixed |  |
+| environment | string |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| void |  |
+
+
+## loadFiles
+
+```php
+public function loadFiles(): void
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| void |  |
+
+
+## merge
+
+```php
+public function merge(string $key, array $config): void
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| key | string |  |
+| config | array |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| void |  |
+
+
+## get
+
+```php
+public function get(string $key, mixed $default): mixed
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| key | string |  |
+| default | mixed |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| mixed |  |
+
+
+## set
+
+```php
+public function set(mixed $key, mixed $value): void
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| key | mixed |  |
+| value | mixed |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| void |  |
+
+
+## getHolder
+
+```php
+public function getHolder(): OneBot\V12\Config\Config
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| OneBot\V12\Config\Config |  |
+
+
+## reload
+
+```php
+public function reload(): void
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| void |  |
+
+
+## getFileMeta
+
+```php
+public function getFileMeta(string $name): array
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| name | string |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
 | array |  |
+
+
+## getFileLoadType
+
+```php
+public function getFileLoadType(string $name): string
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| name | string |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| string |  |
+
+
+## shouldLoadFile
+
+```php
+public function shouldLoadFile(string $path): bool
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| path | string |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| bool |  |
+
+
+## loadConfigFromPath
+
+```php
+public function loadConfigFromPath(string $path): void
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| path | string |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| void |  |
+
+
+## getInstance
+
+```php
+public function getInstance(mixed $args): object
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| args | mixed |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| object |  |
