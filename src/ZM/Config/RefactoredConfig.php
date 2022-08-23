@@ -111,13 +111,15 @@ class RefactoredConfig
     /**
      * 合并传入的配置数组至指定的配置项
      *
+     * 请注意内部实现是 array_replace_recursive，而不是 array_merge
+     *
      * @param string $key    目标配置项，必须为数组
      * @param array  $config 要合并的配置数组
      */
     public function merge(string $key, array $config): void
     {
         $original = $this->get($key, []);
-        $this->set($key, array_merge($original, $config));
+        $this->set($key, array_replace_recursive($original, $config));
     }
 
     /**

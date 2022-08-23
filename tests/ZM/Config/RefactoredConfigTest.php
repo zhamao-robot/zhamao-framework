@@ -44,6 +44,9 @@ class RefactoredConfigTest extends TestCase
                 'b.c' => 'd',
             ],
             'global' => 'yes',
+            'another array' => [
+                'foo', 'bar',
+            ],
         ];
 
         // 下方测试需要临时写入的文件
@@ -58,7 +61,7 @@ class RefactoredConfigTest extends TestCase
         );
         file_put_contents(
             $mock_dir . '/test.patch.php',
-            '<?php return ["patch" => "yes"];'
+            '<?php return ["patch" => "yes", "another array" => ["far", "baz"]];'
         );
 
         $config = new RefactoredConfig([
@@ -157,5 +160,12 @@ class RefactoredConfigTest extends TestCase
             // complex case are not supported yet
             'invalid' => ['test.patch.development', 'undefined'],
         ];
+    }
+
+    public function testArrayReplaceInsteadOfMerge(): void
+    {
+        // using of space inside config key is not an officially supported feature,
+        // it may be removed in the future, please avoid using it in your project.
+        $this->assertSame(['far', 'baz'], self::$config->get('test.another array'));
     }
 }
