@@ -33,7 +33,11 @@ ob_event_provider()->addEventListener(WorkerStartEvent::getName(), function () {
     try {
         // 不退出，而是返回 code
         // unstable and subject to change
-        passthru('vendor/bin/pest --colors=always', $retcode);
+        if (is_windows()) {
+            passthru('./vendor/bin/pest.bat --colors=always', $retcode);
+        } else {
+            passthru('vendor/bin/pest --colors=always', $retcode);
+        }
     } finally {
         global $_swoole_atomic;
         $_swoole_atomic->set($retcode ?? 0);
