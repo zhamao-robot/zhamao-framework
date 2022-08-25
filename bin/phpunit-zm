@@ -34,7 +34,7 @@ ob_event_provider()->addEventListener(WorkerStartEvent::getName(), function () {
         // 不退出，而是返回 code
         // unstable and subject to change
         if (is_windows()) {
-            passthru('./vendor/bin/pest.bat --colors=always', $retcode);
+            passthru('.\vendor\bin\pest.bat --colors=always', $retcode);
         } else {
             passthru('vendor/bin/pest --colors=always', $retcode);
         }
