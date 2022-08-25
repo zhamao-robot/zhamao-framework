@@ -33,15 +33,17 @@ ob_event_provider()->addEventListener(WorkerStartEvent::getName(), function () {
     try {
         // 不退出，而是返回 code
         // unstable and subject to change
-        if (is_windows()) {
-            passthru('.\vendor\bin\pest.bat --colors=always', $retcode);
+        require SOURCE_ROOT_DIR . '/vendor/bin/pest';
+    } catch (Throwable $e) {
+        global $_swoole_atomic;
+        if (is_a($e, '\\Swoole\\ExitException') && method_exists($e, 'getStatus')) {
+            $_swoole_atomic->set($e->getStatus());
         } else {
-            passthru('vendor/bin/pest --colors=always', $retcode);
+            $_swoole_atomic->set(1);
         }
     } finally {
         global $_swoole_atomic;
-        $_swoole_atomic->set($retcode ?? 0);
-        Framework::getInstance()->stop($retcode ?? 0);
+        Framework::getInstance()->stop($_swoole_atomic->get());
     }
 }, 1);
 
@@ -49,7 +51,7 @@ try {
     $options = ServerStartCommand::exportOptionArray();
     $options['driver'] = DIRECTORY_SEPARATOR === '/' ? 'swoole' : 'workerman';
     $options['worker-num'] = 1;
-    $options['private-mode'] = true;
+    echo $options['driver'] . PHP_EOL;
     (new Framework($options))->init()->start();
     exit($_swoole_atomic->get());
 } catch (Throwable $e) {
