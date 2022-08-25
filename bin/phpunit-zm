@@ -6,7 +6,6 @@
 const ZM_TEST_LOG_DEBUG = false;
 
 use OneBot\Driver\Event\Process\WorkerStartEvent;
-use PHPUnit\TextUI\Command;
 use Swoole\Atomic;
 use ZM\Command\Server\ServerStartCommand;
 use ZM\Event\EventProvider;
@@ -33,7 +32,8 @@ $ob_event_provider = new EventProvider();
 ob_event_provider()->addEventListener(WorkerStartEvent::getName(), function () {
     try {
         // 不退出，而是返回 code
-        $retcode = Command::main(false);
+        // unstable and subject to change
+        passthru('vendor/bin/pest --colors=always', $retcode);
     } finally {
         global $_swoole_atomic;
         $_swoole_atomic->set($retcode ?? 0);
