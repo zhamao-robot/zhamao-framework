@@ -14,6 +14,7 @@ use ZM\Command\BuildCommand;
 use ZM\Command\CheckConfigCommand;
 use ZM\Command\Generate\SystemdGenerateCommand;
 use ZM\Command\InitCommand;
+use ZM\Command\ReplCommand;
 use ZM\Command\Server\ServerReloadCommand;
 use ZM\Command\Server\ServerStartCommand;
 use ZM\Command\Server\ServerStatusCommand;
@@ -45,6 +46,7 @@ final class ConsoleApplication extends Application
         $this->add(new ServerStartCommand());       // 运行主服务的指令控制器
         $this->add(new SystemdGenerateCommand());   // 生成systemd文件
         $this->add(new BotCraftCommand());          // 用于从命令行创建插件
+        $this->add(new ReplCommand());              // 交互式控制台
         if (LOAD_MODE === 1) {                      // 如果是 Composer 模式加载的，那么可以输入 check:config 命令，检查配置文件是否需要更新
             $this->add(new CheckConfigCommand());
         }
