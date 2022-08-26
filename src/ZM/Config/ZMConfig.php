@@ -55,12 +55,14 @@ class ZMConfig implements \ArrayAccess
      *
      * @throws ConfigException 配置文件加载出错
      */
-    public function __construct(array $config_paths = [], string $environment = 'development')
+    public function __construct(array $config_paths = [], string $environment = 'uninitiated')
     {
         $this->config_paths = $config_paths ?: [self::DEFAULT_CONFIG_PATH];
         $this->environment = $environment;
         $this->holder = new Config([]);
-        $this->loadFiles();
+        if ($environment !== 'uninitiated') {
+            $this->loadFiles();
+        }
     }
 
     /**
@@ -137,7 +139,6 @@ class ZMConfig implements \ArrayAccess
         // 按照加载顺序加载配置文件
         foreach (self::LOAD_ORDER as $load_type) {
             foreach ($stages[$load_type] as $file_path) {
-                logger()->info("加载配置文件：{$file_path}");
                 $this->loadConfigFromPath($file_path);
             }
         }
@@ -205,6 +206,7 @@ class ZMConfig implements \ArrayAccess
     public function reload(): void
     {
         $this->holder = new Config([]);
+        $this->loaded_files = [];
         $this->loadFiles();
     }
 
@@ -226,7 +228,7 @@ class ZMConfig implements \ArrayAccess
 
     public function offsetUnset($offset): void
     {
-        $this->set($offset, null);
+        $this->set($offset);
     }
 
     /**
@@ -365,5 +367,6 @@ class ZMConfig implements \ArrayAccess
 
         // 加入配置
         $this->merge($group, $config);
+        logger()->debug("已载入配置文件：{$path}");
     }
 }
