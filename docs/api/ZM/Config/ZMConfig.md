@@ -24,69 +24,6 @@ public function __construct(array $config_paths, string $environment): mixed
 | mixed |  |
 
 
-## addConfigPath
-
-```php
-public function addConfigPath(string $path): void
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| path | string |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| void |  |
-
-
-## getEnvironment
-
-```php
-public function getEnvironment(): string
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| string |  |
-
-
-## setEnvironment
-
-```php
-public function setEnvironment(string $environment): void
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| environment | string |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| void |  |
-
-
 ## loadFiles
 
 ```php
@@ -176,10 +113,33 @@ public function set(mixed $key, mixed $value): void
 | void |  |
 
 
-## getHolder
+## addConfigPath
 
 ```php
-public function getHolder(): OneBot\V12\Config\Config
+public function addConfigPath(string $path): void
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| path | string |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| void |  |
+
+
+## getEnvironment
+
+```php
+public function getEnvironment(): string
 ```
 
 ### 描述
@@ -190,7 +150,30 @@ public function getHolder(): OneBot\V12\Config\Config
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| OneBot\V12\Config\Config |  |
+| string |  |
+
+
+## setEnvironment
+
+```php
+public function setEnvironment(string $environment): void
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| environment | string |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| void |  |
 
 
 ## reload
@@ -208,6 +191,46 @@ public function reload(): void
 | 类型 | 描述 |
 | ---- | ----------- |
 | void |  |
+
+
+## getHolder
+
+```php
+public function getHolder(): OneBot\V12\Config\Config
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| OneBot\V12\Config\Config |  |
+
+
+## getTrace
+
+```php
+public function getTrace(string $key): string
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| key | string |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| string |  |
 
 
 ## getFileMeta
