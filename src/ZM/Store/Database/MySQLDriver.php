@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ZM\Store\MySQL;
+namespace ZM\Store\Database;
 
 use Doctrine\DBAL\Driver as DoctrineDriver;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
@@ -13,10 +13,10 @@ class MySQLDriver implements DoctrineDriver
     public function connect(array $params, $username = null, $password = null, array $driverOptions = [])
     {
         logger()->debug('Requiring new connection');
-        return new MySQLConnection($params);
+        return new DBConnection($params);
     }
 
-    public function getDatabasePlatform(): MySqlPlatform
+    public function getDatabasePlatform()
     {
         return new MySqlPlatform();
     }
@@ -33,14 +33,8 @@ class MySQLDriver implements DoctrineDriver
 
     public function getDatabase($conn)
     {
-        $conf = config('global.mysql');
-
-        if ($conn instanceof MySQLConnection) {
-            foreach ($conf as $v) {
-                if (($v['name'] ?? $v['dbname']) === $conn->getPoolName()) {
-                    return $v['dbname'];
-                }
-            }
+        if ($conn instanceof DBConnection) {
+            return config('database')[$conn->getPoolName()]['dbname'] ?? '';
         }
         return '';
     }

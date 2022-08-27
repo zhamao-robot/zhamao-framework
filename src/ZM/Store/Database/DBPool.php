@@ -4,7 +4,7 @@
 
 declare(strict_types=1);
 
-namespace ZM\Store\MySQL;
+namespace ZM\Store\Database;
 
 use OneBot\Driver\Driver;
 use OneBot\Driver\Interfaces\PoolInterface;
@@ -14,8 +14,9 @@ use OneBot\Driver\Workerman\ObjectPool as WorkermanObjectPool;
 use OneBot\Driver\Workerman\WorkermanDriver;
 use PDO;
 use RuntimeException;
+use ZM\Store\FileSystem;
 
-class MySQLPool
+class DBPool
 {
     /**
      * @var array<string, SwooleObjectPool|WorkermanObjectPool> 连接池列表
@@ -25,26 +26,44 @@ class MySQLPool
     /**
      * 通过配置文件创建一个 MySQL 连接池
      *
-     * @throws MySQLException
+     * @throws DBException
      */
     public static function create(string $name, array $config)
     {
-        $size = $config['pool_size'] ?? 128;
-        $connect_str = 'mysql:host={host};port={port};dbname={dbname};charset={charset}';
-        $table = [
-            '{host}' => $config['host'],
-            '{port}' => $config['port'],
-            '{dbname}' => $config['dbname'],
-            '{charset}' => $config['charset'] ?? 'utf8mb4',
-        ];
-        $connect_str = str_replace(array_keys($table), array_values($table), $connect_str);
-        self::checkExtension();
+        $size = $config['pool_size'] ?? 64;
+        switch ($config['type']) {
+            case 'mysql':
+                $connect_str = 'mysql:host={host};port={port};dbname={dbname};charset={charset}';
+                $table = [
+                    '{host}' => $config['host'],
+                    '{port}' => $config['port'],
+                    '{dbname}' => $config['dbname'],
+                    '{charset}' => $config['charset'] ?? 'utf8mb4',
+                ];
+                $connect_str = str_replace(array_keys($table), array_values($table), $connect_str);
+                $args = [$config['username'], $config['password'], $config['options'] ?? []];
+                self::checkMysqlExtension();
+                break;
+            case 'sqlite':
+                $connect_str = 'sqlite:{dbname}';
+                if (FileSystem::isRelativePath($config['dbname'])) {
+                    $config['dbname'] = zm_dir(SOURCE_ROOT_DIR . '/' . $config['dbname']);
+                }
+                $table = [
+                    '{dbname}' => $config['dbname'],
+                ];
+                $args = [];
+                $connect_str = str_replace(array_keys($table), array_values($table), $connect_str);
+                break;
+            default:
+                throw new DBException('type ' . $config['type'] . ' not supported yet');
+        }
         switch (Driver::getActiveDriverClass()) {
             case WorkermanDriver::class:
-                self::$pools[$name] = new WorkermanObjectPool($size, PDO::class, $connect_str, $config['username'], $config['password'], $config['options'] ?? []);
+                self::$pools[$name] = new WorkermanObjectPool($size, PDO::class, $connect_str, ...$args);
                 break;
             case SwooleDriver::class:
-                self::$pools[$name] = new SwooleObjectPool($size, PDO::class, $connect_str, $config['username'], $config['password'], $config['options'] ?? []);
+                self::$pools[$name] = new SwooleObjectPool($size, PDO::class, $connect_str, ...$args);
         }
     }
 
@@ -56,10 +75,10 @@ class MySQLPool
      */
     public static function pool(string $name)
     {
-        if (!isset(self::$pools[$name])) {
+        if (!isset(self::$pools[$name]) && count(self::$pools) !== 1) {
             throw new RuntimeException("Pool {$name} not found");
         }
-        return self::$pools[$name];
+        return self::$pools[$name] ?? self::$pools[array_key_first(self::$pools)];
     }
 
     /**
@@ -85,9 +104,9 @@ class MySQLPool
     /**
      * 检查数据库启动必要的依赖扩展，如果不符合要求则抛出异常
      *
-     * @throws MySQLException
+     * @throws DBException
      */
-    public static function checkExtension()
+    public static function checkMysqlExtension()
     {
         ob_start();
         phpinfo(); // 这个phpinfo是有用的，不能删除
@@ -102,7 +121,7 @@ class MySQLPool
                 continue;
             }
             if (mb_strpos($v, 'pdo_mysql') === false) {
-                throw new MySQLException(zm_internal_errcode('E00028') . '未安装 mysqlnd php-mysql扩展。');
+                throw new DBException(zm_internal_errcode('E00028') . '未安装 mysqlnd php-mysql扩展。');
             }
         }
     }

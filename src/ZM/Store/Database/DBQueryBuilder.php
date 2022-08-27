@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace ZM\Store\MySQL;
+namespace ZM\Store\Database;
 
 use Doctrine\DBAL\Query\QueryBuilder;
-use ZM\Store\MySQL\MySQLException as DbException;
+use ZM\Store\Database\DBException as DbException;
 
-class MySQLQueryBuilder extends QueryBuilder
+class DBQueryBuilder extends QueryBuilder
 {
     private $wrapper;
 
-    public function __construct(MySQLWrapper $wrapper)
+    public function __construct(DBWrapper $wrapper)
     {
         parent::__construct($wrapper->getConnection());
         $this->wrapper = $wrapper;
@@ -19,7 +19,7 @@ class MySQLQueryBuilder extends QueryBuilder
 
     /**
      * @throws DbException
-     * @return int|MySQLStatementWrapper
+     * @return DBStatementWrapper|int
      */
     public function execute()
     {

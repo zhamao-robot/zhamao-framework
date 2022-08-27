@@ -80,11 +80,18 @@ $config['file_server'] = [
     ],
 ];
 
-/* MySQL 数据库连接配置，框架将自动生成连接池，支持多个连接池 */
-$config['mysql'] = [
-    [
-        'pool_name' => '', // 默认只有一个空名称的连接池，如果需要多个连接池，请复制此段配置并修改参数和名称
-        'host' => '', // 填写数据库服务器地址后才会创建数据库连接
+/* MySQL 和 SQLite3 数据库连接配置，框架将自动生成连接池，支持多个连接池 */
+$config['database'] = [
+    'sqlite_db1' => [
+        'enable' => false,
+        'type' => 'sqlite',
+        'dbname' => 'a.db',
+        'pool_size' => 10,
+    ],
+    'zm' => [
+        'enable' => false,
+        'type' => 'mysql',
+        'host' => '127.0.0.1', // 填写数据库服务器地址后才会创建数据库连接
         'port' => 3306,
         'username' => 'root',
         'password' => 'ZhamaoTEST',

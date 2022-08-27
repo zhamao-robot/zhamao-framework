@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace ZM\Store\MySQL;
+namespace ZM\Store\Database;
 
 use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\ParameterType;
@@ -15,7 +15,7 @@ use PDO;
 use PDOStatement;
 use Traversable;
 
-class MySQLStatement implements IteratorAggregate, Statement
+class DBStatement implements IteratorAggregate, Statement
 {
     /** @var PDOStatement */
     private $statement;
