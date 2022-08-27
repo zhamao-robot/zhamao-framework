@@ -9,7 +9,7 @@ use OneBot\V12\Config\Config;
 use ZM\Exception\ConfigException;
 use ZM\Framework;
 
-class ZMConfig implements \ArrayAccess
+class ZMConfig
 {
     use Singleton;
 
@@ -239,27 +239,6 @@ class ZMConfig implements \ArrayAccess
     public function getHolder(): Config
     {
         return $this->holder;
-    }
-
-    public function offsetExists($offset): bool
-    {
-        return $this->get($offset) !== null;
-    }
-
-    #[\ReturnTypeWillChange]
-    public function offsetGet($offset)
-    {
-        return $this->get($offset);
-    }
-
-    public function offsetSet($offset, $value): void
-    {
-        $this->set($offset, $value);
-    }
-
-    public function offsetUnset($offset): void
-    {
-        $this->set($offset);
     }
 
     /**
