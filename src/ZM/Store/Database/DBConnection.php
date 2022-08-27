@@ -4,14 +4,14 @@
 
 declare(strict_types=1);
 
-namespace ZM\Store\MySQL;
+namespace ZM\Store\Database;
 
 use Doctrine\DBAL\Driver\Connection;
 use Doctrine\DBAL\ParameterType;
 use PDO;
 use PDOException;
 
-class MySQLConnection implements Connection
+class DBConnection implements Connection
 {
     /** @var PDO */
     private $conn;
@@ -21,20 +21,20 @@ class MySQLConnection implements Connection
     public function __construct($params)
     {
         logger()->debug('Constructing...');
-        $this->conn = MySQLPool::pool($params['dbName'])->get();
+        $this->conn = DBPool::pool($params['dbName'])->get();
         $this->pool_name = $params['dbName'];
     }
 
     public function __destruct()
     {
         logger()->debug('Destructing！！！');
-        MySQLPool::pool($this->pool_name)->put($this->conn);
+        DBPool::pool($this->pool_name)->put($this->conn);
     }
 
     /**
-     * @param  mixed          $sql
-     * @param  mixed          $options
-     * @throws MySQLException
+     * @param  mixed       $sql
+     * @param  mixed       $options
+     * @throws DBException
      */
     public function prepare($sql, $options = [])
     {
@@ -43,13 +43,13 @@ class MySQLConnection implements Connection
             $statement = $this->conn->prepare($sql, $options);
             assert($statement !== false);
         } catch (PDOException $exception) {
-            throw new MySQLException($exception->getMessage(), $exception->getCode(), $exception);
+            throw new DBException($exception->getMessage(), 0, $exception);
         }
-        return new MySQLStatement($statement);
+        return new DBStatement($statement);
     }
 
     /**
-     * @throws MySQLException
+     * @throws DBException
      */
     public function query(...$args)
     {
@@ -57,9 +57,9 @@ class MySQLConnection implements Connection
             $statement = $this->conn->query(...$args);
             assert($statement !== false);
         } catch (PDOException $exception) {
-            throw new MySQLException($exception->getMessage(), $exception->getCode(), $exception);
+            throw new DBException($exception->getMessage(), 0, $exception);
         }
-        return new MySQLStatement($statement);
+        return new DBStatement($statement);
     }
 
     public function quote($value, $type = ParameterType::STRING)
@@ -68,8 +68,8 @@ class MySQLConnection implements Connection
     }
 
     /**
-     * @param  mixed          $sql
-     * @throws MySQLException
+     * @param  mixed       $sql
+     * @throws DBException
      */
     public function exec($sql)
     {
@@ -79,20 +79,20 @@ class MySQLConnection implements Connection
             assert($statement !== false);
             return $statement;
         } catch (PDOException $exception) {
-            throw new MySQLException($exception->getMessage(), $exception->getCode(), $exception);
+            throw new DBException($exception->getMessage(), 0, $exception);
         }
     }
 
     /**
-     * @param  null|mixed     $name
-     * @throws MySQLException
+     * @param  null|mixed  $name
+     * @throws DBException
      */
     public function lastInsertId($name = null)
     {
         try {
             return $name === null ? $this->conn->lastInsertId() : $this->conn->lastInsertId($name);
         } catch (PDOException $exception) {
-            throw new MySQLException($exception->getMessage(), $exception->getCode(), $exception);
+            throw new DBException($exception->getMessage(), 0, $exception);
         }
     }
 
