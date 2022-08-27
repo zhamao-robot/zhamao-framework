@@ -31,6 +31,17 @@ $ob_event_provider = new EventProvider();
 
 // 注册一个最低级别的 WorkerStart 事件，用于在框架的事件初始化之后开始运行 PHPUnit
 ob_event_provider()->addEventListener(WorkerStartEvent::getName(), function () {
+    register_shutdown_function(function () {
+        $error = error_get_last();
+        // 下面这段代码的作用就是，不是错误引发的退出时照常退出即可
+        if (($error['type'] ?? 0) != 0) {
+            logger()->emergency(zm_internal_errcode('E00027') . 'Internal fatal error: ' . $error['message'] . ' at ' . $error['file'] . "({$error['line']})");
+        }
+        ob_dump($error);
+        ob_dump(func_get_args());
+        ob_dump(debug_backtrace());
+        Framework::getInstance()->stop();
+    });
     try {
         // 不退出，而是返回 code
         $retcode = Command::main(false);
@@ -43,7 +54,7 @@ ob_event_provider()->addEventListener(WorkerStartEvent::getName(), function () {
 
 try {
     $options = ServerStartCommand::exportOptionArray();
-    $options['driver'] = DIRECTORY_SEPARATOR === '/' ? 'swoole' : 'workerman';
+    $options['driver'] = 'workerman';
     $options['worker-num'] = 1;
     $options['private-mode'] = true;
     (new Framework($options))->init()->start();
