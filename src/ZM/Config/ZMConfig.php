@@ -75,13 +75,13 @@ class ZMConfig implements \ArrayAccess
         $this->config_paths = $config_paths ?: [self::DEFAULT_CONFIG_PATH];
         $this->environment = self::$environment_alias[$environment] ?? $environment;
         $this->holder = new Config([]);
-        if ($environment !== 'uninitiated') {
-            $this->loadFiles();
-        }
         if (Framework::getInstance()->getArgv()['debug'] ?? false) {
             $this->tracer = new ConfigTracer();
         } else {
             $this->tracer = null;
+        }
+        if ($environment !== 'uninitiated') {
+            $this->loadFiles();
         }
     }
 
