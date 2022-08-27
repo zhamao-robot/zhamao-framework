@@ -12,12 +12,11 @@ use ZM\Annotation\AnnotationMap;
 use ZM\Annotation\AnnotationParser;
 use ZM\Annotation\Framework\Init;
 use ZM\Container\ContainerServicesProvider;
-use ZM\Exception\ConfigException;
 use ZM\Exception\ZMKnownException;
 use ZM\Framework;
 use ZM\Process\ProcessStateManager;
-use ZM\Store\MySQL\MySQLException;
-use ZM\Store\MySQL\MySQLPool;
+use ZM\Store\Database\DBException;
+use ZM\Store\Database\DBPool;
 use ZM\Utils\ZMUtil;
 
 class WorkerEventListener
@@ -99,6 +98,10 @@ class WorkerEventListener
         if (DIRECTORY_SEPARATOR !== '\\') {
             ProcessStateManager::removeProcessState(ZM_PROCESS_WORKER, ProcessManager::getProcessId());
         }
+        // 清空 MySQL 的连接池
+        foreach (DBPool::getAllPools() as $name => $pool) {
+            DBPool::destroyPool($name);
+        }
     }
 
     /**
@@ -149,29 +152,21 @@ class WorkerEventListener
      *
      * TODO：未来新增其他db的连接池
      *
-     * @throws ConfigException
-     * @throws MySQLException
+     * @throws DBException
      */
     private function initConnectionPool()
     {
         // 清空 MySQL 的连接池
-        foreach (MySQLPool::getAllPools() as $name => $pool) {
-            MySQLPool::destroyPool($name);
+        foreach (DBPool::getAllPools() as $name => $pool) {
+            DBPool::destroyPool($name);
         }
 
         // 读取 MySQL 配置文件
-        $conf = config('global.mysql');
-        if (is_array($conf) && !is_assoc_array($conf)) {
-            // 如果有多个数据库连接，则遍历
-            foreach ($conf as $conn_conf) {
-                if ($conn_conf['host'] !== '') {
-                    MySQLPool::create($conn_conf['pool_name'], $conn_conf);
-                }
-            }
-        } elseif (is_assoc_array($conf)) {
-            // 这种情况也支持，但是不推荐
-            if ($conf['host'] !== '') {
-                MySQLPool::create($conf['pool_name'], $conf);
+        $conf = config('global.database');
+        // 如果有多个数据库连接，则遍历
+        foreach ($conf as $name => $conn_conf) {
+            if (($conn_conf['enable'] ?? true) !== false) {
+                DBPool::create($name, $conn_conf);
             }
         }
     }

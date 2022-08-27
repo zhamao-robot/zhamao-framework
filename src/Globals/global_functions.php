@@ -13,8 +13,8 @@ use ZM\Container\ContainerInterface;
 use ZM\Context\Context;
 use ZM\Logger\ConsoleLogger;
 use ZM\Middleware\MiddlewareHandler;
-use ZM\Store\MySQL\MySQLException;
-use ZM\Store\MySQL\MySQLWrapper;
+use ZM\Store\Database\DBException;
+use ZM\Store\Database\DBWrapper;
 
 // 防止重复引用引发报错
 if (function_exists('zm_internal_errcode')) {
@@ -172,21 +172,21 @@ function app(string $abstract = null, array $parameters = [])
 /**
  * 获取 MySQL 调用的类
  *
- * @throws MySQLException
+ * @throws DBException
  */
-function mysql(string $name = '')
+function db(string $name = '')
 {
-    return new MySQLWrapper($name);
+    return new DBWrapper($name);
 }
 
 /**
  * 获取构建 MySQL 的类
  *
- * @throws MySQLException
+ * @throws DBException
  */
-function mysql_builder(string $name = '')
+function sql_builder(string $name = '')
 {
-    return (new MySQLWrapper($name))->createQueryBuilder();
+    return (new DBWrapper($name))->createQueryBuilder();
 }
 
 /**
