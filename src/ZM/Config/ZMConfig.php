@@ -7,6 +7,7 @@ namespace ZM\Config;
 use OneBot\Util\Singleton;
 use OneBot\V12\Config\Config;
 use ZM\Exception\ConfigException;
+use ZM\Framework;
 
 class ZMConfig implements \ArrayAccess
 {
@@ -57,6 +58,11 @@ class ZMConfig implements \ArrayAccess
     private Config $holder;
 
     /**
+     * @var null|ConfigTracer 配置跟踪器
+     */
+    private ?ConfigTracer $tracer;
+
+    /**
      * 构造配置实例
      *
      * @param array  $config_paths 配置文件路径
@@ -69,46 +75,13 @@ class ZMConfig implements \ArrayAccess
         $this->config_paths = $config_paths ?: [self::DEFAULT_CONFIG_PATH];
         $this->environment = self::$environment_alias[$environment] ?? $environment;
         $this->holder = new Config([]);
+        if (Framework::getInstance()->getArgv()['debug'] ?? false) {
+            $this->tracer = new ConfigTracer();
+        } else {
+            $this->tracer = null;
+        }
         if ($environment !== 'uninitiated') {
             $this->loadFiles();
-        }
-    }
-
-    /**
-     * 添加配置文件路径
-     *
-     * @param string $path 路径
-     */
-    public function addConfigPath(string $path): void
-    {
-        if (!in_array($path, $this->config_paths, true)) {
-            $this->config_paths[] = $path;
-        }
-    }
-
-    /**
-     * 获取当前环境
-     *
-     * @return string 当前环境
-     */
-    public function getEnvironment(): string
-    {
-        return $this->environment;
-    }
-
-    /**
-     * 设置当前环境
-     *
-     * 变更环境后，将会自动调用 `reload` 方法重载配置
-     *
-     * @param string $environment 目标环境
-     */
-    public function setEnvironment(string $environment): void
-    {
-        $target = self::$environment_alias[$environment] ?? $environment;
-        if ($this->environment !== $target) {
-            $this->environment = $target;
-            $this->reload();
         }
     }
 
@@ -210,11 +183,41 @@ class ZMConfig implements \ArrayAccess
     }
 
     /**
-     * 获取内部配置容器
+     * 添加配置文件路径
+     *
+     * @param string $path 路径
      */
-    public function getHolder(): Config
+    public function addConfigPath(string $path): void
     {
-        return $this->holder;
+        if (!in_array($path, $this->config_paths, true)) {
+            $this->config_paths[] = $path;
+        }
+    }
+
+    /**
+     * 获取当前环境
+     *
+     * @return string 当前环境
+     */
+    public function getEnvironment(): string
+    {
+        return $this->environment;
+    }
+
+    /**
+     * 设置当前环境
+     *
+     * 变更环境后，将会自动调用 `reload` 方法重载配置
+     *
+     * @param string $environment 目标环境
+     */
+    public function setEnvironment(string $environment): void
+    {
+        $target = self::$environment_alias[$environment] ?? $environment;
+        if ($this->environment !== $target) {
+            $this->environment = $target;
+            $this->reload();
+        }
     }
 
     /**
@@ -228,6 +231,14 @@ class ZMConfig implements \ArrayAccess
         $this->holder = new Config([]);
         $this->loaded_files = [];
         $this->loadFiles();
+    }
+
+    /**
+     * 获取内部配置容器
+     */
+    public function getHolder(): Config
+    {
+        return $this->holder;
     }
 
     public function offsetExists($offset): bool
@@ -249,6 +260,22 @@ class ZMConfig implements \ArrayAccess
     public function offsetUnset($offset): void
     {
         $this->set($offset);
+    }
+
+    /**
+     * 获取配置项的来源
+     *
+     * @param  string      $key 配置项
+     * @return null|string 来源，如果没有找到，返回 null
+     */
+    public function getTrace(string $key): ?string
+    {
+        if ($this->tracer === null) {
+            logger()->warning('你正在获取配置项的来源，但没有开启配置来源追踪功能');
+            return null;
+        }
+
+        return $this->tracer->getTraceOf($key);
     }
 
     /**
@@ -389,5 +416,9 @@ class ZMConfig implements \ArrayAccess
         // 加入配置
         $this->merge($group, $config);
         logger()->debug("已载入配置文件：{$path}");
+
+        if ($this->tracer !== null) {
+            $this->tracer->addTracesOf($group, $config, $path);
+        }
     }
 }
