@@ -28,6 +28,15 @@ class ZMConfig implements \ArrayAccess
     public const DEFAULT_CONFIG_PATH = SOURCE_ROOT_DIR . '/config';
 
     /**
+     * @var string[] 环境别名
+     */
+    public static array $environment_alias = [
+        'dev' => 'development',
+        'test' => 'testing',
+        'prod' => 'production',
+    ];
+
+    /**
      * @var array 已加载的配置文件
      */
     private array $loaded_files = [];
@@ -55,12 +64,14 @@ class ZMConfig implements \ArrayAccess
      *
      * @throws ConfigException 配置文件加载出错
      */
-    public function __construct(array $config_paths = [], string $environment = 'development')
+    public function __construct(array $config_paths = [], string $environment = 'uninitiated')
     {
         $this->config_paths = $config_paths ?: [self::DEFAULT_CONFIG_PATH];
-        $this->environment = $environment;
+        $this->environment = self::$environment_alias[$environment] ?? $environment;
         $this->holder = new Config([]);
-        $this->loadFiles();
+        if ($environment !== 'uninitiated') {
+            $this->loadFiles();
+        }
     }
 
     /**
@@ -76,6 +87,16 @@ class ZMConfig implements \ArrayAccess
     }
 
     /**
+     * 获取当前环境
+     *
+     * @return string 当前环境
+     */
+    public function getEnvironment(): string
+    {
+        return $this->environment;
+    }
+
+    /**
      * 设置当前环境
      *
      * 变更环境后，将会自动调用 `reload` 方法重载配置
@@ -84,8 +105,9 @@ class ZMConfig implements \ArrayAccess
      */
     public function setEnvironment(string $environment): void
     {
-        if ($this->environment !== $environment) {
-            $this->environment = $environment;
+        $target = self::$environment_alias[$environment] ?? $environment;
+        if ($this->environment !== $target) {
+            $this->environment = $target;
             $this->reload();
         }
     }
@@ -137,7 +159,6 @@ class ZMConfig implements \ArrayAccess
         // 按照加载顺序加载配置文件
         foreach (self::LOAD_ORDER as $load_type) {
             foreach ($stages[$load_type] as $file_path) {
-                logger()->info("加载配置文件：{$file_path}");
                 $this->loadConfigFromPath($file_path);
             }
         }
@@ -205,6 +226,7 @@ class ZMConfig implements \ArrayAccess
     public function reload(): void
     {
         $this->holder = new Config([]);
+        $this->loaded_files = [];
         $this->loadFiles();
     }
 
@@ -226,7 +248,7 @@ class ZMConfig implements \ArrayAccess
 
     public function offsetUnset($offset): void
     {
-        $this->set($offset, null);
+        $this->set($offset);
     }
 
     /**
@@ -246,6 +268,7 @@ class ZMConfig implements \ArrayAccess
             $env = null;
         } else {
             $env = array_pop($parts);
+            $env = self::$environment_alias[$env] ?? $env;
         }
         $group = implode('.', $parts);
         return [$group, $ext, $load_type, $env];
@@ -365,5 +388,6 @@ class ZMConfig implements \ArrayAccess
 
         // 加入配置
         $this->merge($group, $config);
+        logger()->debug("已载入配置文件：{$path}");
     }
 }
