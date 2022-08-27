@@ -480,14 +480,14 @@ class Framework
             }
             switch ($x) {
                 case 'driver':      // 动态设置驱动类型
-                    config()['global']['driver'] = $y;
+                    config()->set('global.driver', $y);
                     break;
                 case 'worker-num':  // 动态设置 Worker 数量
-                    config()['global']['swoole_options']['swoole_set']['worker_num'] = intval($y);
-                    config()['global']['workerman_options']['workerman_worker_num'] = intval($y);
+                    config()->set('global.swoole_options.swoole_set.worker_num', intval($y));
+                    config()->set('global.workerman_options.workerman_worker_num', intval($y));
                     break;
                 case 'daemon':      // 启动为守护进程
-                    config()['global']['swoole_options']['swoole_set']['daemonize'] = 1;
+                    config()->set('global.swoole_options.swoole_set.daemonize', 1);
                     Worker::$daemonize = true;
                     break;
             }
