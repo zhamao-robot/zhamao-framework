@@ -8,6 +8,7 @@ const ZM_TEST_LOG_DEBUG = false;
 use OneBot\Driver\Event\Process\WorkerStartEvent;
 use PHPUnit\TextUI\Command;
 use Swoole\Atomic;
+use Tests\ZMResultPrinter;
 use ZM\Command\Server\ServerStartCommand;
 use ZM\Event\EventProvider;
 use ZM\Framework;
@@ -37,11 +38,10 @@ ob_event_provider()->addEventListener(WorkerStartEvent::getName(), function () {
         if (($error['type'] ?? 0) != 0) {
             logger()->emergency(zm_internal_errcode('E00027') . 'Internal fatal error: ' . $error['message'] . ' at ' . $error['file'] . "({$error['line']})");
         }
-        ob_dump($error);
-        ob_dump(func_get_args());
-        ob_dump(debug_backtrace());
         Framework::getInstance()->stop();
     });
+    $_SERVER['argv'][] = '--printer';
+    $_SERVER['argv'][] = ZMResultPrinter::class;
     try {
         // 不退出，而是返回 code
         $retcode = Command::main(false);
