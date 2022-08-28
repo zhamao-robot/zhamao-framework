@@ -49,7 +49,7 @@ function download_file() {
 
 # 安装下载内建PHP
 function install_native_php() {
-    ZM_PHP_VERSION="8.1"
+    ZM_PHP_VERSION="8.0"
     if [ "$ZM_DOWN_PHP_VERSION" != "" ]; then
         ZM_PHP_VERSION="$ZM_DOWN_PHP_VERSION"
     fi
@@ -245,6 +245,9 @@ function install_framework() {
 }
 
 # 环境变量设置
+if [ "$TMPDIR" != "" ]; then
+    ZM_TEMP_DIR="$TMPDIR"
+fi
 test "$ZM_TEMP_DIR" = "" && ZM_TEMP_DIR="/tmp/.zm-runtime"
 test "$ZM_CUSTOM_DIR" = "" && ZM_CUSTOM_DIR="zhamao-app"
 
