@@ -102,7 +102,7 @@ class ZMConfig
         foreach ($this->config_paths as $config_path) {
             $files = scandir($config_path);
             foreach ($files as $file) {
-                [, $ext, $load_type,] = $this->getFileMeta($file);
+                [, $ext, $load_type] = $this->getFileMeta($file);
                 // 略过不支持的文件
                 if (!in_array($ext, self::ALLOWED_FILE_EXTENSIONS, true)) {
                     continue;

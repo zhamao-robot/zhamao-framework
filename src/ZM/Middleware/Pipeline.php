@@ -45,8 +45,8 @@ class Pipeline
      * 接下来要调用的内容
      *
      * @param  callable                 $callback 然后调用一个什么东西
-     * @throws InvalidArgumentException
      * @return null|mixed               返回调用结果或null
+     * @throws InvalidArgumentException
      */
     public function then(callable $callback)
     {

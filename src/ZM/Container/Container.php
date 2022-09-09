@@ -41,8 +41,8 @@ class Container implements ContainerInterface
      * @template T
      * @param  class-string<T>          $abstract   类或接口名
      * @param  array                    $parameters 参数
-     * @throws EntryResolutionException
      * @return Closure|mixed|T          实例
+     * @throws EntryResolutionException
      */
     public function make(string $abstract, array $parameters = [])
     {

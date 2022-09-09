@@ -108,9 +108,9 @@ class BotCommand extends AnnotationBase implements Level
     }
 
     /**
+     * @return $this
      * @throws InvalidArgumentException
      * @throws ZMKnownException
-     * @return $this
      */
     public function withArgument(
         string $name,

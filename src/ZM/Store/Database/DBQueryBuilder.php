@@ -18,8 +18,8 @@ class DBQueryBuilder extends QueryBuilder
     }
 
     /**
-     * @throws DbException
      * @return DBStatementWrapper|int
+     * @throws DbException
      */
     public function execute()
     {
