@@ -1,0 +1,27 @@
+name: Code Style
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  analyse:
+    name: Code Style
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup PHP
+        uses: sunxyw/workflows/setup-environment@main
+        with:
+          php-version: 8.0
+          php-extensions: swoole, posix, json
+          operating-system: ubuntu-latest
+          use-cache: true
+
+      - name: Code Style
+        uses: sunxyw/workflows/coding-style@main
