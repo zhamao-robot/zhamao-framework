@@ -22,27 +22,12 @@ jobs:
           ref: ${{ github.base_ref }}
 
       - name: Setup PHP
-        uses: "shivammathur/setup-php@v2"
+        uses: sunxyw/workflows/setup-environment@main
         with:
-          php-version: '8.1'
-          extensions: swoole, posix, json
-
-      - name: Setup problem matchers for PHP
-        run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
-
-      - name: Get composer cache directory
-        id: composer-cache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
-
-      - name: Cache dependencies
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
-          restore-keys: ${{ runner.os }}-composer-
-
-      - name: Install Composer Dependencies
-        run: "composer install --prefer-dist --no-progress --optimize-autoloader"
+          php-version: 8.0
+          php-extensions: swoole, posix, json
+          operating-system: ubuntu-latest
+          use-cache: true
 
       - name: Generate API Docs
         id: generate-api-docs
