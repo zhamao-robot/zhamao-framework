@@ -247,8 +247,8 @@ trait ContainerTrait
      * @template T
      * @param  class-string<T>          $abstract   类或接口名
      * @param  array                    $parameters 参数
-     * @throws EntryResolutionException
      * @return Closure|mixed|T          实例
+     * @throws EntryResolutionException
      */
     public function make(string $abstract, array $parameters = [])
     {
@@ -317,8 +317,8 @@ trait ContainerTrait
      * 实例化具体的类实例
      *
      * @param  Closure|string           $concrete 类名或对应的闭包
-     * @throws EntryResolutionException
      * @return mixed
+     * @throws EntryResolutionException
      */
     public function build($concrete)
     {
@@ -394,10 +394,9 @@ trait ContainerTrait
      *
      * @param string $id identifier of the entry to look for
      *
+     * @return mixed                       entry
      * @throws NotFoundExceptionInterface  no entry was found for **this** identifier
      * @throws ContainerExceptionInterface error while retrieving the entry
-     *
-     * @return mixed entry
      */
     public function get(string $id)
     {
@@ -640,8 +639,8 @@ trait ContainerTrait
     /**
      * 解析基本类型
      *
-     * @throws EntryResolutionException 如参数不存在默认值，则抛出异常
      * @return mixed                    对应类型的默认值
+     * @throws EntryResolutionException 如参数不存在默认值，则抛出异常
      */
     protected function resolvePrimitive(ReflectionParameter $parameter)
     {
@@ -655,8 +654,8 @@ trait ContainerTrait
     /**
      * 解析类
      *
-     * @throws EntryResolutionException 如果无法解析类，则抛出异常
      * @return mixed
+     * @throws EntryResolutionException 如果无法解析类，则抛出异常
      */
     protected function resolveClass(ReflectionParameter $parameter)
     {

@@ -69,8 +69,8 @@ class DBWrapper
 
     /**
      * wrapper method
-     * @throws DBException
      * @return array|false
+     * @throws DBException
      */
     public function fetchAssociative(string $query, array $params = [], array $types = [])
     {
@@ -83,8 +83,8 @@ class DBWrapper
 
     /**
      * wrapper method
-     * @throws DBException
      * @return array|false
+     * @throws DBException
      */
     public function fetchNumeric(string $query, array $params = [], array $types = [])
     {
@@ -96,8 +96,8 @@ class DBWrapper
     }
 
     /**
-     * @throws DBException
      * @return false|mixed
+     * @throws DBException
      */
     public function fetchOne(string $query, array $params = [], array $types = [])
     {
@@ -199,8 +199,8 @@ class DBWrapper
      * @param array<int, mixed>|array<string, mixed>                               $params Query parameters
      * @param array<int, null|int|string|Type>|array<string, null|int|string|Type> $types  Parameter types
      *
-     * @throws DBException
      * @return array<int,array<int,mixed>>
+     * @throws DBException
      */
     public function fetchAllNumeric(string $query, array $params = [], array $types = []): array
     {
@@ -217,8 +217,8 @@ class DBWrapper
      * @param array<int, mixed>|array<string, mixed>                               $params Query parameters
      * @param array<int, null|int|string|Type>|array<string, null|int|string|Type> $types  Parameter types
      *
-     * @throws DBException
      * @return array<int,array<string,mixed>>
+     * @throws DBException
      */
     public function fetchAllAssociative(string $query, array $params = [], array $types = []): array
     {
@@ -252,8 +252,8 @@ class DBWrapper
      * @param array<int, mixed>|array<string, mixed>           $params Query parameters
      * @param array<int, int|string>|array<string, int|string> $types  Parameter types
      *
-     * @throws DBException
      * @return array<mixed,array<string,mixed>>
+     * @throws DBException
      */
     public function fetchAllAssociativeIndexed(string $query, array $params = [], array $types = []): array
     {
@@ -270,8 +270,8 @@ class DBWrapper
      * @param array<int, mixed>|array<string, mixed>                               $params Query parameters
      * @param array<int, null|int|string|Type>|array<string, null|int|string|Type> $types  Parameter types
      *
-     * @throws DBException
      * @return array<int,mixed>
+     * @throws DBException
      */
     public function fetchFirstColumn(string $query, array $params = [], array $types = []): array
     {
@@ -288,8 +288,8 @@ class DBWrapper
      * @param array<int, mixed>|array<string, mixed>                               $params Query parameters
      * @param array<int, null|int|string|Type>|array<string, null|int|string|Type> $types  Parameter types
      *
-     * @throws DBException
      * @return Traversable<int,array<int,mixed>>
+     * @throws DBException
      */
     public function iterateNumeric(string $query, array $params = [], array $types = []): Traversable
     {
@@ -306,8 +306,8 @@ class DBWrapper
      * @param array<int, mixed>|array<string, mixed>                               $params Query parameters
      * @param array<int, null|int|string|Type>|array<string, null|int|string|Type> $types  Parameter types
      *
-     * @throws DBException
      * @return Traversable<int,array<string,mixed>>
+     * @throws DBException
      */
     public function iterateAssociative(string $query, array $params = [], array $types = []): Traversable
     {
@@ -324,8 +324,8 @@ class DBWrapper
      * @param array<int, mixed>|array<string, mixed>           $params Query parameters
      * @param array<int, int|string>|array<string, int|string> $types  Parameter types
      *
-     * @throws DBException
      * @return Traversable<mixed,mixed>
+     * @throws DBException
      */
     public function iterateKeyValue(string $query, array $params = [], array $types = []): Traversable
     {
@@ -342,8 +342,8 @@ class DBWrapper
      * @param array<int, mixed>|array<string, mixed>           $params Query parameters
      * @param array<int, int|string>|array<string, int|string> $types  Parameter types
      *
-     * @throws DBException
      * @return Traversable<mixed,array<string,mixed>>
+     * @throws DBException
      */
     public function iterateAssociativeIndexed(string $query, array $params = [], array $types = []): Traversable
     {
@@ -360,8 +360,8 @@ class DBWrapper
      * @param array<int, mixed>|array<string, mixed>                               $params Query parameters
      * @param array<int, null|int|string|Type>|array<string, null|int|string|Type> $types  Parameter types
      *
-     * @throws DBException
      * @return Traversable<int,mixed>
+     * @throws DBException
      */
     public function iterateColumn(string $query, array $params = [], array $types = []): Traversable
     {
@@ -414,8 +414,8 @@ class DBWrapper
      * @param array<int, mixed>|array<string, mixed>                               $params Statement parameters
      * @param array<int, null|int|string|Type>|array<string, null|int|string|Type> $types  Parameter types
      *
-     * @throws DBException
      * @return int|string  the number of affected rows
+     * @throws DBException
      */
     public function executeStatement(string $sql, array $params = [], array $types = [])
     {
@@ -446,8 +446,8 @@ class DBWrapper
 
     /**
      * overwrite method to $this->connection->transactional()
-     * @throws DBException
      * @return mixed
+     * @throws DBException
      */
     public function transactional(Closure $func)
     {

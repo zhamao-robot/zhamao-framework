@@ -65,8 +65,8 @@ class ProcessStateManager
      * 用于框架内部获取多进程运行状态的函数
      *
      * @param  mixed            $id_or_name
-     * @throws ZMKnownException
      * @return false|int|mixed
+     * @throws ZMKnownException
      * @internal
      */
     public static function getProcessState(int $type, $id_or_name = null)

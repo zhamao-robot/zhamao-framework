@@ -16,9 +16,9 @@ class BoundMethod
      *
      * @param  Container                                    $container
      * @param  callable|string                              $callback
+     * @return mixed
      * @throws EntryResolutionException|ReflectionException
      * @throws InvalidArgumentException
-     * @return mixed
      */
     public static function call(ContainerInterface $container, $callback, array $parameters = [], string $default_method = null)
     {

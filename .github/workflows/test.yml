@@ -1,0 +1,54 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - '*-dev*'
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - review_requested
+  workflow_dispatch:
+
+jobs:
+  pre_job:
+    runs-on: ubuntu-latest
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@v4
+        with:
+          concurrent_skipping: same_content_newer
+          skip_after_successful_duplicate: true
+          paths: '["src/**", "tests/**", "bin/phpunit-zm"]'
+          do_not_skip: '["workflow_dispatch", "schedule"]'
+
+  test:
+    needs: pre_job
+    if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
+    strategy:
+      matrix:
+        operating-system: [ ubuntu-latest, windows-latest, macos-latest ]
+        php-version: [ 7.4, 8.0, 8.1 ]
+    name: PHP ${{ matrix.php-version }} Test (${{ matrix.operating-system }})
+    runs-on: ${{ matrix.operating-system }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup PHP
+        uses: sunxyw/workflows/setup-environment@main
+        with:
+          php-version: ${{ matrix.php-version }}
+          php-extensions: swoole, posix, json
+          operating-system: ${{ matrix.operating-system }}
+          use-cache: true
+
+      - name: Test
+        uses: sunxyw/workflows/test@main

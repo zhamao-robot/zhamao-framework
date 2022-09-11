@@ -1,0 +1,42 @@
+name: Code Style
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  pre_job:
+    runs-on: ubuntu-latest
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@v4
+        with:
+          concurrent_skipping: same_content_newer
+          skip_after_successful_duplicate: true
+          paths: '["src/**", "tests/**"]'
+          do_not_skip: '["workflow_dispatch", "schedule"]'
+
+  cs-fix:
+    needs: pre_job
+    if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
+    name: Code Style
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup PHP
+        uses: sunxyw/workflows/setup-environment@main
+        with:
+          php-version: 8.0
+          php-extensions: swoole, posix, json
+          operating-system: ubuntu-latest
+          use-cache: true
+
+      - name: Code Style
+        uses: sunxyw/workflows/coding-style@main

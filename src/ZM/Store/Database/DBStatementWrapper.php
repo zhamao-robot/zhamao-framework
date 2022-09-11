@@ -45,8 +45,8 @@ class DBStatementWrapper
 
     /**
      * wrapper method
-     *@throws DBException
      * @return array|false|mixed
+     *@throws DBException
      */
     public function fetchNumeric()
     {
@@ -59,8 +59,8 @@ class DBStatementWrapper
 
     /**
      * wrapper method
-     *@throws DBException
      * @return array|false|mixed
+     *@throws DBException
      */
     public function fetchAssociative()
     {
@@ -73,8 +73,8 @@ class DBStatementWrapper
 
     /**
      * wrapper method
-     *@throws DBException
      * @return false|mixed
+     *@throws DBException
      */
     public function fetchOne()
     {
@@ -217,8 +217,8 @@ class DBStatementWrapper
 
     /**
      * wrapper method
-     * @throws DBException
      * @return int
+     * @throws DBException
      */
     public function rowCount()
     {
