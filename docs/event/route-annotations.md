@@ -231,10 +231,10 @@ $config['static_file_server'] = [
 ```php
 /**
  * @RequestMapping("/images/{filename}")
- * @param $param
+ * @param array $param
  * @return StaticFileHandler
  */
-public function staticImage($param) {
+public function staticImage(array $param) {
   Console::info("[下载图片] " . $param["filename"]);
   return new StaticFileHandler($param["filename"], "/path/to/your/image_dir/");
 }
