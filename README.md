@@ -50,27 +50,21 @@
 
 ## 简介
 
-炸毛框架使用 PHP 编写，采用 Swoole 扩展为基础，主要面向 API 服务，聊天机器人（OneBot 兼容的 QQ 机器人对接），包含 Websocket、HTTP
+炸毛框架使用 PHP 编写，主要面向 API 服务，聊天机器人，包含 Websocket、HTTP
 等监听和请求库，用户代码采用模块化处理，使用注解可以方便地编写各类功能。
 
-框架主要用途为 HTTP 服务器，机器人搭建框架。尤其对于 QQ 机器人消息处理较为方便和全面，提供了众多会话机制和内部调用机制，可以以各种方式设计你自己的模块。
+框架主要用途为 HTTP 服务器，机器人搭建框架。尤其对于聊天机器人消息处理较为方便和全面，提供了众多会话机制和内部调用机制，可以以各种方式设计你自己的插件。
 
 ```php
-/**
- * @CQCommand("你好")
- */
+#[\BotCommand('你好')]
 public function hello() {
   ctx()->reply("你好，我是炸毛！"); // 简单的命令式回复
 }
-/**
- * @RequestMapping("/index")
- */
+#[\Route('/index')]
 public function index() {
   return "<h1>hello!</h1>"; // 快速的 HTTP 服务开发
 }
 ```
-
-> 从 2.7.0 版本开始，框架已支持同时使用 Annotation 和原生 Attribute 注解，供开发者根据需要自由选用。
 
 ## 开始
 
@@ -113,22 +107,20 @@ bash <(curl -fsSL https://zhamao.xin/go.sh)
 ## 特点
 
 - 原生支持多个机器人客户端同时连接
-- 使用 Swoole 多工作进程机制和协程加持，尽可能简单的情况下提升了性能
 - 灵活的注解事件绑定机制，可同时使用 Annotation 和原生 Attribute 注解
-- 易用的上下文，模块内随处可用
-- 采用模块化编写，可自由搭配其他 Composer 组件，也可单文件面向过程编写
+- 完善的插件系统，可编写插件后打包或分发，供他人使用
+- 采用插件化编写，可自由搭配其他 Composer 组件，也可单文件面向过程编写
 - 支持模块打包、热加载，分享模块更方便
 - 常驻内存，全局缓存变量随处使用，提供多种缓存方案
-- 自带 MySQL、Redis 等数据库连接池等数据库连接方案
+- 自带 MySQL、SQLite、Redis 等数据库连接池
 - 本身为 HTTP 服务器、WebSocket 服务器，可以构建属于自己的 HTTP API 接口
-- 静态文件服务器，可将前端合并到一起
-- 自带 PHP + Swoole 环境，无需手动编译安装，by [crazywhalecc/static-php-cli](https://github.com/crazywhalecc/static-php-cli)
+- 自带 PHP 环境，无需手动编译安装，by [crazywhalecc/static-php-cli](https://github.com/crazywhalecc/static-php-cli)
 
 ## 下载源码
 
 框架源码可直接克隆本仓库进行编辑，如果你在国内，访问 GitHub 和克隆仓库比较慢，可以将 `github.com` 替换为 `fgit.zhamao.me` 进行加速。
 
-例如：`git clone https://fgit.zhamao.me/zhamao-robot/zhamao-framework.git --depth 1`。
+例如：`git clone https://hub.fastgit.xyz/zhamao-robot/zhamao-framework.git --depth 1`。
 
 ## 贡献和捐赠
 
@@ -152,12 +144,12 @@ bash <(curl -fsSL https://zhamao.xin/go.sh)
 
 作者的炸毛机器人已从2018年初起稳定运行了**四年半**，并且持续迭代。
 
-欢迎随时在 HTTP-API 插件群里提问，当然更好的话可以加作者 QQ（[627577391](http://wpa.qq.com/msgrd?v=3&uin=627577391&site=qq&menu=yes)）
+可以加作者 QQ（[627577391](http://wpa.qq.com/msgrd?v=3&uin=627577391&site=qq&menu=yes)）
 或提交 [Issue](https://github.com/zhamao-robot/zhamao-framework/issues/new/choose) 进行疑难解答。
 
-本项目在更新内容时，请及时关注 GitHub 动态，更新前请将自己的模块代码做好备份。
+本项目在更新内容时，请及时关注 GitHub 动态，更新前请将自己的插件或项目代码做好备份。
 
-项目框架采用 Apache-2.0 协议开源，在分发或重写修改等操作时需遵守协议。项目模块部分(`Module` 文件夹) 在非借鉴框架内代码时可不遵守 Apache-2.0 协议进行分发和修改(声明版权)。
+项目框架采用 Apache-2.0 协议开源，在分发或重写修改等操作时需遵守协议。项目插件部分(除 `src/Globals`、`src/ZM` 文件夹外的其他文件夹) 在非借鉴框架内代码时可不遵守 Apache-2.0 协议进行分发和修改(声明版权)。
 
 **注意**：在你使用 mirai 等 `AGPL-3.0` 协议的机器人软件与框架连接时，使用本框架需要将你编写或修改的部分使用 `AGPL-3.0` 协议重新分发。
 
@@ -167,6 +159,6 @@ bash <(curl -fsSL https://zhamao.xin/go.sh)
 
 <img src="https://resources.jetbrains.com/storage/products/company/brand/logos/PhpStorm.svg" width="300">
 
-感谢 [php-libonebot](https://github.com/botuniverse/php-libonebot) 开发者 @sunxyw 中为项目开发规范化提出的一些建议。
+感谢开发者 @sunxyw 中为项目开发规范化提出的一些建议。
 
-<!-- ![star](https://starchart.cc/zhamao-robot/zhamao-framework.svg) -->
+![star](https://starchart.cc/zhamao-robot/zhamao-framework.svg)
