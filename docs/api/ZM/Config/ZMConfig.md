@@ -196,7 +196,7 @@ public function reload(): void
 ## getHolder
 
 ```php
-public function getHolder(): OneBot\V12\Config\Config
+public function getHolder(): OneBot\Config\Config
 ```
 
 ### 描述
@@ -207,7 +207,7 @@ public function getHolder(): OneBot\V12\Config\Config
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| OneBot\V12\Config\Config |  |
+| OneBot\Config\Config |  |
 
 
 ## getTrace
