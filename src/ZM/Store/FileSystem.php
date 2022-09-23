@@ -72,7 +72,7 @@ class FileSystem
     {
         // 适配 Windows 的多盘符目录形式
         if (DIRECTORY_SEPARATOR === '\\') {
-            return strlen($path) > 2 && ctype_alpha($path[0]) && $path[1] === ':';
+            return !(strlen($path) > 2 && ctype_alpha($path[0]) && $path[1] === ':');
         }
         return strlen($path) > 0 && $path[0] !== '/';
     }
