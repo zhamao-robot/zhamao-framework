@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ZM\Config;
 
+use OneBot\Config\Config;
 use OneBot\Util\Singleton;
-use OneBot\V12\Config\Config;
 use ZM\Exception\ConfigException;
 use ZM\Framework;
 
