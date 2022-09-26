@@ -37,6 +37,16 @@ define('WORKING_DIR', getcwd());
 /* 定义源码根目录，如果是 Phar 打包框架运行的话，就是 Phar 文件本身 */
 define('SOURCE_ROOT_DIR', Phar::running() !== '' ? Phar::running() : WORKING_DIR);
 
+if (DIRECTORY_SEPARATOR === '\\') {
+    define('TMP_DIR', 'C:\\Windows\\Temp');
+} elseif (!empty(getenv('TMPDIR'))) {
+    define('TMP_DIR', getenv('TMPDIR'));
+} elseif (is_writable('/tmp')) {
+    define('TMP_DIR', '/tmp');
+} else {
+    define('TMP_DIR', getcwd() . '/.zm-tmp');
+}
+
 /* 定义启动模式，这里指的是框架本身的源码目录是通过 composer 加入 vendor 加载的还是直接放到 src 目录加载的，前者为 1，后者为 0 */
 define('LOAD_MODE', is_dir(zm_dir(SOURCE_ROOT_DIR . '/src/ZM')) ? 0 : 1);
 
@@ -47,10 +57,8 @@ if (Phar::running() !== '') {
     define('FRAMEWORK_ROOT_DIR', realpath(zm_dir(__DIR__ . '/../../')));
 }
 
-/* 定义用于存放框架运行状态的目录（Windows 不可用） */
-if (DIRECTORY_SEPARATOR !== '\\') {
-    define('ZM_PID_DIR', '/tmp/.zm_' . sha1(FRAMEWORK_ROOT_DIR));
-}
+/* 定义用于存放框架运行状态的目录（Windows 可用） */
+define('ZM_STATE_DIR', TMP_DIR . '/.zm_' . sha1(FRAMEWORK_ROOT_DIR));
 
 /* 对 global.php 在 Windows 下的兼容性考虑，因为 Windows 或者无 Swoole 环境时候无法运行 */
 !defined('SWOOLE_BASE') && define('SWOOLE_BASE', 1) && define('SWOOLE_PROCESS', 2);

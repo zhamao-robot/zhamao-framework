@@ -12,6 +12,7 @@ use OneBot\Driver\Event\Process\ManagerStartEvent;
 use OneBot\Driver\Event\Process\ManagerStopEvent;
 use OneBot\Driver\Event\Process\WorkerStartEvent;
 use OneBot\Driver\Event\Process\WorkerStopEvent;
+use OneBot\Driver\Event\WebSocket\WebSocketOpenEvent;
 use OneBot\Driver\Interfaces\DriverInitPolicy;
 use OneBot\Driver\Swoole\SwooleDriver;
 use OneBot\Driver\Workerman\Worker;
@@ -25,6 +26,7 @@ use ZM\Event\Listener\HttpEventListener;
 use ZM\Event\Listener\ManagerEventListener;
 use ZM\Event\Listener\MasterEventListener;
 use ZM\Event\Listener\WorkerEventListener;
+use ZM\Event\Listener\WSEventListener;
 use ZM\Exception\ConfigException;
 use ZM\Exception\InitException;
 use ZM\Exception\ZMKnownException;
@@ -292,14 +294,6 @@ class Framework
         ob_event_provider()->addEventListener(WorkerStartEvent::getName(), [WorkerEventListener::getInstance(), 'onWorkerStart999'], 999);
         ob_event_provider()->addEventListener(WorkerStopEvent::getName(), [WorkerEventListener::getInstance(), 'onWorkerStop999'], 999);
         // Http 事件
-        ob_event_provider()->addEventListener(HttpRequestEvent::getName(), function () {
-            global $starttime;
-            $starttime = microtime(true);
-        }, 1000);
-        ob_event_provider()->addEventListener(HttpRequestEvent::getName(), function () {
-            global $starttime;
-            logger()->error('Finally used ' . round((microtime(true) - $starttime) * 1000, 4) . ' ms');
-        }, 0);
         ob_event_provider()->addEventListener(HttpRequestEvent::getName(), [HttpEventListener::getInstance(), 'onRequest999'], 999);
         ob_event_provider()->addEventListener(HttpRequestEvent::getName(), [HttpEventListener::getInstance(), 'onRequest1'], 1);
         // manager 事件
@@ -307,10 +301,12 @@ class Framework
         ob_event_provider()->addEventListener(ManagerStopEvent::getName(), [ManagerEventListener::getInstance(), 'onManagerStop'], 999);
         // master 事件
         ob_event_provider()->addEventListener(DriverInitEvent::getName(), [MasterEventListener::getInstance(), 'onMasterStart'], 999);
+        // websocket 事件
+        ob_event_provider()->addEventListener(WebSocketOpenEvent::getName(), [WSEventListener::getInstance(), 'onWebSocketOpen'], 999);
 
         // 框架多进程依赖
-        if (defined('ZM_PID_DIR') && !is_dir(ZM_PID_DIR)) {
-            mkdir(ZM_PID_DIR);
+        if (defined('ZM_PID_DIR') && !is_dir(ZM_STATE_DIR)) {
+            mkdir(ZM_STATE_DIR);
         }
     }
 
@@ -334,10 +330,8 @@ class Framework
         $properties['version'] = self::VERSION . (LOAD_MODE === 0 ? (' (build ' . ZM_VERSION_ID . ')') : '');
         // 打印 PHP 版本
         $properties['php_version'] = PHP_VERSION;
-        // 非 Windows 操作系统打印 master 进程的 pid
-        if (PHP_OS_FAMILY !== 'Windows') {
-            $properties['master_pid'] = posix_getpid();
-        }
+        // 打印 master 进程的 pid
+        $properties['master_pid'] = getmypid();
         // 打印进程模型
         if ($this->driver->getName() === 'swoole') {
             $properties['process_mode'] = 'MST1';

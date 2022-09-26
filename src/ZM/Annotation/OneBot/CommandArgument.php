@@ -22,45 +22,23 @@ use ZM\Exception\ZMKnownException;
 class CommandArgument extends AnnotationBase implements ErgodicAnnotation
 {
     /**
-     * @var string
      * @Required()
      */
-    public $name;
+    public string $name;
 
-    /**
-     * @var string
-     */
-    public $description = '';
+    public string $description = '';
 
-    /**
-     * @var string
-     */
-    public $type = 'string';
+    public string $type = 'string';
 
-    /**
-     * @var bool
-     */
-    public $required = false;
+    public bool $required = false;
 
-    /**
-     * @var string
-     */
-    public $prompt = '';
+    public string $prompt = '';
 
-    /**
-     * @var string
-     */
-    public $default = '';
+    public string $default = '';
 
-    /**
-     * @var int
-     */
-    public $timeout = 60;
+    public int $timeout = 60;
 
-    /**
-     * @var int
-     */
-    public $error_prompt_policy = 1;
+    public int $error_prompt_policy = 1;
 
     /**
      * @param  string                                    $name        参数名称（可以是中文）

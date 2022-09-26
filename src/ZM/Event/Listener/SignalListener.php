@@ -113,6 +113,22 @@ class SignalListener
         }
     }
 
+    public function signalWindowsCtrlC()
+    {
+        if (self::$manager_kill_time > 0) {
+            if (self::$manager_kill_time >= 5) {
+                exit(0);
+            }
+            echo "\r";
+            logger()->notice('请再按 {count} 次 Ctrl+C 以强制杀死进程', ['count' => 5 - self::$manager_kill_time]);
+            return;
+        }
+        ++self::$manager_kill_time;
+        if (self::$manager_kill_time === 1) {
+            Framework::getInstance()->stop();
+        }
+    }
+
     /**
      * 按5次Ctrl+C后强行杀死框架的处理函数
      */
@@ -120,7 +136,7 @@ class SignalListener
     {
         if (self::$manager_kill_time > 0) {
             if (self::$manager_kill_time >= 5) {
-                $file_path = ZM_PID_DIR;
+                $file_path = ZM_STATE_DIR;
                 $flist = FileSystem::scanDirFiles($file_path, false, true);
                 foreach ($flist as $file) {
                     $name = explode('.', $file);

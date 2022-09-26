@@ -20,13 +20,13 @@ class ProcessStateManager
     {
         switch ($type) {
             case ZM_PROCESS_MASTER:
-                $file = ZM_PID_DIR . '/master.json';
+                $file = zm_dir(ZM_STATE_DIR . '/master.json');
                 if (file_exists($file)) {
                     unlink($file);
                 }
                 return;
             case ZM_PROCESS_MANAGER:
-                $file = ZM_PID_DIR . '/manager.pid';
+                $file = zm_dir(ZM_STATE_DIR . '/manager.pid');
                 if (file_exists($file)) {
                     unlink($file);
                 }
@@ -35,7 +35,7 @@ class ProcessStateManager
                 if (!is_int($id_or_name)) {
                     throw new ZMKnownException('E99999', 'worker_id必须为整数');
                 }
-                $file = ZM_PID_DIR . '/worker.' . $id_or_name . '.pid';
+                $file = zm_dir(ZM_STATE_DIR . '/worker.' . $id_or_name . '.pid');
                 if (file_exists($file)) {
                     unlink($file);
                 }
@@ -44,7 +44,7 @@ class ProcessStateManager
                 if (!is_string($id_or_name)) {
                     throw new ZMKnownException('E99999', 'process_name必须为字符串');
                 }
-                $file = ZM_PID_DIR . '/user.' . $id_or_name . '.pid';
+                $file = zm_dir(ZM_STATE_DIR . '/user.' . $id_or_name . '.pid');
                 if (file_exists($file)) {
                     unlink($file);
                 }
@@ -53,7 +53,7 @@ class ProcessStateManager
                 if (!is_int($id_or_name)) {
                     throw new ZMKnownException('E99999', 'worker_id必须为整数');
                 }
-                $file = ZM_PID_DIR . '/taskworker.' . $id_or_name . '.pid';
+                $file = zm_dir(ZM_STATE_DIR . '/taskworker.' . $id_or_name . '.pid');
                 if (file_exists($file)) {
                     unlink($file);
                 }
@@ -71,46 +71,46 @@ class ProcessStateManager
      */
     public static function getProcessState(int $type, $id_or_name = null)
     {
-        $file = ZM_PID_DIR;
+        $file = ZM_STATE_DIR;
         switch ($type) {
             case ZM_PROCESS_MASTER:
-                if (!file_exists($file . '/master.json')) {
+                if (!file_exists(zm_dir($file . '/master.json'))) {
                     return false;
                 }
-                $json = json_decode(file_get_contents($file . '/master.json'), true);
+                $json = json_decode(file_get_contents(zm_dir($file . '/master.json')), true);
                 if ($json !== null) {
                     return $json;
                 }
                 return false;
             case ZM_PROCESS_MANAGER:
-                if (!file_exists($file . '/manager.pid')) {
+                if (!file_exists(zm_dir($file . '/manager.pid'))) {
                     return false;
                 }
-                return intval(file_get_contents($file . '/manager.pid'));
+                return intval(file_get_contents(zm_dir($file . '/manager.pid')));
             case ZM_PROCESS_WORKER:
                 if (!is_int($id_or_name)) {
                     throw new ZMKnownException('E99999', 'worker_id必须为整数');
                 }
-                if (!file_exists($file . '/worker.' . $id_or_name . '.pid')) {
+                if (!file_exists(zm_dir($file . '/worker.' . $id_or_name . '.pid'))) {
                     return false;
                 }
-                return intval(file_get_contents($file . '/worker.' . $id_or_name . '.pid'));
+                return intval(file_get_contents(zm_dir($file . '/worker.' . $id_or_name . '.pid')));
             case ZM_PROCESS_USER:
                 if (!is_string($id_or_name)) {
                     throw new ZMKnownException('E99999', 'process_name必须为字符串');
                 }
-                if (!file_exists($file . '/user.' . $id_or_name . '.pid')) {
+                if (!file_exists(zm_dir($file . '/user.' . $id_or_name . '.pid'))) {
                     return false;
                 }
-                return intval(file_get_contents($file . '/user.' . $id_or_name . '.pid'));
+                return intval(file_get_contents(zm_dir($file . '/user.' . $id_or_name . '.pid')));
             case ZM_PROCESS_TASKWORKER:
                 if (!is_int($id_or_name)) {
                     throw new ZMKnownException('E99999', 'worker_id必须为整数');
                 }
-                if (!file_exists($file . '/taskworker.' . $id_or_name . '.pid')) {
+                if (!file_exists(zm_dir($file . '/taskworker.' . $id_or_name . '.pid'))) {
                     return false;
                 }
-                return intval(file_get_contents($file . '/taskworker.' . $id_or_name . '.pid'));
+                return intval(file_get_contents(zm_dir($file . '/taskworker.' . $id_or_name . '.pid')));
             default:
                 return false;
         }
@@ -126,7 +126,7 @@ class ProcessStateManager
     {
         switch ($type) {
             case ZM_PROCESS_MASTER:
-                $file = ZM_PID_DIR . '/master.json';
+                $file = zm_dir(ZM_STATE_DIR . '/master.json');
                 $json = [
                     'pid' => intval($pid),
                     'stdout' => $data['stdout'],
@@ -135,19 +135,19 @@ class ProcessStateManager
                 file_put_contents($file, json_encode($json, JSON_UNESCAPED_UNICODE));
                 return;
             case ZM_PROCESS_MANAGER:
-                $file = ZM_PID_DIR . '/manager.pid';
+                $file = zm_dir(ZM_STATE_DIR . '/manager.pid');
                 file_put_contents($file, strval($pid));
                 return;
             case ZM_PROCESS_WORKER:
-                $file = ZM_PID_DIR . '/worker.' . $data['worker_id'] . '.pid';
+                $file = zm_dir(ZM_STATE_DIR . '/worker.' . $data['worker_id'] . '.pid');
                 file_put_contents($file, strval($pid));
                 return;
             case ZM_PROCESS_USER:
-                $file = ZM_PID_DIR . '/user.' . $data['process_name'] . '.pid';
+                $file = zm_dir(ZM_STATE_DIR . '/user.' . $data['process_name'] . '.pid');
                 file_put_contents($file, strval($pid));
                 return;
             case ZM_PROCESS_TASKWORKER:
-                $file = ZM_PID_DIR . '/taskworker.' . $data['worker_id'] . '.pid';
+                $file = zm_dir(ZM_STATE_DIR . '/taskworker.' . $data['worker_id'] . '.pid');
                 file_put_contents($file, strval($pid));
                 return;
         }
@@ -155,7 +155,7 @@ class ProcessStateManager
 
     public static function isStateEmpty(): bool
     {
-        $ls = FileSystem::scanDirFiles(ZM_PID_DIR, false, true);
+        $ls = FileSystem::scanDirFiles(ZM_STATE_DIR, false, true);
         return empty($ls);
     }
 }

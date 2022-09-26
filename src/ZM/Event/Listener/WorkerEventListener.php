@@ -37,6 +37,13 @@ class WorkerEventListener
         if (!Framework::getInstance()->getArgv()['disable-safe-exit'] && PHP_OS_FAMILY !== 'Windows') {
             SignalListener::getInstance()->signalWorker();
         }
+
+        // Windows 环境下，为了监听 Ctrl+C，只能开启终端输入
+        if (PHP_OS_FAMILY === 'Windows') {
+            sapi_windows_set_ctrl_handler([SignalListener::getInstance(), 'signalWindowsCtrlC']);
+            Framework::getInstance()->getDriver()->getEventLoop()->addReadEvent(STDIN, function ($x) {});
+        }
+
         logger()->debug('Worker #' . ProcessManager::getProcessId() . ' started');
 
         // 设置 Worker 进程的状态和 ID 等信息
@@ -44,8 +51,8 @@ class WorkerEventListener
             /* @phpstan-ignore-next-line */
             $server = Framework::getInstance()->getDriver()->getSwooleServer();
             ProcessStateManager::saveProcessState(ZM_PROCESS_WORKER, $server->worker_pid, ['worker_id' => $server->worker_id]);
-        } elseif ($name === 'workerman' && DIRECTORY_SEPARATOR !== '\\' && extension_loaded('posix')) {
-            ProcessStateManager::saveProcessState(ZM_PROCESS_WORKER, posix_getpid(), ['worker_id' => ProcessManager::getProcessId()]);
+        } elseif ($name === 'workerman') {
+            ProcessStateManager::saveProcessState(ZM_PROCESS_WORKER, getmypid(), ['worker_id' => ProcessManager::getProcessId()]);
         }
 
         // 打印进程ID

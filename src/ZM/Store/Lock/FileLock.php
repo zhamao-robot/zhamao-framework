@@ -20,7 +20,7 @@ class FileLock
     public static function lock(string $name)
     {
         self::$name_hash[$name] = self::$name_hash[$name] ?? md5($name);
-        $lock_file = is_dir('/tmp') ? '/tmp' : WORKING_DIR . '.zm_' . zm_instance_id() . self::$name_hash[$name] . '.lock';
+        $lock_file = zm_dir(TMP_DIR . '/.zm_' . zm_instance_id() . self::$name_hash[$name] . '.lock');
         self::$lock_file_handle[$name] = fopen($lock_file, 'w');
         if (self::$lock_file_handle[$name] === false) {
             logger()->critical("Can not create lock file {$lock_file}\n");

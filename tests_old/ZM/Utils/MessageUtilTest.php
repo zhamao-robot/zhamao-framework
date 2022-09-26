@@ -102,7 +102,7 @@ class MessageUtilTest extends TestCase
 
     public function testGetImageCQFromLocal(): void
     {
-        file_put_contents('/tmp/test.jpg', 'test');
+        file_put_contents(TMP_DIR . '/test.jpg', 'test');
         $this->assertEquals('[CQ:image,file=base64://' . base64_encode('test') . ']', MessageUtil::getImageCQFromLocal('/tmp/test.jpg'));
         unlink('/tmp/test.jpg');
     }
