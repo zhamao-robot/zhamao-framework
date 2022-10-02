@@ -19,23 +19,17 @@ use ZM\Annotation\AnnotationBase;
 #[Attribute(Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE)]
 class BotEvent extends AnnotationBase
 {
-    /** @var null|string */
-    public $type;
+    public ?string $type;
 
-    /** @var null|string */
-    public $detail_type;
+    public ?string $detail_type;
 
-    /** @var null|string */
-    public $impl;
+    public ?string $impl;
 
-    /** @var null|string */
-    public $platform;
+    public ?string $platform;
 
-    /** @var null|string */
-    public $self_id;
+    public ?string $self_id;
 
-    /** @var null|string */
-    public $sub_type;
+    public ?string $sub_type;
 
     public function __construct(
         ?string $type = null,

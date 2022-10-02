@@ -26,7 +26,7 @@ class ServerStopCommand extends ServerCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($input->getOption('force') !== false) {
-            $file_path = ZM_PID_DIR;
+            $file_path = ZM_STATE_DIR;
             $list = FileSystem::scanDirFiles($file_path, false, true);
             foreach ($list as $file) {
                 $name = explode('.', $file);

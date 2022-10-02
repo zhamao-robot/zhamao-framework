@@ -59,8 +59,7 @@ class BotCommand extends AnnotationBase implements Level
     /** @var int */
     public $level = 20;
 
-    /** @var array */
-    private $arguments = [];
+    private array $arguments = [];
 
     public function __construct(
         $name = '',

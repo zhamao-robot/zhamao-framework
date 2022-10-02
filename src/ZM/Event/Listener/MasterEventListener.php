@@ -51,10 +51,10 @@ class MasterEventListener
     public function onMasterStop()
     {
         if (extension_loaded('posix')) {
-            logger()->debug('正在关闭 Master 进程，pid=' . posix_getpid());
+            logger()->debug('正在关闭 Master 进程，pid=' . getmypid());
             ProcessStateManager::removeProcessState(ZM_PROCESS_MASTER);
-            if (FileSystem::scanDirFiles(ZM_PID_DIR) == []) {
-                rmdir(ZM_PID_DIR);
+            if (FileSystem::scanDirFiles(ZM_STATE_DIR) == []) {
+                rmdir(ZM_STATE_DIR);
             }
         }
     }
