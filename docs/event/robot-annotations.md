@@ -212,10 +212,10 @@ class Hello {
 
 | 参数名称    | 参数范围                             | 用途                                                         | 默认 |
 | ----------- | ------------------------------------ | ------------------------------------------------------------ | ---- |
-| notice_type | `string`，支持填入 onebot 标准的内容 | 限定通知事件的类型，见 [OneBot - 通知事件](https://github.com/howmanybots/onebot/blob/master/v11/specs/event/notice.md) | 空   |
-| user_id     | `int64` 或 `string`                  | 限定通知事件用户 ID（QQ 号），同上见 [OneBot - 通知事件](https://github.com/howmanybots/onebot/blob/master/v11/specs/event/notice.md) | 空   |
-| group_id    | `int64` 或 `string`                  | 限定通知事件群 ID（QQ 群号），同上见 [OneBot - 通知事件](https://github.com/howmanybots/onebot/blob/master/v11/specs/event/notice.md) | 空   |
-| operator_id | `int64` 或 `string`                  | 限定操作者 QQ 号，同上见 [OneBot - 通知事件](https://github.com/howmanybots/onebot/blob/master/v11/specs/event/notice.md) | 空   |
+| notice_type | `string`，支持填入 onebot 标准的内容 | 限定通知事件的类型，见 [OneBot - 通知事件](https://github.com/botuniverse/onebot-11/blob/master/event/notice.md) | 空   |
+| user_id     | `int64` 或 `string`                  | 限定通知事件用户 ID（QQ 号），同上见 [OneBot - 通知事件](https://github.com/botuniverse/onebot-11/blob/master/event/notice.md) | 空   |
+| group_id    | `int64` 或 `string`                  | 限定通知事件群 ID（QQ 群号），同上见 [OneBot - 通知事件](https://github.com/botuniverse/onebot-11/blob/master/event/notice.md) | 空   |
+| operator_id | `int64` 或 `string`                  | 限定操作者 QQ 号，同上见 [OneBot - 通知事件](https://github.com/botuniverse/onebot-11/blob/master/event/notice.md) | 空   |
 | level       | `int`                                | 事件优先级（越大越靠前）                                     | 20   |
 
 ### 用法
@@ -240,10 +240,10 @@ TODO：先放着，有时间再更。
 
 | 参数名称     | 参数范围                             | 用途                                                         | 默认 |
 | ------------ | ------------------------------------ | ------------------------------------------------------------ | ---- |
-| request_type | `string`，支持填入 onebot 标准的内容 | 限定请求事件的类型，见 [OneBot - 请求事件](https://github.com/howmanybots/onebot/blob/master/v11/specs/event/request.md) | 空   |
-| user_id      | `int64` 或 `string`                  | 限定请求事件当事人用户 ID（QQ 号），见 [OneBot - 请求事件](https://github.com/howmanybots/onebot/blob/master/v11/specs/event/request.md) | 空   |
-| sub_type     | `string`                             | 限定请求事件来源群 ID（QQ 群号），见 [OneBot - 请求事件](https://github.com/howmanybots/onebot/blob/master/v11/specs/event/request.md) | 空   |
-| comment      | `string`                             | 限定验证消息内容，见 [OneBot - 请求事件](https://github.com/howmanybots/onebot/blob/master/v11/specs/event/request.md) | 空   |
+| request_type | `string`，支持填入 onebot 标准的内容 | 限定请求事件的类型，见 [OneBot - 请求事件](https://github.com/botuniverse/onebot-11/blob/master/event/request.md) | 空   |
+| user_id      | `int64` 或 `string`                  | 限定请求事件当事人用户 ID（QQ 号），见 [OneBot - 请求事件](https://github.com/botuniverse/onebot-11/blob/master/event/request.md) | 空   |
+| sub_type     | `string`                             | 限定请求事件来源群 ID（QQ 群号），见 [OneBot - 请求事件](https://github.com/botuniverse/onebot-11/blob/master/event/request.md) | 空   |
+| comment      | `string`                             | 限定验证消息内容，见 [OneBot - 请求事件](https://github.com/botuniverse/onebot-11/blob/master/event/request.md) | 空   |
 | level        | `int`                                | 事件优先级（越大越靠前）                                     | 20   |
 
 ### 用法
@@ -268,7 +268,7 @@ TODO：先放着，有时间再更。
 
 | 参数名称        | 参数范围           | 用途                                                         | 默认 |
 | --------------- | ------------------ | ------------------------------------------------------------ | ---- |
-| meta_event_type | `string`，**必需** | 限定元事件的类型，见 [OneBot - 元事件](https://github.com/howmanybots/onebot/blob/master/v11/specs/event/meta.md) |      |
+| meta_event_type | `string`，**必需** | 限定元事件的类型，见 [OneBot - 元事件]([OneBot - 请求事件](https://github.com/botuniverse/onebot-11/blob/master/event/meta.md)) |      |
 | level           | `int`              | 事件优先级（越大越靠前）                                     | 20   |
 
 ### 用法
