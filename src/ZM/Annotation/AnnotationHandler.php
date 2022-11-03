@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ZM\Annotation;
 
-use Throwable;
 use ZM\Exception\InterruptException;
 
 /**
@@ -89,8 +88,8 @@ class AnnotationHandler
      * 调用注册了该注解的所有函数们
      * 此处会遍历所有注册了当前注解的函数，并支持中间件插入
      *
-     * @param  mixed     ...$params 传入的参数们
-     * @throws Throwable
+     * @param  mixed      ...$params 传入的参数们
+     * @throws \Throwable
      */
     public function handleAll(...$params)
     {
@@ -113,7 +112,7 @@ class AnnotationHandler
             // InterruptException 用于中断，这里必须 catch，并标记状态
             $this->return_val = $e->return_var;
             $this->status = self::STATUS_INTERRUPTED;
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             // 其他类型的异常就顺势再抛出到外层，此层不做处理
             $this->status = self::STATUS_EXCEPTION;
             throw $e;
@@ -124,7 +123,7 @@ class AnnotationHandler
      * 调用单个注解
      *
      * @throws InterruptException
-     * @throws Throwable
+     * @throws \Throwable
      */
     public function handle(AnnotationBase $v, ?callable $rule_callback = null, ...$args): bool
     {
@@ -144,7 +143,7 @@ class AnnotationHandler
         } catch (InterruptException $e) {
             // 这里直接抛出这个异常的目的就是给上层handleAll()捕获
             throw $e;
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             // 其余的异常就交给中间件的异常捕获器过一遍，没捕获的则继续抛出
             $this->status = self::STATUS_EXCEPTION;
             throw $e;

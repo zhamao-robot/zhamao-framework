@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-$plugin = new \ZM\Plugin\InstantPlugin(__DIR__);
+$plugin = new InstantPlugin(__DIR__);
 
 /*
  * 发送 "测试 123"，回复 "你好，123"

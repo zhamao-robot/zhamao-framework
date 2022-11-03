@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace ZM\Store\Database;
 
-use Closure;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Types\Type;
-use Throwable;
-use Traversable;
 
 class DBWrapper
 {
@@ -33,7 +30,7 @@ class DBWrapper
             } else {
                 throw new DBException('Cannot find database config named "' . $name . '" !');
             }
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -76,7 +73,7 @@ class DBWrapper
     {
         try {
             return $this->connection->fetchAssociative($query, $params, $types);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), intval($e->getCode()), $e);
         }
     }
@@ -90,7 +87,7 @@ class DBWrapper
     {
         try {
             return $this->connection->fetchNumeric($query, $params, $types);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -103,7 +100,7 @@ class DBWrapper
     {
         try {
             return $this->connection->fetchOne($query, $params, $types);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -124,7 +121,7 @@ class DBWrapper
     {
         try {
             return $this->connection->delete($table, $criteria, $types);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -155,7 +152,7 @@ class DBWrapper
     {
         try {
             return $this->connection->update($table, $data, $criteria, $types);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -169,7 +166,7 @@ class DBWrapper
     {
         try {
             return $this->connection->insert($table, $data, $types);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -206,7 +203,7 @@ class DBWrapper
     {
         try {
             return $this->connection->fetchAllNumeric($query, $params, $types);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -224,7 +221,7 @@ class DBWrapper
     {
         try {
             return $this->connection->fetchAllAssociative($query, $params, $types);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -241,7 +238,7 @@ class DBWrapper
     {
         try {
             return $this->connection->fetchAllKeyValue($query, $params, $types);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -259,7 +256,7 @@ class DBWrapper
     {
         try {
             return $this->connection->fetchAllAssociativeIndexed($query, $params, $types);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -277,7 +274,7 @@ class DBWrapper
     {
         try {
             return $this->connection->fetchFirstColumn($query, $params, $types);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -288,14 +285,14 @@ class DBWrapper
      * @param array<int, mixed>|array<string, mixed>                               $params Query parameters
      * @param array<int, null|int|string|Type>|array<string, null|int|string|Type> $types  Parameter types
      *
-     * @return Traversable<int,array<int,mixed>>
+     * @return \Traversable<int,array<int,mixed>>
      * @throws DBException
      */
-    public function iterateNumeric(string $query, array $params = [], array $types = []): Traversable
+    public function iterateNumeric(string $query, array $params = [], array $types = []): \Traversable
     {
         try {
             return $this->connection->iterateNumeric($query, $params, $types);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -306,14 +303,14 @@ class DBWrapper
      * @param array<int, mixed>|array<string, mixed>                               $params Query parameters
      * @param array<int, null|int|string|Type>|array<string, null|int|string|Type> $types  Parameter types
      *
-     * @return Traversable<int,array<string,mixed>>
+     * @return \Traversable<int,array<string,mixed>>
      * @throws DBException
      */
-    public function iterateAssociative(string $query, array $params = [], array $types = []): Traversable
+    public function iterateAssociative(string $query, array $params = [], array $types = []): \Traversable
     {
         try {
             return $this->connection->iterateAssociative($query, $params, $types);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -324,14 +321,14 @@ class DBWrapper
      * @param array<int, mixed>|array<string, mixed>           $params Query parameters
      * @param array<int, int|string>|array<string, int|string> $types  Parameter types
      *
-     * @return Traversable<mixed,mixed>
+     * @return \Traversable<mixed,mixed>
      * @throws DBException
      */
-    public function iterateKeyValue(string $query, array $params = [], array $types = []): Traversable
+    public function iterateKeyValue(string $query, array $params = [], array $types = []): \Traversable
     {
         try {
             return $this->connection->iterateKeyValue($query, $params, $types);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -342,14 +339,14 @@ class DBWrapper
      * @param array<int, mixed>|array<string, mixed>           $params Query parameters
      * @param array<int, int|string>|array<string, int|string> $types  Parameter types
      *
-     * @return Traversable<mixed,array<string,mixed>>
+     * @return \Traversable<mixed,array<string,mixed>>
      * @throws DBException
      */
-    public function iterateAssociativeIndexed(string $query, array $params = [], array $types = []): Traversable
+    public function iterateAssociativeIndexed(string $query, array $params = [], array $types = []): \Traversable
     {
         try {
             return $this->connection->iterateAssociativeIndexed($query, $params, $types);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -360,14 +357,14 @@ class DBWrapper
      * @param array<int, mixed>|array<string, mixed>                               $params Query parameters
      * @param array<int, null|int|string|Type>|array<string, null|int|string|Type> $types  Parameter types
      *
-     * @return Traversable<int,mixed>
+     * @return \Traversable<int,mixed>
      * @throws DBException
      */
-    public function iterateColumn(string $query, array $params = [], array $types = []): Traversable
+    public function iterateColumn(string $query, array $params = [], array $types = []): \Traversable
     {
         try {
             return $this->connection->iterateColumn($query, $params, $types);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -385,7 +382,7 @@ class DBWrapper
         try {
             $query = $this->connection->executeQuery($sql, $params, $types, $qcp);
             return new DBStatementWrapper($query);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw $e;
             // throw new DBException($e->getMessage(), intval($e->getCode()), $e);
         }
@@ -403,7 +400,7 @@ class DBWrapper
         try {
             $query = $this->connection->executeCacheQuery($sql, $params, $types, $qcp);
             return new DBStatementWrapper($query);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -421,7 +418,7 @@ class DBWrapper
     {
         try {
             return $this->connection->executeStatement($sql, $params, $types);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -449,14 +446,14 @@ class DBWrapper
      * @return mixed
      * @throws DBException
      */
-    public function transactional(Closure $func)
+    public function transactional(\Closure $func)
     {
         $this->beginTransaction();
         try {
             $res = $func($this);
             $this->commit();
             return $res;
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             $this->rollBack();
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
@@ -470,7 +467,7 @@ class DBWrapper
     {
         try {
             $this->connection->setNestTransactionsWithSavepoints($nest_transactions_with_savepoints);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -499,7 +496,7 @@ class DBWrapper
     {
         try {
             return $this->connection->commit();
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -512,7 +509,7 @@ class DBWrapper
     {
         try {
             return $this->connection->rollBack();
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -526,7 +523,7 @@ class DBWrapper
     {
         try {
             $this->connection->createSavepoint($savepoint);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -540,7 +537,7 @@ class DBWrapper
     {
         try {
             $this->connection->releaseSavepoint($savepoint);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -554,7 +551,7 @@ class DBWrapper
     {
         try {
             $this->connection->rollbackSavepoint($savepoint);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -567,7 +564,7 @@ class DBWrapper
     {
         try {
             $this->connection->setRollbackOnly();
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -580,7 +577,7 @@ class DBWrapper
     {
         try {
             return $this->connection->isRollbackOnly();
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }

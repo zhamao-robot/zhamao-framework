@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ZM\Command\Server;
 
-use Exception;
 use OneBot\Driver\Process\ProcessManager;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -48,7 +47,7 @@ class ServerStartCommand extends ServerCommand
     /**
      * @throws ZMKnownException
      * @throws InitException
-     * @throws Exception
+     * @throws \Exception
      * @noinspection PhpComposerExtensionStubsInspection
      */
     protected function execute(InputInterface $input, OutputInterface $output): int

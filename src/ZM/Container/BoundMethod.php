@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace ZM\Container;
 
-use InvalidArgumentException;
-use ReflectionException;
-use ReflectionParameter;
 use ZM\Utils\ReflectionUtil;
 
 class BoundMethod
@@ -14,11 +11,11 @@ class BoundMethod
     /**
      * 调用指定闭包、类方法并注入依赖
      *
-     * @param  Container                                    $container
-     * @param  callable|string                              $callback
+     * @param  Container                                     $container
+     * @param  callable|string                               $callback
      * @return mixed
-     * @throws EntryResolutionException|ReflectionException
-     * @throws InvalidArgumentException
+     * @throws EntryResolutionException|\ReflectionException
+     * @throws \InvalidArgumentException
      */
     public static function call(ContainerInterface $container, $callback, array $parameters = [], string $default_method = null)
     {
@@ -35,7 +32,7 @@ class BoundMethod
         }
 
         if (!is_callable($callback)) {
-            throw new InvalidArgumentException('Callback is not callable.');
+            throw new \InvalidArgumentException('Callback is not callable.');
         }
 
         return call_user_func_array($callback, self::getMethodDependencies($container, $callback, $parameters));
@@ -44,8 +41,8 @@ class BoundMethod
     /**
      * Get all dependencies for a given method.
      *
-     * @param  callable|string     $callback
-     * @throws ReflectionException
+     * @param  callable|string      $callback
+     * @throws \ReflectionException
      */
     protected static function getMethodDependencies(ContainerInterface $container, $callback, array $parameters = []): array
     {
@@ -71,7 +68,7 @@ class BoundMethod
      */
     protected static function addDependencyForCallParameter(
         ContainerInterface $container,
-        ReflectionParameter $parameter,
+        \ReflectionParameter $parameter,
         array &$parameters,
         array &$dependencies
     ): void {

@@ -7,8 +7,6 @@ namespace ZM\Annotation;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Koriym\Attributes\AttributeReader;
 use Koriym\Attributes\DualReader;
-use ReflectionClass;
-use ReflectionException;
 use ReflectionMethod;
 use ZM\Annotation\Http\Controller;
 use ZM\Annotation\Http\Route;
@@ -78,7 +76,7 @@ class AnnotationParser
     /**
      * 注册各个模块类的注解和模块level的排序
      *
-     * @throws ReflectionException
+     * @throws \ReflectionException
      * @throws ConfigException
      */
     public function parseAll()
@@ -112,8 +110,8 @@ class AnnotationParser
                 logger()->debug('正在检索 ' . $v);
 
                 // 通过反射实现注解读取
-                $reflection_class = new ReflectionClass($v);
-                $methods = $reflection_class->getMethods(ReflectionMethod::IS_PUBLIC);
+                $reflection_class = new \ReflectionClass($v);
+                $methods = $reflection_class->getMethods(\ReflectionMethod::IS_PUBLIC);
                 $class_annotations = $reader->getClassAnnotations($reflection_class);
                 // 这段为新加的:start
                 // 这里将每个类里面所有的类注解、方法注解通通加到一颗大树上，后期解析

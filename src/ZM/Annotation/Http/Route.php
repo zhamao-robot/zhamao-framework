@@ -16,7 +16,7 @@ use ZM\Annotation\AnnotationBase;
  * @NamedArgumentConstructor()
  * @Target("METHOD")
  */
-#[Attribute(Attribute::IS_REPEATABLE | Attribute::TARGET_METHOD)]
+#[\Attribute(\Attribute::IS_REPEATABLE | \Attribute::TARGET_METHOD)]
 class Route extends AnnotationBase
 {
     /**

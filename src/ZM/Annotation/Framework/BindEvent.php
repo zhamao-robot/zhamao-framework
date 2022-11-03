@@ -20,7 +20,7 @@ use ZM\Annotation\Interfaces\Level;
  * @Target("METHOD")
  * @since 3.0.0
  */
-#[Attribute(Attribute::IS_REPEATABLE | Attribute::TARGET_METHOD)]
+#[\Attribute(\Attribute::IS_REPEATABLE | \Attribute::TARGET_METHOD)]
 class BindEvent extends AnnotationBase implements Level
 {
     /**

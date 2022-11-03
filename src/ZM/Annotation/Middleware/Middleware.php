@@ -17,7 +17,7 @@ use ZM\Annotation\Interfaces\ErgodicAnnotation;
  * @NamedArgumentConstructor()
  * @Target("ALL")
  */
-#[Attribute(Attribute::IS_REPEATABLE | Attribute::TARGET_ALL)]
+#[\Attribute(\Attribute::IS_REPEATABLE | \Attribute::TARGET_ALL)]
 class Middleware extends AnnotationBase implements ErgodicAnnotation
 {
     /**

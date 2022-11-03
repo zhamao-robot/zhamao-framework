@@ -11,8 +11,6 @@ namespace ZM\Store\Database;
 
 use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\DBAL\ForwardCompatibility\Result;
-use Throwable;
-use Traversable;
 
 class DBStatementWrapper
 {
@@ -52,7 +50,7 @@ class DBStatementWrapper
     {
         try {
             return $this->stmt->fetchNumeric();
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -66,7 +64,7 @@ class DBStatementWrapper
     {
         try {
             return $this->stmt->fetchAssociative();
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -80,7 +78,7 @@ class DBStatementWrapper
     {
         try {
             return $this->stmt->fetchOne();
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -93,7 +91,7 @@ class DBStatementWrapper
     {
         try {
             return $this->stmt->fetchAllNumeric();
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -106,7 +104,7 @@ class DBStatementWrapper
     {
         try {
             return $this->stmt->fetchAllAssociative();
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -119,7 +117,7 @@ class DBStatementWrapper
     {
         try {
             return $this->stmt->fetchAllKeyValue();
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -132,7 +130,7 @@ class DBStatementWrapper
     {
         try {
             return $this->stmt->fetchAllAssociativeIndexed();
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -145,7 +143,7 @@ class DBStatementWrapper
     {
         try {
             return $this->stmt->fetchFirstColumn();
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -154,11 +152,11 @@ class DBStatementWrapper
      * wrapper method
      * @throws DBException
      */
-    public function iterateNumeric(): Traversable
+    public function iterateNumeric(): \Traversable
     {
         try {
             return $this->stmt->iterateNumeric();
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -167,11 +165,11 @@ class DBStatementWrapper
      * wrapper method
      * @throws DBException
      */
-    public function iterateAssociative(): Traversable
+    public function iterateAssociative(): \Traversable
     {
         try {
             return $this->stmt->iterateAssociative();
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -180,11 +178,11 @@ class DBStatementWrapper
      * wrapper method
      * @throws DBException
      */
-    public function iterateKeyValue(): Traversable
+    public function iterateKeyValue(): \Traversable
     {
         try {
             return $this->stmt->iterateKeyValue();
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -193,11 +191,11 @@ class DBStatementWrapper
      * wrapper method
      * @throws DBException
      */
-    public function iterateAssociativeIndexed(): Traversable
+    public function iterateAssociativeIndexed(): \Traversable
     {
         try {
             return $this->stmt->iterateAssociativeIndexed();
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -206,11 +204,11 @@ class DBStatementWrapper
      * wrapper method
      * @throws DBException
      */
-    public function iterateColumn(): Traversable
+    public function iterateColumn(): \Traversable
     {
         try {
             return $this->stmt->iterateColumn();
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -224,7 +222,7 @@ class DBStatementWrapper
     {
         try {
             return $this->stmt->rowCount();
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
     }

@@ -4,17 +4,12 @@ declare(strict_types=1);
 
 namespace ZM\Annotation;
 
-use ArrayIterator;
-use Closure;
-use IteratorAggregate;
-use Traversable;
-
-abstract class AnnotationBase implements IteratorAggregate
+abstract class AnnotationBase implements \IteratorAggregate
 {
     public string $method = '';
 
     /**
-     * @var Closure|string
+     * @var \Closure|string
      */
     public $class = '';
 
@@ -33,7 +28,7 @@ abstract class AnnotationBase implements IteratorAggregate
                 $str .= ($v ? 'TRUE' : 'FALSE');
             } elseif (is_array($v)) {
                 $str .= json_encode($v, JSON_UNESCAPED_UNICODE);
-            } elseif ($v instanceof Closure) {
+            } elseif ($v instanceof \Closure) {
                 $str .= '@AnonymousFunction';
             } elseif (is_null($v)) {
                 $str .= 'NULL';
@@ -47,7 +42,7 @@ abstract class AnnotationBase implements IteratorAggregate
     /**
      * 在 InstantPlugin 下调用，设置回调或匿名函数
      *
-     * @param Closure|string $method
+     * @param \Closure|string $method
      */
     public function on($method): AnnotationBase
     {
@@ -55,9 +50,9 @@ abstract class AnnotationBase implements IteratorAggregate
         return $this;
     }
 
-    public function getIterator(): Traversable
+    public function getIterator(): \Traversable
     {
-        return new ArrayIterator($this);
+        return new \ArrayIterator($this);
     }
 
     public function isInGroup(string $name): bool

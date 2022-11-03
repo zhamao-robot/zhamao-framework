@@ -12,8 +12,6 @@ use OneBot\Driver\Swoole\ObjectPool as SwooleObjectPool;
 use OneBot\Driver\Swoole\SwooleDriver;
 use OneBot\Driver\Workerman\ObjectPool as WorkermanObjectPool;
 use OneBot\Driver\Workerman\WorkermanDriver;
-use PDO;
-use RuntimeException;
 use ZM\Store\FileSystem;
 
 class DBPool
@@ -60,10 +58,10 @@ class DBPool
         }
         switch (Driver::getActiveDriverClass()) {
             case WorkermanDriver::class:
-                self::$pools[$name] = new WorkermanObjectPool($size, PDO::class, $connect_str, ...$args);
+                self::$pools[$name] = new WorkermanObjectPool($size, \PDO::class, $connect_str, ...$args);
                 break;
             case SwooleDriver::class:
-                self::$pools[$name] = new SwooleObjectPool($size, PDO::class, $connect_str, ...$args);
+                self::$pools[$name] = new SwooleObjectPool($size, \PDO::class, $connect_str, ...$args);
         }
     }
 
@@ -76,7 +74,7 @@ class DBPool
     public static function pool(string $name)
     {
         if (!isset(self::$pools[$name]) && count(self::$pools) !== 1) {
-            throw new RuntimeException("Pool {$name} not found");
+            throw new \RuntimeException("Pool {$name} not found");
         }
         return self::$pools[$name] ?? self::$pools[array_key_first(self::$pools)];
     }

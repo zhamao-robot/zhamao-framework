@@ -16,7 +16,7 @@ use ZM\Annotation\AnnotationBase;
  * @Target("METHOD")
  * @NamedArgumentConstructor()
  */
-#[Attribute(Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE)]
+#[\Attribute(\Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class BotEvent extends AnnotationBase
 {
     public ?string $type;

@@ -8,12 +8,10 @@ namespace ZM\Store\Database;
 
 use Doctrine\DBAL\Driver\Connection;
 use Doctrine\DBAL\ParameterType;
-use PDO;
-use PDOException;
 
 class DBConnection implements Connection
 {
-    /** @var PDO */
+    /** @var \PDO */
     private $conn;
 
     private $pool_name;
@@ -42,7 +40,7 @@ class DBConnection implements Connection
             logger()->debug('Running SQL prepare: ' . $sql);
             $statement = $this->conn->prepare($sql, $options);
             assert($statement !== false);
-        } catch (PDOException $exception) {
+        } catch (\PDOException $exception) {
             throw new DBException($exception->getMessage(), 0, $exception);
         }
         return new DBStatement($statement);
@@ -56,7 +54,7 @@ class DBConnection implements Connection
         try {
             $statement = $this->conn->query(...$args);
             assert($statement !== false);
-        } catch (PDOException $exception) {
+        } catch (\PDOException $exception) {
             throw new DBException($exception->getMessage(), 0, $exception);
         }
         return new DBStatement($statement);
@@ -78,7 +76,7 @@ class DBConnection implements Connection
             $statement = $this->conn->exec($sql);
             assert($statement !== false);
             return $statement;
-        } catch (PDOException $exception) {
+        } catch (\PDOException $exception) {
             throw new DBException($exception->getMessage(), 0, $exception);
         }
     }
@@ -91,7 +89,7 @@ class DBConnection implements Connection
     {
         try {
             return $name === null ? $this->conn->lastInsertId() : $this->conn->lastInsertId($name);
-        } catch (PDOException $exception) {
+        } catch (\PDOException $exception) {
             throw new DBException($exception->getMessage(), 0, $exception);
         }
     }

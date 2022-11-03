@@ -4,15 +4,8 @@ declare(strict_types=1);
 
 namespace ZM\Container;
 
-use Closure;
-use Exception;
-use InvalidArgumentException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use ReflectionClass;
-use ReflectionException;
-use ReflectionNamedType;
-use ReflectionParameter;
 use ZM\Utils\ReflectionUtil;
 
 trait ContainerTrait
@@ -55,7 +48,7 @@ trait ContainerTrait
     private static $aliases = [];
 
     /**
-     * @var Closure[][]
+     * @var \Closure[][]
      */
     private static $extenders = [];
 
@@ -103,7 +96,7 @@ trait ContainerTrait
     public function alias(string $abstract, string $alias): void
     {
         if ($alias === $abstract) {
-            throw new InvalidArgumentException("[{$abstract}] is same as [{$alias}]");
+            throw new \InvalidArgumentException("[{$abstract}] is same as [{$alias}]");
         }
 
         self::$aliases[$alias] = $abstract;
@@ -116,9 +109,9 @@ trait ContainerTrait
     /**
      * 注册绑定
      *
-     * @param string              $abstract 类或接口名
-     * @param null|Closure|string $concrete 返回类实例的闭包，或是类名
-     * @param bool                $shared   是否共享
+     * @param string               $abstract 类或接口名
+     * @param null|\Closure|string $concrete 返回类实例的闭包，或是类名
+     * @param bool                 $shared   是否共享
      */
     public function bind(string $abstract, $concrete = null, bool $shared = false): void
     {
@@ -135,7 +128,7 @@ trait ContainerTrait
         }
 
         // 如果不是闭包，则认为是类名，此时将其包装在一个闭包中，以方便后续处理
-        if (!$concrete instanceof Closure) {
+        if (!$concrete instanceof \Closure) {
             $concrete = $this->getClosure($abstract, $concrete);
         }
 
@@ -151,9 +144,9 @@ trait ContainerTrait
      *
      * 在已经绑定时不会重复注册
      *
-     * @param string              $abstract 类或接口名
-     * @param null|Closure|string $concrete 返回类实例的闭包，或是类名
-     * @param bool                $shared   是否共享
+     * @param string               $abstract 类或接口名
+     * @param null|\Closure|string $concrete 返回类实例的闭包，或是类名
+     * @param bool                 $shared   是否共享
      */
     public function bindIf(string $abstract, $concrete = null, bool $shared = false): void
     {
@@ -165,8 +158,8 @@ trait ContainerTrait
     /**
      * 注册一个单例绑定
      *
-     * @param string              $abstract 类或接口名
-     * @param null|Closure|string $concrete 返回类实例的闭包，或是类名
+     * @param string               $abstract 类或接口名
+     * @param null|\Closure|string $concrete 返回类实例的闭包，或是类名
      */
     public function singleton(string $abstract, $concrete = null): void
     {
@@ -178,8 +171,8 @@ trait ContainerTrait
      *
      * 在已经绑定时不会重复注册
      *
-     * @param string              $abstract 类或接口名
-     * @param null|Closure|string $concrete 返回类实例的闭包，或是类名
+     * @param string               $abstract 类或接口名
+     * @param null|\Closure|string $concrete 返回类实例的闭包，或是类名
      */
     public function singletonIf(string $abstract, $concrete = null): void
     {
@@ -216,7 +209,7 @@ trait ContainerTrait
      *
      * @param string $abstract 类或接口名
      */
-    public function factory(string $abstract): Closure
+    public function factory(string $abstract): \Closure
     {
         return function () use ($abstract) {
             return $this->make($abstract);
@@ -247,7 +240,7 @@ trait ContainerTrait
      * @template T
      * @param  class-string<T>          $abstract   类或接口名
      * @param  array                    $parameters 参数
-     * @return Closure|mixed|T          实例
+     * @return \Closure|mixed|T         实例
      * @throws EntryResolutionException
      */
     public function make(string $abstract, array $parameters = [])
@@ -316,20 +309,20 @@ trait ContainerTrait
     /**
      * 实例化具体的类实例
      *
-     * @param  Closure|string           $concrete 类名或对应的闭包
+     * @param  \Closure|string          $concrete 类名或对应的闭包
      * @return mixed
      * @throws EntryResolutionException
      */
     public function build($concrete)
     {
         // 如果传入的是闭包，则直接执行并返回
-        if ($concrete instanceof Closure) {
+        if ($concrete instanceof \Closure) {
             return $concrete($this, $this->getLastParameterOverride());
         }
 
         try {
-            $reflection = new ReflectionClass($concrete);
-        } catch (ReflectionException $e) {
+            $reflection = new \ReflectionClass($concrete);
+        } catch (\ReflectionException $e) {
             throw new EntryResolutionException("指定的类 {$concrete} 不存在", 0, $e);
         }
 
@@ -402,7 +395,7 @@ trait ContainerTrait
     {
         try {
             return $this->make($id);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             if ($this->has($id)) {
                 throw new EntryResolutionException('', 0, $e);
             }
@@ -428,10 +421,10 @@ trait ContainerTrait
     /**
      * 扩展一个类或接口
      *
-     * @param string  $abstract 类或接口名
-     * @param Closure $closure  扩展闭包
+     * @param string   $abstract 类或接口名
+     * @param \Closure $closure  扩展闭包
      */
-    public function extend(string $abstract, Closure $closure): void
+    public function extend(string $abstract, \Closure $closure): void
     {
         $abstract = $this->getAlias($abstract);
 
@@ -467,8 +460,8 @@ trait ContainerTrait
     /**
      * 获取对应类型的所有扩展器
      *
-     * @param  string    $abstract 类或接口名
-     * @return Closure[]
+     * @param  string     $abstract 类或接口名
+     * @return \Closure[]
      */
     protected function getExtenders(string $abstract): array
     {
@@ -505,7 +498,7 @@ trait ContainerTrait
      * @param string $abstract 类或接口名
      * @param string $concrete 实际类名
      */
-    protected function getClosure(string $abstract, string $concrete): Closure
+    protected function getClosure(string $abstract, string $concrete): \Closure
     {
         return static function ($container, $parameters = []) use ($abstract, $concrete) {
             $method = $abstract === $concrete ? 'build' : 'make';
@@ -542,7 +535,7 @@ trait ContainerTrait
     /**
      * 解析依赖
      *
-     * @param  ReflectionParameter[]    $dependencies
+     * @param  \ReflectionParameter[]   $dependencies
      * @throws EntryResolutionException
      */
     protected function resolveDependencies(array $dependencies): array
@@ -587,7 +580,7 @@ trait ContainerTrait
     /**
      * 判断传入的参数是否存在覆盖参数
      */
-    protected function hasParameterOverride(ReflectionParameter $parameter): bool
+    protected function hasParameterOverride(\ReflectionParameter $parameter): bool
     {
         return array_key_exists($parameter->name, $this->getLastParameterOverride());
     }
@@ -597,7 +590,7 @@ trait ContainerTrait
      *
      * @return mixed
      */
-    protected function getParameterOverride(ReflectionParameter $parameter)
+    protected function getParameterOverride(\ReflectionParameter $parameter)
     {
         return $this->getLastParameterOverride()[$parameter->name];
     }
@@ -605,7 +598,7 @@ trait ContainerTrait
     /**
      * 判断传入的参数是否存在临时注入的参数
      */
-    protected function hasParameterTypeOverride(ReflectionParameter $parameter): bool
+    protected function hasParameterTypeOverride(\ReflectionParameter $parameter): bool
     {
         if (!$parameter->hasType()) {
             return false;
@@ -613,7 +606,7 @@ trait ContainerTrait
 
         $type = $parameter->getType();
 
-        if (!$type instanceof ReflectionNamedType || $type->isBuiltin()) {
+        if (!$type instanceof \ReflectionNamedType || $type->isBuiltin()) {
             return false;
         }
 
@@ -625,11 +618,11 @@ trait ContainerTrait
      *
      * @return mixed
      */
-    protected function getParameterTypeOverride(ReflectionParameter $parameter)
+    protected function getParameterTypeOverride(\ReflectionParameter $parameter)
     {
         $type = $parameter->getType();
 
-        if (!$type instanceof ReflectionNamedType) {
+        if (!$type instanceof \ReflectionNamedType) {
             return [];
         }
 
@@ -642,7 +635,7 @@ trait ContainerTrait
      * @return mixed                    对应类型的默认值
      * @throws EntryResolutionException 如参数不存在默认值，则抛出异常
      */
-    protected function resolvePrimitive(ReflectionParameter $parameter)
+    protected function resolvePrimitive(\ReflectionParameter $parameter)
     {
         if ($parameter->isDefaultValueAvailable()) {
             return $parameter->getDefaultValue();
@@ -657,7 +650,7 @@ trait ContainerTrait
      * @return mixed
      * @throws EntryResolutionException 如果无法解析类，则抛出异常
      */
-    protected function resolveClass(ReflectionParameter $parameter)
+    protected function resolveClass(\ReflectionParameter $parameter)
     {
         try {
             // 尝试解析
@@ -681,8 +674,8 @@ trait ContainerTrait
     /**
      * 获取类名的实际类型
      *
-     * @param  string         $abstract 类或接口名
-     * @return Closure|string
+     * @param  string          $abstract 类或接口名
+     * @return \Closure|string
      */
     protected function getConcrete(string $abstract)
     {
@@ -701,7 +694,7 @@ trait ContainerTrait
      */
     protected function isBuildable($concrete, string $abstract): bool
     {
-        return $concrete === $abstract || $concrete instanceof Closure;
+        return $concrete === $abstract || $concrete instanceof \Closure;
     }
 
     /**

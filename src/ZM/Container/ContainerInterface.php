@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ZM\Container;
 
-use Closure;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 
 /**
@@ -32,9 +31,9 @@ interface ContainerInterface extends PsrContainerInterface
     /**
      * 注册绑定
      *
-     * @param string              $abstract 类或接口名
-     * @param null|Closure|string $concrete 返回类实例的闭包，或是类名
-     * @param bool                $shared   是否共享
+     * @param string               $abstract 类或接口名
+     * @param null|\Closure|string $concrete 返回类实例的闭包，或是类名
+     * @param bool                 $shared   是否共享
      */
     public function bind(string $abstract, $concrete = null, bool $shared = false): void;
 
@@ -43,17 +42,17 @@ interface ContainerInterface extends PsrContainerInterface
      *
      * 在已经绑定时不会重复注册
      *
-     * @param string              $abstract 类或接口名
-     * @param null|Closure|string $concrete 返回类实例的闭包，或是类名
-     * @param bool                $shared   是否共享
+     * @param string               $abstract 类或接口名
+     * @param null|\Closure|string $concrete 返回类实例的闭包，或是类名
+     * @param bool                 $shared   是否共享
      */
     public function bindIf(string $abstract, $concrete = null, bool $shared = false): void;
 
     /**
      * 注册一个单例绑定
      *
-     * @param string              $abstract 类或接口名
-     * @param null|Closure|string $concrete 返回类实例的闭包，或是类名
+     * @param string               $abstract 类或接口名
+     * @param null|\Closure|string $concrete 返回类实例的闭包，或是类名
      */
     public function singleton(string $abstract, $concrete = null): void;
 
@@ -62,8 +61,8 @@ interface ContainerInterface extends PsrContainerInterface
      *
      * 在已经绑定时不会重复注册
      *
-     * @param string              $abstract 类或接口名
-     * @param null|Closure|string $concrete 返回类实例的闭包，或是类名
+     * @param string               $abstract 类或接口名
+     * @param null|\Closure|string $concrete 返回类实例的闭包，或是类名
      */
     public function singletonIf(string $abstract, $concrete = null): void;
 
@@ -81,7 +80,7 @@ interface ContainerInterface extends PsrContainerInterface
      *
      * @param string $abstract 类或接口名
      */
-    public function factory(string $abstract): Closure;
+    public function factory(string $abstract): \Closure;
 
     /**
      * 清除所有绑定和实例
@@ -92,9 +91,9 @@ interface ContainerInterface extends PsrContainerInterface
      * 获取一个绑定的实例
      *
      * @template T
-     * @param  class-string<T> $abstract   类或接口名
-     * @param  array           $parameters 参数
-     * @return Closure|mixed|T 实例
+     * @param  class-string<T>  $abstract   类或接口名
+     * @param  array            $parameters 参数
+     * @return \Closure|mixed|T 实例
      */
     public function make(string $abstract, array $parameters = []);
 

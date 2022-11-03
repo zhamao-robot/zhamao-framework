@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ZM;
 
-use Exception;
 use Phar;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,6 +13,7 @@ use ZM\Command\BuildCommand;
 use ZM\Command\CheckConfigCommand;
 use ZM\Command\Generate\SystemdGenerateCommand;
 use ZM\Command\InitCommand;
+use ZM\Command\ProxyServerCommand;
 use ZM\Command\ReplCommand;
 use ZM\Command\Server\ServerReloadCommand;
 use ZM\Command\Server\ServerStartCommand;
@@ -47,10 +47,11 @@ final class ConsoleApplication extends Application
         $this->add(new SystemdGenerateCommand());   // 生成systemd文件
         $this->add(new BotCraftCommand());          // 用于从命令行创建插件
         $this->add(new ReplCommand());              // 交互式控制台
+        $this->add(new ProxyServerCommand());       // HTTP 代理服务器
         if (LOAD_MODE === 1) {                      // 如果是 Composer 模式加载的，那么可以输入 check:config 命令，检查配置文件是否需要更新
             $this->add(new CheckConfigCommand());
         }
-        if (Phar::running() === '') {               // 不是 Phar 模式的话，可以执行打包解包初始化命令
+        if (\Phar::running() === '') {               // 不是 Phar 模式的话，可以执行打包解包初始化命令
             $this->add(new BuildCommand());         // 用于将整个应用打包为一个可执行的 phar
             $this->add(new InitCommand());          // 用于在 Composer 模式启动下，初始化脚手架文件
             // $this->add(new PluginPackCommand());    // 用于打包一个子模块为 phar 并进行分发
@@ -69,7 +70,7 @@ final class ConsoleApplication extends Application
     {
         try {
             return parent::run($input, $output);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             echo zm_internal_errcode('E00005') . "{$e->getMessage()} at {$e->getFile()}({$e->getLine()})" . PHP_EOL;
             exit(1);
         }

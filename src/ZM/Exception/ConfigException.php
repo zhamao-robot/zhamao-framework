@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace ZM\Exception;
 
-use Throwable;
-
 class ConfigException extends ZMException
 {
     public const UNSUPPORTED_FILE_TYPE = 'E00079';
 
     public const LOAD_CONFIG_FAILED = 'E00080';
 
-    public function __construct($err_code, $message = '', $code = 0, Throwable $previous = null)
+    public function __construct($err_code, $message = '', $code = 0, \Throwable $previous = null)
     {
         parent::__construct(zm_internal_errcode($err_code) . $message, $code, $previous);
     }

@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace ZM\Middleware;
 
-use Closure;
 use OneBot\Util\Singleton;
-use Throwable;
 use ZM\Exception\InvalidArgumentException;
 
 class MiddlewareHandler
@@ -107,7 +105,7 @@ class MiddlewareHandler
                         $after_result = container()->call($this->middlewares[$item[0]]['after'], $args);
                     }
                 }
-            } catch (Throwable $e) {
+            } catch (\Throwable $e) {
                 while (isset($this->stack[$stack_id]) && ($item = array_pop($this->stack[$stack_id])) !== null) {
                     // 如果是 pipeline 形式的中间件，则使用闭包回去
                     if (class_exists($item[0]) && is_a($item[0], PipelineInterface::class, true)) {
@@ -134,7 +132,7 @@ class MiddlewareHandler
 
     /**
      * @throws InvalidArgumentException
-     * @throws Throwable
+     * @throws \Throwable
      */
     public function process(callable $callback, ...$args)
     {
@@ -169,7 +167,7 @@ class MiddlewareHandler
      */
     public function getStackId(callable $callback): string
     {
-        if ($callback instanceof Closure) {
+        if ($callback instanceof \Closure) {
             // 闭包情况下，直接根据闭包的ID号来找stack
             return strval(spl_object_id($callback));
         }

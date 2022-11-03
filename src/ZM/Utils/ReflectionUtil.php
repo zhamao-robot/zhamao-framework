@@ -4,28 +4,23 @@ declare(strict_types=1);
 
 namespace ZM\Utils;
 
-use Closure;
-use ReflectionException;
 use ReflectionFunction;
-use ReflectionFunctionAbstract;
 use ReflectionMethod;
-use ReflectionNamedType;
-use ReflectionParameter;
 
 class ReflectionUtil
 {
     /**
      * 获取参数的类名（如有）
      *
-     * @param  ReflectionParameter $parameter 参数
-     * @return null|string         类名，如果参数不是类，返回 null
+     * @param  \ReflectionParameter $parameter 参数
+     * @return null|string          类名，如果参数不是类，返回 null
      */
-    public static function getParameterClassName(ReflectionParameter $parameter): ?string
+    public static function getParameterClassName(\ReflectionParameter $parameter): ?string
     {
         // 获取参数类型
         $type = $parameter->getType();
         // 没有声明类型或为基本类型
-        if (!$type instanceof ReflectionNamedType || $type->isBuiltin()) {
+        if (!$type instanceof \ReflectionNamedType || $type->isBuiltin()) {
             return null;
         }
 
@@ -85,13 +80,13 @@ class ReflectionUtil
     /**
      * 判断传入的回调是否为任意类的非静态方法
      *
-     * @param  callable|string     $callback 回调
-     * @throws ReflectionException
+     * @param  callable|string      $callback 回调
+     * @throws \ReflectionException
      */
     public static function isNonStaticMethod($callback): bool
     {
         if (is_array($callback) && is_string($callback[0])) {
-            $reflection = new ReflectionMethod($callback[0], $callback[1]);
+            $reflection = new \ReflectionMethod($callback[0], $callback[1]);
             return !$reflection->isStatic();
         }
         return false;
@@ -105,20 +100,20 @@ class ReflectionUtil
      *
      * 可传入实现了 __invoke 的类
      *
-     * @param  callable|string     $callback 回调
-     * @throws ReflectionException
+     * @param  callable|string      $callback 回调
+     * @throws \ReflectionException
      */
-    public static function getCallReflector($callback): ReflectionFunctionAbstract
+    public static function getCallReflector($callback): \ReflectionFunctionAbstract
     {
         if (is_string($callback) && str_contains($callback, '::')) {
             $callback = explode('::', $callback);
-        } elseif (is_object($callback) && !$callback instanceof Closure) {
+        } elseif (is_object($callback) && !$callback instanceof \Closure) {
             $callback = [$callback, '__invoke'];
         }
 
         return is_array($callback)
-            ? new ReflectionMethod($callback[0], $callback[1])
-            : new ReflectionFunction($callback);
+            ? new \ReflectionMethod($callback[0], $callback[1])
+            : new \ReflectionFunction($callback);
     }
 
     /**
@@ -126,11 +121,11 @@ class ReflectionUtil
      *
      * 请不要滥用此方法！！！
      *
-     * @param  string              $class  类名
-     * @param  string              $method 方法名
-     * @throws ReflectionException
+     * @param  string               $class  类名
+     * @param  string               $method 方法名
+     * @throws \ReflectionException
      */
-    public static function getMethod(string $class, string $method): ReflectionMethod
+    public static function getMethod(string $class, string $method): \ReflectionMethod
     {
         $class = new \ReflectionClass($class);
         $method = $class->getMethod($method);
