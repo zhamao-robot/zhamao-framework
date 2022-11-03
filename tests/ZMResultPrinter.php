@@ -36,6 +36,7 @@ class ZMResultPrinter extends CliTestDoxPrinter
         'last' => '┴',
     ];
 
+    /* @phpstan-ignore-next-line */
     private const SPINNER_ICONS = [
         " \e[36m◐\e[0m running tests",
         " \e[36m◓\e[0m running tests",
