@@ -12,7 +12,7 @@ jobs:
       should_skip: ${{ steps.skip_check.outputs.should_skip }}
     steps:
       - id: skip_check
-        uses: fkirc/skip-duplicate-actions@v4
+        uses: fkirc/skip-duplicate-actions@v5
         with:
           concurrent_skipping: same_content_newer
           skip_after_successful_duplicate: true
@@ -33,7 +33,7 @@ jobs:
       - name: Setup PHP
         uses: sunxyw/workflows/setup-environment@main
         with:
-          php-version: 7.4
+          php-version: 8.0
           php-extensions: swoole, posix, json
           operating-system: ubuntu-latest
           use-cache: true
