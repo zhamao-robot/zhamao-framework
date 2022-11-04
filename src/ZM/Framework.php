@@ -119,7 +119,7 @@ class Framework
                 $this->driver->getSwooleServer()->shutdown();
                 break;
             case 'workerman':
-                if (extension_loaded('posix')) {
+                if (extension_loaded('posix') && isset(ProcessStateManager::getProcessState(ZM_PROCESS_MASTER)['pid'])) {
                     posix_kill(ProcessStateManager::getProcessState(ZM_PROCESS_MASTER)['pid'], SIGTERM);
                 } else {
                     Worker::stopAll($retcode);
