@@ -9,7 +9,6 @@ use PHPUnit\Runner\BaseTestRunner;
 use PHPUnit\Runner\PhptTestCase;
 use PHPUnit\Util\Color;
 use PHPUnit\Util\TestDox\CliTestDoxPrinter;
-use Throwable;
 
 class ZMResultPrinter extends CliTestDoxPrinter
 {
@@ -37,6 +36,7 @@ class ZMResultPrinter extends CliTestDoxPrinter
         'last' => '┴',
     ];
 
+    /* @phpstan-ignore-next-line */
     private const SPINNER_ICONS = [
         " \e[36m◐\e[0m running tests",
         " \e[36m◓\e[0m running tests",
@@ -164,7 +164,7 @@ class ZMResultPrinter extends CliTestDoxPrinter
         }
     }
 
-    protected function formatTestResultMessage(Throwable $t, array $result, ?string $prefix = null): string
+    protected function formatTestResultMessage(\Throwable $t, array $result, ?string $prefix = null): string
     {
         $message = $this->formatThrowable($t, $result['status']);
         $diff = '';

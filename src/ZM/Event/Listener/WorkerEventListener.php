@@ -6,7 +6,6 @@ namespace ZM\Event\Listener;
 
 use OneBot\Driver\Process\ProcessManager;
 use OneBot\Util\Singleton;
-use Throwable;
 use ZM\Annotation\AnnotationHandler;
 use ZM\Annotation\AnnotationMap;
 use ZM\Annotation\AnnotationParser;
@@ -26,7 +25,7 @@ class WorkerEventListener
     /**
      * Driver 的 Worker 进程启动后执行的事件
      *
-     * @throws Throwable
+     * @throws \Throwable
      */
     public function onWorkerStart999()
     {
@@ -113,7 +112,7 @@ class WorkerEventListener
 
     /**
      * 加载用户代码资源，包括普通插件、单文件插件、Composer 插件等
-     * @throws Throwable
+     * @throws \Throwable
      */
     private function initUserPlugins()
     {
@@ -143,7 +142,7 @@ class WorkerEventListener
     }
 
     /**
-     * @throws Throwable
+     * @throws \Throwable
      */
     private function dispatchInit()
     {

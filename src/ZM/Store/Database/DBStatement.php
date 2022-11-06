@@ -10,14 +10,10 @@ namespace ZM\Store\Database;
 
 use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\ParameterType;
-use IteratorAggregate;
-use PDO;
-use PDOStatement;
-use Traversable;
 
-class DBStatement implements IteratorAggregate, Statement
+class DBStatement implements \IteratorAggregate, Statement
 {
-    /** @var PDOStatement */
+    /** @var \PDOStatement */
     private $statement;
 
     public function __construct($obj)
@@ -50,12 +46,12 @@ class DBStatement implements IteratorAggregate, Statement
         return $this->statement->setFetchMode($fetchMode);
     }
 
-    public function fetch($fetchMode = PDO::FETCH_ASSOC, $cursorOrientation = PDO::FETCH_ORI_NEXT, $cursorOffset = 0)
+    public function fetch($fetchMode = \PDO::FETCH_ASSOC, $cursorOrientation = \PDO::FETCH_ORI_NEXT, $cursorOffset = 0)
     {
         return $this->statement->fetch($fetchMode, $cursorOrientation, $cursorOffset);
     }
 
-    public function fetchAll($fetchMode = PDO::FETCH_ASSOC, $fetchArgument = null, $ctorArgs = null)
+    public function fetchAll($fetchMode = \PDO::FETCH_ASSOC, $fetchArgument = null, $ctorArgs = null)
     {
         if ($fetchArgument === null && $ctorArgs === null) {
             return $this->statement->fetchAll($fetchMode);
@@ -102,7 +98,7 @@ class DBStatement implements IteratorAggregate, Statement
         return $this->statement->rowCount();
     }
 
-    public function getIterator(): Traversable
+    public function getIterator(): \Traversable
     {
         while (($result = $this->statement->fetch()) !== false) {
             yield $result;

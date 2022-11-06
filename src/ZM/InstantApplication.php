@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ZM;
 
-use Exception;
 use ZM\Command\Server\ServerStartCommand;
 use ZM\Exception\InitException;
 use ZM\Plugin\InstantPlugin;
@@ -44,7 +43,7 @@ class InstantApplication extends InstantPlugin
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function run()
     {

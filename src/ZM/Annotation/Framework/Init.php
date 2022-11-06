@@ -16,7 +16,7 @@ use ZM\Annotation\AnnotationBase;
  * @Target("METHOD")
  * @since 3.0.0
  */
-#[Attribute(Attribute::IS_REPEATABLE | Attribute::TARGET_METHOD)]
+#[\Attribute(\Attribute::IS_REPEATABLE | \Attribute::TARGET_METHOD)]
 class Init extends AnnotationBase
 {
     /** @var int */

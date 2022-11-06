@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ZM;
 
-use Exception;
 use OneBot\Driver\Driver;
 use OneBot\Driver\Event\DriverInitEvent;
 use OneBot\Driver\Event\Http\HttpRequestEvent;
@@ -12,6 +11,7 @@ use OneBot\Driver\Event\Process\ManagerStartEvent;
 use OneBot\Driver\Event\Process\ManagerStopEvent;
 use OneBot\Driver\Event\Process\WorkerStartEvent;
 use OneBot\Driver\Event\Process\WorkerStopEvent;
+use OneBot\Driver\Event\WebSocket\WebSocketCloseEvent;
 use OneBot\Driver\Event\WebSocket\WebSocketOpenEvent;
 use OneBot\Driver\Interfaces\DriverInitPolicy;
 use OneBot\Driver\Swoole\SwooleDriver;
@@ -46,23 +46,23 @@ class Framework
     public const VERSION_ID = 627;
 
     /** @var string 版本名称 */
-    public const VERSION = '3.0.0-alpha3';
+    public const VERSION = '3.0.0-alpha4';
 
     /** @var array 传入的参数 */
-    protected $argv;
+    protected array $argv;
 
     /** @var Driver|SwooleDriver|WorkermanDriver OneBot驱动 */
-    protected $driver;
+    protected SwooleDriver|Driver|WorkermanDriver $driver;
 
     /** @var array<array<string, string>> 启动注解列表 */
-    protected $setup_annotations = [];
+    protected array $setup_annotations = [];
 
     /**
      * 框架初始化文件
      *
      * @param  array<string, null|bool|string> $argv 传入的参数（见 ServerStartCommand）
      * @throws InitException
-     * @throws Exception
+     * @throws \Exception
      */
     public function __construct(array $argv = [])
     {
@@ -77,7 +77,7 @@ class Framework
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function init(): Framework
     {
@@ -96,7 +96,7 @@ class Framework
     /**
      * 启动框架
      */
-    public function start()
+    public function start(): void
     {
         // 对多进程有效，记录当前已经加载的所有文件，最后在 Worker 进程中比较可重载的文件，用于排错
         global $zm_loaded_files;
@@ -119,7 +119,7 @@ class Framework
                 $this->driver->getSwooleServer()->shutdown();
                 break;
             case 'workerman':
-                if (extension_loaded('posix')) {
+                if (extension_loaded('posix') && isset(ProcessStateManager::getProcessState(ZM_PROCESS_MASTER)['pid'])) {
                     posix_kill(ProcessStateManager::getProcessState(ZM_PROCESS_MASTER)['pid'], SIGTERM);
                 } else {
                     Worker::stopAll($retcode);
@@ -249,9 +249,9 @@ class Framework
      * 初始化驱动及相关事件
      * 实例化 Driver 对象
      *
-     * @throws Exception
+     * @throws \Exception
      */
-    public function initDriver()
+    public function initDriver(): void
     {
         switch ($driver = config('global.driver')) {
             case 'swoole':
@@ -278,10 +278,8 @@ class Framework
      * 初始化框架并输出一些信息
      *
      * 绑定、注册框架本身的事件到 Driver 的 EventProvider 中
-     *
-     * @throws ConfigException
      */
-    public function initFramework()
+    public function initFramework(): void
     {
         // private-mode 模式下，不输出任何内容
         if (!$this->argv['private-mode']) {
@@ -303,17 +301,16 @@ class Framework
         ob_event_provider()->addEventListener(DriverInitEvent::getName(), [MasterEventListener::getInstance(), 'onMasterStart'], 999);
         // websocket 事件
         ob_event_provider()->addEventListener(WebSocketOpenEvent::getName(), [WSEventListener::getInstance(), 'onWebSocketOpen'], 999);
+        ob_event_provider()->addEventListener(WebSocketCloseEvent::getName(), [WSEventListener::getInstance(), 'onWebSocketClose'], 999);
 
         // 框架多进程依赖
-        if (defined('ZM_PID_DIR') && !is_dir(ZM_STATE_DIR)) {
+        if (defined('ZM_STATE_DIR') && !is_dir(ZM_STATE_DIR)) {
             mkdir(ZM_STATE_DIR);
         }
     }
 
     /**
      * 打印属性表格
-     * @noinspection PhpComposerExtensionStubsInspection
-     * @throws ConfigException
      */
     private function printProperties(): void
     {
@@ -491,9 +488,9 @@ class Framework
     /**
      * 初始化 OnSetup 注解
      */
-    private function initSetupAnnotations()
+    private function initSetupAnnotations(): void
     {
-        if (Phar::running() !== '') {
+        if (\Phar::running() !== '') {
             // 在 Phar 下，不需要新启动进程了，因为 Phar 没办法重载，自然不需要考虑多进程的加载 reload 问题
             require FRAMEWORK_ROOT_DIR . '/src/Globals/script_setup_loader.php';
             $r = _zm_setup_loader();

@@ -20,7 +20,7 @@ use ZM\Exception\ZMKnownException;
  * @NamedArgumentConstructor()
  * @Target("METHOD")
  */
-#[Attribute(Attribute::IS_REPEATABLE | Attribute::TARGET_METHOD)]
+#[\Attribute(\Attribute::IS_REPEATABLE | \Attribute::TARGET_METHOD)]
 class BotCommand extends AnnotationBase implements Level
 {
     /** @var string */

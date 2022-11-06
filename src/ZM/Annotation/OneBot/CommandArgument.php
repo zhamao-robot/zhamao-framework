@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ZM\Annotation\OneBot;
 
-use Attribute;
 use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
 use Doctrine\Common\Annotations\Annotation\Required;
 use ZM\Annotation\AnnotationBase;
@@ -18,7 +17,7 @@ use ZM\Exception\ZMKnownException;
  * @NamedArgumentConstructor()
  * @Target("ALL")
  */
-#[Attribute(Attribute::IS_REPEATABLE | Attribute::TARGET_ALL)]
+#[\Attribute(\Attribute::IS_REPEATABLE | \Attribute::TARGET_ALL)]
 class CommandArgument extends AnnotationBase implements ErgodicAnnotation
 {
     /**

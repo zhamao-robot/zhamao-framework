@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ZM\Store;
 
-use RuntimeException;
 use ZM\Utils\ZMUtil;
 
 class FileSystem
@@ -85,7 +84,7 @@ class FileSystem
     public static function createDir(string $path): void
     {
         if (!is_dir($path) && !mkdir($path, 0777, true) && !is_dir($path)) {
-            throw new RuntimeException(sprintf('无法建立目录：%s', $path));
+            throw new \RuntimeException(sprintf('无法建立目录：%s', $path));
         }
     }
 

@@ -14,7 +14,7 @@ use Doctrine\Common\Annotations\Annotation\Target;
  * @NamedArgumentConstructor()
  * @Target("ALL")
  */
-#[Attribute(Attribute::IS_REPEATABLE | Attribute::TARGET_ALL)]
+#[\Attribute(\Attribute::IS_REPEATABLE | \Attribute::TARGET_ALL)]
 class Closed extends AnnotationBase
 {
 }

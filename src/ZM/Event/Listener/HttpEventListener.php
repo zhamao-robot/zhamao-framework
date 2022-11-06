@@ -8,8 +8,6 @@ use OneBot\Driver\Event\Http\HttpRequestEvent;
 use OneBot\Http\HttpFactory;
 use OneBot\Http\Stream;
 use OneBot\Util\Singleton;
-use Stringable;
-use Throwable;
 use ZM\Annotation\AnnotationHandler;
 use ZM\Annotation\Framework\BindEvent;
 use ZM\Annotation\Http\Route;
@@ -26,7 +24,7 @@ class HttpEventListener
      * 这里处理框架特有的内容，比如：
      * 路由、断点续传、注解再分发等
      *
-     * @throws Throwable
+     * @throws \Throwable
      */
     public function onRequest999(HttpRequestEvent $event)
     {
@@ -56,7 +54,7 @@ class HttpEventListener
                     $div->class = $node['class'];
                     $starttime = microtime(true);
                     $handler->handle($div, null, $params, $event->getRequest(), $event);
-                    if (is_string($val = $handler->getReturnVal()) || ($val instanceof Stringable)) {
+                    if (is_string($val = $handler->getReturnVal()) || ($val instanceof \Stringable)) {
                         $event->withResponse(HttpFactory::getInstance()->createResponse(200, null, [], Stream::create($val)));
                     } elseif ($event->getResponse() === null) {
                         $event->withResponse(HttpFactory::getInstance()->createResponse(500));

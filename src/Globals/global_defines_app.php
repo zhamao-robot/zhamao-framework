@@ -57,8 +57,10 @@ if (Phar::running() !== '') {
     define('FRAMEWORK_ROOT_DIR', realpath(zm_dir(__DIR__ . '/../../')));
 }
 
+define('ZM_INIT_TIME', microtime(true));
+
 /* 定义用于存放框架运行状态的目录（Windows 可用） */
-define('ZM_STATE_DIR', TMP_DIR . '/.zm_' . sha1(FRAMEWORK_ROOT_DIR));
+define('ZM_STATE_DIR', TMP_DIR . '/.zm_' . sha1(ZM_INIT_TIME . FRAMEWORK_ROOT_DIR));
 
 /* 对 global.php 在 Windows 下的兼容性考虑，因为 Windows 或者无 Swoole 环境时候无法运行 */
 !defined('SWOOLE_BASE') && define('SWOOLE_BASE', 1) && define('SWOOLE_PROCESS', 2);

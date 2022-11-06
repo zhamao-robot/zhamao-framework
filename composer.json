@@ -13,7 +13,7 @@
         }
     ],
     "require": {
-        "php": "^7.4 || ^8.0 || ^8.1",
+        "php": "^8.0 || ^8.1",
         "ext-json": "*",
         "doctrine/dbal": "^2.13.1",
         "dragonmantank/cron-expression": "^3.3",
@@ -47,7 +47,7 @@
         "ext-redis": "If you use Redis in framework, you will need this extension",
         "league/climate": "Display columns and status in terminal"
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "prefer-stable": true,
     "autoload": {
         "psr-4": {

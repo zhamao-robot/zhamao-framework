@@ -6,7 +6,6 @@ namespace ZM\Event;
 
 use OneBot\Driver\Interfaces\SortedProviderInterface;
 use OneBot\Util\Singleton;
-use Stringable;
 
 class EventProvider implements SortedProviderInterface
 {
@@ -73,7 +72,7 @@ class EventProvider implements SortedProviderInterface
     /**
      * 排序事件
      *
-     * @param string|Stringable $name
+     * @param string|\Stringable $name
      */
     private function sortEvents($name)
     {

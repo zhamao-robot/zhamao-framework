@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ZM\Command;
 
-use Phar;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -92,7 +91,7 @@ class InitCommand extends Command
             return 0;
         }
         if (LOAD_MODE === 2) { // 从phar启动的框架包，初始化的模式
-            $phar_link = new Phar(__DIR__);
+            $phar_link = new \Phar(__DIR__);
             $current_dir = pathinfo($phar_link->getPath())['dirname'];
             chdir($current_dir);
             $phar_link = 'phar://' . $phar_link->getPath();

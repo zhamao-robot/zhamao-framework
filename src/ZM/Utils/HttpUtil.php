@@ -31,11 +31,8 @@ class HttpUtil
      * 返回值为状态
      * 第二个参数为路由节点
      * 第三个参数为动态路由节点中匹配到的参数列表
-     *
-     * @param mixed $node
-     * @param mixed $params
      */
-    public static function parseUri(ServerRequest $request, &$node, &$params): int
+    public static function parseUri(ServerRequest $request, mixed &$node, mixed &$params): int
     {
         // 建立上下文，设置当前请求的方法
         $context = new RequestContext();
