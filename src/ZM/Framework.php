@@ -33,6 +33,7 @@ use ZM\Exception\ZMKnownException;
 use ZM\Logger\ConsoleLogger;
 use ZM\Logger\TablePrinter;
 use ZM\Process\ProcessStateManager;
+use ZM\Bootstrap;
 
 /**
  * 框架入口类
@@ -57,10 +58,20 @@ class Framework
     /** @var array<array<string, string>> 启动注解列表 */
     protected array $setup_annotations = [];
 
+    protected array $bootstrappers = [
+        // 驱动前置
+        Bootstrap\LoadConfiguration::class,
+        Bootstrap\LoadGlobalDefines::class,
+        Bootstrap\RegisterLogger::class,
+        Bootstrap\HandleExceptions::class,
+        Bootstrap\RegisterEventProvider::class,
+        Bootstrap\SetInternalTimezone::class,
+    ];
+
     /**
      * 框架初始化文件
      *
-     * @param  array<string, null|bool|string> $argv 传入的参数（见 ServerStartCommand）
+     * @param array<string, null|bool|string> $argv 传入的参数（见 ServerStartCommand）
      * @throws InitException
      * @throws \Exception
      */
@@ -81,6 +92,10 @@ class Framework
      */
     public function init(): Framework
     {
+        foreach ($this->bootstrappers as $bootstrapper) {
+            app($bootstrapper)->bootstrap($this->argv);
+        }
+
         // 执行一些 Driver 前置条件的内容
         $this->initDriverPrerequisites();
 
@@ -177,70 +192,9 @@ class Framework
      * 6. 覆盖 PHP 报错样式解析
      * 7. 解析命令行参数
      * 8. 读取、解析并执行 OnSetup 注解
-     *
-     * @throws ConfigException
      */
     public function initDriverPrerequisites()
     {
-        // 寻找配置文件目录
-        if ($this->argv['config-dir'] !== null) { // 如果启动参数指定了config寻找目录，那么就在指定的寻找，不在别的地方寻找了
-            $find_dir = [$this->argv['config-dir']];
-            logger()->debug('使用命令参数指定的config-dir：' . $this->argv['config-dir']);
-        } else { // 否则就从默认的工作目录或源码根目录寻找
-            $find_dir = [WORKING_DIR . '/config', SOURCE_ROOT_DIR . '/config'];
-        }
-        foreach ($find_dir as $v) {
-            if (is_dir($v)) {
-                config()->addConfigPath($v);
-                config()->setEnvironment($this->argv['env'] = ($this->argv['env'] ?? 'development'));
-                $config_done = true;
-                break;
-            }
-        }
-        // 找不到的话直接崩溃，因为框架依赖全局配置文件（但其实这个错误在 3.0 开始应该永远无法执行到）
-        if (!isset($config_done)) {
-            echo zm_internal_errcode('E00007') . 'Global config load failed' . "\nPlease init first!\nSee: https://github.com/zhamao-robot/zhamao-framework/issues/37\n";
-            exit(1);
-        }
-
-        // 初始化框架本体运行需要的常量，比如运行时间等
-        require zm_dir(__DIR__ . '/../Globals/global_defines_framework.php');
-
-        // 初始化 Logger，此处为 Master 进程第一次初始化，在后续的多进程环境下，还需要在 Worker 进程中初始化
-        if (!ob_logger_registered()) { // 如果没有注册过 Logger，那么就初始化一个，在启动框架前注册的话，就不会初始化了，可替换为其他 Logger
-            ob_logger_register(new ConsoleLogger($this->argv['log-level'] ?? 'info'));
-        }
-
-        // 注册自己的EventProvider
-        global $ob_event_provider;
-        $ob_event_provider = EventProvider::getInstance();
-
-        // 初始化时区，默认为上海时区
-        date_default_timezone_set(config('global.runtime.timezone'));
-
-        // 注册全局错误处理器
-        set_error_handler(static function ($error_no, $error_msg, $error_file, $error_line) {
-            $tips = [
-                E_WARNING => ['PHP Warning: ', 'warning'],
-                E_NOTICE => ['PHP Notice: ', 'notice'],
-                E_USER_ERROR => ['PHP Error: ', 'error'],
-                E_USER_WARNING => ['PHP Warning: ', 'warning'],
-                E_USER_NOTICE => ['PHP Notice: ', 'notice'],
-                E_STRICT => ['PHP Strict: ', 'notice'],
-                E_RECOVERABLE_ERROR => ['PHP Recoverable Error: ', 'error'],
-                E_DEPRECATED => ['PHP Deprecated: ', 'notice'],
-                E_USER_DEPRECATED => ['PHP User Deprecated: ', 'notice'],
-            ];
-            $level_tip = $tips[$error_no] ?? ['PHP Unknown: ', 'error'];
-            $error = $level_tip[0] . $error_msg . ' in ' . $error_file . ' on ' . $error_line;
-            logger()->{$level_tip[1]}($error);
-            // 如果 return false 则错误会继续递交给 PHP 标准错误处理
-            return true;
-        }, E_ALL | E_STRICT);
-
-        // 解析命令行参数
-        $this->parseArgs();
-
         // 初始化 @OnSetup 事件
         $this->initSetupAnnotations();
     }
@@ -457,32 +411,6 @@ class Framework
         }
         $motd = implode("\n", $motd);
         echo $motd;
-    }
-
-    /**
-     * 解析 argv 参数
-     */
-    private function parseArgs()
-    {
-        foreach ($this->argv as $x => $y) {
-            // 当值为 true/false 时，表示该参数为可选参数。当值为 null 时，表示该参数必定会有一个值，如果是 null，说明没指定
-            if ($y === false || is_null($y)) {
-                continue;
-            }
-            switch ($x) {
-                case 'driver':      // 动态设置驱动类型
-                    config()->set('global.driver', $y);
-                    break;
-                case 'worker-num':  // 动态设置 Worker 数量
-                    config()->set('global.swoole_options.swoole_set.worker_num', intval($y));
-                    config()->set('global.workerman_options.workerman_worker_num', intval($y));
-                    break;
-                case 'daemon':      // 启动为守护进程
-                    config()->set('global.swoole_options.swoole_set.daemonize', 1);
-                    Worker::$daemonize = true;
-                    break;
-            }
-        }
     }
 
     /**
