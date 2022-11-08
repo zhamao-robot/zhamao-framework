@@ -27,13 +27,10 @@ use ZM\Event\Listener\ManagerEventListener;
 use ZM\Event\Listener\MasterEventListener;
 use ZM\Event\Listener\WorkerEventListener;
 use ZM\Event\Listener\WSEventListener;
-use ZM\Exception\ConfigException;
 use ZM\Exception\InitException;
 use ZM\Exception\ZMKnownException;
-use ZM\Logger\ConsoleLogger;
 use ZM\Logger\TablePrinter;
 use ZM\Process\ProcessStateManager;
-use ZM\Bootstrap;
 
 /**
  * 框架入口类
@@ -71,7 +68,7 @@ class Framework
     /**
      * 框架初始化文件
      *
-     * @param array<string, null|bool|string> $argv 传入的参数（见 ServerStartCommand）
+     * @param  array<string, null|bool|string> $argv 传入的参数（见 ServerStartCommand）
      * @throws InitException
      * @throws \Exception
      */

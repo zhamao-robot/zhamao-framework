@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ZM\Exception;
 
 use OneBot\Driver\ExceptionHandler;
-use Throwable;
 
 class Handler extends ExceptionHandler
 {
@@ -13,7 +14,7 @@ class Handler extends ExceptionHandler
         // 将会在稍后修复
     }
 
-    public function handle(Throwable $e): void
+    public function handle(\Throwable $e): void
     {
         if ($e instanceof ZMKnownException) {
             // 如果是已知异常，则可以输出问题说明和解决方案

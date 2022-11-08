@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ZM\Bootstrap;
 
 use OneBot\Driver\Workerman\Worker;
@@ -56,8 +58,8 @@ class LoadConfiguration
                     $config->set('global.driver', $y);
                     break;
                 case 'worker-num':  // 动态设置 Worker 数量
-                    $config->set('global.swoole_options.swoole_set.worker_num', (int)$y);
-                    $config->set('global.workerman_options.workerman_worker_num', (int)$y);
+                    $config->set('global.swoole_options.swoole_set.worker_num', (int) $y);
+                    $config->set('global.workerman_options.workerman_worker_num', (int) $y);
                     break;
                 case 'daemon':      // 启动为守护进程
                     $config->set('global.swoole_options.swoole_set.daemonize', 1);

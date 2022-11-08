@@ -143,7 +143,7 @@ function container(): ContainerInterface
  * 解析类实例（使用容器）
  *
  * @template     T
- * @param class-string<T> $abstract
+ * @param  class-string<T> $abstract
  * @return Closure|mixed|T
  * @noinspection PhpDocMissingThrowsInspection
  */
@@ -157,7 +157,7 @@ function resolve(string $abstract, array $parameters = [])
  * 获取容器实例
  *
  * @template T
- * @param null|class-string<T> $abstract
+ * @param  null|class-string<T>               $abstract
  * @return Closure|ContainerInterface|mixed|T
  */
 function app(string $abstract = null, array $parameters = [])
@@ -196,8 +196,8 @@ function sql_builder(string $name = '')
  * 传入数组，设置配置项
  * 不传参数，返回配置容器
  *
- * @param array|string|null $key     键名
- * @param mixed|null        $default 默认值
+ * @param  null|array|string   $key     键名
+ * @param  null|mixed          $default 默认值
  * @return mixed|void|ZMConfig
  */
 function config(array|string $key = null, mixed $default = null)
