@@ -89,12 +89,13 @@ class Framework
      */
     public function init(): Framework
     {
+        // 顺序执行引导器
         foreach ($this->bootstrappers as $bootstrapper) {
             app($bootstrapper)->bootstrap($this->argv);
         }
 
-        // 执行一些 Driver 前置条件的内容
-        $this->initDriverPrerequisites();
+        // 初始化 @OnSetup 事件
+        $this->initSetupAnnotations();
 
         // 初始化 Driver 及框架内部需要监听的事件
         $this->initDriver();
@@ -176,24 +177,6 @@ class Framework
     public function getDriver()
     {
         return $this->driver;
-    }
-
-    /**
-     * 在框架的 Driver 层初始化前的一些前提条件
-     *
-     * 1. 设置 config 读取的目录
-     * 2. 初始化框架运行时的常量
-     * 3. 初始化 Logger
-     * 4. 初始化 EventProvider
-     * 5. 设置时区，防止 Logger 时间乱跳
-     * 6. 覆盖 PHP 报错样式解析
-     * 7. 解析命令行参数
-     * 8. 读取、解析并执行 OnSetup 注解
-     */
-    public function initDriverPrerequisites()
-    {
-        // 初始化 @OnSetup 事件
-        $this->initSetupAnnotations();
     }
 
     /**
