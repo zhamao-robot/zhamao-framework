@@ -197,10 +197,10 @@ function sql_builder(string $name = '')
  * 不传参数，返回配置容器
  *
  * @param  null|array|string   $key     键名
- * @param  mixed               $default 默认值
+ * @param  null|mixed          $default 默认值
  * @return mixed|void|ZMConfig
  */
-function config($key = null, $default = null)
+function config(array|string $key = null, mixed $default = null)
 {
     $config = ZMConfig::getInstance();
     if (is_null($key)) {
