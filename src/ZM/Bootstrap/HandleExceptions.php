@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ZM\Bootstrap;
 
-use OneBot\Driver\ExceptionHandler;
+use OneBot\Exception\ExceptionHandler;
 use ZM\Exception\Handler;
 
 class HandleExceptions
