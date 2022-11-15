@@ -9,6 +9,6 @@ class InvalidArgumentException extends ZMException
     public function __construct($message = '', $code = 0, \Throwable $previous = null)
     {
         // TODO: change this to a better error message
-        parent::__construct($message, '', 74, $previous);
+        parent::__construct($message, '', $code ?: 74, $previous);
     }
 }
