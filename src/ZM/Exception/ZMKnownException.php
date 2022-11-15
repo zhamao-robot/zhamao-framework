@@ -14,10 +14,10 @@ class ZMKnownException extends ZMException
         parent::__construct(zm_internal_errcode($err_code) . $message, $code, $previous);
         if ($err_code === 'E99999') {
             $code = 0;
-            // 这也太懒了吧
+        // 这也太懒了吧
         } else {
             // 取最后两数
-            $code = (int)substr($err_code, -2);
+            $code = (int) substr($err_code, -2);
         }
         parent::__construct($message, '', $code, $previous);
     }
