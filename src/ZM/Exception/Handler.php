@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace ZM\Exception;
 
-use OneBot\Driver\ExceptionHandler;
+use OneBot\Exception\ExceptionHandler;
+use OneBot\Exception\ExceptionHandlerInterface;
 
-class Handler extends ExceptionHandler
+class Handler extends ExceptionHandler implements ExceptionHandlerInterface
 {
     public function __construct()
     {
-        // 我们知道此处没有调用父类的构造函数，这是设计上的缺陷
-        // 将会在稍后修复
+        parent::__construct();
     }
 
     public function handle(\Throwable $e): void
@@ -21,12 +21,6 @@ class Handler extends ExceptionHandler
             // TODO
         }
 
-        if (is_null($this->whoops)) {
-            ob_logger()->error('Uncaught ' . get_class($e) . ': ' . $e->getMessage() . ' at ' . $e->getFile() . '(' . $e->getLine() . ')');
-            ob_logger()->error($e->getTraceAsString());
-            return;
-        }
-
-//        $this->whoops->handleException($e);
+        $this->handle0($e);
     }
 }
