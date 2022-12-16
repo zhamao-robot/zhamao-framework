@@ -6,6 +6,7 @@ namespace ZM\Command;
 
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleSectionOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 use ZM\Exception\InitException;
 
 class InitCommand extends Command
@@ -19,9 +20,10 @@ class InitCommand extends Command
 
     protected function configure(): void
     {
-        $this->setDescription('Initialize framework starter | 初始化框架运行的基础文件');
+        $this->setDescription('初始化框架运行的基础文件');
         $this->setDefinition([
-            new InputOption('force', 'F', null, '强制重制，覆盖现有文件'),
+            new InputOption('force', 'f', InputOption::VALUE_NONE, '覆盖现有文件'),
+            new InputOption('docker', null, InputOption::VALUE_NONE, '启用 Docker 支持'),
         ]);
         $this->setHelp('提取框架的基础文件到当前目录，以便于快速开始开发。');
     }
@@ -32,25 +34,10 @@ class InitCommand extends Command
         $this->force = $this->input->getOption('force');
 
         $this->section('提取框架基础文件', function (ConsoleSectionOutput $section) {
-            foreach ($this->getExtractFiles() as $file) {
-                $section->write("<fg=gray>提取 {$file} ... </>");
-                if ($this->shouldExtractFile($file)) {
-                    try {
-                        $this->extractFile($file);
-                        $section->write('<info>完成</info>');
-                    } catch (InitException $e) {
-                        $section->write('<error>失败</error>');
-                        throw $e;
-                    } finally {
-                        $section->writeln('');
-                    }
-                } else {
-                    $section->writeln('<comment>跳过（已存在）</comment>');
-                }
-            }
+            $this->extractFiles($this->getExtractFiles(), $section);
         });
 
-        if (LOAD_MODE === 1) {
+        if (LOAD_MODE === LOAD_MODE_SRC) {
             $this->section('应用自动加载配置', function (ConsoleSectionOutput $section) {
                 $autoload = [
                     'psr-4' => [
@@ -61,6 +48,8 @@ class InitCommand extends Command
                         'src/Custom/global_function.php',
                     ],
                 ];
+
+                $section->write('<fg=gray>更新 composer.json ... </>');
 
                 if (!file_exists($this->base_path . '/composer.json')) {
                     throw new InitException('未找到 composer.json 文件', '请检查当前目录是否为项目根目录', 41);
@@ -84,10 +73,36 @@ class InitCommand extends Command
                     throw new InitException('写入 composer.json 文件失败', '', 0, $e);
                 }
 
-                $section->writeln('<fg=gray>执行 composer dump-autoload ...</>');
+                $section->writeln('<info>完成</info>');
+
+                $section->write('<fg=gray>执行 composer dump-autoload ... </>');
                 exec('composer dump-autoload');
 
                 $section->writeln('<info>完成</info>');
+            });
+        }
+
+        if ($this->input->getOption('docker')) {
+            $this->section('应用 Docker 支持', function (ConsoleSectionOutput $section) {
+                $files = $this->getFilesFromPatterns([
+                    '/docker/*/Dockerfile',
+                    '/docker/environment.env.example',
+                    '/docker-compose.yml',
+                ]);
+                $this->extractFiles($files, $section);
+
+                // 生成 env 文件
+                if ($this->shouldExtractFile('/docker/environment.env')) {
+                    $section->write('<fg=gray>生成环境变量文件 ... </>');
+                    $env = file_get_contents($this->base_path . '/docker/environment.env.example');
+                    foreach ($this->getEnvVariables() as $key => $value) {
+                        $env = $this->injectEnv($env, $key, $value);
+                    }
+                    file_put_contents($this->base_path . '/docker/environment.env', $env);
+                    $section->writeln('<info>完成</info>');
+                } else {
+                    $section->writeln('<fg=gray>生成环境变量文件 ... </><comment>跳过（已存在）</comment>');
+                }
             });
         }
 
@@ -105,10 +120,15 @@ class InitCommand extends Command
             '/src/Globals/*.php',
         ];
 
+        return $this->getFilesFromPatterns($patterns);
+    }
+
+    private function getFilesFromPatterns(array $patterns): array
+    {
         $files = [];
         foreach ($patterns as $pattern) {
             // TODO: 优化代码，避免在循环中使用 array_merge 以减少资源消耗
-            $files = array_merge($files, glob($this->getVendorPath($pattern)));
+            $files = array_merge($files, glob($this->getVendorPath($pattern), GLOB_BRACE));
         }
         return array_map(function ($file) {
             return str_replace($this->getVendorPath(''), '', $file);
@@ -172,5 +192,49 @@ class InitCommand extends Command
             throw new InitException('无法读取框架包的 composer.json', '请检查框架包完整性，或者重新安装框架包');
         }
         return $this->base_path . '/vendor/' . $package_name . $file;
+    }
+
+    private function extractFiles(array $files, OutputInterface $output): void
+    {
+        foreach ($files as $file) {
+            $output->write("<fg=gray>提取 {$file} ... </>");
+            if ($this->shouldExtractFile($file)) {
+                try {
+                    $this->extractFile($file);
+                    $output->write('<info>完成</info>');
+                } catch (InitException $e) {
+                    $output->write('<error>失败</error>');
+                    throw $e;
+                } finally {
+                    $output->writeln('');
+                }
+            } else {
+                $output->writeln('<comment>跳过（已存在）</comment>');
+            }
+        }
+    }
+
+    private function injectEnv(string $env, string $key, string $value): string
+    {
+        $pattern = "/^{$key}=.+$/m";
+        if (preg_match($pattern, $env)) {
+            return preg_replace($pattern, "{$key}={$value}", $env);
+        }
+
+        return $env . PHP_EOL . "{$key}={$value}";
+    }
+
+    private function getEnvVariables(): array
+    {
+        return [
+            'REDIS_PASSWORD' => bin2hex(random_bytes(8)),
+
+            'POSTGRES_USER' => 'root',
+            'POSTGRES_PASSWORD' => bin2hex(random_bytes(8)),
+
+            'POSTGRES_APPLICATION_DATABASE' => 'zhamao',
+            'POSTGRES_APPLICATION_USER' => 'zhamao',
+            'POSTGRES_APPLICATION_USER_PASSWORD' => bin2hex(random_bytes(8)),
+        ];
     }
 }

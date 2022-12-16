@@ -31,6 +31,9 @@ const ZM_ERR_METHOD_NOT_FOUND = 1;      // 找不到方法
 const ZM_ERR_ROUTE_NOT_FOUND = 2;       // 找不到路由
 const ZM_ERR_ROUTE_METHOD_NOT_ALLOWED = 3; // 路由方法不允许
 
+const LOAD_MODE_VENDOR = 0; // 从 vendor 加载
+const LOAD_MODE_SRC = 1;    // 从 src 加载
+
 /* 定义工作目录 */
 define('WORKING_DIR', getcwd());
 
@@ -48,7 +51,7 @@ if (DIRECTORY_SEPARATOR === '\\') {
 }
 
 /* 定义启动模式，这里指的是框架本身的源码目录是通过 composer 加入 vendor 加载的还是直接放到 src 目录加载的，前者为 1，后者为 0 */
-define('LOAD_MODE', is_dir(zm_dir(SOURCE_ROOT_DIR . '/src/ZM')) ? 0 : 1);
+define('LOAD_MODE', is_dir(zm_dir(SOURCE_ROOT_DIR . '/src/ZM')) ? LOAD_MODE_VENDOR : LOAD_MODE_SRC);
 
 /* 定义框架本身所处的根目录，此处如果 LOAD_MODE 为 1 的话，框架自身的根目录在 vendor/zhamao/framework 子目录下 */
 if (Phar::running() !== '') {
