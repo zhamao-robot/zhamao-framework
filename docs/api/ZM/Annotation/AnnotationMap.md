@@ -3,7 +3,7 @@
 ## loadAnnotationByParser
 
 ```php
-public function loadAnnotationByParser(ZM\Annotation\AnnotationParser $parser): mixed
+public function loadAnnotationByParser(ZM\Annotation\AnnotationParser $parser): void
 ```
 
 ### 描述
@@ -20,4 +20,4 @@ public function loadAnnotationByParser(ZM\Annotation\AnnotationParser $parser): 
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| mixed |  |
+| void |  |

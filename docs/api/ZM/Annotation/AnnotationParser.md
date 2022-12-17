@@ -50,7 +50,7 @@ public function addSpecialParser(string $class_name, callable $callback): mixed
 ## parseAll
 
 ```php
-public function parseAll(): mixed
+public function parseAll(): void
 ```
 
 ### 描述
@@ -61,7 +61,7 @@ public function parseAll(): mixed
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| mixed |  |
+| void |  |
 
 
 ## generateAnnotationList
@@ -167,7 +167,7 @@ public function getAnnotationMap(): array
 ## addRouteAnnotation
 
 ```php
-public function addRouteAnnotation(ZM\Annotation\Http\Route $vss): mixed
+public function addRouteAnnotation(ZM\Annotation\Http\Route $vss): void
 ```
 
 ### 描述
@@ -184,4 +184,4 @@ public function addRouteAnnotation(ZM\Annotation\Http\Route $vss): mixed
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| mixed |  |
+| void |  |
