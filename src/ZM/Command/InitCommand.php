@@ -13,6 +13,8 @@ use ZM\Exception\InitException;
 #[AsCommand(name: 'init', description: '初始化框架运行的基础文件')]
 class InitCommand extends Command
 {
+    use NonPharLoadModeOnly;
+
     private string $base_path;
 
     private bool $force = false;

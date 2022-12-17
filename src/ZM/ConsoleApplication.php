@@ -4,22 +4,13 @@ declare(strict_types=1);
 
 namespace ZM;
 
-use Phar;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\CommandLoader\FactoryCommandLoader;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use ZM\Command\BotCraft\BotCraftCommand;
-use ZM\Command\BuildCommand;
-use ZM\Command\CheckConfigCommand;
-use ZM\Command\Generate\SystemdGenerateCommand;
-use ZM\Command\InitCommand;
-use ZM\Command\ProxyServerCommand;
-use ZM\Command\ReplCommand;
-use ZM\Command\Server\ServerReloadCommand;
-use ZM\Command\Server\ServerStartCommand;
-use ZM\Command\Server\ServerStatusCommand;
-use ZM\Command\Server\ServerStopCommand;
 use ZM\Exception\SingletonViolationException;
+use ZM\Store\FileSystem;
 
 /**
  * 命令行启动的入口文件，用于初始化环境变量，并启动命令行应用
@@ -37,24 +28,29 @@ final class ConsoleApplication extends Application
         }
 
         // 初始化命令
-        $this->add(new ServerStatusCommand());      // server运行状态
-        $this->add(new ServerReloadCommand());      // server重载
-        $this->add(new ServerStopCommand());        // server停止
-        $this->add(new ServerStartCommand());       // 运行主服务的指令控制器
-        $this->add(new SystemdGenerateCommand());   // 生成systemd文件
-        $this->add(new BotCraftCommand());          // 用于从命令行创建插件
-        $this->add(new ReplCommand());              // 交互式控制台
-        $this->add(new ProxyServerCommand());       // HTTP 代理服务器
-        if (LOAD_MODE === 1) {                      // 如果是 Composer 模式加载的，那么可以输入 check:config 命令，检查配置文件是否需要更新
-            $this->add(new CheckConfigCommand());
+        $command_classes = FileSystem::getClassesPsr4(zm_dir('src/ZM/Command'), 'ZM\\Command');
+        $commands = [];
+        foreach ($command_classes as $command_class) {
+            try {
+                $command_class_ref = new \ReflectionClass($command_class);
+            } catch (\ReflectionException $e) {
+                logger()->error("命令 {$command_class} 无法加载！反射失败：" . $e->getMessage());
+                continue;
+            }
+            if ($command_class_ref->isAbstract()) {
+                continue;
+            }
+            // 从 AsCommand 注解中获取命令名称
+            $attr = $command_class_ref->getAttributes(AsCommand::class);
+            if (count($attr) > 0) {
+                $commands[$attr[0]->getArguments()['name']] = fn () => new $command_class();
+            } else {
+                logger()->warning("命令 {$command_class} 没有使用 AsCommand 注解，无法被加载");
+            }
         }
-        if (\Phar::running() === '') {               // 不是 Phar 模式的话，可以执行打包解包初始化命令
-            $this->add(new BuildCommand());         // 用于将整个应用打包为一个可执行的 phar
-            $this->add(new InitCommand());          // 用于在 Composer 模式启动下，初始化脚手架文件
-            // $this->add(new PluginPackCommand());    // 用于打包一个子模块为 phar 并进行分发
-            // $this->add(new PluginListCommand());    // 用于列出已配置的子模块列表（存在 zm.json 文件的目录）
-            // $this->add(new PluginUnpackCommand());  // 用于将打包好的 phar 模块解包到 src 目录中
-        }
+        // 命令工厂，用于延迟加载命令
+        $command_loader = new FactoryCommandLoader($commands);
+        $this->setCommandLoader($command_loader);
 
         self::$obj = $this; // 用于标记已经初始化完成
         parent::__construct($name, ZM_VERSION);

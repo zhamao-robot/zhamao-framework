@@ -14,7 +14,7 @@ use ZM\Exception\ZMKnownException;
 use ZM\Framework;
 use ZM\Process\ProcessStateManager;
 
-#[AsCommand(name: 'server:start', description: '启动服务器', aliases: ['server'])]
+#[AsCommand(name: 'server', description: '启动服务器', aliases: ['server:start'])]
 class ServerStartCommand extends ServerCommand
 {
     public static function exportOptionArray(): array

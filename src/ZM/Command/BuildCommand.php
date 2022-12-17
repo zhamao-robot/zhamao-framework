@@ -13,6 +13,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[AsCommand(name: 'build', description: '将项目构建一个phar包')]
 class BuildCommand extends Command
 {
+    use NonPharLoadModeOnly;
+
     /**
      * 配置
      */
