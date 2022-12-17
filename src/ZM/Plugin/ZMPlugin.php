@@ -8,22 +8,25 @@ use ZM\Annotation\Http\Route;
 use ZM\Annotation\OneBot\BotCommand;
 use ZM\Annotation\OneBot\BotEvent;
 
-class InstantPlugin
+/**
+ * 单文件插件声明类
+ */
+class ZMPlugin
 {
     /** @var string 插件目录 */
-    protected $dir;
+    protected string $dir;
 
     /** @var array 机器人事件列表 */
-    protected $bot_events = [];
+    protected array $bot_events = [];
 
     /** @var array 机器人指令列表 */
-    protected $bot_commands = [];
+    protected array $bot_commands = [];
 
     /** @var array 全局的事件列表 */
-    protected $events = [];
+    protected array $events = [];
 
     /** @var array 注册的路由列表 */
-    protected $routes = [];
+    protected array $routes = [];
 
     public function __construct(string $dir)
     {
@@ -45,7 +48,7 @@ class InstantPlugin
         $this->bot_commands[] = $command;
     }
 
-    public function registerEvent(string $event_name, callable $callback, int $level = 20)
+    public function addEvent(string $event_name, callable $callback, int $level = 20)
     {
         $this->events[] = [$event_name, $callback, $level];
     }
