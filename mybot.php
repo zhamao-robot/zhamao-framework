@@ -7,7 +7,7 @@ use OneBot\Driver\Event\Http\HttpRequestEvent;
 require 'vendor/autoload.php';
 
 // 创建框架 App
-$app = new ZM\InstantApplication();
+$app = new ZM\ZMApplication();
 // 传入自定义配置文件
 $app->patchConfig([
     'driver' => 'workerman',
@@ -32,7 +32,7 @@ $event = \ZM\Annotation\OneBot\BotEvent::make('message')->withMethod(function ()
 $app->addBotEvent($event);
 $app->addBotCommand($cmd);
 
-$app->registerEvent(HttpRequestEvent::getName(), function (HttpRequestEvent $event) {
+$app->addEvent(HttpRequestEvent::getName(), function (HttpRequestEvent $event) {
     $event->withResponse(\OneBot\Http\HttpFactory::getInstance()->createResponse(503));
 });
 
