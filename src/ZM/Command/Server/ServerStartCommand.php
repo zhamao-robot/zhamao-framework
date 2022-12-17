@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ZM\Command\Server;
 
 use OneBot\Driver\Process\ProcessManager;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -13,20 +14,20 @@ use ZM\Exception\ZMKnownException;
 use ZM\Framework;
 use ZM\Process\ProcessStateManager;
 
+#[AsCommand(name: 'server:start', description: '启动服务器', aliases: ['server'])]
 class ServerStartCommand extends ServerCommand
 {
-    protected static $defaultName = 'server';
-
     public static function exportOptionArray(): array
     {
         $cmd = new self();
         $cmd->configure();
-        return array_map(function ($x) { return $x->getDefault(); }, $cmd->getDefinition()->getOptions());
+        return array_map(function ($x) {
+            return $x->getDefault();
+        }, $cmd->getDefinition()->getOptions());
     }
 
     protected function configure()
     {
-        $this->setAliases(['server:start']);
         $this->setDefinition([
             new InputOption('config-dir', null, InputOption::VALUE_REQUIRED, '指定其他配置文件目录'),
             new InputOption('driver', null, InputOption::VALUE_REQUIRED, '指定驱动类型'),
@@ -40,7 +41,6 @@ class ServerStartCommand extends ServerCommand
             new InputOption('private-mode', null, null, '启动时隐藏MOTD和敏感信息'),
             new InputOption('print-process-pid', null, null, '打印所有进程的PID'),
         ]);
-        $this->setDescription('Run zhamao-framework | 启动框架');
         $this->setHelp('直接运行可以启动');
     }
 

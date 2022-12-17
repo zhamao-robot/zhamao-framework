@@ -4,20 +4,15 @@ declare(strict_types=1);
 
 namespace ZM\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[AsCommand(name: 'check:config', description: '检查配置文件是否和框架当前版本有更新')]
 class CheckConfigCommand extends Command
 {
-    protected static $defaultName = 'check:config';
-
     private $need_update = false;
-
-    protected function configure()
-    {
-        $this->setDescription('检查配置文件是否和框架当前版本有更新');
-    }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {

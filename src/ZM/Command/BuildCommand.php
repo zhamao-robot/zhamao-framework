@@ -4,22 +4,20 @@ declare(strict_types=1);
 
 namespace ZM\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[AsCommand(name: 'build', description: '将项目构建一个phar包')]
 class BuildCommand extends Command
 {
-    // the name of the command (the part after "bin/console")
-    protected static $defaultName = 'build';
-
     /**
      * 配置
      */
     protected function configure()
     {
-        $this->setDescription('Build an ".phar" file | 将项目构建一个phar包');
         $this->setHelp('此功能将会把整个项目打包为phar');
         $this->addOption('target', 'D', InputOption::VALUE_REQUIRED, 'Output Directory | 指定输出目录');
         // ...

@@ -4,18 +4,13 @@ declare(strict_types=1);
 
 namespace ZM\Command\Server;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[AsCommand(name: 'server:status', description: '查看服务器状态')]
 class ServerStatusCommand extends ServerCommand
 {
-    protected static $defaultName = 'server:status';
-
-    protected function configure()
-    {
-        $this->setDescription('查看框架的运行状态');
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         parent::execute($input, $output);

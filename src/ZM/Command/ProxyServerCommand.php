@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ZM\Command;
 
 use OneBot\Driver\Workerman\Worker;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -14,11 +15,9 @@ use Workerman\Connection\AsyncUdpConnection;
 use Workerman\Timer;
 use ZM\Logger\ConsoleLogger;
 
+#[AsCommand(name: 'proxy', description: '开启一个 HTTP 代理服务器')]
 class ProxyServerCommand extends Command
 {
-    // the name of the command (the part after "bin/console")
-    protected static $defaultName = 'proxy';
-
     private array $config = [];
 
     public function onSocksMessage($connection, $buffer)
@@ -394,14 +393,13 @@ class ProxyServerCommand extends Command
      */
     protected function configure()
     {
-        $this->setDescription('Start HTTP proxy server | 开启一个 HTTP 代理服务器');
+        $this->setDescription('开启一个 HTTP 代理服务器');
         $this->addOption('type', 't', InputOption::VALUE_REQUIRED, '类型，可选http、socks');
         $this->addOption('host', 'H', InputOption::VALUE_REQUIRED, '监听地址，默认0.0.0.0');
         $this->addOption('port', 'P', InputOption::VALUE_REQUIRED, '监听端口，默认8080');
         $this->addOption('udp-port', 'U', InputOption::VALUE_REQUIRED, '监听端口，默认8080');
         $this->addOption('username', 'u', InputOption::VALUE_REQUIRED, '认证用的用户名');
         $this->addOption('password', 'p', InputOption::VALUE_REQUIRED, '认证用的密码');
-        // ...
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
