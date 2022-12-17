@@ -101,4 +101,7 @@ $config['database'] = [
     ],
 ];
 
+/* 如果你不想看见彩蛋，可以把这里改为 true */
+$config['i_dont_want_easter_egg'] = false;
+
 return $config;

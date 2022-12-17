@@ -388,6 +388,10 @@ class Framework
         }
         $motd = implode("\n", $motd);
         echo $motd;
+
+        if ($s = EasterEgg::stepToEdge()) {
+            echo $s;
+        }
     }
 
     /**
