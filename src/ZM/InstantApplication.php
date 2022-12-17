@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ZM;
 
 use ZM\Command\Server\ServerStartCommand;
-use ZM\Exception\InitException;
+use ZM\Exception\SingletonViolationException;
 use ZM\Plugin\InstantPlugin;
 
 class InstantApplication extends InstantPlugin
@@ -16,14 +16,10 @@ class InstantApplication extends InstantPlugin
     /** @var array 存储要传入的args */
     private array $args = [];
 
-    /**
-     * @param  null|mixed    $dir
-     * @throws InitException
-     */
-    public function __construct($dir = null)
+    public function __construct(mixed $dir = null)
     {
         if (self::$obj !== null) {
-            throw new InitException(zm_internal_errcode('E00069') . 'Initializing another Application is not allowed!');
+            throw new SingletonViolationException(self::class);
         }
         self::$obj = $this; // 用于标记已经初始化完成
         parent::__construct($dir ?? (__DIR__ . '/../..'));

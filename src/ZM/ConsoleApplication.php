@@ -19,7 +19,7 @@ use ZM\Command\Server\ServerReloadCommand;
 use ZM\Command\Server\ServerStartCommand;
 use ZM\Command\Server\ServerStatusCommand;
 use ZM\Command\Server\ServerStopCommand;
-use ZM\Exception\InitException;
+use ZM\Exception\SingletonViolationException;
 
 /**
  * 命令行启动的入口文件，用于初始化环境变量，并启动命令行应用
@@ -30,13 +30,10 @@ final class ConsoleApplication extends Application
 {
     private static $obj;
 
-    /**
-     * @throws InitException
-     */
     public function __construct(string $name = 'zhamao-framework')
     {
         if (self::$obj !== null) {
-            throw new InitException(zm_internal_errcode('E00069') . 'Initializing another Application is not allowed!');
+            throw new SingletonViolationException(self::class);
         }
 
         // 初始化命令

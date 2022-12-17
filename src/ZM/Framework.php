@@ -27,7 +27,7 @@ use ZM\Event\Listener\ManagerEventListener;
 use ZM\Event\Listener\MasterEventListener;
 use ZM\Event\Listener\WorkerEventListener;
 use ZM\Event\Listener\WSEventListener;
-use ZM\Exception\InitException;
+use ZM\Exception\SingletonViolationException;
 use ZM\Exception\ZMKnownException;
 use ZM\Logger\TablePrinter;
 use ZM\Process\ProcessStateManager;
@@ -69,14 +69,13 @@ class Framework
      * 框架初始化文件
      *
      * @param  array<string, null|bool|string> $argv 传入的参数（见 ServerStartCommand）
-     * @throws InitException
      * @throws \Exception
      */
     public function __construct(array $argv = [])
     {
         // 单例化整个Framework类
         if (self::$instance !== null) {
-            throw new InitException(zm_internal_errcode('E00069') . 'Initializing another Framework in one instance is not allowed!');
+            throw new SingletonViolationException(self::class);
         }
         self::$instance = $this;
 
