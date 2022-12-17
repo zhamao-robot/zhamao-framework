@@ -15,7 +15,7 @@ class AnnotationMap
      * @var array<string, array<AnnotationBase>>
      * @internal
      */
-    public static $_list = [];
+    public static array $_list = [];
 
     /**
      * 存取注解对象的三维列表，key1是注解所在的类名，key2是注解所在的方法名，value是该方法标注的注解们（数组）
@@ -23,14 +23,14 @@ class AnnotationMap
      * @var array<string, array<string, array<AnnotationBase>>>
      * @internal
      */
-    public static $_map = [];
+    public static array $_map = [];
 
     /**
      * 将Parser解析后的注解注册到全局的 AnnotationMap
      *
      * @param AnnotationParser $parser 注解解析器
      */
-    public static function loadAnnotationByParser(AnnotationParser $parser)
+    public static function loadAnnotationByParser(AnnotationParser $parser): void
     {
         // 生成后加入到全局list中
         self::$_list = array_merge(self::$_list, $parser->generateAnnotationList());

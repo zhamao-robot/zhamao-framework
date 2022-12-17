@@ -24,13 +24,11 @@ use ZM\Annotation\Interfaces\Level;
 class BindEvent extends AnnotationBase implements Level
 {
     /**
-     * @var string
      * @Required()
      */
-    public $event_class;
+    public string $event_class;
 
-    /** @var int */
-    public $level = 800;
+    public int $level = 800;
 
     /**
      * @param string $event_class 绑定事件的类型

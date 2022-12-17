@@ -23,41 +23,30 @@ use ZM\Exception\ZMKnownException;
 #[\Attribute(\Attribute::IS_REPEATABLE | \Attribute::TARGET_METHOD)]
 class BotCommand extends AnnotationBase implements Level
 {
-    /** @var string */
-    public $name = '';
+    public string $name = '';
 
-    /** @var string */
-    public $match = '';
+    public string $match = '';
 
-    /** @var string */
-    public $pattern = '';
+    public string $pattern = '';
 
-    /** @var string */
-    public $regex = '';
+    public string $regex = '';
 
-    /** @var string */
-    public $start_with = '';
+    public string $start_with = '';
 
-    /** @var string */
-    public $end_with = '';
+    public string $end_with = '';
 
-    /** @var string */
-    public $keyword = '';
+    public string $keyword = '';
 
     /** @var string[] */
-    public $alias = [];
+    public array $alias = [];
 
-    /** @var string */
-    public $message_type = '';
+    public string $message_type = '';
 
-    /** @var string */
-    public $user_id = '';
+    public string $user_id = '';
 
-    /** @var string */
-    public $group_id = '';
+    public string $group_id = '';
 
-    /** @var int */
-    public $level = 20;
+    public int $level = 20;
 
     private array $arguments = [];
 

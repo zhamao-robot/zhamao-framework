@@ -21,15 +21,14 @@ use ZM\Annotation\Interfaces\ErgodicAnnotation;
 class Middleware extends AnnotationBase implements ErgodicAnnotation
 {
     /**
-     * @var string
      * @Required()
      */
-    public $name;
+    public string $name;
 
     /**
      * @var string[]
      */
-    public $params = [];
+    public array $params = [];
 
     public function __construct($name, $params = [])
     {

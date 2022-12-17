@@ -6,12 +6,12 @@ namespace ZM;
 
 use ZM\Command\Server\ServerStartCommand;
 use ZM\Exception\SingletonViolationException;
-use ZM\Plugin\InstantPlugin;
+use ZM\Plugin\ZMPlugin;
 
-class InstantApplication extends InstantPlugin
+class ZMApplication extends ZMPlugin
 {
-    /** @var null|InstantApplication 存储单例类的变量 */
-    private static ?InstantApplication $obj;
+    /** @var null|ZMApplication 存储单例类的变量 */
+    private static ?ZMApplication $obj;
 
     /** @var array 存储要传入的args */
     private array $args = [];
@@ -26,13 +26,13 @@ class InstantApplication extends InstantPlugin
         $this->args = ServerStartCommand::exportOptionArray();
     }
 
-    public function withConfig(array $config): InstantApplication
+    public function withConfig(array $config): ZMApplication
     {
         // TODO: 完成patch config
         return $this;
     }
 
-    public function withArgs(array $args): InstantApplication
+    public function withArgs(array $args): ZMApplication
     {
         $this->args = array_replace_recursive($this->args, $args);
         return $this;

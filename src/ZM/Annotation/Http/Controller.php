@@ -21,10 +21,9 @@ use ZM\Annotation\Interfaces\ErgodicAnnotation;
 class Controller extends AnnotationBase implements ErgodicAnnotation
 {
     /**
-     * @var string
      * @Required()
      */
-    public $prefix = '';
+    public string $prefix = '';
 
     public function __construct(string $prefix)
     {

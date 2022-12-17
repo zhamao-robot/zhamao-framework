@@ -12,4 +12,4 @@ class_alias(\ZM\Annotation\OneBot\BotCommand::class, 'BotCommand');
 class_alias(\ZM\Annotation\OneBot\BotEvent::class, 'BotEvent');
 class_alias(\ZM\Annotation\OneBot\CommandArgument::class, 'CommandArgument');
 class_alias(\ZM\Annotation\Closed::class, 'Closed');
-class_alias(\ZM\Plugin\InstantPlugin::class, 'InstantPlugin');
+class_alias(\ZM\Plugin\ZMPlugin::class, 'ZMPlugin');

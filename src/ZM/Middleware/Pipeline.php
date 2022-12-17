@@ -11,11 +11,9 @@ use ZM\Exception\InvalidArgumentException;
  */
 class Pipeline
 {
-    /** @var mixed */
-    private $value;
+    private mixed $value;
 
-    /** @var array */
-    private $middlewares;
+    private array $middlewares;
 
     /**
      * 向管道发送数据
@@ -23,7 +21,7 @@ class Pipeline
      * @param  mixed $value 数据
      * @return $this
      */
-    public function send($value): Pipeline
+    public function send(mixed $value): Pipeline
     {
         $this->value = $value;
         return $this;

@@ -20,26 +20,18 @@ use ZM\Annotation\AnnotationBase;
 class Route extends AnnotationBase
 {
     /**
-     * @var string
      * @Required()
      */
-    public $route = '';
+    public string $route = '';
 
-    /**
-     * @var string
-     */
-    public $name = '';
+    public string $name = '';
 
-    /**
-     * @var array
-     */
-    public $request_method = ['GET', 'POST'];
+    public array $request_method = ['GET', 'POST'];
 
     /**
      * Routing path params binding. eg. {"id"="\d+"}
-     * @var array
      */
-    public $params = [];
+    public array $params = [];
 
     public function __construct($route, $name = '', $request_method = ['GET', 'POST'], $params = [])
     {
@@ -49,7 +41,7 @@ class Route extends AnnotationBase
         $this->params = $params;
     }
 
-    public static function make($route, $name = '', $request_method = ['GET', 'POST'], $params = [])
+    public static function make($route, $name = '', $request_method = ['GET', 'POST'], $params = []): static
     {
         return new static($route, $name, $request_method, $params);
     }
