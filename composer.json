@@ -37,7 +37,7 @@
         "phpstan/phpstan-phpunit": "^1.1",
         "phpunit/phpunit": "^8.5 || ^9.0",
         "roave/security-advisories": "dev-latest",
-        "swoole/ide-helper": "^5.0"
+        "swoole/ide-helper": "^4.5"
     },
     "suggest": {
         "ext-ctype": "Use C/C++ extension instead of polyfill will be more efficient",
