@@ -108,7 +108,7 @@ class InitCommand extends Command
 
         // 将命令行入口标记为可执行
         chmod($this->base_path . '/zhamao', 0755);
-        return 0;
+        return self::SUCCESS;
     }
 
     private function getExtractFiles(): array
