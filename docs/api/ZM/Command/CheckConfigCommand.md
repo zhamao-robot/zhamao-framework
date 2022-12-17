@@ -3,7 +3,7 @@
 ## check
 
 ```php
-public function check(mixed $remote, mixed $local, Symfony\Component\Console\Output\OutputInterface $out): mixed
+public function check(mixed $remote, mixed $local): mixed
 ```
 
 ### 描述
@@ -16,7 +16,6 @@ public function check(mixed $remote, mixed $local, Symfony\Component\Console\Out
 | -------- | ---- | ----------- |
 | remote | mixed |  |
 | local | mixed |  |
-| out | Symfony\Component\Console\Output\OutputInterface |  |
 
 ### 返回
 
