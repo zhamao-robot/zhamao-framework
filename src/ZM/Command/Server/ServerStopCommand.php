@@ -5,19 +5,18 @@ declare(strict_types=1);
 namespace ZM\Command\Server;
 
 use Swoole\Process;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use ZM\Process\ProcessStateManager;
 use ZM\Store\FileSystem;
 
+#[AsCommand(name: 'server:stop', description: '停止服务器')]
 class ServerStopCommand extends ServerCommand
 {
-    protected static $defaultName = 'server:stop';
-
     protected function configure()
     {
-        $this->setDescription('停止运行的框架');
         $this->setDefinition([
             new InputOption('force', 'f', InputOption::VALUE_NONE, '强制停止'),
         ]);

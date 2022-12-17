@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace ZM\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use ZM\Exception\InitException;
 
+#[AsCommand(name: 'init', description: '初始化框架运行的基础文件')]
 class InitCommand extends Command
 {
-    // the name of the command (the part after "bin/console")
-    protected static $defaultName = 'init';
+    use NonPharLoadModeOnly;
 
     private string $base_path;
 
@@ -20,7 +21,6 @@ class InitCommand extends Command
 
     protected function configure(): void
     {
-        $this->setDescription('初始化框架运行的基础文件');
         $this->setDefinition([
             new InputOption('force', 'f', InputOption::VALUE_NONE, '覆盖现有文件'),
             new InputOption('docker', null, InputOption::VALUE_NONE, '启用 Docker 支持'),

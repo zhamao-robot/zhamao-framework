@@ -32,7 +32,20 @@ abstract class Command extends \Symfony\Component\Console\Command\Command
     {
         $this->input = $input;
         $this->output = $output;
-        return $this->handle();
+        if ($this->shouldExecute()) {
+            return $this->handle();
+        }
+        return self::SUCCESS;
+    }
+
+    /**
+     * 是否应该执行
+     *
+     * @return bool 返回 true 以继续执行，返回 false 以中断执行
+     */
+    protected function shouldExecute(): bool
+    {
+        return true;
     }
 
     /**
