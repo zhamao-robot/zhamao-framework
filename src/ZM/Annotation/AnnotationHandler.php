@@ -21,8 +21,7 @@ class AnnotationHandler
 
     public const STATUS_RULE_FAILED = 4;       // 判断事件执行的规则函数判定为false，所以不执行此方法
 
-    /** @var AnnotationBase|string */
-    private $annotation_class;
+    private string|AnnotationBase $annotation_class;
 
     /** @var callable */
     private $rule_callback;
@@ -30,11 +29,9 @@ class AnnotationHandler
     /** @var callable */
     private $return_callback;
 
-    /** @var int */
-    private $status = self::STATUS_NORMAL;
+    private int $status = self::STATUS_NORMAL;
 
-    /** @var mixed */
-    private $return_val;
+    private mixed $return_val;
 
     /**
      * 注解调用器构造函数
@@ -50,10 +47,10 @@ class AnnotationHandler
     /**
      * 立刻中断注解调用器执行
      *
-     * @param  mixed              $return_var 中断执行返回值，传入null则代表无返回值
+     * @param  null|mixed         $return_var 中断执行返回值，传入null则代表无返回值
      * @throws InterruptException
      */
-    public static function interrupt($return_var = null)
+    public static function interrupt(mixed $return_var = null)
     {
         throw new InterruptException($return_var);
     }

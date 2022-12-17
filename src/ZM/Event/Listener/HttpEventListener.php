@@ -39,6 +39,7 @@ class HttpEventListener
         $handler->handleAll($event);
         // dump($event->getResponse());
         $node = null;
+        /** @var null|array $params */
         $params = null;
         // 如果状态是 Normal，那么说明跑了一遍没有阻塞或者其他的情况，我就直接跑一遍内部的路由分发和静态文件分发
         if ($handler->getStatus() === AnnotationHandler::STATUS_NORMAL && $event->getResponse() === null) {

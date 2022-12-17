@@ -31,6 +31,7 @@ use ZM\Exception\SingletonViolationException;
 use ZM\Exception\ZMKnownException;
 use ZM\Logger\TablePrinter;
 use ZM\Process\ProcessStateManager;
+use ZM\Utils\EasterEgg;
 
 /**
  * 框架入口类
@@ -55,14 +56,14 @@ class Framework
     /** @var array<array<string, string>> 启动注解列表 */
     protected array $setup_annotations = [];
 
+    /** @var array|string[] 框架启动前置的内容，由上到下执行 */
     protected array $bootstrappers = [
-        // 驱动前置
-        Bootstrap\LoadConfiguration::class,
-        Bootstrap\LoadGlobalDefines::class,
-        Bootstrap\RegisterLogger::class,
-        Bootstrap\HandleExceptions::class,
-        Bootstrap\RegisterEventProvider::class,
-        Bootstrap\SetInternalTimezone::class,
+        Bootstrap\LoadConfiguration::class,         // 加载配置文件
+        Bootstrap\LoadGlobalDefines::class,         // 加载框架级别的全局常量声明
+        Bootstrap\RegisterLogger::class,            // 加载 Logger
+        Bootstrap\HandleExceptions::class,          // 注册异常处理器
+        Bootstrap\RegisterEventProvider::class,     // 绑定框架的 EventProvider 到 libob 的 Driver 上
+        Bootstrap\SetInternalTimezone::class,       // 设置时区
     ];
 
     /**
@@ -84,6 +85,8 @@ class Framework
     }
 
     /**
+     * 初始化框架
+     *
      * @throws \Exception
      */
     public function init(): Framework
@@ -121,9 +124,10 @@ class Framework
      * 停止框架运行
      *
      * 未测试
+     * @param  int              $retcode 退出码
      * @throws ZMKnownException
      */
-    public function stop(int $retcode = 0)
+    public function stop(int $retcode = 0): void
     {
         switch ($this->driver->getName()) {
             case 'swoole':
@@ -368,14 +372,8 @@ class Framework
     {
         // 先获取终端宽度，防止超过边界换行
         $tty_width = (new TablePrinter([]))->fetchTerminalSize();
-        // caidan
-        $str = substr(sprintf('%o', fileperms(__FILE__)), -4);
-        if ($str == '0777') {
-            $table = ['@' => '9fX1', '!' => 'ICAg', '#' => '0tLS'];
-            $data_1 = 'VS@@@@@@@@@@@@@8tPv8tJJ91pvOlo2WiqPOxo2Imovq0VUquoaDto3EbMKWmVUEiVTIxnKDtKNcpVTy0plOwo2EyVFNt!!!!!!!!!VP8XVP#############0tPvNt';
-            $data_2 = $data_1 . '!!KPNtVS5sK14X!!!KPNtXT9iXIksK1@9sPvNt!!!VPusKlyp!!VPypY1jX!!!!!VUk8YF0gYKptsNbt!!!!!sUjt!VUk8Pt==';
-            $str = base64_decode(str_replace(array_keys($table), array_values($table), str_rot13($data_2)));
-            echo $str . PHP_EOL;
+        if ($s = EasterEgg::checkFrameworkPermissionCall()) {
+            echo $s;
             return;
         }
         // 从源码目录、框架本身的初始目录寻找 MOTD 文件
