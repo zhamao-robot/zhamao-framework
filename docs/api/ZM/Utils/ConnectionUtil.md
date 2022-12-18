@@ -1,9 +1,9 @@
-# ZM\Event\Listener\HttpEventListener
+# ZM\Utils\ConnectionUtil
 
-## onRequest999
+## addConnection
 
 ```php
-public function onRequest999(OneBot\Driver\Event\Http\HttpRequestEvent $event): mixed
+public function addConnection(int $fd, array $handle): bool
 ```
 
 ### 描述
@@ -14,19 +14,20 @@ public function onRequest999(OneBot\Driver\Event\Http\HttpRequestEvent $event): 
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| event | OneBot\Driver\Event\Http\HttpRequestEvent |  |
+| fd | int |  |
+| handle | array |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| mixed |  |
+| bool |  |
 
 
-## onRequest1
+## setConnection
 
 ```php
-public function onRequest1(OneBot\Driver\Event\Http\HttpRequestEvent $event): void
+public function setConnection(int $fd, array $handle): void
 ```
 
 ### 描述
@@ -37,7 +38,8 @@ public function onRequest1(OneBot\Driver\Event\Http\HttpRequestEvent $event): vo
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| event | OneBot\Driver\Event\Http\HttpRequestEvent |  |
+| fd | int |  |
+| handle | array |  |
 
 ### 返回
 
@@ -46,10 +48,10 @@ public function onRequest1(OneBot\Driver\Event\Http\HttpRequestEvent $event): vo
 | void |  |
 
 
-## getInstance
+## removeConnection
 
 ```php
-public function getInstance(mixed $args): object
+public function removeConnection(int $fd): void
 ```
 
 ### 描述
@@ -60,10 +62,10 @@ public function getInstance(mixed $args): object
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| args | mixed |  |
+| fd | int |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| object |  |
+| void |  |

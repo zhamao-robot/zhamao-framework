@@ -3,7 +3,7 @@
 ## parseUri
 
 ```php
-public function parseUri(OneBot\Http\ServerRequest $request, mixed $node, mixed $params): int
+public function parseUri(Psr\Http\Message\RequestInterface $request, mixed $node, mixed $params): int
 ```
 
 ### 描述
@@ -14,7 +14,7 @@ public function parseUri(OneBot\Http\ServerRequest $request, mixed $node, mixed 
 
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
-| request | OneBot\Http\ServerRequest |  |
+| request | Psr\Http\Message\RequestInterface |  |
 | node | mixed |  |
 | params | mixed |  |
 
