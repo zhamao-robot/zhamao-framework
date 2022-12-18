@@ -69,6 +69,11 @@ $config['plugin'] = [
     'load_dir' => 'plugins',
 ];
 
+/* 内部默认启用的插件 */
+$config['native_plugin'] = [
+    'onebot12' => true,
+];
+
 /* 静态文件读取器 */
 $config['file_server'] = [
     'enable' => true,

@@ -12,16 +12,15 @@ use OneBot\Driver\Event\Process\ManagerStopEvent;
 use OneBot\Driver\Event\Process\WorkerStartEvent;
 use OneBot\Driver\Event\Process\WorkerStopEvent;
 use OneBot\Driver\Event\WebSocket\WebSocketCloseEvent;
+use OneBot\Driver\Event\WebSocket\WebSocketMessageEvent;
 use OneBot\Driver\Event\WebSocket\WebSocketOpenEvent;
 use OneBot\Driver\Interfaces\DriverInitPolicy;
 use OneBot\Driver\Swoole\SwooleDriver;
 use OneBot\Driver\Workerman\Worker;
 use OneBot\Driver\Workerman\WorkermanDriver;
 use OneBot\Util\Singleton;
-use Phar;
 use ZM\Command\Server\ServerStartCommand;
 use ZM\Config\ZMConfig;
-use ZM\Event\EventProvider;
 use ZM\Event\Listener\HttpEventListener;
 use ZM\Event\Listener\ManagerEventListener;
 use ZM\Event\Listener\MasterEventListener;
@@ -45,7 +44,7 @@ class Framework
     public const VERSION_ID = 633;
 
     /** @var string 版本名称 */
-    public const VERSION = '3.0.0-alpha4';
+    public const VERSION = '3.0.0-alpha5';
 
     /** @var array 传入的参数 */
     protected array $argv;
@@ -239,6 +238,7 @@ class Framework
         // websocket 事件
         ob_event_provider()->addEventListener(WebSocketOpenEvent::getName(), [WSEventListener::getInstance(), 'onWebSocketOpen'], 999);
         ob_event_provider()->addEventListener(WebSocketCloseEvent::getName(), [WSEventListener::getInstance(), 'onWebSocketClose'], 999);
+        ob_event_provider()->addEventListener(WebSocketMessageEvent::getName(), [WSEventListener::getInstance(), 'onWebSocketMessage'], 999);
 
         // 框架多进程依赖
         if (defined('ZM_STATE_DIR') && !is_dir(ZM_STATE_DIR)) {
