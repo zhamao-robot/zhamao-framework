@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace ZM\Event\Listener;
 
+use Choir\Http\HttpFactory;
+use Choir\Http\Stream;
 use OneBot\Driver\Event\Http\HttpRequestEvent;
-use OneBot\Http\HttpFactory;
-use OneBot\Http\Stream;
 use OneBot\Util\Singleton;
 use ZM\Annotation\AnnotationHandler;
 use ZM\Annotation\Framework\BindEvent;
@@ -33,9 +33,7 @@ class HttpEventListener
         // TODO: 这里有个bug，如果是用的Workerman+Fiber协程的话，有个前置协程挂起，这里获取到的Event是被挂起的Event对象，触发两次事件才能归正
         // 跑一遍 BindEvent 绑定了 HttpRequestEvent 的注解
         $handler = new AnnotationHandler(BindEvent::class);
-        $handler->setRuleCallback(function (BindEvent $anno) {
-            return $anno->event_class === HttpRequestEvent::class;
-        });
+        $handler->setRuleCallback(fn (BindEvent $anno) => $anno->event_class === HttpRequestEvent::class);
         $handler->handleAll($event);
         // dump($event->getResponse());
         $node = null;
@@ -51,14 +49,15 @@ class HttpEventListener
                     $div = new Route($node['route']);
                     $div->params = $params;
                     $div->method = $node['method'];
-                    $div->request_method = $node['request_method'];
+                    // TODO：这里有个bug，逻辑上 request_method 应该是个数组，而不是字符串，但是这里 $node['method'] 是字符串，所以这里只能用字符串来判断
+                    // $div->request_method = $node['request_method'];
                     $div->class = $node['class'];
                     $starttime = microtime(true);
                     $handler->handle($div, null, $params, $event->getRequest(), $event);
                     if (is_string($val = $handler->getReturnVal()) || ($val instanceof \Stringable)) {
-                        $event->withResponse(HttpFactory::getInstance()->createResponse(200, null, [], Stream::create($val)));
+                        $event->withResponse(HttpFactory::createResponse(200, null, [], Stream::create($val)));
                     } elseif ($event->getResponse() === null) {
-                        $event->withResponse(HttpFactory::getInstance()->createResponse(500));
+                        $event->withResponse(HttpFactory::createResponse(500));
                     }
                     logger()->warning('Used ' . round((microtime(true) - $starttime) * 1000, 3) . ' ms');
                     break;
@@ -74,7 +73,7 @@ class HttpEventListener
      *
      * @throws ConfigException
      */
-    public function onRequest1(HttpRequestEvent $event)
+    public function onRequest1(HttpRequestEvent $event): void
     {
         if ($event->getResponse() === null) {
             $response = HttpUtil::handleStaticPage($event->getRequest()->getUri()->getPath());

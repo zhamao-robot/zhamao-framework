@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace ZM\Utils;
 
-use OneBot\Http\HttpFactory;
-use OneBot\Http\ServerRequest;
-use OneBot\Http\Stream;
+use Choir\Http\HttpFactory;
+use Choir\Http\Stream;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
@@ -32,7 +32,7 @@ class HttpUtil
      * 第二个参数为路由节点
      * 第三个参数为动态路由节点中匹配到的参数列表
      */
-    public static function parseUri(ServerRequest $request, mixed &$node, mixed &$params): int
+    public static function parseUri(RequestInterface $request, mixed &$node, mixed &$params): int
     {
         // 建立上下文，设置当前请求的方法
         $context = new RequestContext();
@@ -90,7 +90,7 @@ class HttpUtil
         if ($path !== false) {
             // 安全问题，防止目录穿越，只能囚禁到规定的 Web 根目录下获取文件
             $work = realpath($base_dir) . '/';
-            if (strpos($path, $work) !== 0) {
+            if (!str_starts_with($path, $work)) {
                 logger()->info('[403] ' . $uri);
                 return static::handleHttpCodePage(403);
             }
@@ -98,25 +98,25 @@ class HttpUtil
             if (is_dir($path)) {
                 if (mb_substr($uri, -1, 1) != '/') {
                     logger()->info('[302] ' . $uri);
-                    return HttpFactory::getInstance()->createResponse(302, null, ['Location' => $uri . '/']);
+                    return HttpFactory::createResponse(302, null, ['Location' => $uri . '/']);
                 }
                 // 如果结尾有 /，那么就根据默认搜索的文件名进行搜索文件是否存在，存在则直接返回对应文件
                 foreach ($base_index as $vp) {
                     if (is_file($path . '/' . $vp)) {
                         logger()->info('[200] ' . $uri);
                         $exp = strtolower(pathinfo($path . $vp)['extension'] ?? 'unknown');
-                        return HttpFactory::getInstance()->createResponse()
+                        return HttpFactory::createResponse()
                             ->withAddedHeader('Content-Type', config('file_header')[$exp] ?? 'application/octet-stream')
-                            ->withBody(HttpFactory::getInstance()->createStream(file_get_contents($path . '/' . $vp)));
+                            ->withBody(HttpFactory::createStream(file_get_contents($path . '/' . $vp)));
                     }
                 }
             } elseif (is_file($path)) {
                 // 如果文件存在，则直接返回文件内容
                 logger()->info('[200] ' . $uri);
                 $exp = strtolower(pathinfo($path)['extension'] ?? 'unknown');
-                return HttpFactory::getInstance()->createResponse()
+                return HttpFactory::createResponse()
                     ->withAddedHeader('Content-Type', config('file_header')[$exp] ?? 'application/octet-stream')
-                    ->withBody(HttpFactory::getInstance()->createStream(file_get_contents($path)));
+                    ->withBody(HttpFactory::createStream(file_get_contents($path)));
             }
         }
         // 否则最终肯定只能返回 404 了
@@ -137,9 +137,9 @@ class HttpUtil
             $code_page = null;
         }
         if ($code_page === null) {
-            return HttpFactory::getInstance()->createResponse($code);
+            return HttpFactory::createResponse($code);
         }
-        return HttpFactory::getInstance()->createResponse($code, null, [], file_get_contents(config('global.file_server.document_root') . '/' . $code_page));
+        return HttpFactory::createResponse($code, null, [], file_get_contents(config('global.file_server.document_root') . '/' . $code_page));
     }
 
     /**
@@ -151,7 +151,7 @@ class HttpUtil
      */
     public static function createJsonResponse(array $data, int $http_code = 200, int $json_flag = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE): ResponseInterface
     {
-        return HttpFactory::getInstance()->createResponse($http_code)
+        return HttpFactory::createResponse($http_code)
             ->withAddedHeader('Content-Type', 'application/json')
             ->withBody(Stream::create(json_encode($data, $json_flag)));
     }

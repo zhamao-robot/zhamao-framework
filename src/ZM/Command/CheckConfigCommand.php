@@ -15,7 +15,7 @@ class CheckConfigCommand extends Command
 
     protected function handle(): int
     {
-        $current_cfg = getcwd() . '/config/';
+        $current_cfg = SOURCE_ROOT_DIR . '/config/';
         $remote_cfg = include FRAMEWORK_ROOT_DIR . '/config/global_old.php';
         if (file_exists($current_cfg . 'global.php')) {
             $this->check($remote_cfg, 'global.php');
@@ -38,11 +38,7 @@ class CheckConfigCommand extends Command
         return self::SUCCESS;
     }
 
-    /**
-     * @param mixed $remote
-     * @param mixed $local
-     */
-    private function check($remote, $local)
+    private function check(mixed $remote, mixed $local)
     {
         $local_file = include WORKING_DIR . '/config/' . $local;
         if ($local_file === true) {

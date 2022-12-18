@@ -13,6 +13,8 @@ use ZM\Annotation\Framework\Init;
 use ZM\Container\ContainerServicesProvider;
 use ZM\Exception\ZMKnownException;
 use ZM\Framework;
+use ZM\Plugin\OneBot12Adapter;
+use ZM\Plugin\PluginManager;
 use ZM\Process\ProcessStateManager;
 use ZM\Store\Database\DBException;
 use ZM\Store\Database\DBPool;
@@ -134,6 +136,10 @@ class WorkerEventListener
         }
 
         // TODO: 然后加载插件目录下的插件
+        PluginManager::addPlugin([
+            'name' => 'onebot12-adapter',
+            'plugin' => new OneBot12Adapter(),
+        ]);
 
         // 解析所有注册路径的文件，获取注解
         $parser->parseAll();
