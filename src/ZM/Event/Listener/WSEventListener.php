@@ -40,11 +40,23 @@ class WSEventListener
 
     public function onWebSocketMessage(WebSocketMessageEvent $event): void
     {
+        // 调用注解
+        $handler = new AnnotationHandler(BindEvent::class);
+        $handler->setRuleCallback(fn ($x) => is_a($x->event_class, WebSocketMessageEvent::class, true));
+        $handler->handleAll($event);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function onWebSocketClose(WebSocketCloseEvent $event): void
     {
         logger()->info('关闭连接: ' . $event->getFd());
+        // 调用注解
+        $handler = new AnnotationHandler(BindEvent::class);
+        $handler->setRuleCallback(fn ($x) => is_a($x->event_class, WebSocketCloseEvent::class, true));
+        $handler->handleAll($event);
+
         ConnectionUtil::removeConnection($event->getFd());
         resolve(ContainerServicesProvider::class)->cleanup();
     }

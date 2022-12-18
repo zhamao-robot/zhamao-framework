@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ZM\Annotation;
 
+use ZM\Annotation\Interfaces\Level;
+
 /**
  * 注解全局存取位置
  */
@@ -35,5 +37,21 @@ class AnnotationMap
         // 生成后加入到全局list中
         self::$_list = array_merge(self::$_list, $parser->generateAnnotationList());
         self::$_map = $parser->getAnnotationMap();
+    }
+
+    /**
+     * 排序所有的注解
+     */
+    public static function sortAnnotationList(): void
+    {
+        foreach (self::$_list as $class => $annotations) {
+            if (is_a($class, Level::class, true)) {
+                usort(self::$_list[$class], function ($a, $b) {
+                    $left = $a->getLevel();     /** @phpstan-ignore-line */
+                    $right = $b->getLevel();    /* @phpstan-ignore-line */
+                    return $left > $right ? -1 : ($left == $right ? 0 : 1);
+                });
+            }
+        }
     }
 }

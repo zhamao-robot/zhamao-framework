@@ -43,7 +43,7 @@ class CommandArgument extends AnnotationBase implements ErgodicAnnotation
      * @param  string                                    $name        参数名称（可以是中文）
      * @param  string                                    $description 参数描述（默认为空）
      * @param  bool                                      $required    参数是否必需，如果是必需，为true（默认为false）
-     * @param  string                                    $prompt      当参数为必需时，返回给用户的提示输入的消息（默认为"请输入$name"）
+     * @param  string                                    $prompt      当参数为必需且缺失时，返回给用户的提示输入的消息（默认为"请输入$name"）
      * @param  string                                    $default     当required为false时，未匹配到参数将自动使用default值（默认为空）
      * @param  int                                       $timeout     prompt超时时间（默认为60秒）
      * @throws InvalidArgumentException|ZMKnownException

@@ -71,7 +71,8 @@ $config['plugin'] = [
 
 /* 内部默认启用的插件 */
 $config['native_plugin'] = [
-    'onebot12' => true,
+    'onebot12' => true,                 // OneBot v12 协议支持
+    'onebot12-ban-other-ws' => true,    // OneBot v12 协议支持，禁止其他 WebSocket 连接
 ];
 
 /* 静态文件读取器 */

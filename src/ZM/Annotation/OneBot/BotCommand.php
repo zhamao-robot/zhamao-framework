@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ZM\Annotation\OneBot;
 
-use Attribute;
 use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
 use Doctrine\Common\Annotations\Annotation\Target;
 use ZM\Annotation\AnnotationBase;
@@ -111,6 +110,12 @@ class BotCommand extends AnnotationBase implements Level
         int $error_prompt_policy = 1
     ): BotCommand {
         $this->arguments[] = new CommandArgument($name, $description, $type, $required, $prompt, $default, $timeout, $error_prompt_policy);
+        return $this;
+    }
+
+    public function withArgumentObject(CommandArgument $argument): BotCommand
+    {
+        $this->arguments[] = $argument;
         return $this;
     }
 

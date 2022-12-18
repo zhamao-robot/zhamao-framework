@@ -18,6 +18,7 @@ use ZM\Plugin\PluginManager;
 use ZM\Process\ProcessStateManager;
 use ZM\Store\Database\DBException;
 use ZM\Store\Database\DBPool;
+use ZM\Store\FileSystem;
 use ZM\Utils\ZMUtil;
 
 class WorkerEventListener
@@ -29,7 +30,7 @@ class WorkerEventListener
      *
      * @throws \Throwable
      */
-    public function onWorkerStart999()
+    public function onWorkerStart999(): void
     {
         // 自注册一下，刷新当前进程的logger进程banner
         ob_logger_register(ob_logger());
@@ -120,7 +121,7 @@ class WorkerEventListener
     {
         logger()->debug('Loading user sources');
 
-        // 首先先加载 source 普通插件，相当于内部模块，不算插件的一种
+        // 首先先加载 source 模式的代码，相当于内部模块，不算插件的一种
         $parser = new AnnotationParser();
         $composer = ZMUtil::getComposerMetadata();
         // 合并 dev 和 非 dev 的 psr-4 加载目录
@@ -135,22 +136,49 @@ class WorkerEventListener
             }
         }
 
-        // TODO: 然后加载插件目录下的插件
-        PluginManager::addPlugin([
-            'name' => 'onebot12-adapter',
-            'plugin' => new OneBot12Adapter(),
-        ]);
+        // 首先加载内置插件
+        $native_plugins = config('global.native_plugin');
+        foreach ($native_plugins as $name => $enable) {
+            if (!$enable) {
+                continue;
+            }
+            match ($name) {
+                'onebot12' => PluginManager::addPlugin(['name' => $name, 'internal' => true, 'object' => new OneBot12Adapter(parser: $parser)]),
+                'onebot12-ban-other-ws' => PluginManager::addPlugin(['name' => $name, 'internal' => true, 'object' => new OneBot12Adapter(submodule: $name)]),
+            };
+        }
+
+        // 然后加载插件目录的插件
+        if (config('global.plugin.enable')) {
+            $load_dir = config('global.plugin.load_dir');
+            if (empty($load_dir)) {
+                $load_dir = SOURCE_ROOT_DIR . '/plugins';
+            } elseif (FileSystem::isRelativePath($load_dir)) {
+                $load_dir = SOURCE_ROOT_DIR . '/' . $load_dir;
+            }
+            $load_dir = zm_dir($load_dir);
+
+            $count = PluginManager::addPluginsFromDir($load_dir);
+            logger()->info('Loaded ' . $count . ' user plugins');
+
+            // 启用并初始化插件
+            PluginManager::enablePlugins($parser);
+        }
 
         // 解析所有注册路径的文件，获取注解
         $parser->parseAll();
         // 将Parser解析后的注解注册到全局的 AnnotationMap
         AnnotationMap::loadAnnotationByParser($parser);
+        // 排序所有的
+        AnnotationMap::sortAnnotationList();
     }
 
     /**
+     * 分发调用 Init 注解
+     *
      * @throws \Throwable
      */
-    private function dispatchInit()
+    private function dispatchInit(): void
     {
         $handler = new AnnotationHandler(Init::class);
         $handler->setRuleCallback(function (Init $anno) {
@@ -166,7 +194,7 @@ class WorkerEventListener
      *
      * @throws DBException
      */
-    private function initConnectionPool()
+    private function initConnectionPool(): void
     {
         // 清空 MySQL 的连接池
         foreach (DBPool::getAllPools() as $name => $pool) {
