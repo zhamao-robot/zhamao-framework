@@ -13,3 +13,9 @@ class_alias(\ZM\Annotation\OneBot\BotEvent::class, 'BotEvent');
 class_alias(\ZM\Annotation\OneBot\CommandArgument::class, 'CommandArgument');
 class_alias(\ZM\Annotation\Closed::class, 'Closed');
 class_alias(\ZM\Plugin\ZMPlugin::class, 'ZMPlugin');
+
+// 下面是 OneBot 相关类的全局别称
+class_alias(\OneBot\Driver\Event\WebSocket\WebSocketOpenEvent::class, 'WebSocketOpenEvent');
+class_alias(\OneBot\Driver\Event\WebSocket\WebSocketCloseEvent::class, 'WebSocketCloseEvent');
+class_alias(\OneBot\Driver\Event\WebSocket\WebSocketMessageEvent::class, 'WebSocketMessageEvent');
+class_alias(\OneBot\Driver\Event\Http\HttpRequestEvent::class, 'HttpRequestEvent');

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-$plugin = new ZMPlugin(__DIR__);
+$plugin = new \ZM\ZMApplication(__DIR__);
 
 /*
  * 发送 "测试 123"，回复 "你好，123"
@@ -17,8 +17,4 @@ $route1 = Route::make('/index233')->on(fn () => '<h1>Hello world</h1>');
 $plugin->addBotCommand($cmd1);
 $plugin->addHttpRoute($route1);
 
-return [
-    'plugin-name' => 'pasd',
-    'version' => '1.0.0',
-    'plugin' => $plugin,
-];
+$plugin->run();

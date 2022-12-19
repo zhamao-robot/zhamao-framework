@@ -6,11 +6,9 @@ namespace ZM\Annotation;
 
 abstract class AnnotationBase implements \IteratorAggregate
 {
-    public string $method = '';
+    /** @var array|\Closure|string 方法名或闭包 */
+    public \Closure|string|array $method = '';
 
-    /**
-     * @var \Closure|string
-     */
     public $class = '';
 
     public array $group = [];

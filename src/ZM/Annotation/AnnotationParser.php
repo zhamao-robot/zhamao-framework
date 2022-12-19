@@ -10,7 +10,6 @@ use Koriym\Attributes\DualReader;
 use ZM\Annotation\Http\Controller;
 use ZM\Annotation\Http\Route;
 use ZM\Annotation\Interfaces\ErgodicAnnotation;
-use ZM\Annotation\Interfaces\Level;
 use ZM\Annotation\Middleware\Middleware;
 use ZM\Store\FileSystem;
 use ZM\Utils\HttpUtil;
@@ -67,7 +66,7 @@ class AnnotationParser
      * @param string   $class_name 注解类名
      * @param callable $callback   回调函数
      */
-    public function addSpecialParser(string $class_name, callable $callback)
+    public function addSpecialParser(string $class_name, callable $callback): void
     {
         $this->special_parsers[$class_name][] = $callback;
     }
@@ -160,14 +159,11 @@ class AnnotationParser
                 }
 
                 // 预处理3：调用自定义解析器
-                foreach (($this->special_parsers[get_class($vs)] ?? []) as $parser) {
-                    $result = $parser($vs);
-                    if ($result === true) {
-                        continue 2;
-                    }
-                    if ($result === false) {
-                        continue 3;
-                    }
+                if (($a = $this->parseSpecial($vs)) === true) {
+                    continue;
+                }
+                if ($a === false) {
+                    continue 2;
                 }
             }
 
@@ -191,14 +187,11 @@ class AnnotationParser
                     }
 
                     // 预处理3.3：调用自定义解析器
-                    foreach (($this->special_parsers[get_class($method_anno)] ?? []) as $parser) {
-                        $result = $parser($method_anno);
-                        if ($result === true) {
-                            continue 2;
-                        }
-                        if ($result === false) {
-                            continue 3;
-                        }
+                    if (($a = $this->parseSpecial($method_anno, $methods_annotations)) === true) {
+                        continue;
+                    }
+                    if ($a === false) {
+                        continue 2;
                     }
 
                     // 如果上方没有解析或返回了 true，则添加到注解解析列表中
@@ -240,10 +233,18 @@ class AnnotationParser
                 }
             }
         }
-        foreach ($o as $k => $v) {
-            $this->sortByLevel($o, $k);
-        }
         return $o;
+    }
+
+    public function parseSpecial($annotation, $same_method_annotations = null): ?bool
+    {
+        foreach (($this->special_parsers[get_class($annotation)] ?? []) as $parser) {
+            $result = $parser($annotation, $same_method_annotations);
+            if (is_bool($result)) {
+                return $result;
+            }
+        }
+        return null;
     }
 
     /**
@@ -256,26 +257,6 @@ class AnnotationParser
     {
         logger()->debug('Add register path: ' . $path . ' => ' . $indoor_name);
         $this->path_list[] = [$path, $indoor_name];
-    }
-
-    /**
-     * 排序注解列表
-     *
-     * @param array  $events     需要排序的
-     * @param string $class_name 排序的类名
-     * @param string $prefix     前缀
-     * @internal 用于 level 排序
-     */
-    public function sortByLevel(array &$events, string $class_name, string $prefix = '')
-    {
-        if (is_a($class_name, Level::class, true)) {
-            $class_name .= $prefix;
-            usort($events[$class_name], function ($a, $b) {
-                $left = $a->getLevel();
-                $right = $b->getLevel();
-                return $left > $right ? -1 : ($left == $right ? 0 : 1);
-            });
-        }
     }
 
     /**
@@ -297,14 +278,16 @@ class AnnotationParser
     /**
      * 添加注解路由
      */
-    private function addRouteAnnotation(Route $vss): void
+    private function addRouteAnnotation(Route $vss, ?array $same_method_annotations = null)
     {
         // 拿到所属方法的类上面有没有控制器的注解
         $prefix = '';
-        foreach (($this->annotation_tree[$vss->class]['methods_annotations'][$vss->method] ?? []) as $annotation) {
-            if ($annotation instanceof Controller) {
-                $prefix = $annotation->prefix;
-                break;
+        if ($same_method_annotations !== null) {
+            foreach ($same_method_annotations as $annotation) {
+                if ($annotation instanceof Controller) {
+                    $prefix = $annotation->prefix;
+                    break;
+                }
             }
         }
         $tail = trim($vss->route, '/');
@@ -314,5 +297,6 @@ class AnnotationParser
         $route->setMethods($vss->request_method);
 
         HttpUtil::getRouteCollection()->add(md5($route_name), $route);
+        return null;
     }
 }

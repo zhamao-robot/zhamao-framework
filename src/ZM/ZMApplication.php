@@ -6,6 +6,7 @@ namespace ZM;
 
 use ZM\Command\Server\ServerStartCommand;
 use ZM\Exception\SingletonViolationException;
+use ZM\Plugin\PluginManager;
 use ZM\Plugin\ZMPlugin;
 
 class ZMApplication extends ZMPlugin
@@ -43,6 +44,7 @@ class ZMApplication extends ZMPlugin
      */
     public function run()
     {
+        PluginManager::addPlugin(['name' => 'native-app', 'object' => $this]);
         (new Framework($this->args))->init()->start();
     }
 }

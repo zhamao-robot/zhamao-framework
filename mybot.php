@@ -24,10 +24,10 @@ $app->enablePlugins([
     'd',
 ]);
 // BotCommand 事件构造
-$cmd = \ZM\Annotation\OneBot\BotCommand::make('test')->withMethod(function () {
+$cmd = BotCommand::make('test')->on(function () {
     ctx()->reply('test ok');
 });
-$event = \ZM\Annotation\OneBot\BotEvent::make('message')->withMethod(function () {
+$event = BotEvent::make(type: 'message')->on(function () {
 });
 $app->addBotEvent($event);
 $app->addBotCommand($cmd);
