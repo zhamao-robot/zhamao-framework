@@ -21,3 +21,20 @@ public function loadAnnotationByParser(ZM\Annotation\AnnotationParser $parser): 
 | 类型 | 描述 |
 | ---- | ----------- |
 | void |  |
+
+
+## sortAnnotationList
+
+```php
+public function sortAnnotationList(): void
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| void |  |

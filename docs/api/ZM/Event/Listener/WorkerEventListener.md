@@ -3,7 +3,7 @@
 ## onWorkerStart999
 
 ```php
-public function onWorkerStart999(): mixed
+public function onWorkerStart999(): void
 ```
 
 ### 描述
@@ -14,7 +14,7 @@ public function onWorkerStart999(): mixed
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| mixed |  |
+| void |  |
 
 
 ## onWorkerStop999
@@ -54,7 +54,7 @@ public function initUserPlugins(): mixed
 ## dispatchInit
 
 ```php
-public function dispatchInit(): mixed
+public function dispatchInit(): void
 ```
 
 ### 描述
@@ -65,13 +65,13 @@ public function dispatchInit(): mixed
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| mixed |  |
+| void |  |
 
 
 ## initConnectionPool
 
 ```php
-public function initConnectionPool(): mixed
+public function initConnectionPool(): void
 ```
 
 ### 描述
@@ -82,7 +82,7 @@ public function initConnectionPool(): mixed
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| mixed |  |
+| void |  |
 
 
 ## getInstance

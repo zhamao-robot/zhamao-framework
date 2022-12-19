@@ -26,7 +26,7 @@ public function __construct(bool $with_internal_parsers): mixed
 ## addSpecialParser
 
 ```php
-public function addSpecialParser(string $class_name, callable $callback): mixed
+public function addSpecialParser(string $class_name, callable $callback): void
 ```
 
 ### 描述
@@ -44,7 +44,7 @@ public function addSpecialParser(string $class_name, callable $callback): mixed
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| mixed |  |
+| void |  |
 
 
 ## parseAll
@@ -105,31 +105,6 @@ public function addRegisterPath(string $path, string $indoor_name): mixed
 | mixed |  |
 
 
-## sortByLevel
-
-```php
-public function sortByLevel(array $events, string $class_name, string $prefix): mixed
-```
-
-### 描述
-
-作者很懒，什么也没有说
-
-### 参数
-
-| 名称 | 类型 | 描述 |
-| -------- | ---- | ----------- |
-| events | array |  |
-| class_name | string |  |
-| prefix | string |  |
-
-### 返回
-
-| 类型 | 描述 |
-| ---- | ----------- |
-| mixed |  |
-
-
 ## getUsedTime
 
 ```php
@@ -167,7 +142,7 @@ public function getAnnotationMap(): array
 ## addRouteAnnotation
 
 ```php
-public function addRouteAnnotation(ZM\Annotation\Http\Route $vss): void
+public function addRouteAnnotation(ZM\Annotation\Http\Route $vss, array $same_method_annotations): mixed
 ```
 
 ### 描述
@@ -179,9 +154,10 @@ public function addRouteAnnotation(ZM\Annotation\Http\Route $vss): void
 | 名称 | 类型 | 描述 |
 | -------- | ---- | ----------- |
 | vss | ZM\Annotation\Http\Route |  |
+| same_method_annotations | array |  |
 
 ### 返回
 
 | 类型 | 描述 |
 | ---- | ----------- |
-| void |  |
+| mixed |  |

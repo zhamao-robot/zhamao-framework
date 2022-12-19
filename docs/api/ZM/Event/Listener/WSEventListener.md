@@ -23,6 +23,29 @@ public function onWebSocketOpen(OneBot\Driver\Event\WebSocket\WebSocketOpenEvent
 | void |  |
 
 
+## onWebSocketClose
+
+```php
+public function onWebSocketClose(OneBot\Driver\Event\WebSocket\WebSocketCloseEvent $event): void
+```
+
+### 描述
+
+作者很懒，什么也没有说
+
+### 参数
+
+| 名称 | 类型 | 描述 |
+| -------- | ---- | ----------- |
+| event | OneBot\Driver\Event\WebSocket\WebSocketCloseEvent |  |
+
+### 返回
+
+| 类型 | 描述 |
+| ---- | ----------- |
+| void |  |
+
+
 ## getInstance
 
 ```php
