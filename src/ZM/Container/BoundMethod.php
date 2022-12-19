@@ -12,12 +12,11 @@ class BoundMethod
      * 调用指定闭包、类方法并注入依赖
      *
      * @param  Container                                     $container
-     * @param  callable|string                               $callback
      * @return mixed
      * @throws EntryResolutionException|\ReflectionException
      * @throws \InvalidArgumentException
      */
-    public static function call(ContainerInterface $container, $callback, array $parameters = [], string $default_method = null)
+    public static function call(ContainerInterface $container, callable|string $callback, array $parameters = [], string $default_method = null)
     {
         if (is_string($callback) && !$default_method && method_exists($callback, '__invoke')) {
             $default_method = '__invoke';
@@ -41,10 +40,9 @@ class BoundMethod
     /**
      * Get all dependencies for a given method.
      *
-     * @param  callable|string      $callback
      * @throws \ReflectionException
      */
-    protected static function getMethodDependencies(ContainerInterface $container, $callback, array $parameters = []): array
+    protected static function getMethodDependencies(ContainerInterface $container, callable|string $callback, array $parameters = []): array
     {
         $dependencies = [];
 

@@ -30,6 +30,7 @@ use ZM\Exception\SingletonViolationException;
 use ZM\Exception\ZMKnownException;
 use ZM\Logger\TablePrinter;
 use ZM\Process\ProcessStateManager;
+use ZM\Store\FileSystem;
 use ZM\Utils\EasterEgg;
 
 /**
@@ -173,10 +174,8 @@ class Framework
 
     /**
      * 获取驱动
-     *
-     * @return Driver|SwooleDriver|WorkermanDriver
      */
-    public function getDriver()
+    public function getDriver(): Driver
     {
         return $this->driver;
     }
@@ -242,7 +241,7 @@ class Framework
 
         // 框架多进程依赖
         if (defined('ZM_STATE_DIR') && !is_dir(ZM_STATE_DIR)) {
-            mkdir(ZM_STATE_DIR);
+            FileSystem::createDir(ZM_STATE_DIR);
         }
     }
 
@@ -408,7 +407,7 @@ class Framework
             logger()->emergency('代码解析错误！');
             exit(1);
         }
-        $json = json_decode($r, true);
+        $json = json_decode($r, true, 512, JSON_THROW_ON_ERROR);
         if (!is_array($json)) {
             logger()->error(zm_internal_errcode('E00012') . '解析 @OnSetup 时发生错误，请检查代码！');
             return;

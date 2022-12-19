@@ -21,9 +21,7 @@ class ServerStartCommand extends ServerCommand
     {
         $cmd = new self();
         $cmd->configure();
-        return array_map(function ($x) {
-            return $x->getDefault();
-        }, $cmd->getDefinition()->getOptions());
+        return array_map(fn ($x) => $x->getDefault(), $cmd->getDefinition()->getOptions());
     }
 
     protected function configure()

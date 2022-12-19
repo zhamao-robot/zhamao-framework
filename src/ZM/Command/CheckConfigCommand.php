@@ -11,7 +11,7 @@ class CheckConfigCommand extends Command
 {
     use SourceLoadModeOnly;
 
-    private $need_update = false;
+    private bool $need_update = false;
 
     protected function handle(): int
     {

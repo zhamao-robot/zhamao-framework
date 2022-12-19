@@ -12,7 +12,7 @@ use Doctrine\DBAL\ParameterType;
 class DBConnection implements Connection
 {
     /** @var \PDO */
-    private $conn;
+    private object $conn;
 
     private $pool_name;
 

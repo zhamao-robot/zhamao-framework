@@ -9,7 +9,7 @@ use ZM\Store\Database\DBException as DbException;
 
 class DBQueryBuilder extends QueryBuilder
 {
-    private $wrapper;
+    private DBWrapper $wrapper;
 
     public function __construct(DBWrapper $wrapper)
     {
@@ -18,10 +18,9 @@ class DBQueryBuilder extends QueryBuilder
     }
 
     /**
-     * @return DBStatementWrapper|int
      * @throws DbException
      */
-    public function execute()
+    public function execute(): DBStatementWrapper|int
     {
         if ($this->getType() === self::SELECT) {
             return $this->wrapper->executeQuery($this->getSQL(), $this->getParameters(), $this->getParameterTypes());

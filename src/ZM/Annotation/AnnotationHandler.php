@@ -58,8 +58,7 @@ class AnnotationHandler
     /**
      * 设置执行前判断注解是否应该被执行的检查回调函数
      *
-     * @param  callable $rule 回调函数
-     * @return $this
+     * @param callable $rule 回调函数
      */
     public function setRuleCallback(callable $rule): AnnotationHandler
     {
@@ -71,8 +70,7 @@ class AnnotationHandler
     /**
      * 设置成功执行后有返回值时执行的返回值后续逻辑回调函数
      *
-     * @param  callable $return 回调函数
-     * @return $this
+     * @param callable $return 回调函数
      */
     public function setReturnCallback(callable $return): AnnotationHandler
     {
@@ -88,7 +86,7 @@ class AnnotationHandler
      * @param  mixed      ...$params 传入的参数们
      * @throws \Throwable
      */
-    public function handleAll(...$params)
+    public function handleAll(mixed ...$params)
     {
         try {
             // 遍历注册的注解

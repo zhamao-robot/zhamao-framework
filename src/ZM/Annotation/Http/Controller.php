@@ -20,13 +20,11 @@ use ZM\Annotation\Interfaces\ErgodicAnnotation;
 #[\Attribute(\Attribute::IS_REPEATABLE | \Attribute::TARGET_CLASS)]
 class Controller extends AnnotationBase implements ErgodicAnnotation
 {
-    /**
-     * @Required()
-     */
-    public string $prefix = '';
-
-    public function __construct(string $prefix)
-    {
-        $this->prefix = $prefix;
+    public function __construct(
+        /**
+         * @Required()
+         */
+        public string $prefix
+    ) {
     }
 }

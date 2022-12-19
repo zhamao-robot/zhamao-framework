@@ -18,8 +18,7 @@ class Pipeline
     /**
      * 向管道发送数据
      *
-     * @param  mixed $value 数据
-     * @return $this
+     * @param mixed $value 数据
      */
     public function send(mixed $value): Pipeline
     {
@@ -30,8 +29,7 @@ class Pipeline
     /**
      * 指定要过的中间件列表
      *
-     * @param  array $middlewares 要过的中间件（或者叫兼容管道的中间件也行）列表
-     * @return $this
+     * @param array $middlewares 要过的中间件（或者叫兼容管道的中间件也行）列表
      */
     public function through(array $middlewares): Pipeline
     {

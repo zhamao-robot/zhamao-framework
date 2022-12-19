@@ -29,9 +29,7 @@ class PipelineTest extends TestCase
         $pipe = new Pipeline();
         $a = $pipe->send('APP')
             ->through([TimerMiddleware::class])
-            ->then(function (string $value) {
-                return $value;
-            });
+            ->then(fn (string $value) => $value);
         $this->assertEquals('APP', $a);
     }
 }

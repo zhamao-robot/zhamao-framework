@@ -24,19 +24,15 @@ use ZM\Annotation\Interfaces\Level;
 class BindEvent extends AnnotationBase implements Level
 {
     /**
-     * @Required()
-     */
-    public string $event_class;
-
-    public int $level = 800;
-
-    /**
      * @param string $event_class 绑定事件的类型
      */
-    public function __construct(string $event_class, int $level = 800)
-    {
-        $this->event_class = $event_class;
-        $this->level = $level;
+    public function __construct(
+        /**
+         * @Required()
+         */
+        public string $event_class,
+        public int $level = 800
+    ) {
     }
 
     public function getLevel(): int

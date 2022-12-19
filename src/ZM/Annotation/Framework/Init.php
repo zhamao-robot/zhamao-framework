@@ -19,10 +19,7 @@ use ZM\Annotation\AnnotationBase;
 #[\Attribute(\Attribute::IS_REPEATABLE | \Attribute::TARGET_METHOD)]
 class Init extends AnnotationBase
 {
-    public int $worker = 0;
-
-    public function __construct(int $worker = 0)
+    public function __construct(public int $worker = 0)
     {
-        $this->worker = $worker;
     }
 }

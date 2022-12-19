@@ -37,7 +37,7 @@ class ConnectionUtil
         // 这里下面为连接准入，允许接入反向 WS
         if (ProcessStateManager::$process_mode['worker'] > 1) {
             // 文件名格式为 .WS{fd}.{pid}，文件内容是 impl 名称的 JSON 格式
-            file_put_contents(zm_dir(ZM_STATE_DIR . '/.WS' . $fd . '.' . ProcessManager::getProcessId()), json_encode($handle));
+            file_put_contents(zm_dir(ZM_STATE_DIR . '/.WS' . $fd . '.' . ProcessManager::getProcessId()), json_encode($handle, JSON_THROW_ON_ERROR));
         }
         return true;
     }
@@ -53,7 +53,7 @@ class ConnectionUtil
         // 这里下面为连接准入，允许接入反向 WS
         if (ProcessStateManager::$process_mode['worker'] > 1) {
             // 文件名格式为 .WS{fd}.{pid}，文件内容是 impl 名称的 JSON 格式
-            file_put_contents(zm_dir(ZM_STATE_DIR . '/.WS' . $fd . '.' . ProcessManager::getProcessId()), json_encode(self::$connection_handles[$fd]));
+            file_put_contents(zm_dir(ZM_STATE_DIR . '/.WS' . $fd . '.' . ProcessManager::getProcessId()), json_encode(self::$connection_handles[$fd], JSON_THROW_ON_ERROR));
         }
     }
 

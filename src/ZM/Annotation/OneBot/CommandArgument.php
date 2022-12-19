@@ -20,24 +20,7 @@ use ZM\Exception\ZMKnownException;
 #[\Attribute(\Attribute::IS_REPEATABLE | \Attribute::TARGET_ALL)]
 class CommandArgument extends AnnotationBase implements ErgodicAnnotation
 {
-    /**
-     * @Required()
-     */
-    public string $name;
-
-    public string $description = '';
-
     public string $type = 'string';
-
-    public bool $required = false;
-
-    public string $prompt = '';
-
-    public string $default = '';
-
-    public int $timeout = 60;
-
-    public int $error_prompt_policy = 1;
 
     /**
      * @param  string                                    $name        参数名称（可以是中文）
@@ -49,23 +32,19 @@ class CommandArgument extends AnnotationBase implements ErgodicAnnotation
      * @throws InvalidArgumentException|ZMKnownException
      */
     public function __construct(
-        string $name,
-        string $description = '',
+        /**
+         * @Required()
+         */
+        public string $name,
+        public string $description = '',
         string $type = 'string',
-        bool $required = false,
-        string $prompt = '',
-        string $default = '',
-        int $timeout = 60,
-        int $error_prompt_policy = 1
+        public bool $required = false,
+        public string $prompt = '',
+        public string $default = '',
+        public int $timeout = 60,
+        public int $error_prompt_policy = 1
     ) {
-        $this->name = $name;
-        $this->description = $description;
         $this->type = $this->fixTypeName($type);
-        $this->required = $required;
-        $this->prompt = $prompt;
-        $this->default = $default;
-        $this->timeout = $timeout;
-        $this->error_prompt_policy = $error_prompt_policy;
         if ($this->type === 'bool') {
             if ($this->default === '') {
                 $this->default = 'yes';

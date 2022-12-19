@@ -10,47 +10,42 @@ use ZM\Utils\ReflectionUtil;
 
 trait ContainerTrait
 {
-    /**
-     * @var array
-     */
-    protected $shared = [];
+    protected array $shared = [];
 
     /**
      * @var array[]
      */
-    protected $build_stack = [];
+    protected array $build_stack = [];
 
     /**
      * @var array[]
      */
-    protected $with = [];
+    protected array $with = [];
 
     /**
      * 日志前缀
-     *
-     * @var string
      */
-    protected $log_prefix;
+    protected string $log_prefix;
 
     /**
      * @var array[]
      */
-    private static $bindings = [];
+    private static array $bindings = [];
 
     /**
      * @var object[]
      */
-    private static $instances = [];
+    private static array $instances = [];
 
     /**
      * @var string[]
      */
-    private static $aliases = [];
+    private static array $aliases = [];
 
     /**
      * @var \Closure[][]
      */
-    private static $extenders = [];
+    private static array $extenders = [];
 
     public function __construct()
     {
@@ -188,7 +183,7 @@ trait ContainerTrait
      * @param  mixed  $instance 实例
      * @return mixed
      */
-    public function instance(string $abstract, $instance)
+    public function instance(string $abstract, mixed $instance)
     {
         if (isset(self::$instances[$abstract])) {
             return self::$instances[$abstract];
@@ -211,9 +206,7 @@ trait ContainerTrait
      */
     public function factory(string $abstract): \Closure
     {
-        return function () use ($abstract) {
-            return $this->make($abstract);
-        };
+        return fn () => $this->make($abstract);
     }
 
     /**
@@ -313,7 +306,7 @@ trait ContainerTrait
      * @return mixed
      * @throws EntryResolutionException
      */
-    public function build($concrete)
+    public function build(\Closure|string $concrete)
     {
         // 如果传入的是闭包，则直接执行并返回
         if ($concrete instanceof \Closure) {
@@ -363,7 +356,7 @@ trait ContainerTrait
      * @param  null|string     $default_method 默认方法
      * @return mixed
      */
-    public function call($callback, array $parameters = [], string $default_method = null)
+    public function call(callable|string $callback, array $parameters = [], string $default_method = null)
     {
         if ($this->shouldLog()) {
             if (count($parameters)) {
@@ -674,10 +667,9 @@ trait ContainerTrait
     /**
      * 获取类名的实际类型
      *
-     * @param  string          $abstract 类或接口名
-     * @return \Closure|string
+     * @param string $abstract 类或接口名
      */
-    protected function getConcrete(string $abstract)
+    protected function getConcrete(string $abstract): \Closure|string
     {
         if (isset(self::$bindings[$abstract])) {
             return self::$bindings[$abstract]['concrete'];
@@ -692,7 +684,7 @@ trait ContainerTrait
      * @param mixed  $concrete 实际类型
      * @param string $abstract 类或接口名
      */
-    protected function isBuildable($concrete, string $abstract): bool
+    protected function isBuildable(mixed $concrete, string $abstract): bool
     {
         return $concrete === $abstract || $concrete instanceof \Closure;
     }

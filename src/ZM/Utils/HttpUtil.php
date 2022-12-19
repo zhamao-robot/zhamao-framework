@@ -21,10 +21,7 @@ use ZM\Store\FileSystem;
  */
 class HttpUtil
 {
-    /**
-     * @var RouteCollection
-     */
-    private static $routes;
+    private static ?RouteCollection $routes = null;
 
     /**
      * 解析 Uri，用于匹配路由用的
@@ -42,10 +39,10 @@ class HttpUtil
             // 使用UrlMatcher进行匹配Url
             $matcher = new UrlMatcher(static::getRouteCollection(), $context);
             $matched = $matcher->match($request->getUri()->getPath());
-        } catch (ResourceNotFoundException $e) {
+        } catch (ResourceNotFoundException) {
             // 路由找不到会抛出异常，我们不需要这个异常，转换为状态码
             return ZM_ERR_ROUTE_NOT_FOUND;
-        } catch (MethodNotAllowedException $e) {
+        } catch (MethodNotAllowedException) {
             // 路由匹配到了，但该路由不能使用该方法，所以返回状态码（路由不允许）
             return ZM_ERR_ROUTE_METHOD_NOT_ALLOWED;
         }

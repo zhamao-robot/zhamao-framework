@@ -33,7 +33,7 @@ class ServerStopCommand extends ServerCommand
                     $pid = file_get_contents($file_path . '/' . $file);
                     Process::kill((int) $pid, SIGKILL);
                 } elseif ($file === 'master.json') {
-                    $json = json_decode(file_get_contents($file_path . '/' . $file), true);
+                    $json = json_decode(file_get_contents($file_path . '/' . $file), true, 512, JSON_THROW_ON_ERROR);
                     Process::kill($json['pid'], SIGKILL);
                 }
                 unlink($file_path . '/' . $file);

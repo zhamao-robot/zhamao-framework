@@ -181,9 +181,7 @@ class WorkerEventListener
     private function dispatchInit(): void
     {
         $handler = new AnnotationHandler(Init::class);
-        $handler->setRuleCallback(function (Init $anno) {
-            return $anno->worker === -1 || $anno->worker === ProcessManager::getProcessId();
-        });
+        $handler->setRuleCallback(fn (Init $anno) => $anno->worker === -1 || $anno->worker === ProcessManager::getProcessId());
         $handler->handleAll();
     }
 

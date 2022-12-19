@@ -19,7 +19,7 @@ class DBPool
     /**
      * @var array<string, SwooleObjectPool|WorkermanObjectPool> 连接池列表
      */
-    private static $pools = [];
+    private static array $pools = [];
 
     /**
      * 通过配置文件创建一个 MySQL 连接池
@@ -68,10 +68,9 @@ class DBPool
     /**
      * 获取一个数据库连接池
      *
-     * @param  string                               $name 连接池名称
-     * @return SwooleObjectPool|WorkermanObjectPool
+     * @param string $name 连接池名称
      */
-    public static function pool(string $name)
+    public static function pool(string $name): PoolInterface
     {
         if (!isset(self::$pools[$name]) && count(self::$pools) !== 1) {
             throw new \RuntimeException("Pool {$name} not found");
