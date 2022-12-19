@@ -81,7 +81,7 @@ class ReflectionUtil
      * @param  callable|string      $callback 回调
      * @throws \ReflectionException
      */
-    public static function isNonStaticMethod(callable|string $callback): bool
+    public static function isNonStaticMethod(callable|array|string $callback): bool
     {
         if (is_array($callback) && is_string($callback[0])) {
             $reflection = new \ReflectionMethod($callback[0], $callback[1]);

@@ -40,7 +40,7 @@ abstract class AnnotationBase implements \IteratorAggregate, \Stringable
     /**
      * 在 InstantPlugin 下调用，设置回调或匿名函数
      */
-    public function on(\Closure|string $method): AnnotationBase
+    public function on(\Closure|callable|string $method): AnnotationBase
     {
         $this->method = $method;
         return $this;

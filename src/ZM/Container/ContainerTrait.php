@@ -439,7 +439,7 @@ trait ContainerTrait
      */
     public function getLogPrefix(): string
     {
-        return ($this->log_prefix ?: '[WorkerContainer(U)]') . ' ';
+        return ($this->log_prefix ?? '[WorkerContainer(U)]') . ' ';
     }
 
     /**
