@@ -28,7 +28,7 @@ if (function_exists('zm_internal_errcode')) {
  */
 function zm_dir(string $dir): string
 {
-    if (strpos($dir, 'phar://') === 0) {
+    if (str_starts_with($dir, 'phar://')) {
         return $dir;
     }
     return str_replace('/', DIRECTORY_SEPARATOR, $dir);
@@ -46,10 +46,8 @@ function zm_exec(string $cmd): ExecutionResult
 
 /**
  * sleep 指定时间，单位为秒（最小单位为1毫秒，即0.001）
- *
- * @param float|int $time
  */
-function zm_sleep($time)
+function zm_sleep(float|int $time)
 {
     Adaptive::sleep($time);
 }
@@ -64,10 +62,8 @@ function coroutine(): ?CoroutineInterface
 
 /**
  * 获取内部错误码
- *
- * @param int|string $code
  */
-function zm_internal_errcode($code): string
+function zm_internal_errcode(int|string $code): string
 {
     return "[ErrCode:{$code}] ";
 }

@@ -184,9 +184,7 @@ class ZMResultPrinter extends CliTestDoxPrinter
 
         if ($this->colors) {
             $color = self::STATUS_STYLES[$result['status']]['color'] ?? '';
-            $prefix = array_map(static function ($p) use ($color) {
-                return Color::colorize($color, $p);
-            }, self::PREFIX_DECORATED);
+            $prefix = array_map(static fn ($p) => Color::colorize($color, $p), self::PREFIX_DECORATED);
         }
 
         $out = '';

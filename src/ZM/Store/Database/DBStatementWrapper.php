@@ -14,11 +14,8 @@ use Doctrine\DBAL\ForwardCompatibility\Result;
 
 class DBStatementWrapper
 {
-    public ?Result $stmt;
-
-    public function __construct(?Result $stmt)
+    public function __construct(public ?Result $stmt)
     {
-        $this->stmt = $stmt;
     }
 
     /**

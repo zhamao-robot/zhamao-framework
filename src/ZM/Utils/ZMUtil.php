@@ -12,6 +12,6 @@ class ZMUtil
      */
     public static function getComposerMetadata(?string $path = null): ?array
     {
-        return json_decode(file_get_contents(($path ?? SOURCE_ROOT_DIR) . '/composer.json'), true);
+        return json_decode(file_get_contents(($path ?? SOURCE_ROOT_DIR) . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
     }
 }

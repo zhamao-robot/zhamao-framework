@@ -19,32 +19,8 @@ use ZM\Annotation\AnnotationBase;
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class BotEvent extends AnnotationBase
 {
-    public ?string $type;
-
-    public ?string $detail_type;
-
-    public ?string $impl;
-
-    public ?string $platform;
-
-    public ?string $self_id;
-
-    public ?string $sub_type;
-
-    public function __construct(
-        ?string $type = null,
-        ?string $detail_type = null,
-        ?string $impl = null,
-        ?string $platform = null,
-        ?string $self_id = null,
-        ?string $sub_type = null
-    ) {
-        $this->type = $type;
-        $this->detail_type = $detail_type;
-        $this->impl = $impl;
-        $this->platform = $platform;
-        $this->self_id = $self_id;
-        $this->sub_type = $sub_type;
+    public function __construct(public ?string $type = null, public ?string $detail_type = null, public ?string $impl = null, public ?string $platform = null, public ?string $self_id = null, public ?string $sub_type = null)
+    {
     }
 
     public static function make(

@@ -19,7 +19,7 @@ use ZM\Store\FileSystem;
  */
 final class ConsoleApplication extends Application
 {
-    private static $obj;
+    private static ?ConsoleApplication $obj = null;
 
     public function __construct(string $name = 'zhamao-framework')
     {

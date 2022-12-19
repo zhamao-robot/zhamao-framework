@@ -22,7 +22,7 @@ class DBWrapper
     {
         try {
             $db_list = config()->get('global.database');
-            if (isset($db_list[$name]) || count($db_list) === 1) {
+            if (isset($db_list[$name]) || (is_countable($db_list) ? count($db_list) : 0) === 1) {
                 if ($name === '') {
                     $name = array_key_first($db_list);
                 }
@@ -66,10 +66,9 @@ class DBWrapper
 
     /**
      * wrapper method
-     * @return array|false
      * @throws DBException
      */
-    public function fetchAssociative(string $query, array $params = [], array $types = [])
+    public function fetchAssociative(string $query, array $params = [], array $types = []): array|false
     {
         try {
             return $this->connection->fetchAssociative($query, $params, $types);
@@ -80,10 +79,9 @@ class DBWrapper
 
     /**
      * wrapper method
-     * @return array|false
      * @throws DBException
      */
-    public function fetchNumeric(string $query, array $params = [], array $types = [])
+    public function fetchNumeric(string $query, array $params = [], array $types = []): array|false
     {
         try {
             return $this->connection->fetchNumeric($query, $params, $types);
@@ -182,10 +180,9 @@ class DBWrapper
 
     /**
      * wrapper method
-     * @param mixed                $value
      * @param null|int|string|Type $type
      */
-    public function quote($value, $type = ParameterType::STRING)
+    public function quote(mixed $value, $type = ParameterType::STRING)
     {
         return $this->connection->quote($value, $type);
     }
@@ -414,7 +411,7 @@ class DBWrapper
      * @return int|string  the number of affected rows
      * @throws DBException
      */
-    public function executeStatement(string $sql, array $params = [], array $types = [])
+    public function executeStatement(string $sql, array $params = [], array $types = []): int|string
     {
         try {
             return $this->connection->executeStatement($sql, $params, $types);
@@ -436,7 +433,7 @@ class DBWrapper
      * @param  null|string      $name name of the sequence object from which the ID should be returned
      * @return false|int|string a string representation of the last inserted ID
      */
-    public function lastInsertId(?string $name = null)
+    public function lastInsertId(?string $name = null): false|int|string
     {
         return $this->connection->lastInsertId($name);
     }
@@ -600,13 +597,10 @@ class DBWrapper
      */
     private function getConnectionClass(string $type): string
     {
-        switch ($type) {
-            case 'mysql':
-                return MySQLDriver::class;
-            case 'sqlite':
-                return SQLiteDriver::class;
-            default:
-                throw new DBException('Unknown database type: ' . $type);
-        }
+        return match ($type) {
+            'mysql' => MySQLDriver::class,
+            'sqlite' => SQLiteDriver::class,
+            default => throw new DBException('Unknown database type: ' . $type),
+        };
     }
 }

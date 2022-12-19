@@ -22,59 +22,13 @@ use ZM\Exception\ZMKnownException;
 #[\Attribute(\Attribute::IS_REPEATABLE | \Attribute::TARGET_METHOD)]
 class BotCommand extends AnnotationBase implements Level
 {
-    public string $name = '';
-
-    public string $match = '';
-
-    public string $pattern = '';
-
-    public string $regex = '';
-
-    public string $start_with = '';
-
-    public string $end_with = '';
-
-    public string $keyword = '';
-
-    /** @var string[] */
-    public array $alias = [];
-
-    public string $message_type = '';
-
-    public string $user_id = '';
-
-    public string $group_id = '';
-
-    public int $level = 20;
-
     private array $arguments = [];
 
-    public function __construct(
-        $name = '',
-        $match = '',
-        $pattern = '',
-        $regex = '',
-        $start_with = '',
-        $end_with = '',
-        $keyword = '',
-        $alias = [],
-        $message_type = '',
-        $user_id = '',
-        $group_id = '',
-        $level = 20
-    ) {
-        $this->name = $name;
-        $this->match = $match;
-        $this->pattern = $pattern;
-        $this->regex = $regex;
-        $this->start_with = $start_with;
-        $this->end_with = $end_with;
-        $this->keyword = $keyword;
-        $this->alias = $alias;
-        $this->message_type = $message_type;
-        $this->user_id = $user_id;
-        $this->group_id = $group_id;
-        $this->level = $level;
+    /**
+     * @param string[] $alias
+     */
+    public function __construct(public $name = '', public $match = '', public $pattern = '', public $regex = '', public $start_with = '', public $end_with = '', public $keyword = '', public $alias = [], public $message_type = '', public $user_id = '', public $group_id = '', public $level = 20)
+    {
     }
 
     public static function make(
@@ -95,7 +49,6 @@ class BotCommand extends AnnotationBase implements Level
     }
 
     /**
-     * @return $this
      * @throws InvalidArgumentException
      * @throws ZMKnownException
      */

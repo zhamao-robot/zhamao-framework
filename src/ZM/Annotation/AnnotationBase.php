@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ZM\Annotation;
 
-abstract class AnnotationBase implements \IteratorAggregate
+abstract class AnnotationBase implements \IteratorAggregate, \Stringable
 {
     /** @var array|\Closure|string 方法名或闭包 */
     public \Closure|string|array $method = '';
@@ -13,9 +13,9 @@ abstract class AnnotationBase implements \IteratorAggregate
 
     public array $group = [];
 
-    public function __toString()
+    public function __toString(): string
     {
-        $str = __CLASS__ . ': ';
+        $str = self::class . ': ';
         foreach ($this as $k => $v) {
             $str .= "\n\t" . $k . ' => ';
             if (is_string($v)) {
@@ -39,10 +39,8 @@ abstract class AnnotationBase implements \IteratorAggregate
 
     /**
      * 在 InstantPlugin 下调用，设置回调或匿名函数
-     *
-     * @param \Closure|string $method
      */
-    public function on($method): AnnotationBase
+    public function on(\Closure|callable|string $method): AnnotationBase
     {
         $this->method = $method;
         return $this;

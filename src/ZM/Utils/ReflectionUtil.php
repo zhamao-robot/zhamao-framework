@@ -43,16 +43,14 @@ class ReflectionUtil
 
     /**
      * 将传入变量转换为字符串
-     *
-     * @param mixed $var
      */
-    public static function variableToString($var): string
+    public static function variableToString(mixed $var): string
     {
         switch (true) {
             case is_callable($var):
                 if (is_array($var)) {
                     if (is_object($var[0])) {
-                        return get_class($var[0]) . '@' . $var[1];
+                        return $var[0]::class . '@' . $var[1];
                     }
                     return $var[0] . '::' . $var[1];
                 }
@@ -60,9 +58,9 @@ class ReflectionUtil
             case is_string($var):
                 return $var;
             case is_array($var):
-                return 'array' . json_encode($var);
+                return 'array' . json_encode($var, JSON_THROW_ON_ERROR);
             case is_object($var):
-                return get_class($var);
+                return $var::class;
             case is_resource($var):
                 return 'resource(' . get_resource_type($var) . ')';
             case is_null($var):
@@ -83,7 +81,7 @@ class ReflectionUtil
      * @param  callable|string      $callback 回调
      * @throws \ReflectionException
      */
-    public static function isNonStaticMethod($callback): bool
+    public static function isNonStaticMethod(callable|array|string $callback): bool
     {
         if (is_array($callback) && is_string($callback[0])) {
             $reflection = new \ReflectionMethod($callback[0], $callback[1]);
@@ -103,7 +101,7 @@ class ReflectionUtil
      * @param  callable|string      $callback 回调
      * @throws \ReflectionException
      */
-    public static function getCallReflector($callback): \ReflectionFunctionAbstract
+    public static function getCallReflector(callable|string $callback): \ReflectionFunctionAbstract
     {
         if (is_string($callback) && str_contains($callback, '::')) {
             $callback = explode('::', $callback);

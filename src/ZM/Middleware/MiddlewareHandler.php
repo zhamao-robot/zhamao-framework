@@ -14,22 +14,22 @@ class MiddlewareHandler
     /**
      * @var array 存储中间件的
      */
-    protected $middlewares = [];
+    protected array $middlewares = [];
 
     /**
      * @var array 存储注册中间件的类和方法
      */
-    protected $reg_map = [];
+    protected array $reg_map = [];
 
     /**
      * @var array 用于将中间件名称压栈
      */
-    protected $stack = [];
+    protected array $stack = [];
 
     /**
      * @var array 用于将正在运行的中间件压栈
      */
-    protected $callable_stack = [];
+    protected array $callable_stack = [];
 
     public function registerBefore(string $name, callable $callback)
     {
@@ -44,7 +44,7 @@ class MiddlewareHandler
             && isset($this->middlewares[$name]['before'])           // 且存在before
             && is_array($this->middlewares[$name]['before'])        // 且before也是数组类型callback
             && is_object($this->middlewares[$name]['before'][0])    // 且before类型也为动态调用
-            && get_class($this->middlewares[$name]['before'][0]) === get_class($callback[0]) // 且before和after在一个类
+            && $this->middlewares[$name]['before'][0]::class === $callback[0]::class // 且before和after在一个类
         ) {
             // 那么就把after的对象替换为和before同一个
             $callback[0] = $this->middlewares[$name]['before'][0];
@@ -173,7 +173,7 @@ class MiddlewareHandler
         }
         if (is_array($callback) && count($callback) === 2) {
             // 活性调用，根据组合名称来判断
-            return (is_object($callback[0]) ? get_class($callback[0]) : $callback[0]) . '::' . $callback[1];
+            return (is_object($callback[0]) ? $callback[0]::class : $callback[0]) . '::' . $callback[1];
         }
         if (is_string($callback)) {
             return $callback;

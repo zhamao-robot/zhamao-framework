@@ -143,7 +143,7 @@ class ProxyServerCommand extends Command
                         $ip = 0;
                         for ($i = 0; $i < 4; ++$i) {
                             // var_dump(ord($tmp[$i]));
-                            $ip += ord($tmp[$i]) * pow(256, 3 - $i);
+                            $ip += ord($tmp[$i]) * 256 ** (3 - $i);
                         }
                         $request['dest_addr'] = long2ip($ip);
                         $offset += 4;
@@ -308,6 +308,7 @@ class ProxyServerCommand extends Command
 
     public function udpWorkerOnMessage($udp_connection, $data, &$worker)
     {
+        $addr = [];
         logger()->debug('send:' . bin2hex($data));
         $request = [];
         $offset = 0;
@@ -326,7 +327,7 @@ class ProxyServerCommand extends Command
                 $tmp = substr($data, $offset, 4);
                 $ip = 0;
                 for ($i = 0; $i < 4; ++$i) {
-                    $ip += ord($tmp[$i]) * pow(256, 3 - $i);
+                    $ip += ord($tmp[$i]) * 256 ** (3 - $i);
                 }
                 $request['dest_addr'] = long2ip($ip);
                 $offset += 4;
@@ -412,15 +413,11 @@ class ProxyServerCommand extends Command
         $this->config['auth'] = [0 => true];
         $type = $input->getOption('type') ?? 'http';
         logger()->notice('Proxy server started at ' . $type . '://' . $address . ':' . $port);
-        switch ($type) {
-            case 'http':
-                $this->startHttpProxy($address, $port);
-                break;
-            case 'socks':
-            case 'socks5':
-                $this->startSocksProxy($address, $port);
-                break;
-        }
+        match ($type) {
+            'http' => $this->startHttpProxy($address, $port),
+            'socks', 'socks5' => $this->startSocksProxy($address, $port),
+            default => 0,
+        };
         return 0;
     }
 
@@ -464,7 +461,7 @@ class ProxyServerCommand extends Command
      * @param string     $address 地址
      * @param int|string $port    端口
      */
-    private function startSocksProxy(string $address, $port)
+    private function startSocksProxy(string $address, int|string $port)
     {
         define('STAGE_INIT', 0);
         define('STAGE_AUTH', 1);

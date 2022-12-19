@@ -130,9 +130,7 @@ class InitCommand extends Command
             // TODO: 优化代码，避免在循环中使用 array_merge 以减少资源消耗
             $files = array_merge($files, glob($this->getVendorPath($pattern), GLOB_BRACE));
         }
-        return array_map(function ($file) {
-            return str_replace($this->getVendorPath(''), '', $file);
-        }, $files);
+        return array_map(fn ($file) => str_replace($this->getVendorPath(''), '', $file), $files);
     }
 
     /**

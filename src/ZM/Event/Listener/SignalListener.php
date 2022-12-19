@@ -17,10 +17,8 @@ class SignalListener
 
     /**
      * 用于记录 Ctrl+C 的次数
-     *
-     * @var int
      */
-    private static $manager_kill_time = 0;
+    private static int $manager_kill_time = 0;
 
     /**
      * 开启 Worker 进程的 SIGINT 监听

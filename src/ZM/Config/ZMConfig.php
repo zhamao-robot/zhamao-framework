@@ -60,7 +60,7 @@ class ZMConfig
     /**
      * @var null|ConfigTracer 配置跟踪器
      */
-    private ?ConfigTracer $tracer;
+    private ?ConfigTracer $tracer = null;
 
     /**
      * 构造配置实例
@@ -159,7 +159,7 @@ class ZMConfig
      *
      * @return null|array|mixed
      */
-    public function get(string $key, $default = null)
+    public function get(string $key, mixed $default = null)
     {
         return $this->holder->get($key, $default);
     }
@@ -174,7 +174,7 @@ class ZMConfig
      * @param array|string $key   配置项名称，可使用.访问数组
      * @param mixed        $value 要写入的值，传入 null 会进行删除
      */
-    public function set($key, $value = null): void
+    public function set(array|string $key, mixed $value = null): void
     {
         $keys = is_array($key) ? $key : [$key => $value];
         foreach ($keys as $i_key => $i_val) {
@@ -294,7 +294,7 @@ class ZMConfig
         // 2. 文件名.环境：如 test.development，此时加载类型为 environment
         // 3. 文件名.patch：如 test.patch，此时加载类型为 patch
         // 至于其他的格式，则为未定义行为
-        if (strpos($name, '.') === false) {
+        if (!str_contains($name, '.')) {
             return 'default';
         }
         $name_and_env = explode('.', $name);

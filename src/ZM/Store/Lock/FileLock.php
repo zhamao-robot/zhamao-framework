@@ -8,9 +8,9 @@ use ZM\Exception\ZMKnownException;
 
 class FileLock
 {
-    private static $lock_file_handle = [];
+    private static array $lock_file_handle = [];
 
-    private static $name_hash = [];
+    private static array $name_hash = [];
 
     /**
      * 基于文件的锁，适用于跨进程操作资源用的
@@ -19,7 +19,7 @@ class FileLock
      */
     public static function lock(string $name)
     {
-        self::$name_hash[$name] = self::$name_hash[$name] ?? md5($name);
+        self::$name_hash[$name] ??= md5($name);
         $lock_file = zm_dir(TMP_DIR . '/.zm_' . zm_instance_id() . self::$name_hash[$name] . '.lock');
         self::$lock_file_handle[$name] = fopen($lock_file, 'w');
         if (self::$lock_file_handle[$name] === false) {

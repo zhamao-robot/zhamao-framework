@@ -94,9 +94,8 @@ class ZMConfigTest extends TestCase
 
     /**
      * @dataProvider providerTestGetValue
-     * @param mixed $expected
      */
-    public function testGetValue(string $key, $expected): void
+    public function testGetValue(string $key, mixed $expected): void
     {
         $this->assertSame($expected, self::$config->get($key));
     }

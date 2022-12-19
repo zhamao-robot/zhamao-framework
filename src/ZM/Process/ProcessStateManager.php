@@ -12,11 +12,10 @@ class ProcessStateManager
     public static array $process_mode = [];
 
     /**
-     * @param  null|int|string  $id_or_name
      * @throws ZMKnownException
      * @internal
      */
-    public static function removeProcessState(int $type, $id_or_name = null)
+    public static function removeProcessState(int $type, int|string $id_or_name = null)
     {
         switch ($type) {
             case ZM_PROCESS_MASTER:
@@ -64,12 +63,11 @@ class ProcessStateManager
     /**
      * 用于框架内部获取多进程运行状态的函数
      *
-     * @param  mixed            $id_or_name
      * @return false|int|mixed
      * @throws ZMKnownException
      * @internal
      */
-    public static function getProcessState(int $type, $id_or_name = null)
+    public static function getProcessState(int $type, mixed $id_or_name = null)
     {
         $file = ZM_STATE_DIR;
         switch ($type) {
@@ -78,10 +76,7 @@ class ProcessStateManager
                     return false;
                 }
                 $json = json_decode(file_get_contents(zm_dir($file . '/master.json')), true);
-                if ($json !== null) {
-                    return $json;
-                }
-                return false;
+                return $json ?? false;
             case ZM_PROCESS_MANAGER:
                 if (!file_exists(zm_dir($file . '/manager.pid'))) {
                     return false;
@@ -119,10 +114,9 @@ class ProcessStateManager
     /**
      * 将各进程的pid写入文件，以备后续崩溃及僵尸进程处理使用
      *
-     * @param int|string $pid
      * @internal
      */
-    public static function saveProcessState(int $type, $pid, array $data = [])
+    public static function saveProcessState(int $type, int|string $pid, array $data = [])
     {
         switch ($type) {
             case ZM_PROCESS_MASTER:

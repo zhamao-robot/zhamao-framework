@@ -11,14 +11,13 @@ class FileSystem
     /**
      * 递归或非递归扫描目录，可返回相对目录的文件列表或绝对目录的文件列表
      *
-     * @param  string      $dir         目录
-     * @param  bool        $recursive   是否递归扫描子目录
-     * @param  bool|string $relative    是否返回相对目录，如果为true则返回相对目录，如果为false则返回绝对目录
-     * @param  bool        $include_dir 非递归模式下，是否包含目录
-     * @return array|false
+     * @param string      $dir         目录
+     * @param bool        $recursive   是否递归扫描子目录
+     * @param bool|string $relative    是否返回相对目录，如果为true则返回相对目录，如果为false则返回绝对目录
+     * @param bool        $include_dir 非递归模式下，是否包含目录
      * @since 2.5
      */
-    public static function scanDirFiles(string $dir, bool $recursive = true, $relative = false, bool $include_dir = false)
+    public static function scanDirFiles(string $dir, bool $recursive = true, bool|string $relative = false, bool $include_dir = false): array|false
     {
         $dir = zm_dir($dir);
         // 不是目录不扫，直接 false 处理
@@ -114,26 +113,26 @@ class FileSystem
      * @param  bool|string $return_path_value 是否返回文件路径，返回文件路径的话传入字符串
      * @return string[]
      */
-    public static function getClassesPsr4(string $dir, string $base_namespace, $rule = null, $return_path_value = false): array
+    public static function getClassesPsr4(string $dir, string $base_namespace, mixed $rule = null, bool|string $return_path_value = false): array
     {
         // 预先读取下composer的file列表
         $composer = ZMUtil::getComposerMetadata();
         $classes = [];
         // 扫描目录，使用递归模式，相对路径模式，因为下面此路径要用作转换成namespace
-        $files = FileSystem::scanDirFiles($dir, true, true);
+        $files = self::scanDirFiles($dir, true, true);
         foreach ($files as $v) {
             $pathinfo = pathinfo($v);
             if (($pathinfo['extension'] ?? '') == 'php') {
                 $path = rtrim($dir, '/') . '/' . rtrim($pathinfo['dirname'], './') . '/' . $pathinfo['basename'];
 
                 // 过滤不包含类的文件
-                $tokens = token_get_all(file_get_contents($path));
+                $tokens = \PhpToken::tokenize(file_get_contents($path));
                 $found = false;
                 foreach ($tokens as $token) {
-                    if (!is_array($token)) {
+                    if (!$token instanceof \PhpToken) {
                         continue;
                     }
-                    if ($token[0] === T_CLASS) {
+                    if ($token->is(T_CLASS)) {
                         $found = true;
                         break;
                     }

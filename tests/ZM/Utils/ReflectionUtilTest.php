@@ -34,9 +34,8 @@ class ReflectionUtilTest extends TestCase
 
     /**
      * @dataProvider provideTestVariableToString
-     * @param mixed $variable
      */
-    public function testVariableToString($variable, string $expected): void
+    public function testVariableToString(mixed $variable, string $expected): void
     {
         $this->assertSame($expected, ReflectionUtil::variableToString($variable));
     }
@@ -61,9 +60,8 @@ class ReflectionUtilTest extends TestCase
 
     /**
      * @dataProvider provideTestGetCallReflector
-     * @param mixed $callback
      */
-    public function testGetCallReflector($callback, \ReflectionFunctionAbstract $expected): void
+    public function testGetCallReflector(mixed $callback, \ReflectionFunctionAbstract $expected): void
     {
         $this->assertEquals($expected, ReflectionUtil::getCallReflector($callback));
     }

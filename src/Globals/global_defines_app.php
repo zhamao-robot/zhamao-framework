@@ -84,5 +84,5 @@ define('ZM_STATE_DIR', TMP_DIR . '/.zm_' . sha1(ZM_INIT_TIME . FRAMEWORK_ROOT_DI
     && define('SWOOLE_HOOK_NATIVE_CURL', 4096)
     && define('SWOOLE_HOOK_BLOCKING_FUNCTION', 8192)
     && define('SWOOLE_HOOK_SOCKETS', 16384)
-    && define('SWOOLE_HOOK_ALL', 2147481599)
+    && define('SWOOLE_HOOK_ALL', 2_147_481_599)
 );

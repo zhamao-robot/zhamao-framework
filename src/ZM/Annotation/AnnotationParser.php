@@ -138,7 +138,7 @@ class AnnotationParser
 
                 // 预处理0：排除所有非继承于 AnnotationBase 的注解
                 if (!$vs instanceof AnnotationBase) {
-                    logger()->notice(get_class($vs) . ' is not extended from ' . AnnotationBase::class);
+                    logger()->notice($vs::class . ' is not extended from ' . AnnotationBase::class);
                     continue;
                 }
 
@@ -172,7 +172,7 @@ class AnnotationParser
                 foreach ($methods_annotations as $method_anno) {
                     // 预处理3.0：排除所有非继承于 AnnotationBase 的注解
                     if (!$method_anno instanceof AnnotationBase) {
-                        logger()->notice('Binding annotation ' . get_class($method_anno) . ' to ' . $v . '::' . $method_name . ' is not extended from ' . AnnotationBase::class);
+                        logger()->notice('Binding annotation ' . $method_anno::class . ' to ' . $v . '::' . $method_name . ' is not extended from ' . AnnotationBase::class);
                         continue;
                     }
 
@@ -225,11 +225,11 @@ class AnnotationParser
                 if ($class_annotation instanceof ErgodicAnnotation) {
                     continue;
                 }
-                $o[get_class($class_annotation)][] = $class_annotation;
+                $o[$class_annotation::class][] = $class_annotation;
             }
             foreach (($obj['methods_annotations'] ?? []) as $methods_annotations) {
                 foreach ($methods_annotations as $annotation) {
-                    $o[get_class($annotation)][] = $annotation;
+                    $o[$annotation::class][] = $annotation;
                 }
             }
         }
@@ -238,7 +238,7 @@ class AnnotationParser
 
     public function parseSpecial($annotation, $same_method_annotations = null): ?bool
     {
-        foreach (($this->special_parsers[get_class($annotation)] ?? []) as $parser) {
+        foreach (($this->special_parsers[$annotation::class] ?? []) as $parser) {
             $result = $parser($annotation, $same_method_annotations);
             if (is_bool($result)) {
                 return $result;

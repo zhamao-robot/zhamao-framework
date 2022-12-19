@@ -19,26 +19,18 @@ use ZM\Annotation\AnnotationBase;
 #[\Attribute(\Attribute::IS_REPEATABLE | \Attribute::TARGET_METHOD)]
 class Route extends AnnotationBase
 {
-    /**
-     * @Required()
-     */
-    public string $route = '';
-
-    public string $name = '';
-
-    public array $request_method = ['GET', 'POST'];
-
-    /**
-     * Routing path params binding. eg. {"id"="\d+"}
-     */
-    public array $params = [];
-
-    public function __construct($route, $name = '', $request_method = ['GET', 'POST'], $params = [])
-    {
-        $this->route = $route;
-        $this->name = $name;
-        $this->request_method = $request_method;
-        $this->params = $params;
+    public function __construct(
+        /**
+         * @Required()
+         */
+        public $route,
+        public $name = '',
+        public $request_method = ['GET', 'POST'],
+        /**
+         * Routing path params binding. eg. {"id"="\d+"}
+         */
+        public $params = []
+    ) {
     }
 
     public static function make($route, $name = '', $request_method = ['GET', 'POST'], $params = []): static
