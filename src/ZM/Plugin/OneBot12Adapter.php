@@ -123,7 +123,6 @@ class OneBot12Adapter extends ZMPlugin
      */
     public function handleWSReverseOpen(WebSocketOpenEvent $event): void
     {
-        logger()->info('收到握手请求：' . json_encode($event->getRequest()->getHeaders(), JSON_PRETTY_PRINT));
         // 判断是不是 OneBot 12 反向 WS 连进来的，通过 Sec-WebSocket-Protocol 头
         $line = explode('.', $event->getRequest()->getHeaderLine('Sec-WebSocket-Protocol'), 2);
         if ($line[0] === '12') {

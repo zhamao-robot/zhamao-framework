@@ -24,7 +24,6 @@ class WSEventListener
      */
     public function onWebSocketOpen(WebSocketOpenEvent $event): void
     {
-        logger()->info('接入连接: ' . $event->getFd());
         // 计数，最多只能接入 1024 个连接，为了适配多进程
         if (!ConnectionUtil::addConnection($event->getFd(), [])) {
             $event->withResponse(HttpFactory::createResponse(503));
