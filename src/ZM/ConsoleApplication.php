@@ -28,7 +28,19 @@ final class ConsoleApplication extends Application
         }
 
         // 初始化命令
-        $command_classes = FileSystem::getClassesPsr4(zm_dir('src/ZM/Command'), 'ZM\\Command');
+        $command_classes = [];
+        // 先加载框架内置命令
+        $command_classes = array_merge(
+            $command_classes,
+            FileSystem::getClassesPsr4(FRAMEWORK_ROOT_DIR . '/src/ZM/Command', 'ZM\\Command')
+        );
+        // 再加载用户自定义命令（如存在）
+        if (is_dir(zm_dir('src/Command'))) {
+            $command_classes = array_merge(
+                $command_classes,
+                FileSystem::getClassesPsr4(zm_dir('src/Command'), 'Command')
+            );
+        }
         $commands = [];
         foreach ($command_classes as $command_class) {
             try {
