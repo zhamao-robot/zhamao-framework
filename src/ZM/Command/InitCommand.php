@@ -44,11 +44,7 @@ class InitCommand extends Command
                         'Module\\' => 'src/Module',
                         'Custom\\' => 'src/Custom',
                     ],
-                    'files' => [
-                        'src/Globals/global_functions.php',
-                        'src/Globals/global_defines_app.php',
-                        'src/Globals/global_class_alias.php',
-                    ],
+                    'files' => [],
                 ];
 
                 $section->write('<fg=gray>更新 composer.json ... </>');
@@ -119,7 +115,6 @@ class InitCommand extends Command
             '/zhamao',
             '/.gitignore',
             '/config/*',
-            '/src/Globals/*.php',
         ];
 
         return $this->getFilesFromPatterns($patterns);
