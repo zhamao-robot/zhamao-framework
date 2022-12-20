@@ -49,7 +49,6 @@ class ConnectionUtil
      */
     public static function setConnection(int $fd, array $handle): void
     {
-        logger()->notice('设置连接情况：' . json_encode($handle));
         self::$connection_handles[$fd] = array_merge(self::$connection_handles[$fd] ?? [], $handle);
         // 这里下面为连接准入，允许接入反向 WS
         if (ProcessStateManager::$process_mode['worker'] > 1) {
