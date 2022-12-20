@@ -9,6 +9,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use ZM\Exception\InitException;
+use ZM\Utils\ZMUtil;
 
 #[AsCommand(name: 'init', description: '初始化框架运行的基础文件')]
 class InitCommand extends Command
@@ -185,7 +186,7 @@ class InitCommand extends Command
     private function getVendorPath(string $file): string
     {
         try {
-            $package_name = json_decode(file_get_contents(__DIR__ . '/../../../composer.json'), true, 512, JSON_THROW_ON_ERROR)['name'];
+            $package_name = ZMUtil::getComposerMetadata()['name'];
         } catch (\JsonException) {
             throw new InitException('无法读取框架包的 composer.json', '请检查框架包完整性，或者重新安装框架包');
         }
