@@ -6,11 +6,11 @@ use OneBot\Driver\Coroutine\Adaptive;
 use OneBot\Driver\Coroutine\CoroutineInterface;
 use OneBot\Driver\Process\ExecutionResult;
 use OneBot\V12\Object\MessageSegment;
+use OneBot\V12\Object\OneBotEvent;
 use Psr\Log\LoggerInterface;
 use ZM\Config\ZMConfig;
 use ZM\Container\Container;
 use ZM\Container\ContainerInterface;
-use ZM\Context\Context;
 use ZM\Logger\ConsoleLogger;
 use ZM\Middleware\MiddlewareHandler;
 use ZM\Store\Database\DBException;
@@ -68,6 +68,9 @@ function zm_internal_errcode(int|string $code): string
     return "[ErrCode:{$code}] ";
 }
 
+/**
+ * 返回当前炸毛实例的 ID
+ */
 function zm_instance_id(): string
 {
     if (defined('ZM_INSTANCE_ID')) {
@@ -99,11 +102,6 @@ function logger(): LoggerInterface
 function is_assoc_array(array $array): bool
 {
     return !empty($array) && array_keys($array) !== range(0, count($array) - 1);
-}
-
-function ctx(): Context
-{
-    return \container()->get('ctx');
 }
 
 /**
@@ -207,4 +205,14 @@ function config(array|string $key = null, mixed $default = null)
         return;
     }
     return $config->get($key, $default);
+}
+
+function bot(): ZM\Context\BotContext
+{
+    if (\container()->has('bot.event')) {
+        /** @var OneBotEvent $bot_event */
+        $bot_event = \container()->get('bot.event');
+        return new \ZM\Context\BotContext($bot_event->self['user_id'] ?? '', $bot_event->self['platform']);
+    }
+    return new \ZM\Context\BotContext('', '');
 }

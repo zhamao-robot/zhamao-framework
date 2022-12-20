@@ -11,11 +11,15 @@ class_alias(\ZM\Annotation\Middleware\Middleware::class, 'Middleware');
 class_alias(\ZM\Annotation\OneBot\BotCommand::class, 'BotCommand');
 class_alias(\ZM\Annotation\OneBot\BotEvent::class, 'BotEvent');
 class_alias(\ZM\Annotation\OneBot\CommandArgument::class, 'CommandArgument');
+class_alias(\ZM\Annotation\OneBot\BotAction::class, 'BotAction');
+class_alias(\ZM\Annotation\OneBot\BotActionResponse::class, 'BotActionResponse');
 class_alias(\ZM\Annotation\Closed::class, 'Closed');
 class_alias(\ZM\Plugin\ZMPlugin::class, 'ZMPlugin');
+class_alias(\ZM\Context\BotContext::class, 'BotContext');
 
 // 下面是 OneBot 相关类的全局别称
 class_alias(\OneBot\Driver\Event\WebSocket\WebSocketOpenEvent::class, 'WebSocketOpenEvent');
 class_alias(\OneBot\Driver\Event\WebSocket\WebSocketCloseEvent::class, 'WebSocketCloseEvent');
 class_alias(\OneBot\Driver\Event\WebSocket\WebSocketMessageEvent::class, 'WebSocketMessageEvent');
 class_alias(\OneBot\Driver\Event\Http\HttpRequestEvent::class, 'HttpRequestEvent');
+class_alias(\OneBot\V12\Object\OneBotEvent::class, 'OneBotEvent');
