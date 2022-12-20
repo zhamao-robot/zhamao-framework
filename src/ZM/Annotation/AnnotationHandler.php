@@ -41,7 +41,7 @@ class AnnotationHandler
     public function __construct(string $annotation_class)
     {
         $this->annotation_class = $annotation_class;
-        logger()->debug('开始分发注解 {annotation}', ['annotation' => $annotation_class]);
+        logger()->debug('声明注解分发器 {annotation}', ['annotation' => $annotation_class]);
     }
 
     /**
@@ -88,6 +88,7 @@ class AnnotationHandler
      */
     public function handleAll(mixed ...$params)
     {
+        logger()->debug('开始分发注解 ' . $this->annotation_class);
         try {
             // 遍历注册的注解
             foreach ((AnnotationMap::$_list[$this->annotation_class] ?? []) as $v) {

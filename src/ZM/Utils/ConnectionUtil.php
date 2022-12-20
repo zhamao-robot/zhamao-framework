@@ -49,6 +49,7 @@ class ConnectionUtil
      */
     public static function setConnection(int $fd, array $handle): void
     {
+        logger()->notice('设置连接情况：' . json_encode($handle));
         self::$connection_handles[$fd] = array_merge(self::$connection_handles[$fd] ?? [], $handle);
         // 这里下面为连接准入，允许接入反向 WS
         if (ProcessStateManager::$process_mode['worker'] > 1) {
@@ -71,5 +72,16 @@ class ConnectionUtil
             // 文件名格式为 .WS{fd}.{pid}，文件内容是 impl 名称的 JSON 格式
             @unlink(zm_dir(ZM_STATE_DIR . '/.WS' . $fd . '.' . ProcessManager::getProcessId()));
         }
+    }
+
+    /**
+     * 获取记录连接内容的特殊信息
+     *
+     * @param  int        $fd WS 连接 ID
+     * @return null|mixed
+     */
+    public static function getConnection(int $fd)
+    {
+        return self::$connection_handles[$fd] ?? null;
     }
 }
