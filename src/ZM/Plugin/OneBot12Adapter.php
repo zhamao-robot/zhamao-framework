@@ -189,6 +189,7 @@ class OneBot12Adapter extends ZMPlugin
             // 绑定容器
             container()->instance(OneBotEvent::class, $obj);
             container()->alias(OneBotEvent::class, 'bot.event');
+            container()->bind(BotContext::class, function () { return bot(); });
 
             // 调用 BotEvent 事件
             $handler = new AnnotationHandler(BotEvent::class);
@@ -215,10 +216,6 @@ class OneBot12Adapter extends ZMPlugin
                 return $event->retcode === null || $event->retcode === $resp->retcode;
             });
             $handler->handleAll($resp);
-
-            $act = bot()->getEchoAction($resp->echo);
-            if ($act !== null) {
-            }
         }
     }
 

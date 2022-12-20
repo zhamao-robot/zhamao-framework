@@ -15,6 +15,8 @@ ClassAliasHelper::addAlias(\ZM\Annotation\OneBot\BotEvent::class, 'BotEvent');
 ClassAliasHelper::addAlias(\ZM\Annotation\OneBot\CommandArgument::class, 'CommandArgument');
 ClassAliasHelper::addAlias(\ZM\Annotation\Closed::class, 'Closed');
 ClassAliasHelper::addAlias(\ZM\Plugin\ZMPlugin::class, 'ZMPlugin');
+ClassAliasHelper::addAlias(\OneBot\V12\Object\OneBotEvent::class, 'OneBotEvent');
+ClassAliasHelper::addAlias(\ZM\Context\BotContext::class, 'BotContext');
 
 // 下面是 OneBot 相关类的全局别称
 ClassAliasHelper::addAlias(\OneBot\Driver\Event\WebSocket\WebSocketOpenEvent::class, 'WebSocketOpenEvent');
