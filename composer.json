@@ -48,7 +48,6 @@
         "league/climate": "Display columns and status in terminal"
     },
     "minimum-stability": "dev",
-    "prefer-stable": true,
     "autoload": {
         "psr-4": {
             "ZM\\": "src/ZM"
