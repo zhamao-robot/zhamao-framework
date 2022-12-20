@@ -72,4 +72,15 @@ class ConnectionUtil
             @unlink(zm_dir(ZM_STATE_DIR . '/.WS' . $fd . '.' . ProcessManager::getProcessId()));
         }
     }
+
+    /**
+     * 获取记录连接内容的特殊信息
+     *
+     * @param  int        $fd WS 连接 ID
+     * @return null|mixed
+     */
+    public static function getConnection(int $fd)
+    {
+        return self::$connection_handles[$fd] ?? null;
+    }
 }

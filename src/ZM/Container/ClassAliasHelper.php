@@ -73,4 +73,12 @@ class ClassAliasHelper
     {
         return self::$aliases[$alias]['class'] ?? $alias;
     }
+
+    /**
+     * 获取所有别名定义信息
+     */
+    public static function getAllAlias(): array
+    {
+        return self::$aliases;
+    }
 }

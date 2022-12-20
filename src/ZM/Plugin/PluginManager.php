@@ -43,6 +43,9 @@ class PluginManager
     public static function addPluginsFromDir(string $dir): int
     {
         // 遍历插件目录
+        if (!is_dir($dir)) {
+            return 0;
+        }
         $list = FileSystem::scanDirFiles($dir, false, false, true);
         $cnt = 0;
         foreach ($list as $item) {
@@ -159,6 +162,11 @@ class PluginManager
         throw new PluginException('插件 ' . $meta['name'] . ' 无法加载，因为没有入口文件，也没有自动加载文件和内建 Composer');
     }
 
+    /**
+     * 启用所有插件
+     *
+     * @param AnnotationParser $parser 传入注解解析器，用于将插件中的事件注解解析出来
+     */
     public static function enablePlugins(AnnotationParser $parser): void
     {
         foreach (self::$plugins as $name => $plugin) {
