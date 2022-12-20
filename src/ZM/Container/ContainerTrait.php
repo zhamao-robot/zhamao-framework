@@ -76,6 +76,9 @@ trait ContainerTrait
     public function getAlias(string $abstract): string
     {
         if (!isset(self::$aliases[$abstract])) {
+            if (ClassAliasHelper::isAlias($abstract)) {
+                return $this->getAlias(ClassAliasHelper::getAlias($abstract)['class']);
+            }
             return $abstract;
         }
 
@@ -439,7 +442,13 @@ trait ContainerTrait
      */
     public function getLogPrefix(): string
     {
-        return ($this->log_prefix ?? '[WorkerContainer(U)]') . ' ';
+        $id = spl_object_id($this);
+        // 级联容器的日志前缀为父容器的日志前缀加上当前容器的id
+        if (method_exists($this, 'getParent')) {
+            $parent = $this->getParent();
+            $id = spl_object_id($parent) . '-' . $id;
+        }
+        return "[Container {$id}] ";
     }
 
     /**
