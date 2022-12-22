@@ -36,7 +36,7 @@ jobs:
 
       - name: Generate Doxygen
         if: steps.prepare-doxygen.outcome == 'success'
-        use: mattnotmitt/doxygen-action@v1.9.5
+        uses: mattnotmitt/doxygen-action@v1.9.5
 
       - name: Finishing Doxygen
         if: steps.prepare-doxygen.outcome == 'success'
