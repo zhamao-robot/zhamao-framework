@@ -1,1 +1,0 @@
-# ZM\Entity\CQObject
