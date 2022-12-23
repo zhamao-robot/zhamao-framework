@@ -129,9 +129,6 @@ class FileSystem
                 $tokens = \PhpToken::tokenize(file_get_contents($path));
                 $found = false;
                 foreach ($tokens as $token) {
-                    if (!$token instanceof \PhpToken) {
-                        continue;
-                    }
                     if ($token->is(T_CLASS)) {
                         $found = true;
                         break;
