@@ -32,6 +32,7 @@
         "brainmaestro/composer-git-hooks": "^3.0",
         "friendsofphp/php-cs-fixer": "^3.2 != 3.7.0",
         "jetbrains/phpstorm-attributes": "^1.0",
+        "phpspec/prophecy": "1.x-dev",
         "phpstan/extension-installer": "^1.1",
         "phpstan/phpstan": "^1.1",
         "phpstan/phpstan-deprecation-rules": "^1.0",
@@ -39,6 +40,9 @@
         "phpunit/phpunit": "^8.5 || ^9.0",
         "roave/security-advisories": "dev-latest",
         "swoole/ide-helper": "^4.5"
+    },
+    "replace": {
+        "symfony/polyfill-php80": "*"
     },
     "suggest": {
         "ext-ctype": "Use C/C++ extension instead of polyfill will be more efficient",
@@ -48,6 +52,7 @@
         "league/climate": "Display columns and status in terminal"
     },
     "minimum-stability": "dev",
+    "prefer-stable": true,
     "autoload": {
         "psr-4": {
             "ZM\\": "src/ZM"
@@ -70,11 +75,11 @@
         "bin/zhamao"
     ],
     "config": {
-        "optimize-autoloader": true,
-        "sort-packages": true,
         "allow-plugins": {
             "phpstan/extension-installer": true
-        }
+        },
+        "optimize-autoloader": true,
+        "sort-packages": true
     },
     "extra": {
         "hooks": {

@@ -3,6 +3,7 @@ parameters:
   level: 4
   paths:
     - ./src/
+    - ./tests/
   ignoreErrors:
     - '#Constant .* not found#'
     - '#PHPDoc tag @throws with type Psr\\Container\\ContainerExceptionInterface is not subtype of Throwable#'
