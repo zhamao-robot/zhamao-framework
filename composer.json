@@ -32,6 +32,7 @@
         "brainmaestro/composer-git-hooks": "^3.0",
         "friendsofphp/php-cs-fixer": "^3.2 != 3.7.0",
         "jetbrains/phpstorm-attributes": "^1.0",
+        "mikey179/vfsstream": "^1.6",
         "phpspec/prophecy": "1.x-dev",
         "phpstan/extension-installer": "^1.1",
         "phpstan/phpstan": "^1.1",

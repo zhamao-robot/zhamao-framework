@@ -40,7 +40,6 @@ class CatCodeTest extends TestCase
                 ],
                 '',
             ],
-            'non-string, non-segment, non-array' => [123, ''],
         ];
     }
 
