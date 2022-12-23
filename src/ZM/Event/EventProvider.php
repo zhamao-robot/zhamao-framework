@@ -34,6 +34,7 @@ class EventProvider implements SortedProviderInterface
                 self::$_event_map[$event->class][$event->method][] = $event;
             } elseif (is_array($callback) && is_object($callback[0] ?? '') && is_string($callback[1] ?? null)) {
                 // 如果没有上面两个属性，则可能是回调函数是一个数组，如果是这样，则可以直接使用回调函数
+                self::$_events[$event::class][] = [$level, $callback];
                 self::$_event_map[$callback[0]::class][$callback[1]][] = $event;
                 $event->class = $callback[0]::class;
                 $event->method = $callback[1];
