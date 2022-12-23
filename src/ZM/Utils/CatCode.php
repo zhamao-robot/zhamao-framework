@@ -11,7 +11,7 @@ class CatCode
     /**
      * 从 MessageSegment 转换为 CatCode 字符串
      */
-    public static function fromSegment(mixed $message_segment): string
+    public static function fromSegment(array|MessageSegment|string $message_segment): string
     {
         // 传入的必须是段数组或段对象
         if (is_array($message_segment)) {
@@ -24,13 +24,12 @@ class CatCode
             }
             return $str;
         }
+
         if ($message_segment instanceof MessageSegment) {
             return self::segment2CatCode($message_segment);
         }
-        if (is_string($message_segment)) {
-            return $message_segment;
-        }
-        return '';
+
+        return $message_segment;
     }
 
     /**
