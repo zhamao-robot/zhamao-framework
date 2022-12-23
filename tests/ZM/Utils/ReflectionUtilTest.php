@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\ZM\Utils;
 
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 use ZM\Utils\ReflectionUtil;
 
 /**

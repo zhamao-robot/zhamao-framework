@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\ZM\Config;
 
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 use ZM\Config\ZMConfig;
+use ZM\Exception\ConfigException;
 use ZM\Utils\ReflectionUtil;
 
 /**
@@ -64,9 +65,13 @@ class ZMConfigTest extends TestCase
             '<?php return ["patch" => "yes", "another array" => ["far", "baz"]];'
         );
 
-        $config = new ZMConfig([
-            __DIR__ . '/config_mock',
-        ], 'development');
+        try {
+            $config = new ZMConfig([
+                __DIR__ . '/config_mock',
+            ], 'development');
+        } catch (ConfigException $e) {
+            self::fail($e->getMessage());
+        }
         self::$config = $config;
     }
 
@@ -83,8 +88,8 @@ class ZMConfigTest extends TestCase
     public function testGetValueWhenKeyContainsDot(): void
     {
         $this->markTestSkipped('should it be supported?');
-        $this->assertEquals('c', self::$config->get('test.a.b'));
-        $this->assertEquals('d', self::$config->get('test.a.b.c'));
+//        $this->assertEquals('c', self::$config->get('test.a.b'));
+//        $this->assertEquals('d', self::$config->get('test.a.b.c'));
     }
 
     public function testGetBooleanValue(): void
