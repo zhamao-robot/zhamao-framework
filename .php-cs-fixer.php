@@ -67,6 +67,8 @@ return (new PhpCsFixer\Config())
         'phpdoc_summary' => false,
         'php_unit_test_class_requires_covers' => false,
         'global_namespace_import' => false,
+        'phpdoc_order' => false,
+        'no_useless_concat_operator' => false,
     ])
     ->setFinder(
         PhpCsFixer\Finder::create()
