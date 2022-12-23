@@ -15,10 +15,11 @@ class MessageUtil
      * 将消息段无损转换为 CatCode 字符串
      *
      * @param array $message_segment 消息段
+     * @param bool  $encode_text     是否对文本进行 CatCode 转义
      */
-    public static function arrayToStr(array $message_segment): string
+    public static function arrayToStr(array $message_segment, bool $encode_text = false): string
     {
-        return CatCode::fromSegment($message_segment);
+        return CatCode::fromSegment($message_segment, $encode_text);
     }
 
     /**
