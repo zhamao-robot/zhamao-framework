@@ -11,10 +11,10 @@ class CatCode
     /**
      * 从 MessageSegment 转换为 CatCode 字符串
      *
-     * @param mixed $message_segment MessageSegment 对象或数组
-     * @param bool  $encode_text     是否对文本进行 CatCode 编码（默认为否）
+     * @param array|MessageSegment|string $message_segment MessageSegment 对象或数组
+     * @param bool                        $encode_text     是否对文本进行 CatCode 编码（默认为否）
      */
-    public static function fromSegment(mixed $message_segment, bool $encode_text = false): string
+    public static function fromSegment(string|array|MessageSegment $message_segment, bool $encode_text = false): string
     {
         // 传入的必须是段数组或段对象
         if (is_array($message_segment)) {
@@ -30,10 +30,7 @@ class CatCode
         if ($message_segment instanceof MessageSegment) {
             return self::segment2CatCode($message_segment, $encode_text);
         }
-        if (is_string($message_segment)) {
-            return $message_segment;
-        }
-        return '';
+        return $message_segment;
     }
 
     /**
