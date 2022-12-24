@@ -29,10 +29,18 @@ jobs:
           operating-system: ubuntu-latest
           use-cache: true
 
-      - name: Generate API Docs
-        id: generate-api-docs
+      - name: Prepare Doxygen
+        id: prepare-doxygen
         continue-on-error: true
-        run: bin/gendoc
+        run: bin/prepare-doxygen before
+
+      - name: Generate Doxygen
+        if: steps.prepare-doxygen.outcome == 'success'
+        uses: mattnotmitt/doxygen-action@v1.9.5
+
+      - name: Finishing Doxygen
+        if: steps.prepare-doxygen.outcome == 'success'
+        run: bin/prepare-doxygen after
 
       - name: Commit API Docs
         uses: stefanzweifel/git-auto-commit-action@v4

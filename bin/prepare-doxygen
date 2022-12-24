@@ -1,0 +1,73 @@
+#!/usr/bin/env php
+<?php
+
+function find_valid_root(string $current_dir, int $max_loop): string
+{
+    if ($max_loop <= 0) {
+        return '';
+    }
+    if (!file_exists($current_dir . '/composer.json')) {
+        return find_valid_root(dirname($current_dir), $max_loop - 1);
+    }
+    return $current_dir;
+}
+
+$root = find_valid_root(getcwd(), 3);
+if (empty($root)) {
+    echo '找不到有效的根目录';
+    exit(1);
+}
+
+chdir($root);
+
+require_once $root . '/vendor/autoload.php';
+
+// 获取参数，可为 before 或 after
+$param = $argv[1] ?? 'before';
+
+if ($param === 'before') {
+    // Doxyfile file source: https://pastebin.com/raw/N8tJ9kWE
+    // Posted by: sunxyw
+
+    // 从剪贴板获取 Doxyfile 内容并保存到临时文件
+    logger()->info('正在获取 Doxyfile 内容');
+    $doxyfile = file_get_contents('https://pastebin.com/raw/N8tJ9kWE');
+    $doxyfile = str_replace('<zm_version>', \ZM\Framework::VERSION, $doxyfile);
+    file_put_contents('Doxyfile', $doxyfile);
+
+    // 应用 Awesome 样式
+    // 来源：https://github.com/jothepro/doxygen-awesome-css.git
+    // 优先使用本地文件
+    logger()->info('正在应用 Awesome 样式');
+    \ZM\Store\FileSystem::createDir('doxy/css');
+    if (
+        file_exists('doxy/css/doxygen-awesome.css') &&
+        (md5_file('doxy/css/doxygen-awesome.css') === '326a1447f9693d1b3876f59de837a7c0')
+    ) {
+        logger()->info('本地 Awesome 样式文件已存在，跳过下载');
+    } else {
+        logger()->info('正在下载 Awesome 样式文件');
+        $cmd = [
+            'git clone https://github.com/jothepro/doxygen-awesome-css.git doxy/css',
+            'cd doxy/css',
+            'git checkout v2.1.0',
+            'cd ../..',
+        ];
+        $cmd = implode(' && ', $cmd);
+        exec($cmd);
+    }
+} elseif ($param === 'after') {
+    // 删除临时文件
+    unlink('Doxyfile');
+
+    // 清除旧文档
+    exec('rm -rf docs/.vuepress/public/doxy');
+
+    // 移动新文档到 docs 目录
+    exec('mv doxy/html docs/.vuepress/public/doxy');
+
+    logger()->info('文档生成完成');
+} else {
+    logger()->error('参数错误');
+    exit(1);
+}
