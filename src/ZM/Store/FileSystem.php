@@ -142,7 +142,7 @@ class FileSystem
                     /*if (substr(file_get_contents($dir . '/' . $v), 6, 6) == '#plain') {
                         continue;
                     }*/
-                    if (file_exists($dir . '/' . $pathinfo['basename'] . '.ignore')) {
+                    if (file_exists($dir . '/' . $v . '.ignore')) {
                         continue;
                     }
                     if (mb_substr($pathinfo['basename'], 0, 7) == 'global_' || mb_substr($pathinfo['basename'], 0, 7) == 'script_') {
