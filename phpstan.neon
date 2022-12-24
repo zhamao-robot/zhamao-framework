@@ -10,6 +10,9 @@ parameters:
     - '#Unsafe usage of new static#'
     - '#Call to method initTableList\(\) of deprecated class ZM\\DB\\DB#'
     - '#class Fiber#'
+    - # Ignore Prophesize deprecation bug: https://github.com/phpstan/phpstan-deprecation-rules/issues/76
+      message: '#^Call to deprecated method prophesize\(\) of class Tests\\TestCase#'
+      path: tests
   dynamicConstantNames:
     - SWOOLE_VERSION
     - ZM_TEST_LOG_DEBUG

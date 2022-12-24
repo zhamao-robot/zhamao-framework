@@ -190,7 +190,7 @@ class ZMResultPrinter extends CliTestDoxPrinter
         $out = '';
 
         if ($message) {
-            $out .= $this->prefixLines($prefix['message'], strtolower($message) . PHP_EOL) . PHP_EOL;
+            $out .= $this->prefixLines($prefix['message'], $message . PHP_EOL) . PHP_EOL;
         }
 
         if ($diff) {
