@@ -75,12 +75,12 @@ class FileSystemTest extends TestCase
                 'Qux' => [
                     'Quux.php' => '<?php namespace Bar\Qux; class Quux {}',
                 ],
+                'Baz.php.ignore' => '',
             ],
             'Chore' => [
                 'global.php' => '<?php function global_function() {}',
                 'global_classes.php' => '<?php class GlobalClass {}',
             ],
-            'Baz.php.ignore' => '',
         ], $this->vfs);
         $classes = FileSystem::getClassesPsr4($this->vfs->url(), '');
         $this->assertSame([

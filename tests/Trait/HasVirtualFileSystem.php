@@ -11,8 +11,8 @@ trait HasVirtualFileSystem
 {
     private vfsStreamDirectory $vfs;
 
-    private function setUpVfs(string $dir = 'root'): void
+    private function setUpVfs(string $dir = 'root', array $structure = []): void
     {
-        $this->vfs = vfsStream::setup($dir);
+        $this->vfs = vfsStream::setup($dir, structure: $structure);
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\ZM\Config;
 
 use Tests\TestCase;
+use Tests\Trait\HasVirtualFileSystem;
 use ZM\Config\ZMConfig;
 use ZM\Exception\ConfigException;
 use ZM\Utils\ReflectionUtil;
@@ -14,15 +15,13 @@ use ZM\Utils\ReflectionUtil;
  */
 class ZMConfigTest extends TestCase
 {
-    private static ZMConfig $config;
+    use HasVirtualFileSystem;
 
-    public static function setUpBeforeClass(): void
+    private ZMConfig $config;
+
+    protected function setUp(): void
     {
-        $mock_dir = __DIR__ . '/config_mock';
-        if (!is_dir($mock_dir)) {
-            mkdir($mock_dir, 0755, true);
-        }
-
+        parent::setUp();
         $test_config = [
             'foo' => 'bar',
             'bar' => 'baz',
@@ -49,52 +48,33 @@ class ZMConfigTest extends TestCase
                 'foo', 'bar',
             ],
         ];
-
-        // 下方测试需要临时写入的文件
-        file_put_contents($mock_dir . '/test.php', '<?php return ' . var_export($test_config, true) . ';');
-        file_put_contents(
-            $mock_dir . '/test.development.php',
-            '<?php return ["environment" => "yes", "env" => "development"];'
-        );
-        file_put_contents(
-            $mock_dir . '/test.production.php',
-            '<?php return ["environment" => "yes", "env" => "production"];'
-        );
-        file_put_contents(
-            $mock_dir . '/test.patch.php',
-            '<?php return ["patch" => "yes", "another array" => ["far", "baz"]];'
-        );
+        $this->setUpVfs('config', [
+            'test.php' => '<?php return ' . var_export($test_config, true) . ';',
+            'test.development.php' => '<?php return ["environment" => "yes", "env" => "development"];',
+            'test.production.php' => '<?php return ["environment" => "yes", "env" => "production"];',
+            'test.patch.php' => '<?php return ["patch" => "yes", "another array" => ["far", "baz"]];',
+        ]);
 
         try {
             $config = new ZMConfig([
-                __DIR__ . '/config_mock',
+                $this->vfs->url(),
             ], 'development');
         } catch (ConfigException $e) {
-            self::fail($e->getMessage());
+            $this->fail($e->getMessage());
         }
-        self::$config = $config;
-    }
-
-    public static function tearDownAfterClass(): void
-    {
-        foreach (scandir(__DIR__ . '/config_mock') as $file) {
-            if ($file !== '.' && $file !== '..') {
-                unlink(__DIR__ . '/config_mock/' . $file);
-            }
-        }
-        rmdir(__DIR__ . '/config_mock');
+        $this->config = $config;
     }
 
     public function testGetValueWhenKeyContainsDot(): void
     {
         $this->markTestSkipped('should it be supported?');
-//        $this->assertEquals('c', self::$config->get('test.a.b'));
-//        $this->assertEquals('d', self::$config->get('test.a.b.c'));
+//        $this->assertEquals('c', $this->config->get('test.a.b'));
+//        $this->assertEquals('d', $this->config->get('test.a.b.c'));
     }
 
     public function testGetBooleanValue(): void
     {
-        $this->assertTrue(self::$config->get('test.boolean'));
+        $this->assertTrue($this->config->get('test.boolean'));
     }
 
     /**
@@ -102,7 +82,7 @@ class ZMConfigTest extends TestCase
      */
     public function testGetValue(string $key, mixed $expected): void
     {
-        $this->assertSame($expected, self::$config->get($key));
+        $this->assertSame($expected, $this->config->get($key));
     }
 
     public function providerTestGetValue(): array
@@ -118,31 +98,31 @@ class ZMConfigTest extends TestCase
 
     public function testGetWithDefault(): void
     {
-        $this->assertSame('default', self::$config->get('not_exist', 'default'));
+        $this->assertSame('default', $this->config->get('not_exist', 'default'));
     }
 
     public function testSetValue(): void
     {
-        self::$config->set('key', 'value');
-        $this->assertSame('value', self::$config->get('key'));
+        $this->config->set('key', 'value');
+        $this->assertSame('value', $this->config->get('key'));
     }
 
     public function testSetArrayValue(): void
     {
-        self::$config->set('array', ['a', 'b']);
-        $this->assertSame(['a', 'b'], self::$config->get('array'));
-        $this->assertSame('a', self::$config->get('array.0'));
+        $this->config->set('array', ['a', 'b']);
+        $this->assertSame(['a', 'b'], $this->config->get('array'));
+        $this->assertSame('a', $this->config->get('array.0'));
     }
 
     public function testGetEnvironmentSpecifiedValue(): void
     {
-        $this->assertSame('yes', self::$config->get('test.environment'));
-        $this->assertSame('development', self::$config->get('test.env'));
+        $this->assertSame('yes', $this->config->get('test.environment'));
+        $this->assertSame('development', $this->config->get('test.env'));
     }
 
     public function testGetPatchSpecifiedValue(): void
     {
-        $this->assertSame('yes', self::$config->get('test.patch'));
+        $this->assertSame('yes', $this->config->get('test.patch'));
     }
 
     /**
@@ -151,7 +131,7 @@ class ZMConfigTest extends TestCase
     public function testGetFileLoadType(string $name, string $type): void
     {
         $method = ReflectionUtil::getMethod(ZMConfig::class, 'getFileLoadType');
-        $actual = $method->invokeArgs(self::$config, [$name]);
+        $actual = $method->invokeArgs($this->config, [$name]);
         $this->assertSame($type, $actual);
     }
 
@@ -170,6 +150,6 @@ class ZMConfigTest extends TestCase
     {
         // using of space inside config key is not an officially supported feature,
         // it may be removed in the future, please avoid using it in your project.
-        $this->assertSame(['far', 'baz'], self::$config->get('test.another array'));
+        $this->assertSame(['far', 'baz'], $this->config->get('test.another array'));
     }
 }
