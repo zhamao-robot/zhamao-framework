@@ -28,13 +28,12 @@ class ContainerHolder
     private static function buildContainer(): Container
     {
         $builder = new ContainerBuilder();
-        $sources = [
-            new DI\Definition\Source\ReflectionBasedAutowiring(),
-            new DI\Definition\Source\AttributeBasedAutowiring(),
+        $builder->addDefinitions(
+            new AliasDefinitionSource(),
             new DI\Definition\Source\DefinitionArray(config('container.definitions', [])),
-        ];
-        $source = new DI\Definition\Source\SourceChain($sources);
-        $builder->addDefinitions(new AliasBasedAutowiring($source));
+        );
+        $builder->useAutowiring(true);
+        $builder->useAttributes(true);
         return $builder->build();
     }
 }
