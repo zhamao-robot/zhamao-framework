@@ -6,13 +6,23 @@ namespace ZM\Utils\CodeGenerator;
 
 use ZM\Store\FileSystem;
 
+/**
+ * Class PluginGenerator
+ * 插件脚手架生成器
+ */
 class PluginGenerator
 {
     public function __construct(private string $name, private string $plugin_dir)
     {
     }
 
-    public function generate(array $options)
+    /**
+     * 开始生成
+     *
+     * @param array $options 传入的命令行选项
+     * @return void
+     */
+    public function generate(array $options): void
     {
         // 先检查插件目录是否存在，不存在则创建
         FileSystem::createDir($this->plugin_dir);
@@ -75,6 +85,9 @@ class PluginGenerator
         }
     }
 
+    /**
+     * 根据传入的名称，生成相应的驼峰类名
+     */
     public function convertClassName(): string
     {
         $name = $this->name;
