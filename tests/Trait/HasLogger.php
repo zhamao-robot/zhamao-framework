@@ -5,13 +5,11 @@ declare(strict_types=1);
 namespace Tests\Trait;
 
 use Prophecy\Argument;
-use Prophecy\Prophet;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LogLevel;
 
 /**
  * 模拟 Logger 行为
- * @property Prophet $prophet
  */
 trait HasLogger
 {
@@ -37,7 +35,7 @@ trait HasLogger
 
     private function startMockLogger(): void
     {
-        $logger = $this->prophet->prophesize(AbstractLogger::class);
+        $logger = $this->prophesize(AbstractLogger::class);
         $levels = [
             LogLevel::EMERGENCY,
             LogLevel::ALERT,
@@ -50,9 +48,11 @@ trait HasLogger
         ];
         $log_it = fn (...$args) => $this->mockLog(...$args);
         foreach ($levels as $level) {
-            $logger->{$level}(Argument::type('string'), Argument::any())->will(fn ($args) => $log_it($level, ...$args));
+            $logger->{$level}(Argument::type('string'), Argument::any())
+                ->will(fn ($args) => $log_it($level, ...$args));
         }
-        $logger->log(Argument::in($levels), Argument::type('string'), Argument::any())->will(fn ($args) => $log_it(...$args));
+        $logger->log(Argument::in($levels), Argument::type('string'), Argument::any())
+            ->will(fn ($args) => $log_it(...$args));
         ob_logger_register($logger->reveal());
     }
 }

@@ -35,7 +35,7 @@
         "jangregor/phpstan-prophecy": "^1.0",
         "jetbrains/phpstorm-attributes": "^1.0",
         "mikey179/vfsstream": "^1.6",
-        "phpspec/prophecy": "1.x-dev",
+        "phpspec/prophecy-phpunit": "^2.0",
         "phpstan/extension-installer": "^1.1",
         "phpstan/phpstan": "^1.1",
         "phpstan/phpstan-deprecation-rules": "^1.0",
