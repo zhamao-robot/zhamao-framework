@@ -21,6 +21,7 @@ use OneBot\Driver\Workerman\WorkermanDriver;
 use OneBot\Util\Singleton;
 use ZM\Command\Server\ServerStartCommand;
 use ZM\Config\ZMConfig;
+use ZM\Container\ContainerBindingListener;
 use ZM\Event\Listener\HttpEventListener;
 use ZM\Event\Listener\ManagerEventListener;
 use ZM\Event\Listener\MasterEventListener;
@@ -93,7 +94,7 @@ class Framework
     {
         // 顺序执行引导器
         foreach ($this->bootstrappers as $bootstrapper) {
-            app($bootstrapper)->bootstrap($this->argv);
+            resolve($bootstrapper)->bootstrap($this->argv);
         }
 
         // 初始化 @OnSetup 事件
@@ -221,6 +222,8 @@ class Framework
             $this->printProperties();
             $this->printMotd();
         }
+
+        ContainerBindingListener::listenForEvents();
 
         // 添加框架需要监听的顶层事件监听器
         // worker 事件

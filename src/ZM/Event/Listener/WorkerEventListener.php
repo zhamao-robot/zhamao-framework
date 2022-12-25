@@ -10,7 +10,6 @@ use ZM\Annotation\AnnotationHandler;
 use ZM\Annotation\AnnotationMap;
 use ZM\Annotation\AnnotationParser;
 use ZM\Annotation\Framework\Init;
-use ZM\Container\ContainerServicesProvider;
 use ZM\Exception\ZMKnownException;
 use ZM\Framework;
 use ZM\Plugin\OneBot12Adapter;
@@ -68,9 +67,6 @@ class WorkerEventListener
             $i = ProcessManager::getProcessId();
             logger()->info('WORKER#' . $i . ":\t" . ProcessStateManager::getProcessState(ZM_PROCESS_WORKER, $i));
         }
-
-        // 设置容器，注册容器提供商
-        resolve(ContainerServicesProvider::class)->registerServices('global');
 
         // 注册 Worker 进程遇到退出时的回调，安全退出
         register_shutdown_function(function () {

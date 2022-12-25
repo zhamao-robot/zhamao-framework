@@ -19,7 +19,7 @@ use ZM\Annotation\OneBot\BotActionResponse;
 use ZM\Annotation\OneBot\BotCommand;
 use ZM\Annotation\OneBot\BotEvent;
 use ZM\Annotation\OneBot\CommandArgument;
-use ZM\Container\ContainerServicesProvider;
+use ZM\Container\ContainerRegistrant;
 use ZM\Context\BotContext;
 use ZM\Utils\ConnectionUtil;
 
@@ -33,7 +33,7 @@ class OneBot12Adapter extends ZMPlugin
             case 'onebot12':
                 // 处理所有 OneBot 12 的反向 WS 握手事件
                 $this->addEvent(WebSocketOpenEvent::class, [$this, 'handleWSReverseOpen']);
-                $this->addEvent(\WebSocketMessageEvent::class, [$this, 'handleWSReverseMessage']);
+                $this->addEvent(WebSocketMessageEvent::class, [$this, 'handleWSReverseMessage']);
                 // 在 BotEvent 内处理 BotCommand
                 // $cmd_event = BotEvent::make(type: 'message', level: 15)->on([$this, 'handleBotCommand']);
                 // $this->addBotEvent($cmd_event);
@@ -165,9 +165,6 @@ class OneBot12Adapter extends ZMPlugin
             return;
         }
 
-        // 处理
-        resolve(ContainerServicesProvider::class)->registerServices('message');
-
         // 解析 Frame 到 UTF-8 JSON
         $body = $event->getFrame()->getData();
         $body = json_decode($body, true);
@@ -186,9 +183,7 @@ class OneBot12Adapter extends ZMPlugin
             }
 
             // 绑定容器
-            container()->instance(OneBotEvent::class, $obj);
-            container()->alias(OneBotEvent::class, 'bot.event');
-            container()->bind(BotContext::class, function () { return bot(); });
+            ContainerRegistrant::registerOBEventServices($obj);
 
             // 调用 BotEvent 事件
             $handler = new AnnotationHandler(BotEvent::class);
@@ -206,8 +201,7 @@ class OneBot12Adapter extends ZMPlugin
             $resp->message = $body['message'] ?? '';
             $resp->data = $body['data'] ?? null;
 
-            container()->instance(ActionResponse::class, $resp);
-            container()->alias(ActionResponse::class, 'bot.action.response');
+            ContainerRegistrant::registerOBActionResponseServices($resp);
 
             // 调用 BotActionResponse 事件
             $handler = new AnnotationHandler(BotActionResponse::class);

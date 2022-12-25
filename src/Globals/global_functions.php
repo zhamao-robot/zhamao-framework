@@ -9,8 +9,7 @@ use OneBot\V12\Object\MessageSegment;
 use OneBot\V12\Object\OneBotEvent;
 use Psr\Log\LoggerInterface;
 use ZM\Config\ZMConfig;
-use ZM\Container\Container;
-use ZM\Container\ContainerInterface;
+use ZM\Container\ContainerHolder;
 use ZM\Logger\ConsoleLogger;
 use ZM\Middleware\MiddlewareHandler;
 use ZM\Store\Database\DBException;
@@ -126,41 +125,26 @@ function middleware(): MiddlewareHandler
 // ////////////////// 容器部分 //////////////////////
 
 /**
- * 获取容器（请求级）实例
+ * 获取容器实例
  */
-function container(): ContainerInterface
+function container(): DI\Container
 {
-    return Container::getInstance();
+    return ContainerHolder::getEventContainer();
 }
 
 /**
  * 解析类实例（使用容器）
  *
+ * 这是 {@see container()}->make($abstract, $parameters) 的别名
+ *
  * @template     T
  * @param  class-string<T> $abstract
  * @return Closure|mixed|T
- * @noinspection PhpDocMissingThrowsInspection
  */
 function resolve(string $abstract, array $parameters = [])
 {
     /* @noinspection PhpUnhandledExceptionInspection */
-    return Container::getInstance()->make($abstract, $parameters);
-}
-
-/**
- * 获取容器实例
- *
- * @template T
- * @param  null|class-string<T>               $abstract
- * @return Closure|ContainerInterface|mixed|T
- */
-function app(string $abstract = null, array $parameters = [])
-{
-    if (is_null($abstract)) {
-        return container();
-    }
-
-    return resolve($abstract, $parameters);
+    return container()->make($abstract, $parameters);
 }
 
 /**
