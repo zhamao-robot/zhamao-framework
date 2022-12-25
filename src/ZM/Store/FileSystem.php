@@ -82,7 +82,7 @@ class FileSystem
      */
     public static function createDir(string $path): void
     {
-        if (!is_dir($path) && !mkdir($path, 0777, true) && !is_dir($path)) {
+        if (!is_dir($path) && !mkdir($path, 0755, true) && !is_dir($path)) {
             throw new \RuntimeException(sprintf('无法建立目录：%s', $path));
         }
     }
