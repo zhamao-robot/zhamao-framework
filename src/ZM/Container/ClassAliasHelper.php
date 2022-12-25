@@ -10,7 +10,7 @@ namespace ZM\Container;
 class ClassAliasHelper
 {
     /**
-     * @var array{class:string,alias:string}[]
+     * @var array<string, class-string>
      */
     private static array $aliases = [];
 
@@ -23,7 +23,7 @@ class ClassAliasHelper
     public static function addAlias(string $class, string $alias): void
     {
         class_alias($class, $alias);
-        self::$aliases[$alias] = ['class' => $class, 'alias' => $alias];
+        self::$aliases[$alias] = $class;
     }
 
     /**
@@ -39,10 +39,10 @@ class ClassAliasHelper
     /**
      * 获取别名定义信息
      *
-     * @param  string                                $alias 别名
-     * @return null|array{class:string,alias:string} 如果没有定义则返回 null
+     * @param  string            $alias 别名
+     * @return null|class-string 如果没有定义则返回 null
      */
-    public static function getAlias(string $alias): ?array
+    public static function getAlias(string $alias): ?string
     {
         return self::$aliases[$alias] ?? null;
     }
@@ -50,17 +50,12 @@ class ClassAliasHelper
     /**
      * 根据类名获取别名
      *
-     * @param  string                                $class 类名
-     * @return null|array{class:string,alias:string} 如果没有定义则返回 null
+     * @param  string            $class 类名
+     * @return null|class-string 如果没有定义则返回 null
      */
-    public static function getAliasByClass(string $class): ?array
+    public static function getAliasByClass(string $class): ?string
     {
-        foreach (self::$aliases as $alias) {
-            if ($alias['class'] === $class) {
-                return $alias;
-            }
-        }
-        return null;
+        return array_search($class, self::$aliases, true) ?: null;
     }
 
     /**
@@ -71,7 +66,7 @@ class ClassAliasHelper
      */
     public static function getClass(string $alias): string
     {
-        return self::$aliases[$alias]['class'] ?? $alias;
+        return self::$aliases[$alias] ?? $alias;
     }
 
     /**

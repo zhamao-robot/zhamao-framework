@@ -11,7 +11,7 @@ use OneBot\Driver\Event\WebSocket\WebSocketOpenEvent;
 use OneBot\Util\Singleton;
 use ZM\Annotation\AnnotationHandler;
 use ZM\Annotation\Framework\BindEvent;
-use ZM\Container\ContainerServicesProvider;
+use ZM\Container\ContainerRegistrant;
 use ZM\Exception\Handler;
 use ZM\Utils\ConnectionUtil;
 
@@ -30,22 +30,17 @@ class WSEventListener
             return;
         }
         // 注册容器
-        resolve(ContainerServicesProvider::class)->registerServices('connection');
-        container()->instance(WebSocketOpenEvent::class, $event);
-        container()->alias(WebSocketOpenEvent::class, 'ws.open.event');
+        ContainerRegistrant::registerWSOpenServices($event);
 
         // 调用注解
         $handler = new AnnotationHandler(BindEvent::class);
         $handler->setRuleCallback(fn ($x) => is_a($x->event_class, WebSocketOpenEvent::class, true));
         $handler->handleAll($event);
-
-        resolve(ContainerServicesProvider::class)->cleanup();
     }
 
     public function onWebSocketMessage(WebSocketMessageEvent $event): void
     {
-        container()->instance(WebSocketMessageEvent::class, $event);
-        container()->alias(WebSocketMessageEvent::class, 'ws.message.event');
+        ContainerRegistrant::registerWSMessageServices($event);
         // 调用注解
         try {
             $handler = new AnnotationHandler(BindEvent::class);
@@ -54,8 +49,6 @@ class WSEventListener
         } catch (\Throwable $e) {
             logger()->error("处理 WebSocket 消息时出现异常：{$e->getMessage()}");
             Handler::getInstance()->handle($e);
-        } finally {
-            resolve(ContainerServicesProvider::class)->cleanup();
         }
     }
 
@@ -66,14 +59,12 @@ class WSEventListener
     {
         logger()->info('关闭连接: ' . $event->getFd());
         // 绑定容器
-        container()->instance(WebSocketCloseEvent::class, $event);
-        container()->alias(WebSocketCloseEvent::class, 'ws.close.event');
+        ContainerRegistrant::registerWSCloseServices($event);
         // 调用注解
         $handler = new AnnotationHandler(BindEvent::class);
         $handler->setRuleCallback(fn ($x) => is_a($x->event_class, WebSocketCloseEvent::class, true));
         $handler->handleAll($event);
 
         ConnectionUtil::removeConnection($event->getFd());
-        resolve(ContainerServicesProvider::class)->cleanup();
     }
 }

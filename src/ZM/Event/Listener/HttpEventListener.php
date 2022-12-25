@@ -11,7 +11,7 @@ use OneBot\Util\Singleton;
 use ZM\Annotation\AnnotationHandler;
 use ZM\Annotation\Framework\BindEvent;
 use ZM\Annotation\Http\Route;
-use ZM\Container\ContainerServicesProvider;
+use ZM\Container\ContainerRegistrant;
 use ZM\Exception\ConfigException;
 use ZM\Utils\HttpUtil;
 
@@ -29,7 +29,7 @@ class HttpEventListener
     public function onRequest999(HttpRequestEvent $event)
     {
         // 注册容器
-        resolve(ContainerServicesProvider::class)->registerServices('request', $event);
+        ContainerRegistrant::registerHttpRequestServices($event);
         // TODO: 这里有个bug，如果是用的Workerman+Fiber协程的话，有个前置协程挂起，这里获取到的Event是被挂起的Event对象，触发两次事件才能归正
         // 跑一遍 BindEvent 绑定了 HttpRequestEvent 的注解
         $handler = new AnnotationHandler(BindEvent::class);
@@ -79,6 +79,5 @@ class HttpEventListener
             $response = HttpUtil::handleStaticPage($event->getRequest()->getUri()->getPath());
             $event->withResponse($response);
         }
-        container()->flush();
     }
 }
