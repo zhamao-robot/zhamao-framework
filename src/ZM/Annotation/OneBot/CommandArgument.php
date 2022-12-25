@@ -23,13 +23,14 @@ class CommandArgument extends AnnotationBase implements ErgodicAnnotation
     public string $type = 'string';
 
     /**
-     * @param  string                                    $name        参数名称（可以是中文）
-     * @param  string                                    $description 参数描述（默认为空）
-     * @param  bool                                      $required    参数是否必需，如果是必需，为true（默认为false）
-     * @param  string                                    $prompt      当参数为必需且缺失时，返回给用户的提示输入的消息（默认为"请输入$name"）
-     * @param  string                                    $default     当required为false时，未匹配到参数将自动使用default值（默认为空）
-     * @param  int                                       $timeout     prompt超时时间（默认为60秒）
-     * @throws InvalidArgumentException|ZMKnownException
+     * @param  string                               $name        参数名称（可以是中文）
+     * @param  string                               $description 参数描述（默认为空）
+     * @param  bool                                 $required    参数是否必需，如果是必需，为true（默认为false）
+     * @param  string                               $prompt      当参数为必需且缺失时，返回给用户的提示输入的消息（默认为"请输入$name"）
+     * @param  null|array|\Closure|float|int|string $default     当required为false时，未匹配到参数将自动使用default值（默认为空）
+     * @param  int                                  $timeout     prompt超时时间（默认为60秒）
+     * @throws InvalidArgumentException
+     * @throws ZMKnownException
      */
     public function __construct(
         /**
@@ -40,7 +41,7 @@ class CommandArgument extends AnnotationBase implements ErgodicAnnotation
         string $type = 'string',
         public bool $required = false,
         public string $prompt = '',
-        public string $default = '',
+        public string|\Closure|array|int|float|null $default = '',
         public int $timeout = 60,
         public int $error_prompt_policy = 1
     ) {
@@ -96,6 +97,10 @@ class CommandArgument extends AnnotationBase implements ErgodicAnnotation
         ];
         if (array_key_exists($type, $table)) {
             return $table[$type];
+        }
+        // 说明是自定义类型
+        if (mb_strpos($type, '.') === 0 && mb_strlen($type) >= 2) {
+            return $type;
         }
         throw new ZMKnownException(zm_internal_errcode('E00077') . 'Invalid argument type: ' . $type . ', only support any, string, number and bool !');
     }

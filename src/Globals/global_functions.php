@@ -104,6 +104,54 @@ function is_assoc_array(array $array): bool
 }
 
 /**
+ * 格式匹配
+ */
+function match_pattern(string $pattern, string $subject): bool
+{
+    $pattern = str_replace(['\*', '\\\\.*'], ['.*', '\*'], preg_quote($pattern, '/'));
+    $pattern = '/^' . $pattern . '$/i';
+    return preg_match($pattern, $subject) === 1;
+}
+
+/**
+ * 匹配参数
+ *
+ * @return array|false 成功时返回匹配到的参数数组，失败时返回false
+ */
+function match_args(string $pattern, string $subject)
+{
+    $result = [];
+    if (match_pattern($pattern, $subject)) {
+        if (mb_strpos($pattern, '*') === false) {
+            return [];
+        }
+        $exp = explode('*', $pattern);
+        $i = 0;
+        foreach ($exp as $k => $v) {
+            if (empty($v) && $k === 0) {
+                continue;
+            }
+            if (empty($v) && $k === count($exp) - 1) {
+                $subject .= '^EOL';
+                $v = '^EOL';
+            }
+            $cur_var = '';
+            $ori = $i;
+            while (($a = mb_substr($subject, $i, mb_strlen($v))) !== $v && !empty($a)) {
+                $cur_var .= mb_substr($subject, $i, 1);
+                ++$i;
+            }
+            if ($i !== $ori || $k === 1 || $k === count($exp) - 1) {
+                $result[] = $cur_var;
+            }
+            $i += mb_strlen($v);
+        }
+        return $result;
+    }
+    return false;
+}
+
+/**
  * 构建消息段的助手函数
  *
  * @param string $type 类型

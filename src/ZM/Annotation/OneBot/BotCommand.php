@@ -28,34 +28,32 @@ class BotCommand extends AnnotationBase implements Level
      * @param string[] $alias
      */
     public function __construct(
-        public $name = '',
-        public $match = '',
-        public $pattern = '',
-        public $regex = '',
-        public $start_with = '',
-        public $end_with = '',
-        public $keyword = '',
-        public $alias = [],
-        public $detail_type = '',
-        public $user_id = '',
-        public $group_id = '',
-        public $level = 20
+        public string $name = '',
+        public string $match = '',
+        public string $pattern = '',
+        public string $regex = '',
+        public string $start_with = '',
+        public string $end_with = '',
+        public string $keyword = '',
+        public array $alias = [],
+        public string $detail_type = '',
+        public string $prefix = '',
+        public int $level = 20
     ) {
     }
 
     public static function make(
-        $name = '',
-        $match = '',
-        $pattern = '',
-        $regex = '',
-        $start_with = '',
-        $end_with = '',
-        $keyword = '',
-        $alias = [],
-        $message_type = '',
-        $user_id = '',
-        $group_id = '',
-        $level = 20
+        string $name = '',
+        string $match = '',
+        string $pattern = '',
+        string $regex = '',
+        string $start_with = '',
+        string $end_with = '',
+        string $keyword = '',
+        array $alias = [],
+        string $detail_type = '',
+        string $prefix = '',
+        int $level = 20
     ): BotCommand {
         return new static(...func_get_args());
     }

@@ -10,8 +10,11 @@ use OneBot\Driver\Event\WebSocket\WebSocketMessageEvent;
 use OneBot\Driver\Event\WebSocket\WebSocketOpenEvent;
 use OneBot\V12\Exception\OneBotException;
 use OneBot\V12\Object\ActionResponse;
+use OneBot\V12\Object\MessageSegment;
 use OneBot\V12\Object\OneBotEvent;
 use OneBot\V12\Validator;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use ZM\Annotation\AnnotationHandler;
 use ZM\Annotation\AnnotationMap;
 use ZM\Annotation\AnnotationParser;
@@ -21,10 +24,24 @@ use ZM\Annotation\OneBot\BotEvent;
 use ZM\Annotation\OneBot\CommandArgument;
 use ZM\Container\ContainerRegistrant;
 use ZM\Context\BotContext;
+use ZM\Exception\InterruptException;
+use ZM\Exception\OneBot12Exception;
+use ZM\Exception\WaitTimeoutException;
 use ZM\Utils\ConnectionUtil;
+use ZM\Utils\MessageUtil;
 
 class OneBot12Adapter extends ZMPlugin
 {
+    /**
+     * 缓存待询问参数的队列
+     *
+     * 0: 代表 OneBotEvent 对象，即用于判断是否为同一会话环境
+     * 1: \Generator 生成器，协程，不多讲
+     * 2: BotCommand 注解对象
+     * 3: match_result（array）匹配到一半的结果
+     */
+    private static array $prompt_queue = [];
+
     public function __construct(string $submodule = '', ?AnnotationParser $parser = null)
     {
         parent::__construct(__DIR__);
@@ -35,8 +52,9 @@ class OneBot12Adapter extends ZMPlugin
                 $this->addEvent(WebSocketOpenEvent::class, [$this, 'handleWSReverseOpen']);
                 $this->addEvent(WebSocketMessageEvent::class, [$this, 'handleWSReverseMessage']);
                 // 在 BotEvent 内处理 BotCommand
-                // $cmd_event = BotEvent::make(type: 'message', level: 15)->on([$this, 'handleBotCommand']);
-                // $this->addBotEvent($cmd_event);
+                $this->addBotEvent(BotEvent::make(type: 'message', level: 15)->on([$this, 'handleBotCommand']));
+                // 在 BotEvent 内处理需要等待回复的 CommandArgument
+                $this->addBotEvent(BotEvent::make(type: 'message', level: 20)->on([$this, 'handlePrompt']));
                 // 处理和声明所有 BotCommand 下的 CommandArgument
                 $parser->addSpecialParser(BotCommand::class, [$this, 'parseBotCommand']);
                 // 不需要给列表写入 CommandArgument
@@ -77,30 +95,98 @@ class OneBot12Adapter extends ZMPlugin
     }
 
     /**
-     * 调用 BotCommand 注解的方法
+     * [CALLBACK] 调用 BotCommand 注解的方法
      *
-     * @param BotEvent   $event BotEvent 事件
-     * @param BotContext $ctx   机器人环境上下文
+     * @param  BotContext                  $ctx 机器人环境上下文
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws \Throwable
+     * @throws OneBot12Exception
      */
-    public function handleBotCommand(BotEvent $event, BotContext $ctx)
+    public function handleBotCommand(BotContext $ctx)
     {
-        $handler = new AnnotationHandler(BotCommand::class);
-        $handler->setReturnCallback(function ($result) use ($ctx) {
-            if (is_string($result)) {
-                $ctx->reply($result);
-                return;
-            }
-            try {
-                Validator::validateMessageSegment($result);
-                $ctx->reply($result);
-            } catch (\Throwable) {
-            }
-            if ($ctx->hasReplied()) {
-                AnnotationHandler::interrupt();
-            }
-        });
+        if ($ctx->hasReplied()) {
+            return;
+        }
         // 匹配消息
         $match_result = $this->matchBotCommand($ctx->getEvent());
+        if ($match_result === null) {
+            return;
+        }
+        // 匹配成功，检查 CommandArguments
+        /** @var BotCommand $command */
+        $command = $match_result[0];
+        $arguments = $this->matchCommandArguments($match_result[1], $command);
+        // 返回的是生成器，说明有需要询问的参数
+        if ($arguments instanceof \Generator) {
+            /** @var null|CommandArgument $argument */
+            $argument = $arguments->current();
+            if ($argument === null) {
+                // 是 null 表明返回了空生成器，说明参数都已经匹配完毕
+                $ctx->setParams($arguments->getReturn());
+                $this->callBotCommand($ctx, $command);
+                return;
+            }
+            $message = MessageSegment::text($argument->prompt === '' ? ('请输入' . $argument->name) : $argument->prompt);
+            $ctx->reply([$message]);
+            // 然后将此事件放入等待队列
+            self::$prompt_queue[] = [$ctx->getEvent(), $arguments, $command, $match_result];
+            return;
+        }
+        $ctx->setParams($arguments);
+        // 调用方法
+        $this->callBotCommand($ctx, $command);
+    }
+
+    /**
+     * [CALLBACK] 处理需要等待回复的 CommandArgument
+     *
+     * @param  BotContext                  $ctx 机器人上下文
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws OneBot12Exception
+     * @throws \Throwable
+     */
+    public function handlePrompt(BotContext $ctx)
+    {
+        // 需要先从队列里找到定义当前会话的 prompt
+        // 定义一个会话的标准是：事件的 detail_type，user_id，[group_id]，[guild_id，channel_id] 全部相同
+        $new_event = $ctx->getEvent();
+        foreach (self::$prompt_queue as $k => $v) {
+            /** @var OneBotEvent $old_event */
+            $old_event = $v[0];
+            if ($old_event->detail_type !== $new_event->detail_type) {
+                continue;
+            }
+            $matched = match ($old_event->detail_type) {
+                'private' => $new_event->getUserId() === $old_event->getUserId(),
+                'group' => $new_event->getGroupId() === $old_event->getGroupId(),
+                'guild' => $new_event->getGuildId() === $old_event->getGuildId() && $new_event->getChannelId() === $old_event->getChannelId(),
+                default => false,
+            };
+            if (!$matched) {
+                continue;
+            }
+            array_splice(self::$prompt_queue, $k, 1);
+            // 找到了，开始处理
+            /** @var \Generator $arguments */
+            $arguments = $v[1];
+            $new_arguments = $arguments->send($new_event->getMessage());
+            if ($new_arguments !== null || $arguments->valid()) {
+                // 还有需要询问的参数
+                /** @var CommandArgument $argument */
+                $argument = $arguments->current();
+                $message = MessageSegment::text($argument->prompt === '' ? ('请输入' . $argument->name) : $argument->prompt);
+                $ctx->reply([$message]);
+                // 然后将此事件放入等待队列
+                self::$prompt_queue[] = [$ctx->getEvent(), $arguments, $v[2], $v[3]];
+            } else {
+                // 所有参数都已经获取到了，调用方法
+                $ctx->setParams($arguments->getReturn());
+                $this->callBotCommand($ctx, $v[2]);
+            }
+            return;
+        }
     }
 
     /**
@@ -118,8 +204,10 @@ class OneBot12Adapter extends ZMPlugin
     }
 
     /**
-     * 接入和认证反向 WS 的连接
+     * [CALLBACK] 接入和认证反向 WS 的连接
+     *
      * @throws StopException
+     * @throws \JsonException
      */
     public function handleWSReverseOpen(WebSocketOpenEvent $event): void
     {
@@ -151,7 +239,7 @@ class OneBot12Adapter extends ZMPlugin
     }
 
     /**
-     * 处理 WebSocket 消息
+     * [CALLBACK] 处理 WebSocket 消息
      *
      * @param  WebSocketMessageEvent $event 事件对象
      * @throws OneBotException
@@ -177,7 +265,7 @@ class OneBot12Adapter extends ZMPlugin
             // 如果含有 type，detail_type 字段，表明是 event
             try {
                 $obj = new OneBotEvent($body);
-            } catch (OneBotException $e) {
+            } catch (OneBotException) {
                 logger()->debug('收到非 OneBot 12 标准的消息，已忽略');
                 return;
             }
@@ -192,7 +280,11 @@ class OneBot12Adapter extends ZMPlugin
                     && ($event->sub_type === null || $event->sub_type === $obj->sub_type)
                     && ($event->detail_type === null || $event->detail_type === $obj->detail_type);
             });
-            $handler->handleAll($obj);
+            try {
+                $handler->handleAll($obj);
+            } catch (WaitTimeoutException $e) {
+                bot()->reply($e->getMessage());
+            }
         } elseif (isset($body['status'], $body['retcode'])) {
             // 如果含有 status，retcode 字段，表明是 action 的 response
             $resp = new ActionResponse();
@@ -212,11 +304,325 @@ class OneBot12Adapter extends ZMPlugin
         }
     }
 
-    private function matchBotCommand(OneBotEvent $event): array
+    /**
+     * 根据事件匹配规则
+     *
+     * @param OneBotEvent $event 事件对象
+     */
+    public function matchBotCommand(OneBotEvent $event): ?array
     {
+        /** @var BotCommand[] $ls */
         $ls = AnnotationMap::$_list[BotCommand::class] ?? [];
-        $msg = $event->getMessageString();
-        // TODO: 还没写完匹配 BotCommand
-        return [];
+        $msgs = $event->getMessage();
+        $head = '';
+        $cmd_explode = [];
+        $full_str = '';
+        foreach ($msgs as $segment) {
+            /** @param \MessageSegment $segment */
+            if ($segment->type !== 'text') {
+                if ($head === '') {
+                    continue;
+                }
+                $cmd_explode[] = $segment;
+                continue;
+            }
+            // 当没识别到命令头的时候，就当作命令头识别
+            if ($head === '') {
+                $text = $segment->data['text'];
+                $full_str .= $text;
+                // 切分字符串
+                $nlp = MessageUtil::splitMessage(str_replace("\r", '', $text));
+                // 啥也没有，分个锤子
+                if (empty($nlp)) {
+                    continue;
+                }
+                // 先预留一个给分组而配置的空间
+                $cmd_explode = $nlp;
+                $head = $nlp[0];
+            } else {
+                $full_str .= $segment->data['text'];
+                // 如果已经识别到了命令头，就当作命令体识别
+                $nlp = MessageUtil::splitMessage(str_replace("\r", '', $segment->data['text']));
+                if (empty($nlp)) {
+                    continue;
+                }
+                $cmd_explode = array_merge($cmd_explode, $nlp);
+            }
+            // 先匹配
+        }
+        if ($head === '') {
+            return null;
+        }
+        // 遍历所有 BotCommand 注解
+        foreach ($ls as $v) {
+            /** @var BotCommand $v */
+            // 测试 deatil_type
+            if ($v->detail_type !== '' && $v->detail_type !== $event->detail_type) {
+                continue;
+            }
+            // 测试 prefix
+            if ($v->prefix !== '' && mb_strpos($full_str, $v->prefix) !== 0) {
+                continue;
+            }
+            // 测试 match
+            if ($v->match !== '' && $v->match === $head) {
+                array_shift($cmd_explode);
+                return [$v, $cmd_explode, $full_str];
+            }
+            // 测试 alias
+            if ($v->match !== '' && $v->alias !== [] && in_array($head, $v->alias, true)) {
+                array_shift($cmd_explode);
+                return [$v, $cmd_explode, $full_str];
+            }
+            // 测试 pattern
+            if ($v->pattern !== '' && ($args = match_args($v->pattern, $full_str)) !== false) {
+                return [$v, $args, $full_str];
+            }
+            // 测试 regex
+            if ($v->regex !== '' && preg_match('/' . $v->regex . '/u', $full_str, $match) !== 0) {
+                return [$v, $match, $full_str];
+            }
+            // 测试 start_with
+            if ($v->start_with !== '' && mb_strpos($full_str, $v->start_with) === 0) {
+                return [$v, [mb_substr($full_str, mb_strlen($v->start_with))], $full_str];
+            }
+            // 测试 end_with
+            if ($v->end_with !== '' && mb_substr($full_str, 0 - mb_strlen($v->end_with)) === $v->end_with) {
+                return [$v, [mb_substr($full_str, 0, 0 - mb_strlen($v->end_with))], $full_str];
+            }
+            // 测试 keyword
+            if ($v->keyword !== '' && mb_strpos($full_str, $v->keyword) !== false) {
+                return [$v, explode($v->keyword, $full_str), $full_str];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * 根据匹配结果和 CommandArgument 进行匹配
+     *
+     * @param  array                $match_result 匹配结果的引用
+     * @param  BotCommand           $cmd          注解对象
+     * @return array|\Generator     返回 array 时为匹配结果，返回 Generator 时为等待结果
+     * @throws WaitTimeoutException
+     */
+    private function matchCommandArguments(array $match_result, BotCommand $cmd): array|\Generator
+    {
+        $arguments = [];
+        /** @var CommandArgument $argument */
+        foreach ($cmd->getArguments() as $argument) {
+            switch ($argument->type) {
+                case 'string':
+                case 'any':
+                case 'str':
+                    $cnt = count($match_result);
+                    for ($k = 0; $k < $cnt; ++$k) {
+                        $v = $match_result[$k];
+                        if (is_string($v)) {
+                            array_splice($match_result, $k, 1);
+                            $arguments[$argument->name] = $v;
+                            break 2;
+                        }
+                    }
+                    if ($argument->required) {
+                        // 不够用，且是必需的，就询问用户（这里可能还需要考虑没有协程环境怎么处理）
+                        $g = yield $argument;
+                        foreach ($g as $v) {
+                            if ($v instanceof MessageSegment && $v->type === 'text') {
+                                $arguments[$argument->name] = $v->data['text'];
+                                break 2;
+                            }
+                            if (is_string($v)) {
+                                $arguments[$argument->name] = $v;
+                                break 2;
+                            }
+                        }
+                        if ($argument->error_prompt_policy === 1) {
+                            $prompt = $argument->getTypeErrorPrompt() . "\n" . $argument->prompt;
+                            $clone_argument = clone $argument;
+                            $clone_argument->prompt = $prompt;
+                            $g = yield $clone_argument;
+                            foreach ($g as $v) {
+                                if ($v instanceof MessageSegment && $v->type === 'text') {
+                                    $arguments[$argument->name] = $v->data['text'];
+                                    break 2;
+                                }
+                                if (is_string($v)) {
+                                    $arguments[$argument->name] = $v;
+                                    break 2;
+                                }
+                            }
+                        }
+                        throw new WaitTimeoutException($cmd->name, $argument->getErrorQuitPrompt());
+                    } else {
+                        // 非必需，就使用缺省值
+                        $arguments[$argument->name] = $argument->default;
+                    }
+                    break;
+                case 'number':
+                    $cnt = count($match_result);
+                    // 遍历现存的参数列表，找到第一个数字
+                    for ($k = 0; $k < $cnt; ++$k) {
+                        $v = $match_result[$k];
+                        if (is_numeric($v)) {
+                            array_splice($match_result, $k, 1);
+                            $arguments[$argument->name] = $v / 1;
+                            break 2;
+                        }
+                    }
+                    // 找不到就看看是不是必需的，如果不是必需的，且缺省值是数字，那么就顶上
+                    if (!$argument->required && is_numeric($argument->default)) {
+                        $arguments[$argument->name] = $argument->default / 1;
+                        break;
+                    }
+                    // 到这里还没找到，就说明需要询问用户了
+                    $g = yield $argument;
+                    foreach ($g as $v) {
+                        if (is_numeric($v)) {
+                            $arguments[$argument->name] = $v / 1;
+                            break 2;
+                        }
+                        if ($v instanceof MessageSegment && $v->type === 'text') {
+                            if (is_numeric($v->data['text'])) {
+                                $arguments[$argument->name] = $v->data['text'] / 1;
+                                break 2;
+                            }
+                        }
+                    }
+                    if ($argument->error_prompt_policy === 1) {
+                        $prompt = $argument->getTypeErrorPrompt() . "\n" . $argument->prompt;
+                        $clone_argument = clone $argument;
+                        $clone_argument->prompt = $prompt;
+                        $g = yield $clone_argument;
+                        foreach ($g as $v) {
+                            if (is_numeric($v)) {
+                                $arguments[$argument->name] = $v / 1;
+                                break 2;
+                            }
+                            if ($v instanceof MessageSegment && $v->type === 'text') {
+                                if (is_numeric($v->data['text'])) {
+                                    $arguments[$argument->name] = $v->data['text'] / 1;
+                                    break 2;
+                                }
+                            }
+                        }
+                    }
+                    throw new WaitTimeoutException($cmd->name, $argument->getErrorQuitPrompt());
+                case 'bool':
+                    // 先遍历参数，找到具有布尔值参数的语言
+                    $cnt = count($match_result);
+                    for ($k = 0; $k < $cnt; ++$k) {
+                        $v = $match_result[$k];
+                        // 看看有没有true值
+                        if (in_array(strtolower($v), TRUE_LIST, true)) {
+                            array_splice($match_result, $k, 1);
+                            $arguments[$argument->name] = true;
+                            break 2;
+                        }
+                        // 看看有没有false值
+                        if (in_array(strtolower($v), FALSE_LIST, true)) {
+                            array_splice($match_result, $k, 1);
+                            $arguments[$argument->name] = false;
+                            break 2;
+                        }
+                    }
+                    // 如果不是必需的，那就使用缺省值
+                    if (!$argument->required) {
+                        $arguments[$argument->name] = in_array($argument->default === '' ? true : 'true', TRUE_LIST);
+                        break;
+                    }
+                    // 到这里还没找到，就说明需要询问用户了
+                    $g = yield $argument;
+                    if (in_array(strtolower($g), TRUE_LIST, true)) {
+                        $arguments[$argument->name] = true;
+                    } elseif (in_array(strtolower($g), FALSE_LIST, true)) {
+                        $arguments[$argument->name] = false;
+                    } else {
+                        if ($argument->error_prompt_policy === 1) {
+                            $prompt = $argument->getTypeErrorPrompt() . "\n" . $argument->prompt;
+                            $clone_argument = clone $argument;
+                            $clone_argument->prompt = $prompt;
+                            $g = yield $clone_argument;
+                            if (in_array(strtolower($g), TRUE_LIST, true)) {
+                                $arguments[$argument->name] = true;
+                            } elseif (in_array(strtolower($g), FALSE_LIST, true)) {
+                                $arguments[$argument->name] = false;
+                            } else {
+                                throw new WaitTimeoutException($cmd->name, $argument->getErrorQuitPrompt());
+                            }
+                        } else {
+                            throw new WaitTimeoutException($cmd->name, $argument->getErrorQuitPrompt());
+                        }
+                    }
+                    break;
+                default:
+                    // 其他类型，处理富文本
+                    $msg_type = mb_substr($argument->type, 1);
+                    $cnt = count($match_result);
+                    for ($k = 0; $k < $cnt; ++$k) {
+                        $v = $match_result[$k];
+                        if ($v instanceof MessageSegment && $v->type === $msg_type) {
+                            array_splice($match_result, $k, 1);
+                            $arguments[$argument->name] = $v;
+                            break 2;
+                        }
+                    }
+                    // 如果不是必需的，那就使用缺省值
+                    if (!$argument->required && is_array($argument->default)) {
+                        // 生成一个消息段的段
+                        $a = [new MessageSegment($msg_type, $argument->default)];
+                        $arguments[$argument->name] = $a;
+                        break;
+                    }
+                    // 到这里还没找到，就说明需要询问用户了
+                    $g = yield $argument;
+                    foreach ($g as $v) {
+                        if ($v instanceof MessageSegment && $v->type === $msg_type) {
+                            $arguments[$argument->name] = $v;
+                            break 2;
+                        }
+                    }
+                    if ($argument->error_prompt_policy === 1) {
+                        $prompt = $argument->getTypeErrorPrompt() . "\n" . $argument->prompt;
+                        $clone_argument = clone $argument;
+                        $clone_argument->prompt = $prompt;
+                        $g = yield $clone_argument;
+                        foreach ($g as $v) {
+                            if ($v instanceof MessageSegment && $v->type === $msg_type) {
+                                $arguments[$argument->name] = $v;
+                                break 2;
+                            }
+                        }
+                    }
+                    throw new WaitTimeoutException($cmd->name, $argument->getErrorQuitPrompt());
+            }
+        }
+        $arguments['.unnamed'] = $match_result;
+        return $arguments;
+    }
+
+    /**
+     * @throws InterruptException
+     * @throws \Throwable
+     */
+    private function callBotCommand(BotContext $ctx, BotCommand $cmd)
+    {
+        $handler = new AnnotationHandler(BotCommand::class);
+        $handler->setReturnCallback(function ($result) use ($ctx) {
+            if (is_string($result)) {
+                $ctx->reply($result);
+                return;
+            }
+            try {
+                Validator::validateMessageSegment($result);
+                $ctx->reply($result);
+            } catch (\Throwable) {
+            }
+            if ($ctx->hasReplied()) {
+                AnnotationHandler::interrupt();
+            }
+        });
+        $handler->handle($cmd);
     }
 }

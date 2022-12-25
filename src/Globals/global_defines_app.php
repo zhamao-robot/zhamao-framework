@@ -15,7 +15,7 @@ const ZM_VERSION_ID = Framework::VERSION_ID;
 const ZM_VERSION = Framework::VERSION;
 
 /** 机器人用的，用于判断二元语意 */
-const TRUE_LIST = ['yes', 'y', 'true', 'on', '是', '对', true];
+const TRUE_LIST = ['yes', 'ok', 'y', 'true', 'on', '是', '对', true];
 const FALSE_LIST = ['no', 'n', 'false', 'off', '否', '错', false];
 
 /** 定义多进程的全局变量 */

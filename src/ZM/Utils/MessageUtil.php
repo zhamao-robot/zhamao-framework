@@ -64,6 +64,11 @@ class MessageUtil
     public static function convertToArr(MessageSegment|\Stringable|array|string $message)
     {
         if (is_array($message)) {
+            foreach ($message as $k => $v) {
+                if (is_string($v)) {
+                    $message[$k] = new MessageSegment('text', ['text' => $v]);
+                }
+            }
             return $message;
         }
         if ($message instanceof MessageSegment) {
@@ -73,5 +78,49 @@ class MessageUtil
             return new MessageSegment('text', ['text' => $message->__toString()]);
         }
         return new MessageSegment('text', ['text' => $message]);
+    }
+
+    /**
+     * 分割消息字符串
+     *
+     * @param array $includes 需要进行切割的字符串，默认包含空格及制表符（\t)
+     */
+    public static function splitMessage(string $msg, array $includes = [' ', "\t"]): array
+    {
+        $msg = trim($msg);
+        foreach ($includes as $v) {
+            $msg = str_replace($v, "\n", $msg);
+        }
+        $msg_seg = explode("\n", $msg);
+        $ls = [];
+        foreach ($msg_seg as $v) {
+            if (empty(trim($v))) {
+                continue;
+            }
+            $ls[] = trim($v);
+        }
+        return $ls;
+    }
+
+    public static function getAltMessage(null|array|string|MessageSegment $message): string
+    {
+        if ($message === null) {
+            return '';
+        }
+        if (is_string($message)) {
+            return $message;
+        }
+        if ($message instanceof MessageSegment) {
+            $message = [$message];
+        }
+        $message_string = '';
+        foreach ($message as $segment) {
+            if ($segment->type === 'text') {
+                $message_string .= $segment->data['text'];
+            } else {
+                $message_string .= '[富文本:' . $segment->type . ']';
+            }
+        }
+        return $message_string;
     }
 }

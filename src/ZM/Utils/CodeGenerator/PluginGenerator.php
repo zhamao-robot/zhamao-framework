@@ -67,7 +67,7 @@ class PluginGenerator
                 '{class}' => $this->convertClassName(),
             ];
             $main_php = str_replace(array_keys($replace), array_values($replace), $template);
-            file_put_contents(zm_dir($plugin_base_dir . '/src/PluginMain.php'), $main_php);
+            file_put_contents(zm_dir($plugin_base_dir . '/src/' . $this->convertClassName() . '.php'), $main_php);
             // 写入 composer.json
             $composer_json = [
                 'autoload' => [
