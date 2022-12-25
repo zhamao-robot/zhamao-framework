@@ -23,8 +23,8 @@ class ContainerBindingListener
     {
         // 监听感兴趣的事件，方便做容器初始化和销毁
         foreach (self::$events as $event) {
-            ob_event_provider()->addEventListener($event, [self::class, 'callback'], PHP_INT_MAX);
-            ob_event_provider()->addEventListener($event, [self::class, 'cleanCallback'], PHP_INT_MIN);
+            ob_event_provider()->addEventListener($event, [self::class, 'callback'], PHP_INT_MAX - 100);
+            ob_event_provider()->addEventListener($event, [self::class, 'cleanCallback'], PHP_INT_MIN + 100);
         }
     }
 
