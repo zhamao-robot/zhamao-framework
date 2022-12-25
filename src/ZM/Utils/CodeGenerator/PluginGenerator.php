@@ -20,7 +20,6 @@ class PluginGenerator
      * 开始生成
      *
      * @param array $options 传入的命令行选项
-     * @return void
      */
     public function generate(array $options): void
     {
