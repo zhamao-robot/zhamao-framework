@@ -26,12 +26,7 @@ module.exports = {
         activeHeaderLinks: false,
         nav: [
             { text: '指南', link: '/guide/' },
-            { text: '事件和注解', link: '/event/' },
-            { text: '组件', link: '/component/' },
-            { text: '进阶', link: '/advanced/' },
             { text: 'API', link: '/doxy/', target: '_blank' },
-            { text: 'FAQ', link: '/faq/' },
-            { text: '更新日志', link: '/update/v2/' },
             { text: '炸毛框架 v1', link: 'https://docs-v1.zhamao.xin/' }
         ],
         sidebar: {
@@ -43,147 +38,12 @@ module.exports = {
                     children: [
                         '',
                         'installation',
-                        'quickstart-robot',
-                        'quickstart-http',
-                        'onebot-choose',
-                        'basic-config',
-                        'write-module',
-                        'register-event',
-                        'upgrade',
-                        'errcode'
+                        'configuration',
+                        'structure',
+                        'get_started',
                     ]
                 }
             ],
-            '/event/': [
-                {
-                    title: '事件和注解',
-                    collapsable: false,
-                    sidebarDepth: 1,
-                    children: [
-                        '',
-                        'robot-annotations',
-                        'route-annotations',
-                        'framework-annotations',
-                        'middleware',
-                        'custom-annotations',
-                        'event-dispatcher'
-                    ]
-                }
-            ],
-            '/component/': [
-                '',
-                {
-                    title: '聊天机器人组件',
-                    collapsable: true,
-                    sidebarDepth: 2,
-                    children: [
-                        'bot/robot-api-12',
-                        'bot/robot-api',
-                        'bot/cqcode',
-                        'bot/message-util',
-                        'bot/access-token',
-                        'bot/turing-api',
-                        'bot/help-generator.md',
-                    ]
-                },
-                {
-                    title: '存储组件',
-                    collapsable: true,
-                    sidebarDepth: 2,
-                    children: [
-                        'store/light-cache',
-                        'store/mysql',
-                        'store/mysql-db',
-                        'store/redis',
-                        'store/atomics',
-                        'store/spin-lock',
-                        'store/data-provider'
-                    ]
-                },
-                {
-                    title: '通用组件',
-                    collapsable: true,
-                    sidebarDepth: 2,
-                    children: [
-                        'common/context',
-                        'common/coroutine-pool',
-                        'common/singleton-trait',
-                        'common/zmutil',
-                        'common/global-functions',
-                        'common/console',
-                        'common/task-worker',
-                        'common/remote-terminal',
-                        'common/event-tracer'
-                    ]
-                },
-                {
-                    title: 'HTTP 组件',
-                    collapsable: true,
-                    sidebarDepth: 2,
-                    children: [
-                        'http/zmrequest',
-                        'http/route-manager'
-                    ]
-                },
-                {
-                    title: '模块/插件管理',
-                    collapsable: true,
-                    sidebarDepth: 2,
-                    children: [
-                        'module/module-pack',
-                        'module/module-unpack'
-                    ]
-                }
-            ],
-            '/advanced/': [
-                '',
-                {
-                    title: '框架高级开发',
-                    collapsable: true,
-                    sidebarDepth: 2,
-                    children: [
-                        'framework-structure',
-                        'custom-start',
-                        'manually-install',
-                        'inside-class',
-                        'multi-process',
-                        'task-worker'
-                    ]
-                },
-                {
-                    title: '开发实战教程',
-                    collapsable: true,
-                    sidebarDepth: 2,
-                    children: [
-                        'connect-ws-client',
-                        'example/admin',
-                        'example/integrate-qingyunke-chatbot',
-                        'example/weather-bot'
-                    ]
-                },
-            ],
-            '/faq/': [
-                '',
-                'to-v2',
-                'usual-question',
-                'address-already-in-use',
-                'display-deadlock',
-                'light-cache-wrong',
-                'wait-message-cqbefore'
-            ],
-            '/update/': [
-                {
-                    title: '更新日志',
-                    collapsable: true,
-                    sidebarDepth: 0,
-                    children: [
-                        'v2',
-                        'v1',
-                        'build-update'
-                    ]
-                },
-                'config'
-            ]
         }
     }
 }
