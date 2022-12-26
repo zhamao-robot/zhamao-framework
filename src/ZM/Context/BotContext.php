@@ -145,7 +145,8 @@ class BotContext implements ContextInterface
         self::$echo_id_list[$a->echo] = $a;
         // 调用事件在回复之前的回调
         $handler = new AnnotationHandler(BotAction::class);
-        $handler->setRuleCallback(fn (BotAction $act) => $act->action === $action && !$act->need_response);
+        container()->set(Action::class, $a);
+        $handler->setRuleCallback(fn (BotAction $act) => $act->action === '' || $act->action === $action && !$act->need_response);
         $handler->handleAll($a);
         // 被阻断时候，就不发送了
         if ($handler->getStatus() === AnnotationHandler::STATUS_INTERRUPTED) {
