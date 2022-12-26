@@ -13,8 +13,8 @@
 如果检测到本机未安装 PHP 或不符合运行要求，脚本将会自动拉取提前编译好的静态 PHP 运行时。
 
 ```shell
-# 将静态 PHP 和框架安装在当前目录
-bash <(curl -fsSL https://zhamao.xin/go.sh)
+# 将静态 PHP 和框架安装在当前目录（适用于 Linux、macOS）
+bash <(curl -fsSL https://zhamao.xin/v3.sh)
 
 # 安装完成后启动
 ./zhamao server
@@ -40,6 +40,12 @@ composer require zhamao/framework
 ## 安装完成后启动
 ./zhamao server
 ```
+
+## Windows 安装方法
+
+由于 Windows 系统下的 PHP 环境配置较为复杂，我们推荐使用 Docker 或一键脚本来进行安装。
+
+如果你打算在 Windows 使用原生的 Win 环境 PHP，你需要先安装 PHP 和 Composer，然后在任意目录下执行上方 composer 的安装方法即可。
 
 ## 更多的环境部署和开发方式
 

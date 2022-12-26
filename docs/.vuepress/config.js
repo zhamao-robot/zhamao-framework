@@ -1,5 +1,5 @@
 module.exports = {
-    title: '炸毛框架',
+    title: '炸毛框架 v3',
     description: '一个高性能聊天机器人 + Web 框架',
     theme: 'antdocs',
     markdown: {
@@ -26,8 +26,8 @@ module.exports = {
         activeHeaderLinks: false,
         nav: [
             { text: '指南', link: '/guide/' },
-            { text: 'API', link: '/doxy/', target: '_blank' },
-            { text: '炸毛框架 v1', link: 'https://docs-v1.zhamao.xin/' }
+            { text: 'API 文档', link: '/doxy/', target: '_blank' },
+            { text: '炸毛框架 v2', link: 'https://docs-v2.zhamao.xin/' }
         ],
         sidebar: {
             '/guide/': [
