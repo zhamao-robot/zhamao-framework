@@ -24,6 +24,10 @@ class BotContext implements ContextInterface
 
     private array $self;
 
+    private array $params = [];
+
+    private bool $replied = false;
+
     public function __construct(string $bot_id, string $platform)
     {
         $this->self = ['user_id' => $bot_id, 'platform' => $platform];
@@ -55,6 +59,7 @@ class BotContext implements ContextInterface
                 throw new OneBot12Exception('bot()->reply() can only be used in message event.');
             }
             $msg = (is_string($message) ? [new MessageSegment('text', ['text' => $message])] : ($message instanceof MessageSegment ? [$message] : $message));
+            $this->replied = true;
             return $this->sendMessage($msg, $event->detail_type, $event->jsonSerialize());
         }
         throw new OneBot12Exception('bot()->reply() can only be used in message event.');
@@ -65,8 +70,7 @@ class BotContext implements ContextInterface
      */
     public function hasReplied(): bool
     {
-        // TODO: 完成是否已经回复的记录和返回
-        return false;
+        return $this->replied;
     }
 
     /**
@@ -91,6 +95,39 @@ class BotContext implements ContextInterface
         $params['message'] = $message;
         $params['detail_type'] = $detail_type;
         return $this->sendAction(Utils::camelToSeparator(__FUNCTION__), $params, $this->self);
+    }
+
+    /**
+     * 设置该消息下解析出来的参数列表
+     *
+     * @param array $params 参数列表
+     */
+    public function setParams(array $params): void
+    {
+        $this->params = $params;
+    }
+
+    /**
+     * 获取单个参数值，不存在则返回 null
+     *
+     * @param int|string $name 参数名称或索引
+     */
+    public function getParam(string|int $name): mixed
+    {
+        return $this->params[$name] ?? null;
+    }
+
+    public function getParamString(string|int $name): ?string
+    {
+        return MessageUtil::getAltMessage($this->params[$name] ?? null);
+    }
+
+    /**
+     * 获取所有参数
+     */
+    public function getParams(): array
+    {
+        return $this->params;
     }
 
     public function getEchoAction(mixed $echo): ?Action

@@ -35,7 +35,7 @@ class AnnotationMap
     public static function loadAnnotationByParser(AnnotationParser $parser): void
     {
         // 生成后加入到全局list中
-        self::$_list = array_merge(self::$_list, $parser->generateAnnotationList());
+        self::$_list = array_merge_recursive(self::$_list, $parser->generateAnnotationList());
         self::$_map = $parser->getAnnotationMap();
     }
 
