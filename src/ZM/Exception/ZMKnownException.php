@@ -11,7 +11,7 @@ class ZMKnownException extends ZMException
 {
     public function __construct($err_code, $message = '', $code = 0, \Throwable $previous = null)
     {
-        parent::__construct(zm_internal_errcode($err_code) . $message, '', $code, $previous);
+        parent::__construct(zm_internal_errcode($err_code) . $message, $code, $previous);
         if ($err_code === 'E99999') {
             $code = 0;
         // 这也太懒了吧
@@ -19,6 +19,6 @@ class ZMKnownException extends ZMException
             // 取最后两数
             $code = (int) substr($err_code, -2);
         }
-        parent::__construct($message, '', $code, $previous);
+        parent::__construct($message, $code, $previous);
     }
 }

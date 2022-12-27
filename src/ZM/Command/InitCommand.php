@@ -50,13 +50,13 @@ class InitCommand extends Command
                 $section->write('<fg=gray>更新 composer.json ... </>');
 
                 if (!file_exists($this->base_path . '/composer.json')) {
-                    throw new InitException('未找到 composer.json 文件', '请检查当前目录是否为项目根目录', 41);
+                    throw new InitException('未找到 composer.json 文件', 41);
                 }
 
                 try {
                     $composer = json_decode(file_get_contents($this->base_path . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
                 } catch (\JsonException $e) {
-                    throw new InitException('解析 composer.json 文件失败', '请检查 composer.json 文件是否存在语法错误', 42, $e);
+                    throw new InitException('解析 composer.json 文件失败', 42, $e);
                 }
 
                 if (!isset($composer['autoload'])) {
@@ -68,7 +68,7 @@ class InitCommand extends Command
                 try {
                     file_put_contents($this->base_path . '/composer.json', json_encode($composer, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
                 } catch (\JsonException $e) {
-                    throw new InitException('写入 composer.json 文件失败', '', 0, $e);
+                    throw new InitException('写入 composer.json 文件失败', 0, $e);
                 }
 
                 $section->writeln('<info>完成</info>');
@@ -146,7 +146,7 @@ class InitCommand extends Command
             if (file_exists($phar_link . '/vendor/autoload.php')) {
                 $this->base_path = $current_dir;
             } else {
-                throw new InitException('框架启动模式不是 Composer 模式，无法进行初始化', '如果您是从 Github 下载的框架，请参阅文档进行源码模式启动', 42);
+                throw new InitException('框架启动模式不是 Composer 模式，无法进行初始化', 42);
             }
         }
     }
@@ -166,11 +166,11 @@ class InitCommand extends Command
             && !mkdir($concurrent_dir = $this->base_path . $info['dirname'], 0777, true)
             && !is_dir($concurrent_dir)
         ) {
-            throw new InitException("无法创建目录 {$concurrent_dir}", '请检查目录权限');
+            throw new InitException("无法创建目录 {$concurrent_dir}");
         }
 
         if (copy($this->getVendorPath($file), $this->base_path . $file) === false) {
-            throw new InitException("无法复制文件 {$file}", '请检查目录权限');
+            throw new InitException("无法复制文件 {$file}");
         }
     }
 
