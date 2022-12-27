@@ -10,6 +10,6 @@ class DBException extends ZMException
 {
     public function __construct(string $description, int $code = 0, ?\Throwable $previous = null)
     {
-        parent::__construct($description, '', $code, $previous);
+        parent::__construct($description, $code, $previous);
     }
 }
