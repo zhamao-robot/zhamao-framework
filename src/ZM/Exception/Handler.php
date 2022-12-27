@@ -14,7 +14,8 @@ class Handler extends ExceptionHandler
         parent::__construct();
         /** @noinspection ClassConstantCanBeUsedInspection */
         $ns = 'NunoMaduro\Collision\Handler';
-        if (class_exists($ns)) {
+        // TODO: 在 LibOB 发布新版时移除检查
+        if (class_exists($ns) && method_exists($this, 'tryEnableCollision')) {
             $this->tryEnableCollision(new SolutionRepository());
         }
     }
