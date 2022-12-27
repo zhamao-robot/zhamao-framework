@@ -73,7 +73,6 @@
         }
     },
     "bin": [
-        "bin/gendoc",
         "bin/phpunit-zm",
         "bin/zhamao"
     ],
