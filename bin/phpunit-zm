@@ -16,7 +16,7 @@ use ZM\Logger\ConsoleLogger;
 use ZM\Store\MockAtomic;
 
 // 引入自动加载
-require dirname(__DIR__) . '/vendor/autoload.php';
+require $_composer_autoload_path ?? dirname(__DIR__) . '/vendor/autoload.php';
 
 // 声明一个全局的原子计数，用于保存整个进程的退出状态码
 global $_swoole_atomic;
