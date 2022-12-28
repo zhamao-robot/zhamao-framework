@@ -7,6 +7,7 @@ namespace ZM\Plugin;
 use ZM\Annotation\AnnotationMap;
 use ZM\Annotation\AnnotationParser;
 use ZM\Annotation\Framework\BindEvent;
+use ZM\Annotation\OneBot\BotCommand;
 use ZM\Annotation\OneBot\BotEvent;
 use ZM\Exception\PluginException;
 use ZM\Store\FileSystem;
@@ -191,6 +192,7 @@ class PluginManager
                 }
                 // 将 BotCommand 加入事件监听
                 foreach ($obj->getBotCommands() as $cmd) {
+                    AnnotationMap::$_list[BotCommand::class][] = $cmd;
                     $parser->parseSpecial($cmd);
                 }
             } elseif (isset($plugin['autoload'], $plugin['dir'])) {

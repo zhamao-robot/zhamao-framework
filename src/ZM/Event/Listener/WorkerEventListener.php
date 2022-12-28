@@ -12,6 +12,7 @@ use ZM\Annotation\AnnotationParser;
 use ZM\Annotation\Framework\Init;
 use ZM\Exception\ZMKnownException;
 use ZM\Framework;
+use ZM\Plugin\CommandManualPlugin;
 use ZM\Plugin\OneBot12Adapter;
 use ZM\Plugin\PluginManager;
 use ZM\Process\ProcessStateManager;
@@ -141,6 +142,7 @@ class WorkerEventListener
             match ($name) {
                 'onebot12' => PluginManager::addPlugin(['name' => $name, 'internal' => true, 'object' => new OneBot12Adapter(parser: $parser)]),
                 'onebot12-ban-other-ws' => PluginManager::addPlugin(['name' => $name, 'internal' => true, 'object' => new OneBot12Adapter(submodule: $name)]),
+                'command-manual' => PluginManager::addPlugin(['name' => $name, 'internal' => true, 'object' => new CommandManualPlugin($parser)]),
             };
         }
 
