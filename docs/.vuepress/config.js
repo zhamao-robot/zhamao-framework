@@ -26,6 +26,7 @@ module.exports = {
         activeHeaderLinks: false,
         nav: [
             { text: '指南', link: '/guide/' },
+            { text: '事件', link: '/event/' },
             { text: 'API 文档', link: '/doxy/', target: '_blank' },
             { text: '炸毛框架 v2', link: 'https://docs-v2.zhamao.xin/' }
         ],
@@ -44,6 +45,21 @@ module.exports = {
                     ]
                 }
             ],
+            '/event/': [
+                {
+                    title: '事件',
+                    collapsable: false,
+                    sidebarDepth: 1,
+                    children: [
+                        '',
+                        'bot',
+                        'http',
+                        'middleware',
+                        'framework',
+                        'extend',
+                    ]
+                }
+            ]
         }
     }
 }
