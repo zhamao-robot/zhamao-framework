@@ -6,7 +6,6 @@ use OneBot\Driver\Coroutine\Adaptive;
 use OneBot\Driver\Coroutine\CoroutineInterface;
 use OneBot\Driver\Process\ExecutionResult;
 use OneBot\V12\Object\MessageSegment;
-use OneBot\V12\Object\OneBotEvent;
 use Psr\Log\LoggerInterface;
 use ZM\Config\ZMConfig;
 use ZM\Container\ContainerHolder;
@@ -241,10 +240,8 @@ function config(array|string $key = null, mixed $default = null)
 
 function bot(): ZM\Context\BotContext
 {
-    if (\container()->has('bot.event')) {
-        /** @var OneBotEvent $bot_event */
-        $bot_event = \container()->get('bot.event');
-        return new \ZM\Context\BotContext($bot_event->self['user_id'] ?? '', $bot_event->self['platform']);
+    if (container()->has(ZM\Context\BotContext::class)) {
+        return container()->get(ZM\Context\BotContext::class);
     }
     return new \ZM\Context\BotContext('', '');
 }
