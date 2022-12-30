@@ -41,3 +41,11 @@ jobs:
           ssh_private_key: ${{ secrets.ZHAMAO_XIN_PRIVATE_KEY }}
           local_path: './ext/go.sh'
           remote_path: ${{ secrets.ZHAMAO_XIN_MAIN_TARGET }}
+      - name: deploy script file
+        uses: wlixcc/SFTP-Deploy-Action@v1.2
+        with:
+          username: ${{ secrets.ZHAMAO_XIN_USER }}
+          server: ${{ secrets.ZHAMAO_XIN_HOST }}
+          ssh_private_key: ${{ secrets.ZHAMAO_XIN_PRIVATE_KEY }}
+          local_path: './ext/v3.sh'
+          remote_path: ${{ secrets.ZHAMAO_XIN_MAIN_TARGET }}
