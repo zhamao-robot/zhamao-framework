@@ -7,22 +7,26 @@ namespace ZM\Container;
 use DI;
 use DI\Container;
 use DI\ContainerBuilder;
+use OneBot\Driver\Coroutine\Adaptive;
 
 class ContainerHolder
 {
-    private static ?Container $container = null;
+    /** @var Container[] */
+    private static array $container = [];
 
     public static function getEventContainer(): Container
     {
-        if (self::$container === null) {
-            self::$container = self::buildContainer();
+        $cid = Adaptive::getCoroutine()?->getCid() ?? -1;
+        if (!isset(self::$container[$cid])) {
+            self::$container[$cid] = self::buildContainer();
         }
-        return self::$container;
+        return self::$container[$cid];
     }
 
     public static function clearEventContainer(): void
     {
-        self::$container = null;
+        $cid = Adaptive::getCoroutine()?->getCid() ?? -1;
+        unset(self::$container[$cid]);
     }
 
     private static function buildContainer(): Container
