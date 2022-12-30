@@ -8,7 +8,9 @@ class ZMUtil
 {
     /**
      * 获取 composer.json 并转为数组进行读取使用
-     * @param null|string $path 路径
+     *
+     * @param  null|string    $path 路径
+     * @throws \JsonException
      */
     public static function getComposerMetadata(?string $path = null): ?array
     {

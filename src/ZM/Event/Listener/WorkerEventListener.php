@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ZM\Event\Listener;
 
+use OneBot\Driver\Coroutine\Adaptive;
 use OneBot\Driver\Process\ProcessManager;
 use OneBot\Util\Singleton;
 use ZM\Annotation\AnnotationHandler;
@@ -35,6 +36,8 @@ class WorkerEventListener
         // 自注册一下，刷新当前进程的logger进程banner
         ob_logger_register(ob_logger());
 
+        Adaptive::initWithDriver(Framework::getInstance()->getDriver());
+
         // 如果没有引入参数disable-safe-exit，则监听 Ctrl+C
         if (!Framework::getInstance()->getArgv()['disable-safe-exit'] && PHP_OS_FAMILY !== 'Windows') {
             SignalListener::getInstance()->signalWorker();
@@ -42,11 +45,9 @@ class WorkerEventListener
 
         // Windows 环境下，为了监听 Ctrl+C，只能开启终端输入
         if (PHP_OS_FAMILY === 'Windows') {
+            logger()->debug('监听Windows的键盘输入');
             sapi_windows_set_ctrl_handler([SignalListener::getInstance(), 'signalWindowsCtrlC']);
-            Framework::getInstance()->getDriver()->getEventLoop()->addReadEvent(STDIN, function ($x) {});
         }
-
-        logger()->debug('Worker #' . ProcessManager::getProcessId() . ' started');
 
         // 设置 Worker 进程的状态和 ID 等信息
         if (($name = Framework::getInstance()->getDriver()->getName()) === 'swoole') {
@@ -88,17 +89,23 @@ class WorkerEventListener
         $this->initUserPlugins();
 
         // handle @Init annotation
-        $this->dispatchInit();
-
+        Adaptive::getCoroutine()->create(function () {
+            $this->dispatchInit();
+        });
         // 回显 debug 日志：进程占用的内存
         $memory_total = memory_get_usage() / 1024 / 1024;
         logger()->debug('Worker process used ' . round($memory_total, 3) . ' MB');
     }
 
+    public function onWorkerStart1(): void
+    {
+        logger()->debug('Worker #' . ProcessManager::getProcessId() . ' started');
+    }
+
     /**
      * @throws ZMKnownException
      */
-    public function onWorkerStop999()
+    public function onWorkerStop999(): void
     {
         logger()->debug('Worker #' . ProcessManager::getProcessId() . ' stopping');
         if (DIRECTORY_SEPARATOR !== '\\') {
@@ -110,11 +117,16 @@ class WorkerEventListener
         }
     }
 
+    public function onWorkerStop1(): void
+    {
+        logger()->debug('Worker #' . ProcessManager::getProcessId() . ' stopped');
+    }
+
     /**
      * 加载用户代码资源，包括普通插件、单文件插件、Composer 插件等
      * @throws \Throwable
      */
-    private function initUserPlugins()
+    private function initUserPlugins(): void
     {
         logger()->debug('Loading user sources');
 

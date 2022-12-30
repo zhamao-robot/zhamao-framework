@@ -46,7 +46,7 @@ class Framework
     public const VERSION_ID = 651;
 
     /** @var string 版本名称 */
-    public const VERSION = '3.0.0-beta2';
+    public const VERSION = '3.0.0-beta3';
 
     /** @var array 传入的参数 */
     protected array $argv;
@@ -228,7 +228,9 @@ class Framework
         // 添加框架需要监听的顶层事件监听器
         // worker 事件
         ob_event_provider()->addEventListener(WorkerStartEvent::getName(), [WorkerEventListener::getInstance(), 'onWorkerStart999'], 999);
+        ob_event_provider()->addEventListener(WorkerStartEvent::getName(), [WorkerEventListener::getInstance(), 'onWorkerStart1'], 1);
         ob_event_provider()->addEventListener(WorkerStopEvent::getName(), [WorkerEventListener::getInstance(), 'onWorkerStop999'], 999);
+        ob_event_provider()->addEventListener(WorkerStopEvent::getName(), [WorkerEventListener::getInstance(), 'onWorkerStop1'], 1);
         // Http 事件
         ob_event_provider()->addEventListener(HttpRequestEvent::getName(), [HttpEventListener::getInstance(), 'onRequest999'], 999);
         ob_event_provider()->addEventListener(HttpRequestEvent::getName(), [HttpEventListener::getInstance(), 'onRequest1'], 1);

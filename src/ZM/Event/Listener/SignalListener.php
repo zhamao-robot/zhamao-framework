@@ -119,10 +119,10 @@ class SignalListener
             }
             echo "\r";
             logger()->notice('请再按 {count} 次 Ctrl+C 以强制杀死进程', ['count' => 5 - self::$manager_kill_time]);
-            return;
         }
         ++self::$manager_kill_time;
         if (self::$manager_kill_time === 1) {
+            logger()->notice('Keyboard interrupt, shutting down server...');
             Framework::getInstance()->stop();
         }
     }

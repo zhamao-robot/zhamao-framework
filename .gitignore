@@ -9,7 +9,7 @@
 /site/
 /plugins/
 /doxy/
-
+/walle/
 # 框架审计文件
 audit.log
 
