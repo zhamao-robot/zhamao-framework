@@ -26,8 +26,16 @@ class ContainerRegistrant
         self::addServices([
             OneBotEvent::class => $event,
             'bot.event' => DI\get(OneBotEvent::class),
-            BotContext::class => fn () => bot(),
         ]);
+
+        if (isset($event->self['platform'])) {
+            self::addServices([
+                BotContext::class => DI\autowire(BotContext::class)->constructor(
+                    $event->self['user_id'] ?? '',
+                    $event->self['platform'],
+                ),
+            ]);
+        }
     }
 
     /**
