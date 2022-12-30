@@ -12,6 +12,7 @@ use ZM\Container\ContainerHolder;
 use ZM\Logger\ConsoleLogger;
 use ZM\Middleware\MiddlewareHandler;
 use ZM\Store\Database\DBException;
+use ZM\Store\Database\DBQueryBuilder;
 use ZM\Store\Database\DBWrapper;
 
 // 防止重复引用引发报错
@@ -209,7 +210,7 @@ function db(string $name = '')
  *
  * @throws DBException
  */
-function sql_builder(string $name = '')
+function sql_builder(string $name = ''): DBQueryBuilder
 {
     return (new DBWrapper($name))->createQueryBuilder();
 }

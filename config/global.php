@@ -18,12 +18,6 @@ $config['servers'] = [
         'type' => 'http',
         'flag' => 20002,
     ],
-    [
-        'host' => '0.0.0.0',
-        'port' => 20003,
-        'type' => 'http',
-        'flag' => 20003,
-    ],
 ];
 
 /* Workerman 驱动相关配置 */
