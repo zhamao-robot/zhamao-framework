@@ -4,22 +4,21 @@ declare(strict_types=1);
 
 namespace ZM\Context;
 
-use Choir\Http\HttpFactory;
 use OneBot\Driver\Event\Http\HttpRequestEvent;
 use OneBot\Driver\Event\WebSocket\WebSocketMessageEvent;
-use OneBot\Util\Utils;
 use OneBot\V12\Object\Action;
 use OneBot\V12\Object\MessageSegment;
 use OneBot\V12\Object\OneBotEvent;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use ZM\Annotation\AnnotationHandler;
-use ZM\Annotation\OneBot\BotAction;
+use ZM\Context\Trait\BotActionTrait;
 use ZM\Exception\OneBot12Exception;
 use ZM\Utils\MessageUtil;
 
 class BotContext implements ContextInterface
 {
+    use BotActionTrait;
+
     private static array $echo_id_list = [];
 
     private array $self;
@@ -28,9 +27,10 @@ class BotContext implements ContextInterface
 
     private bool $replied = false;
 
-    public function __construct(string $bot_id, string $platform)
+    public function __construct(string $bot_id, string $platform, null|WebSocketMessageEvent|HttpRequestEvent $event = null)
     {
         $this->self = ['user_id' => $bot_id, 'platform' => $platform];
+        $this->base_event = $event;
     }
 
     public function getEvent(): OneBotEvent
@@ -82,19 +82,7 @@ class BotContext implements ContextInterface
      */
     public function getBot(string $bot_id, string $platform = ''): BotContext
     {
-        // TODO: 完善多机器人支持
         return $this;
-    }
-
-    /**
-     * @throws \Throwable
-     */
-    public function sendMessage(\Stringable|array|MessageSegment|string $message, string $detail_type, array $params = [])
-    {
-        $message = MessageUtil::convertToArr($message);
-        $params['message'] = $message;
-        $params['detail_type'] = $detail_type;
-        return $this->sendAction(Utils::camelToSeparator(__FUNCTION__), $params, $this->self);
     }
 
     /**
@@ -133,40 +121,5 @@ class BotContext implements ContextInterface
     public function getEchoAction(mixed $echo): ?Action
     {
         return self::$echo_id_list[$echo] ?? null;
-    }
-
-    /**
-     * @throws \Throwable
-     */
-    private function sendAction(string $action, array $params = [], ?array $self = null)
-    {
-        // 声明 Action 对象
-        $a = new Action($action, $params, ob_uuidgen(), $self);
-        self::$echo_id_list[$a->echo] = $a;
-        // 调用事件在回复之前的回调
-        $handler = new AnnotationHandler(BotAction::class);
-        container()->set(Action::class, $a);
-        $handler->setRuleCallback(fn (BotAction $act) => $act->action === '' || $act->action === $action && !$act->need_response);
-        $handler->handleAll($a);
-        // 被阻断时候，就不发送了
-        if ($handler->getStatus() === AnnotationHandler::STATUS_INTERRUPTED) {
-            return false;
-        }
-
-        // 调用机器人连接发送 Action
-        if (container()->has('ws.message.event')) {
-            /** @var WebSocketMessageEvent $ws */
-            $ws = container()->get('ws.message.event');
-            return $ws->send(json_encode($a->jsonSerialize()));
-        }
-        // 如果是 HTTP WebHook 的形式，那么直接调用 Response
-        if (container()->has('http.request.event')) {
-            /** @var HttpRequestEvent $event */
-            $event = container()->get('http.request.event');
-            $response = HttpFactory::createResponse(headers: ['Content-Type' => 'application/json'], body: json_encode([$a->jsonSerialize()]));
-            $event->withResponse($response);
-            return true;
-        }
-        throw new OneBot12Exception('No bot connection found.');
     }
 }

@@ -12,11 +12,14 @@ use ZM\Plugin\ZMPlugin;
 class ZMApplication extends ZMPlugin
 {
     /** @var null|ZMApplication 存储单例类的变量 */
-    private static ?ZMApplication $obj;
+    private static ?ZMApplication $obj = null;
 
     /** @var array 存储要传入的args */
     private array $args = [];
 
+    /**
+     * @throws SingletonViolationException
+     */
     public function __construct(mixed $dir = null)
     {
         if (self::$obj !== null) {
