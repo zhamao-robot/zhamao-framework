@@ -85,13 +85,13 @@ class BuildCommand extends Command
 
     private function build(string $target, string $entry): void
     {
-        $phar = new \Phar($target, 0, $target);
+        $phar = new \Phar($target, 0);
 
         $phar->startBuffering();
         $files = FileSystem::scanDirFiles(SOURCE_ROOT_DIR, true, true);
-        // 只打包 bin / config / resources / src / vendor
+        // 只打包 bin / config / resources / src / vendor 目录以及 composer.json / composer.lock / entry.php
         $files = array_filter($files, function ($file) {
-            return preg_match('#^(bin|config|resources|src|vendor)/#', $file);
+            return preg_match('/(^(bin|config|resources|src|vendor)\\/|^(composer\\.json|README\\.md)$)/', $file);
         });
         sort($files);
 
