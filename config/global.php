@@ -40,7 +40,7 @@ $config['swoole_options'] = [
 ];
 
 /* 默认存取炸毛数据的目录（相对目录时，代表WORKING_DIR下的目录，绝对目录按照绝对目录来） */
-$config['data_dir'] = 'zm_data';
+$config['data_dir'] = WORKING_DIR . '/zm_data';
 
 /* 框架本体运行时的一些可调配置 */
 $config['runtime'] = [
@@ -100,6 +100,13 @@ $config['database'] = [
         'charset' => 'utf8mb4',
         'pool_size' => 64,
     ],
+];
+
+/* KV 数据库的配置 */
+$config['kv'] = [
+    'use' => \LightCache::class,                        // 默认在单进程模式下使用 LightCache，多进程需要使用 ZMRedis
+    'light_cache_dir' => $config['data_dir'] . '/lc',   // 默认的 LightCache 保存持久化数据的位置
+    'light_cache_autosave_time' => 600,                 // LightCache 自动保存时间（秒）
 ];
 
 return $config;
