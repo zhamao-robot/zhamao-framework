@@ -24,6 +24,7 @@
         "onebot/libonebot": "^0.5",
         "php-di/php-di": "^7",
         "psr/container": "^2.0",
+        "psr/simple-cache": "^3.0",
         "psy/psysh": "^0.11.8",
         "symfony/console": "^6.0",
         "symfony/polyfill-ctype": "^1.19",
