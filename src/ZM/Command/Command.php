@@ -165,7 +165,7 @@ abstract class Command extends \Symfony\Component\Console\Command\Command
         $progress->setEmptyBarCharacter('<fg=red>⚬</>');
         $progress->setProgressCharacter('<fg=green>➤</>');
         $progress->setFormat(
-            "%current%/%max% [%bar%] %percent:3s%%\n🪅 %estimated:-20s%  %memory:20s%"
+            "%current%/%max% [%bar%] %percent:3s%%\n🪅 %estimated:-20s%  %memory:20s%" . PHP_EOL
         );
         return $progress;
     }

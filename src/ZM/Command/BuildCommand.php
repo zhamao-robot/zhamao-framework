@@ -18,8 +18,9 @@ class BuildCommand extends Command
      */
     protected function configure()
     {
-        $this->setHelp('此功能将会把整个项目打包为 Phar');
+        $this->setHelp('此功能将会把整个项目打包为 Phar' . PHP_EOL . '默认会启用压缩功能，通过去除文件中的注释和空格，以减小文件大小，但可能增加构建耗时');
         $this->addOption('target', 'D', InputOption::VALUE_REQUIRED, '指定输出文件位置', 'zm.phar');
+        $this->addOption('no-compress', null, InputOption::VALUE_NONE, '是否不压缩文件，以减小构建耗时');
     }
 
     protected function handle(): int
@@ -33,9 +34,17 @@ class BuildCommand extends Command
         $this->ensureTargetWritable($target);
         $this->comment("目标文件：{$target}");
 
+        if (file_exists($target)) {
+            $this->comment('目标文件已存在，正在删除...');
+            unlink($target);
+        }
+
         $this->info('正在构建 Phar 包');
 
-        $this->build($target, LOAD_MODE === LOAD_MODE_VENDOR ? 'src/entry.php' : 'vendor/zhamao/framework/src/entry.php');
+        $this->build(
+            $target,
+            LOAD_MODE === LOAD_MODE_VENDOR ? 'src/entry.php' : 'vendor/zhamao/framework/src/entry.php',
+        );
 
         $this->info('Phar 包构建完成');
 
@@ -80,14 +89,20 @@ class BuildCommand extends Command
 
         $phar->startBuffering();
         $files = FileSystem::scanDirFiles(SOURCE_ROOT_DIR, true, true);
-        $files = array_filter($files, function ($x) {
-            $dirs = preg_match('/(^(bin|config|resources|src|vendor)\\/|^(composer\\.json|README\\.md)$)/', $x);
-            return !($dirs !== 1);
+        // 只打包 bin / config / resources / src / vendor
+        $files = array_filter($files, function ($file) {
+            return preg_match('#^(bin|config|resources|src|vendor)/#', $file);
         });
         sort($files);
 
-        foreach ($this->progress()->iterate($files) as $file) {
-            $phar->addFile($file, $file);
+        if ($this->input->getOption('no-compress')) {
+            foreach ($this->progress()->iterate($files) as $file) {
+                $phar->addFile($file, $file);
+            }
+        } else {
+            foreach ($this->progress()->iterate($files) as $file) {
+                $phar->addFromString($file, php_strip_whitespace($file));
+            }
         }
 
         $phar->setStub(
