@@ -45,21 +45,23 @@ class HttpEventListener
             $result = HttpUtil::parseUri($event->getRequest(), $node, $params);
             switch ($result) {
                 case ZM_ERR_NONE:   // 解析到存在路由了
-                    $handler = new AnnotationHandler(Route::class);
+                    $route_handler = new AnnotationHandler(Route::class);
                     $div = new Route($node['route']);
                     $div->params = $params;
                     $div->method = $node['method'];
                     // TODO：这里有个bug，逻辑上 request_method 应该是个数组，而不是字符串，但是这里 $node['method'] 是字符串，所以这里只能用字符串来判断
                     // $div->request_method = $node['request_method'];
                     $div->class = $node['class'];
-                    $handler->handle($div, null, $params, $event->getRequest(), $event);
-                    if (is_string($val = $handler->getReturnVal()) || ($val instanceof \Stringable)) {
+                    $route_handler->handle($div, null, $params, $event->getRequest(), $event);
+                    if (is_string($val = $route_handler->getReturnVal()) || ($val instanceof \Stringable)) {
+                        // 返回的内容是可以被字符串化的，就当作 Body 来返回，状态码 200
                         $event->withResponse(HttpFactory::createResponse(200, null, [], Stream::create($val)));
                     } elseif ($event->getResponse() === null) {
+                        // 过了一遍 Route，没有促成 Response，则返回 500（路由必须有返回才行）
                         $event->withResponse(HttpFactory::createResponse(500));
                     }
                     break;
-                case ZM_ERR_ROUTE_METHOD_NOT_ALLOWED:
+                case ZM_ERR_ROUTE_METHOD_NOT_ALLOWED:    // 路由检测到存在，但是方法不匹配，则返回 405，表示方法不受支持
                     $event->withResponse(HttpUtil::handleHttpCodePage(405));
                     break;
             }
