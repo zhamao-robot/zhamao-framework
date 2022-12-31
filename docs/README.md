@@ -7,7 +7,7 @@ actions:
     type: primary
     size: large
   - text: 快速上手（v2 旧版）
-    link: https://docs-v2.zhamao.me/
+    link: https://docs-v2.zhamao.xin/
     type: primary
     ghost: true
     size: large

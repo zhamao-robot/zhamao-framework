@@ -57,8 +57,8 @@
 
 ```php
 #[\BotCommand('你好')]
-public function hello() {
-  ctx()->reply("你好，我是炸毛！"); // 简单的命令式回复
+public function hello(\BotContext $ctx) {
+  $ctx->reply("你好，我是炸毛！"); // 简单的命令式回复
 }
 #[\Route('/index')]
 public function index() {
@@ -74,10 +74,10 @@ public function index() {
 
 ```bash
 # 检测PHP环境、安装框架
-bash <(curl -fsSL https://zhamao.xin/go.sh)
+bash <(curl -fsSL https://zhamao.xin/v3.sh)
 
 # 启动框架
-cd zhamao-app
+cd zhamao-v3
 ./zhamao server
 ```
 
@@ -86,14 +86,14 @@ cd zhamao-app
 ```bash
 # 脚本默认会检测系统的PHP，如果想直接跳过检测，安装独立的PHP版本，则添加此环境变量
 export ZM_NO_LOCAL_PHP="yes"
-# 脚本如果安装独立版本PHP，默认版本为8.0，如果想使用其他版本，则添加此环境变量指定版本
-export ZM_DOWN_PHP_VERSION="8.1"
+# 脚本如果安装独立版本PHP，默认版本为8.1，如果想使用其他版本，则添加此环境变量指定版本
+export ZM_DOWN_PHP_VERSION="8.2"
 # 脚本默认会将框架在当前目录下的 `zhamao-app` 目录进行安装，如果想使用其他目录，则添加此环境变量
 export ZM_CUSTOM_DIR="my-custom-app"
 # 脚本默认会对本项目使用阿里云国内加速镜像，如果想使用packagist源，则添加此环境变量
 export ZM_COMPOSER_PACKAGIST="yes"
 # 执行完前面的环境变量再执行一键安装脚本，就可以实现自定义参数！
-bash <(curl -fsSL https://zhamao.xin/go.sh)
+bash <(curl -fsSL https://zhamao.xin/v3.sh)
 ```
 
 关于其他安装方式，请参阅[文档](https://framework.zhamao.xin/guide/installation.html) 。
@@ -116,12 +116,6 @@ bash <(curl -fsSL https://zhamao.xin/go.sh)
 - 本身为 HTTP 服务器、WebSocket 服务器，可以构建属于自己的 HTTP API 接口
 - 自带 PHP 环境，无需手动编译安装，by [crazywhalecc/static-php-cli](https://github.com/crazywhalecc/static-php-cli)
 
-## 下载源码
-
-框架源码可直接克隆本仓库进行编辑，如果你在国内，访问 GitHub 和克隆仓库比较慢，可以将 `github.com` 替换为 `fgit.zhamao.me` 进行加速。
-
-例如：`git clone https://hub.fastgit.xyz/zhamao-robot/zhamao-framework.git --depth 1`。
-
 ## 贡献和捐赠
 
 如果你在使用过程中发现任何问题，可以提交 Issue 或自行 Fork 后修改并提交 Pull Request。
@@ -142,7 +136,7 @@ bash <(curl -fsSL https://zhamao.xin/go.sh)
 
 框架和 SDK 是 炸毛机器人 项目的核心框架开源部分。炸毛机器人是作者写的一个高性能机器人，曾获全国计算机设计大赛一等奖。
 
-作者的炸毛机器人已从2018年初起稳定运行了**四年半**，并且持续迭代。
+作者的炸毛机器人已从2018年初起稳定运行了**五年**，并且持续迭代。
 
 可以加作者 QQ（[627577391](http://wpa.qq.com/msgrd?v=3&uin=627577391&site=qq&menu=yes)）
 或提交 [Issue](https://github.com/zhamao-robot/zhamao-framework/issues/new/choose) 进行疑难解答。
