@@ -19,14 +19,14 @@ class BuildCommand extends Command
     protected function configure()
     {
         $this->setHelp('此功能将会把整个项目打包为 Phar');
-        $this->addOption('target', 'D', InputOption::VALUE_REQUIRED, '指定输出文件位置');
+        $this->addOption('target', 'D', InputOption::VALUE_REQUIRED, '指定输出文件位置', 'zm.phar');
     }
 
     protected function handle(): int
     {
         $this->ensurePharWritable();
 
-        $target = $this->input->getOption('target') ?? 'zm.phar';
+        $target = $this->input->getOption('target');
         if (FileSystem::isRelativePath($target)) {
             $target = SOURCE_ROOT_DIR . '/' . $target;
         }
