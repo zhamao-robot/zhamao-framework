@@ -14,6 +14,8 @@ use ZM\Middleware\MiddlewareHandler;
 use ZM\Store\Database\DBException;
 use ZM\Store\Database\DBQueryBuilder;
 use ZM\Store\Database\DBWrapper;
+use ZM\Store\KV\KVInterface;
+use ZM\Utils\ZMRequest;
 
 // 防止重复引用引发报错
 if (function_exists('zm_internal_errcode')) {
@@ -245,4 +247,13 @@ function bot(): ZM\Context\BotContext
         return container()->get(ZM\Context\BotContext::class);
     }
     return new \ZM\Context\BotContext('', '');
+}
+
+function kv(string $name = ''): KVInterface
+{
+    global $kv_class;
+    if (!$kv_class) {
+        $kv_class = config('global.kv.use', \LightCache::class);
+    }
+    return $kv_class::open($name);
 }

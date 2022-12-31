@@ -20,6 +20,7 @@ use ZM\Process\ProcessStateManager;
 use ZM\Store\Database\DBException;
 use ZM\Store\Database\DBPool;
 use ZM\Store\FileSystem;
+use ZM\Store\KV\LightCache;
 use ZM\Utils\ZMUtil;
 
 class WorkerEventListener
@@ -70,6 +71,11 @@ class WorkerEventListener
             logger()->info('WORKER#' . $i . ":\t" . ProcessStateManager::getProcessState(ZM_PROCESS_WORKER, $i));
         }
 
+        // 如果使用的是 LightCache，注册下自动保存的监听器
+        if (is_a(config('global.kv.use', \LightCache::class), LightCache::class, true)) {
+            Framework::getInstance()->getDriver()->getEventLoop()->addTimer(config('global.kv.light_cache_autosave_time', 600) * 1000, [LightCache::class, 'saveAll'], 0);
+        }
+
         // 注册 Worker 进程遇到退出时的回调，安全退出
         register_shutdown_function(function () {
             $error = error_get_last();
@@ -104,9 +110,13 @@ class WorkerEventListener
 
     /**
      * @throws ZMKnownException
+     * @throws \JsonException
      */
     public function onWorkerStop999(): void
     {
+        if (is_a(config('global.kv.use', \LightCache::class), LightCache::class, true)) {
+            LightCache::saveAll();
+        }
         logger()->debug('Worker #' . ProcessManager::getProcessId() . ' stopping');
         if (DIRECTORY_SEPARATOR !== '\\') {
             ProcessStateManager::removeProcessState(ZM_PROCESS_WORKER, ProcessManager::getProcessId());
