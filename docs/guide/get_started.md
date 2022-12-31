@@ -100,6 +100,11 @@ $cmd1 = BotCommand::make('repeater', match: '复读')->on(function(OneBotEvent $
 
 至此，你的第一个功能，复读机，也就开发完成了。
 
+<chat-box :my-chats="[
+{type:0,content:'复读 给我复读'},
+{type:1,content:'复读 给我复读'},
+]"></chat-box>
+
 ## 使用机器人 API 和更多事件
 
 如果你希望机器人进行其他复杂的动作（操作），请参见 机器人 API。
