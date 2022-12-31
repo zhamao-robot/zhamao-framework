@@ -365,12 +365,12 @@ class OneBot12Adapter extends ZMPlugin
                 continue;
             }
             // 测试 match
-            if ($v->match !== '' && $v->match === $head) {
+            if ($v->match !== '' && ($v->prefix . $v->match) === $head) {
                 array_shift($cmd_explode);
                 return [$v, $cmd_explode, $full_str];
             }
             // 测试 alias
-            if ($v->match !== '' && $v->alias !== [] && in_array($head, $v->alias, true)) {
+            if ($v->match !== '' && $v->alias !== [] && in_array($head, array_map(fn ($x) => $v->prefix . $x, $v->alias), true)) {
                 array_shift($cmd_explode);
                 return [$v, $cmd_explode, $full_str];
             }
@@ -610,7 +610,7 @@ class OneBot12Adapter extends ZMPlugin
     {
         $handler = new AnnotationHandler(BotCommand::class);
         $handler->setReturnCallback(function ($result) use ($ctx) {
-            if (is_string($result)) {
+            if (is_string($result) || $result instanceof MessageSegment) {
                 $ctx->reply($result);
                 return;
             }
