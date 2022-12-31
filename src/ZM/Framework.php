@@ -51,8 +51,8 @@ class Framework
     /** @var array 传入的参数 */
     protected array $argv;
 
-    /** @var Driver|SwooleDriver|WorkermanDriver OneBot驱动 */
-    protected SwooleDriver|Driver|WorkermanDriver $driver;
+    /** @var null|Driver|SwooleDriver|WorkermanDriver OneBot驱动 */
+    protected SwooleDriver|Driver|WorkermanDriver|null $driver = null;
 
     /** @var array<array<string, string>> 启动注解列表 */
     protected array $setup_annotations = [];
@@ -178,6 +178,9 @@ class Framework
      */
     public function getDriver(): Driver
     {
+        if ($this->driver === null) {
+            $this->driver = new WorkermanDriver();
+        }
         return $this->driver;
     }
 
