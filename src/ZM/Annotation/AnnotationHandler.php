@@ -94,15 +94,6 @@ class AnnotationHandler
             foreach ((AnnotationMap::$_list[$this->annotation_class] ?? []) as $v) {
                 // 调用单个注解
                 $this->handle($v, $this->rule_callback, ...$params);
-                // 执行完毕后检查状态，如果状态是规则判断或中间件before不通过，则重置状态后继续执行别的注解函数
-                if ($this->status == self::STATUS_BEFORE_FAILED || $this->status == self::STATUS_RULE_FAILED) {
-                    $this->status = self::STATUS_NORMAL;
-                    continue;
-                }
-                // 如果执行完毕，且设置了返回值后续逻辑的回调函数，那么就调用返回值回调的逻辑
-                if (is_callable($this->return_callback) && $this->status === self::STATUS_NORMAL) {
-                    ($this->return_callback)($this->return_val);
-                }
             }
         } catch (InterruptException $e) {
             // InterruptException 用于中断，这里必须 catch，并标记状态
@@ -140,6 +131,15 @@ class AnnotationHandler
         }
         try {
             $this->return_val = middleware()->process($callback, ...$args);
+            // 执行完毕后检查状态，如果状态是规则判断或中间件before不通过，则重置状态后继续执行别的注解函数
+            if ($this->status == self::STATUS_BEFORE_FAILED || $this->status == self::STATUS_RULE_FAILED) {
+                $this->status = self::STATUS_NORMAL;
+                return false;
+            }
+            // 如果执行完毕，且设置了返回值后续逻辑的回调函数，那么就调用返回值回调的逻辑
+            if (is_callable($this->return_callback) && $this->status === self::STATUS_NORMAL) {
+                ($this->return_callback)($this->return_val);
+            }
         } catch (InterruptException $e) {
             // 这里直接抛出这个异常的目的就是给上层handleAll()捕获
             throw $e;
