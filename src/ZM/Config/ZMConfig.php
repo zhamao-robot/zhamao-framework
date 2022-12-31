@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ZM\Config;
 
 use OneBot\Config\Config;
+use OneBot\Config\Loader\LoaderInterface;
 use OneBot\Util\Singleton;
 use ZM\Exception\ConfigException;
 use ZM\Framework;
@@ -14,19 +15,9 @@ class ZMConfig
     use Singleton;
 
     /**
-     * @var array 支持的文件扩展名
-     */
-    public const ALLOWED_FILE_EXTENSIONS = ['php', 'yaml', 'yml', 'json', 'toml'];
-
-    /**
      * @var array 配置文件加载顺序，后覆盖前
      */
     public const LOAD_ORDER = ['default', 'environment', 'patch'];
-
-    /**
-     * @var string 默认配置文件路径
-     */
-    public const DEFAULT_CONFIG_PATH = SOURCE_ROOT_DIR . '/config';
 
     /**
      * @var string[] 环境别名
@@ -41,6 +32,11 @@ class ZMConfig
      * @var array 已加载的配置文件
      */
     private array $loaded_files = [];
+
+    /**
+     * @var array 配置文件扩展名
+     */
+    private array $file_extensions = [];
 
     /**
      * @var array 配置文件路径
@@ -62,6 +58,9 @@ class ZMConfig
      */
     private ?ConfigTracer $tracer = null;
 
+    /** @var LoaderInterface 配置加载器 */
+    private LoaderInterface $loader;
+
     /**
      * 构造配置实例
      *
@@ -70,16 +69,29 @@ class ZMConfig
      *
      * @throws ConfigException 配置文件加载出错
      */
-    public function __construct(array $config_paths = [], string $environment = 'uninitiated')
+    public function __construct(string $environment = 'uninitiated')
     {
-        $this->config_paths = $config_paths ?: [self::DEFAULT_CONFIG_PATH];
+        $conf = $this->loadInitConfig();
+        $this->file_extensions = $conf['source']['extensions'];
+        $this->config_paths = $conf['source']['paths'];
+
         $this->environment = self::$environment_alias[$environment] ?? $environment;
-        $this->holder = new Config([]);
+
+        // 初始化配置容器
+        $this->holder = new Config(
+            new ($conf['repository'][0])(...$conf['repository'][1]),
+        );
+
+        // 初始化配置加载器
+        $this->loader = new ($conf['loader'][0])(...$conf['loader'][1]);
+
+        // 调试模式下启用配置跟踪器
         if (Framework::getInstance()->getArgv()['debug'] ?? false) {
             $this->tracer = new ConfigTracer();
         } else {
             $this->tracer = null;
         }
+
         if ($environment !== 'uninitiated') {
             $this->loadFiles();
         }
@@ -104,7 +116,7 @@ class ZMConfig
             foreach ($files as $file) {
                 [, $ext, $load_type] = $this->getFileMeta($file);
                 // 略过不支持的文件
-                if (!in_array($ext, self::ALLOWED_FILE_EXTENSIONS, true)) {
+                if (!in_array($ext, $this->file_extensions, true)) {
                     continue;
                 }
 
@@ -347,12 +359,14 @@ class ZMConfig
 
         // 判断文件格式是否支持
         [$group, $ext, $load_type, $env] = $this->getFileMeta($path);
-        if (!in_array($ext, self::ALLOWED_FILE_EXTENSIONS, true)) {
+        if (!in_array($ext, $this->file_extensions, true)) {
             throw ConfigException::unsupportedFileType($path);
         }
 
         // 读取并解析配置
         $content = file_get_contents($path);
+        // TODO: 使用 Loader 替代
+//        $config = $this->loader->load($path);
         $config = [];
         switch ($ext) {
             case 'php':
@@ -396,8 +410,11 @@ class ZMConfig
         $this->merge($group, $config);
         logger()->debug("已载入配置文件：{$path}");
 
-        if ($this->tracer !== null) {
-            $this->tracer->addTracesOf($group, $config, $path);
-        }
+        $this->tracer?->addTracesOf($group, $config, $path);
+    }
+
+    private function loadInitConfig(): array
+    {
+        return require SOURCE_ROOT_DIR . '/config/config.php';
     }
 }

@@ -14,7 +14,7 @@
         "enabled": true,
         "actions": [
             {
-                "action": "composer cs-fix -- {$STAGED_FILES|of-type:php} --dry-run",
+                "action": "composer cs-fix -- --config=.php-cs-fixer.php --dry-run --diff {$STAGED_FILES|of-type:php}",
                 "conditions": [
                     {
                         "exec": "\\CaptainHook\\App\\Hook\\Condition\\FileStaged\\OfType",
