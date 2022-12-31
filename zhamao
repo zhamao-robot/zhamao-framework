@@ -21,12 +21,6 @@ else
 	fi
 fi
 
-result=$(echo "$1" | grep -E "module|build")
-
-if [ "$result" != "" ]; then
-    executable="$executable -d phar.readonly=off"
-fi
-
 if [ -f "$(pwd)/src/entry.php" ]; then
     $executable "$(pwd)/src/entry.php" $@
 elif [ -f "$(pwd)/vendor/zhamao/framework/src/entry.php" ]; then

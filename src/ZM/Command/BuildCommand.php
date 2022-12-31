@@ -5,12 +5,10 @@ declare(strict_types=1);
 namespace ZM\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
+use ZM\Store\FileSystem;
 
-#[AsCommand(name: 'build', description: '将项目构建一个phar包')]
+#[AsCommand(name: 'build', description: '将项目构建一个 Phar 包')]
 class BuildCommand extends Command
 {
     use NonPharLoadModeOnly;
@@ -20,81 +18,82 @@ class BuildCommand extends Command
      */
     protected function configure()
     {
-        $this->setHelp('此功能将会把整个项目打包为phar');
-        $this->addOption('target', 'D', InputOption::VALUE_REQUIRED, 'Output Directory | 指定输出目录');
-        // ...
+        $this->setHelp('此功能将会把整个项目打包为 Phar');
+        $this->addOption('target', 'D', InputOption::VALUE_REQUIRED, '指定输出文件位置');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function handle(): int
     {
-        /* TODO
-        $this->output = $output;
-        $target_dir = $input->getOption('target') ?? WORKING_DIR;
-        if (mb_strpos($target_dir, '../')) {
-            $target_dir = realpath($target_dir);
+        $this->ensurePharWritable();
+
+        $target = $this->input->getOption('target') ?? 'zm.phar';
+        if (FileSystem::isRelativePath($target)) {
+            $target = SOURCE_ROOT_DIR . '/' . $target;
         }
-        if ($target_dir === false) {
-            $output->writeln(TermColor::color8(31) . zm_internal_errcode('E00039') . 'Error: No such file or directory (' . $target_dir . ')' . TermColor::RESET);
-            return 1;
-        }
-        $output->writeln('Target: ' . $target_dir);
-        if (mb_substr($target_dir, -1, 1) !== '/') {
-            $target_dir .= '/';
-        }
-        if (ini_get('phar.readonly') == 1) {
-            $output->writeln(TermColor::color8(31) . zm_internal_errcode('E00040') . 'You need to set "phar.readonly" to "Off"!');
-            $output->writeln(TermColor::color8(31) . 'See: https://stackoverflow.com/questions/34667606/cant-enable-phar-writing');
-            return 1;
-        }
-        if (!is_dir($target_dir)) {
-            $output->writeln(TermColor::color8(31) . zm_internal_errcode('E00039') . "Error: No such file or directory ({$target_dir})" . TermColor::RESET);
-            return 1;
-        }
-        $filename = 'server.phar';
-        $this->build($target_dir, $filename);
-        */
-        $output->writeln('<error>Not implemented.</error>');
-        return 1;
+        $this->ensureTargetWritable($target);
+        $this->comment("目标文件：{$target}");
+
+        $this->info('正在构建 Phar 包');
+
+        $this->build($target, LOAD_MODE === LOAD_MODE_VENDOR ? 'src/entry.php' : 'vendor/zhamao/framework/src/entry.php');
+
+        $this->info('Phar 包构建完成');
+
+        return self::SUCCESS;
     }
-    /*
-        private function build($target_dir, $filename)
-        {
-            @unlink($target_dir . $filename);
-            $phar = new Phar($target_dir . $filename);
-            $phar->startBuffering();
 
-            $all = DataProvider::scanDirFiles(DataProvider::getSourceRootDir(), true, true);
-
-            $all = array_filter($all, function ($x) {
-                $dirs = preg_match('/(^(bin|config|resources|src|vendor)\\/|^(composer\\.json|README\\.md)$)/', $x);
-                return !($dirs !== 1);
-            });
-
-            sort($all);
-
-            $archive_dir = DataProvider::getSourceRootDir();
-            $map = [];
-
-            if (class_exists('\\League\\CLImate\\CLImate')) {
-                $climate = new CLImate();
-                $progress = $climate->progress()->total(count($all));
+    private function ensurePharWritable(): void
+    {
+        if (ini_get('phar.readonly') === '1') {
+            if (!function_exists('pcntl_exec')) {
+                $this->error('Phar 处于只读模式，且 pcntl 扩展未加载，无法自动切换到读写模式。');
+                $this->error('请修改 php.ini 中的 phar.readonly 为 0，或执行 php -d phar.readonly=0 ' . $_SERVER['PHP_SELF'] . ' build');
+                exit(1);
             }
-            foreach ($all as $k => $v) {
-                $map[$v] = $archive_dir . '/' . $v;
-                if (isset($progress)) {
-                    $progress->current($k + 1, 'Adding ' . $v);
-                }
+            // Windows 下无法使用 pcntl_exec
+            if (DIRECTORY_SEPARATOR === '\\') {
+                $this->error('Phar 处于只读模式，且当前运行环境为 Windows，无法自动切换到读写模式。');
+                $this->error('请修改 php.ini 中的 phar.readonly 为 0，或执行 php -d phar.readonly=0 ' . $_SERVER['PHP_SELF'] . ' build');
+                exit(1);
             }
-            $this->output->write('<info>Building...</info>');
-            $phar->buildFromIterator(new ArrayIterator($map));
-            $phar->setStub(
-                "#!/usr/bin/env php\n" .
-                $phar->createDefaultStub(LOAD_MODE == 0 ? 'src/entry.php' : 'vendor/zhamao/framework/src/entry.php')
-            );
-            $phar->stopBuffering();
-            $this->output->writeln('');
-            $this->output->writeln('Successfully built. Location: ' . $target_dir . "{$filename}");
-            $this->output->writeln('<info>You may use `chmod +x server.phar` to let phar executable with `./` command</info>');
+            $this->info('Phar 处于只读模式，正在尝试切换到读写模式...');
+            sleep(1);
+            $args = array_merge(['php', '-d', 'phar.readonly=0'], $_SERVER['argv']);
+            if (pcntl_exec('/usr/bin/env', $args) === false) {
+                $this->error('切换到读写模式失败，请检查环境。');
+                exit(1);
+            }
         }
-    */
+    }
+
+    private function ensureTargetWritable(string $target): void
+    {
+        if (file_exists($target) && !is_writable($target)) {
+            $this->error('目标文件不可写：' . $target);
+            exit(1);
+        }
+    }
+
+    private function build(string $target, string $entry): void
+    {
+        $phar = new \Phar($target, 0, $target);
+
+        $phar->startBuffering();
+        $files = FileSystem::scanDirFiles(SOURCE_ROOT_DIR, true, true);
+        $files = array_filter($files, function ($x) {
+            $dirs = preg_match('/(^(bin|config|resources|src|vendor)\\/|^(composer\\.json|README\\.md)$)/', $x);
+            return !($dirs !== 1);
+        });
+        sort($files);
+
+        foreach ($this->progress()->iterate($files) as $file) {
+            $phar->addFile($file, $file);
+        }
+
+        $phar->setStub(
+            '#!/usr/bin/env php' . PHP_EOL .
+            $phar::createDefaultStub($entry)
+        );
+        $phar->stopBuffering();
+    }
 }

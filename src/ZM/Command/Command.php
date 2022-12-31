@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ZM\Command;
 
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\ConsoleSectionOutput;
@@ -150,5 +151,22 @@ abstract class Command extends \Symfony\Component\Console\Command\Command
             $this->error($e->getMessage());
             exit(self::FAILURE);
         }
+    }
+
+    /**
+     * 获取一个进度条实例
+     *
+     * @param int $max 最大进度值，可以稍后再设置
+     */
+    protected function progress(int $max = 0): ProgressBar
+    {
+        $progress = new ProgressBar($this->output, $max);
+        $progress->setBarCharacter('<fg=green>⚬</>');
+        $progress->setEmptyBarCharacter('<fg=red>⚬</>');
+        $progress->setProgressCharacter('<fg=green>➤</>');
+        $progress->setFormat(
+            "%current%/%max% [%bar%] %percent:3s%%\n🪅 %estimated:-20s%  %memory:20s%"
+        );
+        return $progress;
     }
 }
