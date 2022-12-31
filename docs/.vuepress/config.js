@@ -1,7 +1,7 @@
 const apiConfig = require('./api')
 
 module.exports = {
-    title: '炸毛框架',
+    title: '炸毛框架（v2 旧版）',
     description: '一个高性能聊天机器人 + Web 框架',
     theme: 'antdocs',
     markdown: {
@@ -34,7 +34,7 @@ module.exports = {
             { text: 'API', link: '/api/' },
             { text: 'FAQ', link: '/faq/' },
             { text: '更新日志', link: '/update/v2/' },
-            { text: '炸毛框架 v1', link: 'https://docs-v1.zhamao.xin/' }
+            { text: '炸毛框架 v3（最新版）', link: 'https://framework.zhamao.xin/' }
         ],
         sidebar: {
             '/guide/': [
