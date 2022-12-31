@@ -15,7 +15,6 @@ use ZM\Store\Database\DBException;
 use ZM\Store\Database\DBQueryBuilder;
 use ZM\Store\Database\DBWrapper;
 use ZM\Store\KV\KVInterface;
-use ZM\Utils\ZMRequest;
 
 // 防止重复引用引发报错
 if (function_exists('zm_internal_errcode')) {
