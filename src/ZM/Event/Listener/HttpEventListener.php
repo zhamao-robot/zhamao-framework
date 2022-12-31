@@ -52,14 +52,12 @@ class HttpEventListener
                     // TODO：这里有个bug，逻辑上 request_method 应该是个数组，而不是字符串，但是这里 $node['method'] 是字符串，所以这里只能用字符串来判断
                     // $div->request_method = $node['request_method'];
                     $div->class = $node['class'];
-                    $starttime = microtime(true);
                     $handler->handle($div, null, $params, $event->getRequest(), $event);
                     if (is_string($val = $handler->getReturnVal()) || ($val instanceof \Stringable)) {
                         $event->withResponse(HttpFactory::createResponse(200, null, [], Stream::create($val)));
                     } elseif ($event->getResponse() === null) {
                         $event->withResponse(HttpFactory::createResponse(500));
                     }
-                    logger()->warning('Used ' . round((microtime(true) - $starttime) * 1000, 3) . ' ms');
                     break;
                 case ZM_ERR_ROUTE_METHOD_NOT_ALLOWED:
                     $event->withResponse(HttpUtil::handleHttpCodePage(405));
