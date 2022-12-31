@@ -58,20 +58,22 @@ class ZMConfig
      */
     private ?ConfigTracer $tracer = null;
 
-    /** @var LoaderInterface 配置加载器 */
+    /**
+     * @var LoaderInterface 配置加载器
+     * @phpstan-ignore-next-line We will use this property in the future.
+     */
     private LoaderInterface $loader;
 
     /**
      * 构造配置实例
      *
-     * @param array  $config_paths 配置文件路径
-     * @param string $environment  环境
+     * @param string $environment 环境
      *
      * @throws ConfigException 配置文件加载出错
      */
-    public function __construct(string $environment = 'uninitiated')
+    public function __construct(string $environment = 'uninitiated', array $init_config = null)
     {
-        $conf = $this->loadInitConfig();
+        $conf = $init_config ?: $this->loadInitConfig();
         $this->file_extensions = $conf['source']['extensions'];
         $this->config_paths = $conf['source']['paths'];
 
