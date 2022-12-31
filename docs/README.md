@@ -1,11 +1,16 @@
 ---
 home: true
 heroImage: ./logo_trans.png
-actionBtn:
-  text: 快速上手
-  link: /guide/
-  type: primary
-  size: large
+actions:
+  - text: 快速上手
+    link: /guide/
+    type: primary
+    size: large
+  - text: 快速上手（v2 旧版）
+    link: https://docs-v2.zhamao.me/
+    type: primary
+    ghost: true
+    size: large
 features:
 - title: 高性能
   details: 基于 PHP 的 Swoole 高性能扩展，利用 WebSocket 进行与 OneBot 协议兼容的聊天机器人软件的通信，还有数据库连接池、内存缓存、多任务进程等特色，大幅增强性能。
