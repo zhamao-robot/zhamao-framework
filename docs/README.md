@@ -29,7 +29,7 @@ footer: |
 此命令可一键以模板安装框架！（仅限 Linux 和 macOS）
 
 ```bash
-bash <(curl -fsSL https://zhamao.xin/go.sh)
+bash <(curl -fsSL https://zhamao.xin/v3.sh)
 ```
 
 ## 运行框架
