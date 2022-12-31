@@ -248,11 +248,12 @@ function bot(): ZM\Context\BotContext
     return new \ZM\Context\BotContext('', '');
 }
 
-function kv(string $name = ''): KVInterface
+function kv(string $name = ''): Psr\SimpleCache\CacheInterface
 {
     global $kv_class;
     if (!$kv_class) {
         $kv_class = config('global.kv.use', \LightCache::class);
     }
-    return $kv_class::open($name);
+    /* @phpstan-ignore-next-line */
+    return is_a($kv_class, KVInterface::class, true) ? $kv_class::open($name) : new $kv_class($name);
 }
