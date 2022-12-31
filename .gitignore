@@ -82,3 +82,6 @@ package-lock.json
 /.tool-version
 
 .DS_Store
+
+### PHP CS Fixer ###
+.php-cs-fixer.cache

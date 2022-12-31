@@ -24,7 +24,9 @@ class ZMRequestTest extends TestCase
 
     public function testGet()
     {
-        $r = ZMRequest::get('http://ip.zhamao.xin');
-        $this->assertStringContainsString('114', $r);
+        $r = ZMRequest::get('http://httpbin.org/get', [
+            'X-Test' => '123',
+        ]);
+        $this->assertStringContainsString('123', $r);
     }
 }

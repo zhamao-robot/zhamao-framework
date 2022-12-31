@@ -71,5 +71,6 @@ return (new PhpCsFixer\Config())
         PhpCsFixer\Finder::create()
             ->in(__DIR__ . '/src')
             ->in(__DIR__ . '/tests')
-    )
-    ->setUsingCache(false);
+            ->in(__DIR__ . '/config')
+            ->in(__DIR__ . '/bin')
+    );
