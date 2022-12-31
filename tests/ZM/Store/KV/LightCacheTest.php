@@ -17,7 +17,7 @@ class LightCacheTest extends TestCase
         $a = LightCache::open('asd');
         $this->assertInstanceOf(LightCache::class, $a);
         /* @phpstan-ignore-next-line */
-        $this->assertTrue($a->removeSelf());
+        $this->assertTrue($a->clear());
     }
 
     public function testSet()
@@ -27,7 +27,7 @@ class LightCacheTest extends TestCase
 
     public function testIsset()
     {
-        $this->assertFalse(LightCache::open()->isset('test111'));
+        $this->assertFalse(LightCache::open()->has('test111'));
     }
 
     public function testGet()
@@ -41,7 +41,7 @@ class LightCacheTest extends TestCase
         $kv = LightCache::open('sss');
         $kv->set('test', 'test');
         $this->assertSame($kv->get('test'), 'test');
-        $kv->unset('test');
+        $kv->delete('test');
         $this->assertNull($kv->get('test'));
     }
 }

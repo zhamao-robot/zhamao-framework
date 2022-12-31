@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ZM\Store\KV;
 
+use Psr\SimpleCache\CacheInterface;
 use ZM\Exception\InvalidArgumentException;
 use ZM\Process\ProcessStateManager;
 use ZM\Store\FileSystem;
@@ -11,7 +12,7 @@ use ZM\Store\FileSystem;
 /**
  * 轻量、基于本地 JSON 文件的 KV 键值对缓存
  */
-class LightCache implements KVInterface
+class LightCache implements CacheInterface, KVInterface
 {
     /** @var array 存放库对象的列表 */
     private static array $objs = [];
@@ -49,7 +50,7 @@ class LightCache implements KVInterface
     /**
      * @throws InvalidArgumentException
      */
-    public static function open(string $name = ''): KVInterface
+    public static function open(string $name = ''): CacheInterface
     {
         if (!isset(self::$objs[$name])) {
             self::$objs[$name] = new LightCache($name);
@@ -82,18 +83,6 @@ class LightCache implements KVInterface
         ], JSON_THROW_ON_ERROR));
     }
 
-    /**
-     * 删除该 KV 库的所有数据，并且永远无法恢复
-     */
-    public function removeSelf(): bool
-    {
-        if (file_exists($this->find_dir . '/' . $this->name . '.json')) {
-            unlink($this->find_dir . '/' . $this->name . '.json');
-        }
-        unset(self::$caches[$this->name], self::$ttys[$this->name], self::$objs[$this->name]);
-        return true;
-    }
-
     public function get(string $key, mixed $default = null): mixed
     {
         // 首先判断在不在缓存变量里
@@ -115,24 +104,62 @@ class LightCache implements KVInterface
     /**
      * @throws InvalidArgumentException
      */
-    public function set(string $key, mixed $value, int $ttl = 0): bool
+    public function set(string $key, mixed $value, null|int|\DateInterval $ttl = null): bool
     {
         $this->validateKey($key);
         self::$caches[$this->name][$key] = $value;
-        if ($ttl > 0) {
+        if ($ttl !== null) {
+            if ($ttl instanceof \DateInterval) {
+                $ttl = $ttl->days * 86400 + $ttl->h * 3600 + $ttl->i * 60 + $ttl->s;
+            }
             self::$ttys[$this->name][$key] = time() + $ttl;
         }
         return true;
     }
 
-    public function unset(string $key): bool
+    public function delete(string $key): bool
     {
         unset(self::$caches[$this->name][$key], self::$ttys[$this->name][$key]);
-
         return true;
     }
 
-    public function isset(string $key): bool
+    public function clear(): bool
+    {
+        if (file_exists($this->find_dir . '/' . $this->name . '.json')) {
+            unlink($this->find_dir . '/' . $this->name . '.json');
+        }
+        unset(self::$caches[$this->name], self::$ttys[$this->name], self::$objs[$this->name]);
+        return true;
+    }
+
+    public function getMultiple(iterable $keys, mixed $default = null): iterable
+    {
+        foreach ($keys as $v) {
+            yield $v => $this->get($v, $default);
+        }
+    }
+
+    public function setMultiple(iterable $values, \DateInterval|int|null $ttl = null): bool
+    {
+        foreach ($values as $k => $v) {
+            if (!$this->set($k, $v, $ttl)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public function deleteMultiple(iterable $keys): bool
+    {
+        foreach ($keys as $v) {
+            if (!$this->delete($v)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public function has(string $key): bool
     {
         if (!isset(self::$caches[$this->name][$key])) {
             return false;
