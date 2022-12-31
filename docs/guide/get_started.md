@@ -17,7 +17,7 @@
 
 这里以 Walle-Q 实现端为例，在实际使用中，你可以自由选用不同的实现端。
 
-你可以前往 Walle-Q 的[发布页面](https://github.com/onebot-walle/walle-q/releases)下载最新的发行版本，并运行以进行初始化。
+你可以前往 Walle-Q 的 [发布页面](https://github.com/onebot-walle/walle-q/releases) 下载最新的发行版本，并运行以进行初始化。
 
 在登录成功后，请关闭 Walle-Q 以修改配置文件。
 
@@ -38,26 +38,57 @@ reconnect_interval = 4
 
 修改完成并保存后，重新启动 Walle-Q 并登录即可。如果出现连接失败也请勿惊慌，因为框架此时尚未启动，失败是正常现象。
 
+有些情况可能无法正常扫码登录，可使用 QQ+密码 的方式登录，在最上方插入配置：
+
+```toml
+[qq.123456]
+password = "MyPassword"
+```
+
+> 请将 123456 替换为你的机器人 QQ 号码，MyPassword 替换为机器人 QQ 密码。
+
 ## 编写第一个功能
 
 在框架中，几乎所有事件的绑定都是通过注解进行的，详情可以参阅 注解的使用。
 
-让我们在 `src/Module/Repeater.php` 中开发我们的第一个功能。
+让我们新建第一个插件，插件的功能很简单，就是复读。我们假设这个复读插件的名字是 `repeater`
 
-```php
-namespace Module;
-
-class Repeater
-{
-	#[BotCommand('echo')]
-	public function repeat(OneBotEvent $event, BotContext $context): void
-  {
-		$context->reply($event->getMessage());
-  }
-}
+```bash
+./zhamao plugin:make
+# 然后根据提示，创建，比如名字输入 repeater
+# 选择类型的时候，输入 file
 ```
 
-借助容器的依赖注入功能，我们可以直接指定相应的类，相关实例会在调用时自动传入。
+我们就可以在目录 `plugins/repeater/` 下得到两个文件，其中 `main.php` 代码可能如下：
+
+```php
+<?php
+
+declare(strict_types=1);
+
+$plugin = new ZMPlugin(__DIR__);
+
+/*
+ * 发送 "测试repeater"，回复 "这是repeater插件的第一个命令！"
+ */
+$cmd1 = BotCommand::make('repeater', match: '测试repeater')->on(fn () => '这是repeater插件的第一个命令！');
+
+$plugin->addBotCommand($cmd1);
+
+return $plugin;
+```
+
+然后根据复读的原理（简单重复一遍用户发的消息），将上方 `$cmd1` 替换为下面的指令：
+
+```php
+$cmd1 = BotCommand::make('repeater', match: '复读')->on(function(OneBotEvent $event, BotContext $ctx) {
+    $ctx->reply($event->getMessage());
+});
+```
+
+此后，保存文件。
+
+> 借助容器的依赖注入功能，我们可以直接指定相应的类，相关实例会在调用时自动传入。上方的 OneBotEvent 和 BotContext 可以自由选择位置。
 
 ## 启动框架
 
@@ -65,7 +96,7 @@ class Repeater
 
 启动后，Walle-Q 的日志应当会显示连接成功的信息。
 
-此时，你可以通过任意账号向机器人发送 `echo 给我复读` 消息，机器人会回复 `给我复读`。
+此时，你可以通过任意账号向机器人发送 `复读 给我复读` 消息，机器人会回复 `复读 给我复读`。
 
 至此，你的第一个功能，复读机，也就开发完成了。
 

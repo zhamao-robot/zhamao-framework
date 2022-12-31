@@ -39,6 +39,9 @@ composer require zhamao/framework
 
 ## 安装完成后启动
 ./zhamao server
+
+## 生成新插件脚手架，用于开发
+./zhamao plugin:make
 ```
 
 ## Windows 安装方法

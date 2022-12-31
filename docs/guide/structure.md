@@ -1,48 +1,36 @@
 # 目录结构
 
-## 根目录
+## 用户目录
 
-### Config 目录
+### config 目录
 
 `config` 目录包含框架、应用的所有配置文件。最好把这些文件都浏览一遍，并熟悉所有可用的选项。
 
-### Src 目录
-
-`src` 目录包含应用的核心代码，你的大部分工作都将在这里进行。
-
-### Tests 目录
-
-`tests` 目录通常是你编写 PHPUnit 单元测试和功能测试的地方。你可以使用 `composer test` 运行其中的测试。
-
-> 该目录并不自带
->
-
-### Vendor 目录
-
-`vendor` 目录包含你通过 Composer 安装的所有依赖。
-
-## Src 目录
-
-你的大多数代码都位于 `src` 目录中。
-
-### Globals 目录
-
-`globals` 目录包含你的全局定义文件，例如全局函数和常量等。
-
-需要注意的是，框架本身并不会为你自动加载其中的文件，你需要自行使用 Composer 自动加载或其他方式加载其中的代码。
-
-例如 `Globals/my_functions.php` 可以被添加到 `composer.json` 当中。
-
-```json
-{
-	"autoload": {
-		"files": [
-			"src/Globals/my_functions.php"
-		]
-	}
-}
+```
+config/
+├── global.php           # 全局配置文件
+├── container.php        # 容器配置文件
+└── motd.txt             # 框架启动时展示的文字信息
 ```
 
-### Module 目录
+### vendor 目录
 
-`module` 目录包含你机器人或是服务的主体代码，其中的所有类都会被框架自动扫描并解析，你可以在其中利用注解来注册事件绑定并进行相应处理。
+`vendor` 目录包含你通过 Composer 安装的所有依赖，此目录为自动生成，无需操作。
+
+### plugins 目录
+
+`plugins` 目录包含你编写或加载到源代码模式的插件，里面的插件都会被框架自动扫描并解析，你可以在其中利用注解来注册事件绑定并进行相应处理。
+
+比如你通过 `./zhamao plugin:make` 新建了一个名字叫 `test-app` 的插件，并且设置为单文件模式（`file`），那么这个插件内包含的文件及结构为：
+
+```
+plugins/
+└── test-app/
+    ├── main.php         # 你的插件源代码文件
+    └── zmplugin.json    # 插件元信息（如名称、版本等）
+```
+
+### zm_data 目录
+
+`zm_data` 目录存放了框架运行时持久化保存的数据，例如 KV 数据库、驱动日志等内容。
+
