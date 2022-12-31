@@ -20,6 +20,7 @@
         "dragonmantank/cron-expression": "^3.3",
         "jelix/version": "^2.0",
         "koriym/attributes": "^1.0",
+        "nunomaduro/collision": "^6.3",
         "onebot/libonebot": "^0.5",
         "php-di/php-di": "^7",
         "psr/container": "^2.0",
@@ -30,7 +31,7 @@
         "symfony/routing": "~6.0 || ~5.0 || ~4.0"
     },
     "require-dev": {
-        "brainmaestro/composer-git-hooks": "^3.0",
+        "captainhook/captainhook": "^5.12",
         "friendsofphp/php-cs-fixer": "^3.2 != 3.7.0",
         "jangregor/phpstan-prophecy": "^1.0",
         "jetbrains/phpstorm-attributes": "^1.0",
@@ -84,17 +85,6 @@
         "sort-packages": true
     },
     "extra": {
-        "hooks": {
-            "post-merge": "composer install",
-            "pre-commit": [
-                "echo committing as $(git config user.name)",
-                "composer cs-fix -- --diff"
-            ],
-            "pre-push": [
-                "composer cs-fix -- --dry-run --diff",
-                "composer analyse"
-            ]
-        },
         "zm": {
             "exclude-annotation-path": [
                 "src/ZM",
@@ -103,11 +93,9 @@
         }
     },
     "scripts": {
-        "post-install-cmd": [
-            "[ $COMPOSER_DEV_MODE -eq 0 ] || vendor/bin/cghooks add"
-        ],
+        "post-autoload-dump": "vendor/bin/captainhook install -f -s",
         "analyse": "phpstan analyse --memory-limit 300M",
-        "cs-fix": "php-cs-fixer fix",
+        "cs-fix": "PHP_CS_FIXER_FUTURE_MODE=1 php-cs-fixer fix",
         "test": "bin/phpunit-zm --no-coverage"
     }
 }
