@@ -9,8 +9,6 @@ use OneBot\Driver\Event\WebSocket\WebSocketMessageEvent;
 use OneBot\V12\Object\Action;
 use OneBot\V12\Object\MessageSegment;
 use OneBot\V12\Object\OneBotEvent;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use ZM\Context\Trait\BotActionTrait;
 use ZM\Exception\OneBot12Exception;
 use ZM\Utils\MessageUtil;
@@ -18,6 +16,8 @@ use ZM\Utils\MessageUtil;
 class BotContext implements ContextInterface
 {
     use BotActionTrait;
+
+    private static array $bots = [];
 
     private static array $echo_id_list = [];
 
@@ -30,6 +30,7 @@ class BotContext implements ContextInterface
     public function __construct(string $bot_id, string $platform, null|WebSocketMessageEvent|HttpRequestEvent $event = null)
     {
         $this->self = ['user_id' => $bot_id, 'platform' => $platform];
+        self::$bots[$bot_id][$platform] = $this;
         $this->base_event = $event;
     }
 
@@ -41,11 +42,7 @@ class BotContext implements ContextInterface
     /**
      * 快速回复机器人消息文本
      *
-     * @param  array|MessageSegment|string|\Stringable $message 消息内容、消息段或消息段数组
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     * @throws OneBot12Exception
-     * @throws \Throwable
+     * @param array|MessageSegment|string|\Stringable $message 消息内容、消息段或消息段数组
      */
     public function reply(\Stringable|MessageSegment|array|string $message)
     {
@@ -76,13 +73,24 @@ class BotContext implements ContextInterface
     /**
      * 获取其他机器人的上下文操作对象
      *
-     * @param  string $bot_id   机器人的 self.user_id 对应的 ID
-     * @param  string $platform 机器人的 self.platform 对应的 platform
-     * @return $this
+     * @param  string            $bot_id   机器人的 self.user_id 对应的 ID
+     * @param  string            $platform 机器人的 self.platform 对应的 platform
+     * @throws OneBot12Exception
      */
     public function getBot(string $bot_id, string $platform = ''): BotContext
     {
-        return $this;
+        if (isset(self::$bots[$bot_id])) {
+            if ($platform === '') {
+                $one = current(self::$bots[$bot_id]);
+                if ($one instanceof BotContext) {
+                    return $one;
+                }
+            } elseif (isset(self::$bots[$bot_id][$platform])) {
+                return self::$bots[$bot_id][$platform];
+            }
+        }
+        // 到这里说明没找到对应的机器人，抛出异常
+        throw new OneBot12Exception('Bot not found.');
     }
 
     /**
@@ -121,5 +129,10 @@ class BotContext implements ContextInterface
     public function getEchoAction(mixed $echo): ?Action
     {
         return self::$echo_id_list[$echo] ?? null;
+    }
+
+    public function getSelf(): array
+    {
+        return $this->self;
     }
 }
