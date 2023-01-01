@@ -13,7 +13,7 @@ IF /i "%ZM_CUSTOM_PHP_PATH%" neq "" (
     echo "* Using system PHP executable"
     SET executable=php
 )
-@REM TODO: Phar write support is missing
+
 IF exist src/entry.php (
     @REM Run the PHP entry point
     %executable% src/entry.php %*
