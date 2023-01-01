@@ -67,8 +67,8 @@ class BuildCommand extends Command
             }
             $this->info('Phar 处于只读模式，正在尝试切换到读写模式...');
             sleep(1);
-            $args = array_merge(['php', '-d', 'phar.readonly=0'], $_SERVER['argv']);
-            if (pcntl_exec('/usr/bin/env', $args) === false) {
+            $args = array_merge(['-d', 'phar.readonly=0'], $_SERVER['argv']);
+            if (pcntl_exec(PHP_BINARY, $args) === false) {
                 $this->error('切换到读写模式失败，请检查环境。');
                 exit(1);
             }
