@@ -63,6 +63,20 @@ class DBPool
             case SwooleDriver::class:
                 self::$pools[$name] = new SwooleObjectPool($size, \PDO::class, $connect_str, ...$args);
         }
+        switch ($config['type']) {
+            case 'sqlite':
+                /** @var \PDO $pool */
+                $pool = self::$pools[$name]->get();
+                $a = $pool->query('select sqlite_version();')->fetchAll()[0][0] ?? '';
+                if (str_starts_with($a, '3')) {
+                    logger()->debug('sqlite ' . $name . ' connected');
+                }
+                self::$pools[$name]->put($pool);
+                break;
+            case 'mysql':
+                // TODO: 编写验证 MySQL 连接有效性的功能
+                break;
+        }
     }
 
     /**
