@@ -21,6 +21,7 @@ use ZM\Store\Database\DBException;
 use ZM\Store\Database\DBPool;
 use ZM\Store\FileSystem;
 use ZM\Store\KV\LightCache;
+use ZM\Store\KV\Redis\RedisPool;
 use ZM\Utils\ZMUtil;
 
 class WorkerEventListener
@@ -219,6 +220,9 @@ class WorkerEventListener
         foreach (DBPool::getAllPools() as $name => $pool) {
             DBPool::destroyPool($name);
         }
+        foreach (RedisPool::getAllPools() as $name => $pool) {
+            RedisPool::destroyPool($name);
+        }
 
         // 读取 MySQL 配置文件
         $conf = config('global.database');
@@ -226,6 +230,13 @@ class WorkerEventListener
         foreach ($conf as $name => $conn_conf) {
             if (($conn_conf['enable'] ?? true) !== false) {
                 DBPool::create($name, $conn_conf);
+            }
+        }
+
+        $redis_conf = config('global.redis');
+        foreach ($redis_conf as $name => $conn_conf) {
+            if (($conn_conf['enable'] ?? true) !== false) {
+                RedisPool::create($name, $conn_conf);
             }
         }
     }
