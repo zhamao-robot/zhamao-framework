@@ -108,7 +108,7 @@ class CommandManualPlugin extends ZMPlugin
         $adjacent_annotations = $this->adjacent_annotations[$command_name] ?? [];
 
         // 遍历工厂，直到找到一个返回非空的工厂
-        foreach (self::$manual_factories as $factory) {
+        foreach (array_reverse(self::$manual_factories) as $factory) {
             $manual = container()->call(
                 $factory,
                 [
