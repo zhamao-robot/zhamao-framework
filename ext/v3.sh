@@ -173,8 +173,15 @@ function linux_env_check() {
         if type php >/dev/null 2>&1; then
             php_executable=$(which php)
             echo "位置：$php_executable"
-            if [ "$($php_executable -m | grep swoole)" = "" ]; then
-                echo "$(nhead red) PHP 不存在 swoole 扩展，可能无法正常使用 Swoole 框架！" && \
+            ver_id=$($php_executable -r "echo PHP_VERSION_ID;")
+            if [ "$ver_id" -lt 80000 ]; then
+                echo "$(nhead red) PHP 版本过低，框架需要 PHP >= 8.0.0！" && \
+                prompt_install_native_php && \
+                install_native_php && \
+                install_native_composer && composer_check && return 0 || return 1
+            fi
+            if [ "$($php_executable -m | grep tokenizer)" = "" ]; then
+                echo "$(nhead red) PHP 不存在 tokenizer 扩展，可能无法正常使用框架！" && \
                 prompt_install_native_php && \
                 install_native_php && \
                 install_native_composer && composer_check && return 0 || return 1
@@ -233,12 +240,12 @@ function install_framework() {
         $composer_executable init --name="zhamao/zhamao-v3-app" -n -q && \
         if_use_aliyun && \
         echo "$(nhead) 从 Composer 拉取框架 ..." && \
-        echo '{"minimum-stability":"dev"}' > composer.json && composer require -n -q zhamao/framework:^3 && \
-        $composer_executable require -n -q --dev swoole/ide-helper:^4.5 && \
+        echo '{"minimum-stability":"dev"}' > composer.json && composer require -n zhamao/framework:^3 && \
+        $composer_executable require -n --dev swoole/ide-helper:^4.5 && \
         if_restore_native_runtime && \
         echo "$(nhead) 初始化框架脚手架文件 ..." && \
-        vendor/bin/zhamao init >/dev/null 2>&1 && \
-        $composer_executable dump-autoload -n -q && \
+        vendor/bin/zhamao init && \
+        $composer_executable dump-autoload -n && \
         show_success_msg || {
             echo "$(nhead red) 安装框架失败！" && cd $ZM_PWD && rm -rf "$ZM_CUSTOM_DIR" && return 1
         }
