@@ -89,7 +89,7 @@ $config['database'] = [
         'dbname' => 'a.db',
         'pool_size' => 10,
     ],
-    'zm' => [
+    'default' => [
         'enable' => false,
         'type' => 'mysql',
         'host' => '127.0.0.1', // 填写数据库服务器地址后才会创建数据库连接
@@ -102,11 +102,24 @@ $config['database'] = [
     ],
 ];
 
+/* Redis 连接配置，框架将自动生成连接池，支持多个连接池 */
+$config['redis'] = [
+    'default' => [
+        'enable' => false,
+        'host' => '127.0.0.1',
+        'port' => 6379,
+        'index' => 0,
+        'auth' => '',
+        'pool_size' => 10,
+    ],
+];
+
 /* KV 数据库的配置 */
 $config['kv'] = [
     'use' => \LightCache::class,                        // 默认在单进程模式下使用 LightCache，多进程需要使用 ZMRedis
     'light_cache_dir' => $config['data_dir'] . '/lc',   // 默认的 LightCache 保存持久化数据的位置
     'light_cache_autosave_time' => 600,                 // LightCache 自动保存时间（秒）
+    'redis_config' => 'default',
 ];
 
 return $config;
