@@ -317,17 +317,23 @@ class Framework
         foreach (config('global.servers') as $k => $v) {
             $properties['listen_' . $k] = $v['type'] . '://' . $v['host'] . ':' . $v['port'];
         }
-        // 打印 MySQL 连接信息
-        if ((config('global.mysql_config.host') ?? '') !== '') {
-            $conf = config('global', 'mysql_config');
-            $properties['mysql'] = $conf['dbname'] . '@' . $conf['host'] . ':' . $conf['port'];
+        // 打印 database 连接信息
+        foreach (config('global.database') as $name => $db) {
+            if (!$db['enable']) {
+                continue;
+            }
+            $properties['db[' . $name . ']'] = match ($db['type']) {
+                'sqlite' => $db['type'] . '://' . $db['dbname'],
+                'mysql' => $db['type'] . '://' . $db['host'] . ':' . $db['port'] . '/' . $db['dbname'],
+                default => '未知数据库类型',
+            };
         }
-        // 打印 Redis 连接信息
-        if ((config('global', 'redis_config')['host'] ?? '') !== '') {
-            $conf = config('global', 'redis_config');
-            $properties['redis_pool'] = $conf['host'] . ':' . $conf['port'];
+        // 打印 redis 连接信息
+        foreach (config('global.redis') as $name => $redis) {
+            if ($redis['enable']) {
+                $properties['redis[' . $name . ']'] = $redis['host'] . ':' . $redis['port'];
+            }
         }
-
         if (LOAD_MODE === 0) {
             logger()->info('框架正以源码模式启动');
         }
