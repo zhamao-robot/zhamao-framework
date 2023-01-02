@@ -13,7 +13,7 @@ use ZM\Annotation\AnnotationParser;
 use ZM\Annotation\Framework\Init;
 use ZM\Exception\ZMKnownException;
 use ZM\Framework;
-use ZM\Plugin\CommandManualPlugin;
+use ZM\Plugin\CommandManual\CommandManualPlugin;
 use ZM\Plugin\OneBot12Adapter;
 use ZM\Plugin\PluginManager;
 use ZM\Process\ProcessStateManager;
