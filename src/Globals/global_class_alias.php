@@ -16,6 +16,7 @@ class_alias(\ZM\Plugin\ZMPlugin::class, 'ZMPlugin');
 class_alias(\OneBot\V12\Object\OneBotEvent::class, 'OneBotEvent');
 class_alias(\ZM\Context\BotContext::class, 'BotContext');
 class_alias(\ZM\Store\KV\LightCache::class, 'LightCache');
+class_alias(\ZM\Store\KV\Redis\KVRedis::class, 'KVRedis');
 
 // 下面是 OneBot 相关类的全局别称
 class_alias(\OneBot\Driver\Event\WebSocket\WebSocketOpenEvent::class, 'WebSocketOpenEvent');
