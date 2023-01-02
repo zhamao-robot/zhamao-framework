@@ -34,7 +34,7 @@ class StaticManualFactory
         return $section;
     }
 
-    private function getSectionContent(BotCommand $command, string $type, CommandHelp $help): string
+    protected function getSectionContent(BotCommand $command, string $type, CommandHelp $help): string
     {
         switch ($type) {
             case 'command':
@@ -57,7 +57,7 @@ class StaticManualFactory
         }
     }
 
-    private function addSection(string &$section, string $content, array $options): void
+    protected function addSection(string &$section, string $content, array $options): void
     {
         if (!$content) {
             return;
