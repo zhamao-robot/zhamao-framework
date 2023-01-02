@@ -58,7 +58,7 @@ class CommandManualPlugin extends ZMPlugin
         }
 
         $parser->addSpecialParser(BotCommand::class, [$this, 'parseBotCommand']);
-        $parser->addSpecialParser(CommandHelp::class, fn () => false);
+        $parser->addSpecialParser(CommandHelp::class, fn () => true);
 
         $this->addBotCommand(
             BotCommand::make('help', 'help', level: 10)
@@ -89,7 +89,7 @@ class CommandManualPlugin extends ZMPlugin
     {
         $this->commands[$command->name] = $command;
         $this->adjacent_annotations[$command->name] = $adjacent_annotations ?? [];
-        return true;
+        return null;
     }
 
     /**
