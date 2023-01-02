@@ -58,7 +58,7 @@ class OneBot12Adapter extends ZMPlugin
                 // 处理和声明所有 BotCommand 下的 CommandArgument
                 $parser->addSpecialParser(BotCommand::class, [$this, 'parseBotCommand']);
                 // 不需要给列表写入 CommandArgument
-                $parser->addSpecialParser(CommandArgument::class, [$this, 'parseCommandArgument']);
+                $parser->addSpecialParser(CommandArgument::class, fn () => true);
                 break;
             case 'onebot12-ban-other-ws':
                 // 禁止其他类型的 WebSocket 客户端接入
@@ -84,14 +84,6 @@ class OneBot12Adapter extends ZMPlugin
             }
         }
         return null;
-    }
-
-    /**
-     * 忽略解析记录 CommandArgument 注解
-     */
-    public function parseCommandArgument(): ?bool
-    {
-        return true;
     }
 
     /**
