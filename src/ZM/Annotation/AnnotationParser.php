@@ -20,9 +20,9 @@ use ZM\Utils\HttpUtil;
 class AnnotationParser
 {
     /**
-     * @var array 要解析的路径列表
+     * @var array 要解析的 PSR-4 class 列表
      */
-    private array $path_list = [];
+    private array $class_list = [];
 
     /**
      * @var float 用于计算解析时间用的
@@ -56,6 +56,7 @@ class AnnotationParser
             $this->special_parsers = [
                 Middleware::class => [function (Middleware $middleware) { \middleware()->bindMiddleware([resolve($middleware->class), $middleware->method], $middleware->name, $middleware->params); }],
                 Route::class => [[$this, 'addRouteAnnotation']],
+                Closed::class => [function () { return false; }],
             ];
         }
     }
@@ -71,13 +72,21 @@ class AnnotationParser
         $this->special_parsers[$class_name][] = $callback;
     }
 
-    public function parse(array $path): void
+    /**
+     * 解析所有传入的 PSR-4 下识别出来的类及下方的注解
+     * 返回一个包含三个元素的数组，分别是list、map、tree
+     * 其中list为注解列表，key是注解的class名称，value是所有此注解的列表，即[Annotation1, ...]
+     * map是类、方法映射表关系的三维数组，即[类名 => [方法名 => [注解1, ...]]]
+     * tree是解析中间生成的树结构，内含反射对象，见下方注释
+     *
+     * @return array[]
+     * @throws \ReflectionException
+     */
+    public function parse(): array
     {
-        // 写日志
-        logger()->debug('parsing annotation in ' . $path[0] . ':' . $path[1]);
-
-        // 首先获取路径下所有的类（通过 PSR-4 标准解析）
-        $all_class = FileSystem::getClassesPsr4($path[0], $path[1]);
+        $reflection_tree = [];
+        $annotation_map = [];
+        $annotation_list = [];
 
         // 读取配置文件中配置的忽略解析的注解名，防止误解析一些别的地方需要的注解，比如@mixin
         $conf = config('global.runtime.annotation_reader_ignore');
@@ -97,7 +106,7 @@ class AnnotationParser
 
         // 声明一个既可以解析注解又可以解析Attribute的双reader来读取注解和Attribute
         $reader = new DualReader(new AnnotationReader(), new AttributeReader());
-        foreach ($all_class as $v) {
+        foreach ($this->class_list as $v) {
             logger()->debug('正在检索 ' . $v);
 
             // 通过反射实现注解读取
@@ -107,7 +116,7 @@ class AnnotationParser
             // 这段为新加的:start
             // 这里将每个类里面所有的类注解、方法注解通通加到一颗大树上，后期解析
             /*
-            $annotation_map: {
+            $reflection_tree: {
                 Module\Example\Hello: {
                     class_annotations: [
                         注解对象1, 注解对象2, ...
@@ -124,16 +133,16 @@ class AnnotationParser
             */
 
             // 保存对class的注解
-            $this->annotation_tree[$v]['class_annotations'] = $class_annotations;
+            $reflection_tree[$v]['class_annotations'] = $class_annotations;
             // 保存类成员的方法的对应反射对象们
-            $this->annotation_tree[$v]['methods'] = $methods;
+            $reflection_tree[$v]['methods'] = $methods;
             // 保存对每个方法获取到的注解们
             foreach ($methods as $method) {
-                $this->annotation_tree[$v]['methods_annotations'][$method->getName()] = $reader->getMethodAnnotations($method);
+                $reflection_tree[$v]['methods_annotations'][$method->getName()] = $reader->getMethodAnnotations($method);
             }
 
             // 因为适用于类的注解有一些比较特殊，比如有向下注入的，有控制行为的，所以需要遍历一下下放到方法里
-            foreach ($this->annotation_tree[$v]['class_annotations'] as $vs) {
+            foreach ($reflection_tree[$v]['class_annotations'] as $vs) {
                 $vs->class = $v;
 
                 // 预处理0：排除所有非继承于 AnnotationBase 的注解
@@ -142,33 +151,30 @@ class AnnotationParser
                     continue;
                 }
 
-                // 预处理1：如果类包含了@Closed注解，则跳过这个类
-                if ($vs instanceof Closed) {
-                    unset($this->annotation_tree[$v]);
-                    continue 2;
-                }
-
                 // 预处理2：将适用于每一个函数的注解到类注解重新注解到每个函数下面
                 if ($vs instanceof ErgodicAnnotation) {
-                    foreach (($this->annotation_tree[$v]['methods'] ?? []) as $method) {
+                    foreach (($reflection_tree[$v]['methods'] ?? []) as $method) {
                         // 用 clone 的目的是生成个独立的对象，避免和 class 以及方法之间互相冲突
                         $copy = clone $vs;
                         $copy->method = $method->getName();
-                        $this->annotation_tree[$v]['methods_annotations'][$method->getName()][] = $copy;
+                        $reflection_tree[$v]['methods_annotations'][$method->getName()][] = $copy;
+                        $annotation_list[get_class($vs)][] = $copy;
                     }
                 }
 
                 // 预处理3：调用自定义解析器
-                if (($a = $this->parseSpecial($vs)) === true) {
+                if (($a = $this->parseSpecial($vs, $reflection_tree[$v]['class_annotations'])) === true) {
                     continue;
                 }
                 if ($a === false) {
+                    unset($reflection_tree[$v]);
                     continue 2;
                 }
+                $annotation_list[get_class($vs)][] = $vs;
             }
 
             // 预处理3：处理每个函数上面的特殊注解，就是需要操作一些东西的
-            foreach (($this->annotation_tree[$v]['methods_annotations'] ?? []) as $method_name => $methods_annotations) {
+            foreach (($reflection_tree[$v]['methods_annotations'] ?? []) as $method_name => $methods_annotations) {
                 foreach ($methods_annotations as $method_anno) {
                     // 预处理3.0：排除所有非继承于 AnnotationBase 的注解
                     if (!$method_anno instanceof AnnotationBase) {
@@ -180,43 +186,31 @@ class AnnotationParser
                     $method_anno->class = $v;
                     $method_anno->method = $method_name;
 
-                    // 预处理3.2：如果包含了@Closed注解，则跳过这个方法的注解解析
-                    if ($method_anno instanceof Closed) {
-                        unset($this->annotation_tree[$v]['methods_annotations'][$method_name]);
-                        continue 2;
-                    }
-
                     // 预处理3.3：调用自定义解析器
-                    if (($a = $this->parseSpecial($method_anno, $methods_annotations)) === true) {
+                    $a = $this->parseSpecial($method_anno, $methods_annotations);
+
+                    if ($a === true) {
                         continue;
                     }
                     if ($a === false) {
+                        unset($reflection_tree[$v]['methods_annotations'][$method_name]);
                         continue 2;
                     }
-
                     // 如果上方没有解析或返回了 true，则添加到注解解析列表中
-                    $this->annotation_map[$v][$method_name][] = $method_anno;
+                    $annotation_map[$v][$method_name][] = $method_anno;
+                    $annotation_list[get_class($method_anno)][] = $method_anno;
                 }
             }
         }
-    }
-
-    /**
-     * 注册各个模块类的注解和模块level的排序
-     */
-    public function parseAll(): void
-    {
-        // 对每个设置的路径依次解析
-        foreach ($this->path_list as $path) {
-            $this->parse($path);
-        }
         logger()->debug('解析注解完毕！');
+        // ob_dump($annotation_list);
+        return [$annotation_list, $annotation_map, $reflection_tree];
     }
 
     /**
      * 生成排序后的注解列表
      */
-    public function generateAnnotationList(): array
+    public function generateAnnotationListFromMap(): array
     {
         $o = [];
         foreach ($this->annotation_tree as $obj) {
@@ -253,10 +247,11 @@ class AnnotationParser
      * @param string $path        注册解析注解的路径
      * @param string $indoor_name 起始命名空间的名称
      */
-    public function addRegisterPath(string $path, string $indoor_name)
+    public function addPsr4Path(string $path, string $indoor_name)
     {
         logger()->debug('Add register path: ' . $path . ' => ' . $indoor_name);
-        $this->path_list[] = [$path, $indoor_name];
+        $all_class = FileSystem::getClassesPsr4($path, $indoor_name);
+        $this->class_list = array_merge($this->class_list, $all_class);
     }
 
     /**

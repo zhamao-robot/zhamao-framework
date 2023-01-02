@@ -27,16 +27,22 @@ class AnnotationMap
      */
     public static array $_map = [];
 
-    /**
-     * 将Parser解析后的注解注册到全局的 AnnotationMap
-     *
-     * @param AnnotationParser $parser 注解解析器
-     */
-    public static function loadAnnotationByParser(AnnotationParser $parser): void
+    public static function loadAnnotationList(array $list): void
     {
-        // 生成后加入到全局list中
-        self::$_list = array_merge_recursive(self::$_list, $parser->generateAnnotationList());
-        self::$_map = $parser->getAnnotationMap();
+        self::$_list = array_merge_recursive(self::$_list, $list);
+    }
+
+    public static function loadAnnotationMap(array $map): void
+    {
+        self::$_map = array_merge_recursive(self::$_map, $map);
+    }
+
+    /**
+     * @return AnnotationBase[]
+     */
+    public static function getAnnotationList(string $class_name): array
+    {
+        return self::$_list[$class_name] ?? [];
     }
 
     /**
