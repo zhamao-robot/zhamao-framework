@@ -151,7 +151,7 @@ class WorkerEventListener
             // 如果在排除表就排除，否则就解析注解
             if (is_dir(SOURCE_ROOT_DIR . '/' . $v) && !in_array($v, $excludes)) {
                 // 添加解析路径，对应Base命名空间也贴出来
-                $parser->addRegisterPath(SOURCE_ROOT_DIR . '/' . $v . '/', trim($k, '\\'));
+                $parser->addPsr4Path(SOURCE_ROOT_DIR . '/' . $v . '/', trim($k, '\\'));
             }
         }
 
@@ -162,9 +162,9 @@ class WorkerEventListener
                 continue;
             }
             match ($name) {
-                'onebot12' => PluginManager::addPlugin(['name' => $name, 'internal' => true, 'object' => new OneBot12Adapter(parser: $parser)]),
-                'onebot12-ban-other-ws' => PluginManager::addPlugin(['name' => $name, 'internal' => true, 'object' => new OneBot12Adapter(submodule: $name)]),
-                'command-manual' => PluginManager::addPlugin(['name' => $name, 'internal' => true, 'object' => new CommandManualPlugin($parser)]),
+                'onebot12' => PluginManager::addPlugin(['name' => $name, 'version' => '1.0', 'internal' => true, 'object' => new OneBot12Adapter(parser: $parser)]),
+                'onebot12-ban-other-ws' => PluginManager::addPlugin(['name' => $name, 'version' => '1.0', 'internal' => true, 'object' => new OneBot12Adapter(submodule: $name)]),
+                'command-manual' => PluginManager::addPlugin(['name' => $name, 'version' => '1.0', 'internal' => true, 'object' => new CommandManualPlugin($parser)]),
             };
         }
 
@@ -186,9 +186,10 @@ class WorkerEventListener
         }
 
         // 解析所有注册路径的文件，获取注解
-        $parser->parseAll();
+        [$list, $map] = $parser->parse();
         // 将Parser解析后的注解注册到全局的 AnnotationMap
-        AnnotationMap::loadAnnotationByParser($parser);
+        AnnotationMap::loadAnnotationList($list);
+        AnnotationMap::loadAnnotationMap($map);
         // 排序所有的
         AnnotationMap::sortAnnotationList();
     }

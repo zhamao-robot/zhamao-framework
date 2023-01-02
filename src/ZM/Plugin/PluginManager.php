@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ZM\Plugin;
 
+use Jelix\Version\VersionComparator;
 use ZM\Annotation\AnnotationMap;
 use ZM\Annotation\AnnotationParser;
 use ZM\Annotation\Framework\BindEvent;
@@ -166,13 +167,23 @@ class PluginManager
     /**
      * 启用所有插件
      *
-     * @param AnnotationParser $parser 传入注解解析器，用于将插件中的事件注解解析出来
+     * @param  AnnotationParser $parser 传入注解解析器，用于将插件中的事件注解解析出来
+     * @throws PluginException
      */
     public static function enablePlugins(AnnotationParser $parser): void
     {
         foreach (self::$plugins as $name => $plugin) {
             if (!isset($plugin['internal'])) {
                 logger()->info('Enabling plugin: ' . $name);
+            }
+            // 先判断下依赖关系，如果声明了依赖，但依赖不合规直接报错崩溃
+            foreach (($plugin['dependencies'] ?? []) as $dep_name => $dep_version) {
+                if (!isset(self::$plugins[$dep_name])) {
+                    throw new PluginException('插件 ' . $name . ' 依赖插件 ' . $dep_name . '，但是没有找到这个插件');
+                }
+                if (VersionComparator::compareVersionRange(self::$plugins[$dep_name]['version'] ?? '1.0', $dep_version) === false) {
+                    throw new PluginException('插件 ' . $name . ' 依赖插件 ' . $dep_name . '，但是这个插件的版本不符合要求');
+                }
             }
             if (isset($plugin['object']) && $plugin['object'] instanceof ZMPlugin) {
                 $obj = $plugin['object'];
@@ -197,7 +208,7 @@ class PluginManager
                 }
             } elseif (isset($plugin['autoload'], $plugin['dir'])) {
                 foreach ($plugin['autoload'] as $k => $v) {
-                    $parser->addRegisterPath($plugin['dir'] . '/' . $v . '/', trim($k, '\\'));
+                    $parser->addPsr4Path($plugin['dir'] . '/' . $v . '/', trim($k, '\\'));
                 }
             }
         }

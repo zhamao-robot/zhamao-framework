@@ -21,7 +21,7 @@ function _zm_setup_loader()
             // 如果在排除表就排除，否则就解析注解
             if (is_dir(SOURCE_ROOT_DIR . '/' . $v) && !in_array($v, $excludes)) {
                 // 添加解析路径，对应Base命名空间也贴出来
-                $parser->addRegisterPath(SOURCE_ROOT_DIR . '/' . $v . '/', trim($k, '\\'));
+                $parser->addPsr4Path(SOURCE_ROOT_DIR . '/' . $v . '/', trim($k, '\\'));
             }
         }
         $parser->addSpecialParser(Setup::class, function (Setup $setup) {
@@ -36,7 +36,7 @@ function _zm_setup_loader()
         // TODO: 然后加载插件目录下的插件
 
         // 解析所有注册路径的文件，获取注解
-        $parser->parseAll();
+        $parser->parse();
 
         return json_encode(['setup' => $_tmp_setup_list]);
     } catch (Throwable $e) {

@@ -156,7 +156,7 @@ function darwin_env_check() {
 
 # 询问是否安装 native php
 function prompt_install_native_php() {
-    echo -ne "$(nhead yellow) 检测到系统的 PHP 不存在 swoole 扩展，是否下载安装独立的内建 PHP 和 Composer？[Y/n] "
+    echo -ne "$(nhead yellow) 检测到系统的 PHP 不符合要求，是否下载安装独立的内建 PHP 和 Composer？[Y/n] "
     read -r y
     case $y in
     Y|y|"") return 0 ;;

@@ -76,7 +76,8 @@
     },
     "bin": [
         "bin/phpunit-zm",
-        "bin/zhamao"
+        "bin/zhamao",
+        "bin/zhamao.bat"
     ],
     "config": {
         "allow-plugins": {
