@@ -7,10 +7,12 @@ namespace ZM\Annotation;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Koriym\Attributes\AttributeReader;
 use Koriym\Attributes\DualReader;
+use ZM\Annotation\Framework\Cron;
 use ZM\Annotation\Http\Controller;
 use ZM\Annotation\Http\Route;
 use ZM\Annotation\Interfaces\ErgodicAnnotation;
 use ZM\Annotation\Middleware\Middleware;
+use ZM\Schedule\Schedule;
 use ZM\Store\FileSystem;
 use ZM\Utils\HttpUtil;
 
@@ -56,7 +58,8 @@ class AnnotationParser
             $this->special_parsers = [
                 Middleware::class => [function (Middleware $middleware) { \middleware()->bindMiddleware([resolve($middleware->class), $middleware->method], $middleware->name, $middleware->params); }],
                 Route::class => [[$this, 'addRouteAnnotation']],
-                Closed::class => [function () { return false; }],
+                Closed::class => [fn () => false],
+                Cron::class => [[resolve(Schedule::class), 'addSchedule']],
             ];
         }
     }

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Module\Example;
 
+use OneBot\Driver\Coroutine\Adaptive;
 use OneBot\Driver\Event\WebSocket\WebSocketMessageEvent;
+use ZM\Annotation\Framework\Cron;
 use ZM\Annotation\Http\Route;
 use ZM\Annotation\Middleware\Middleware;
 use ZM\Annotation\OneBot\BotCommand;
@@ -35,5 +37,20 @@ class Hello123
     public function repeat(\OneBotEvent $event, BotContext $context): void
     {
         $context->reply($event->getMessage());
+    }
+
+    #[Cron('* * * * *', no_overlap: true)]
+    public function logTime(): void
+    {
+        $time = date('Y-m-d H:i:s');
+        logger()->info('我看到时间了，让我写下来');
+        Adaptive::sleep(5);
+        logger()->info('写好啦，时间是' . $time);
+    }
+
+    #[Cron('* * * * *')]
+    public function logTime2(): void
+    {
+        logger()->info('我不需要等，但也不给你看时间');
     }
 }
