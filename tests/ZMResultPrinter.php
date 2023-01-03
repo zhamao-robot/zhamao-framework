@@ -115,12 +115,13 @@ class ZMResultPrinter extends CliTestDoxPrinter
 
     protected function printFooter(TestResult $result): void
     {
-        if ($result->failureCount() === 0) {
+        $non_passed = $result->failureCount() + $result->errorCount() + $result->warningCount();
+        if ($non_passed === 0) {
             $color = 'bg-green,fg-white,bold';
-            $text = '[OK] No errors';
+            $text = '[GOOD] All tests passed';
         } else {
             $color = 'bg-red,fg-white,bold';
-            $text = '[ERROR] Found ' . $result->failureCount() . ' failures';
+            $text = '[FAIL] Found ' . $non_passed . ' non-passed tests';
         }
         $this->writeWithColor($color, "\n {$text} ");
     }
