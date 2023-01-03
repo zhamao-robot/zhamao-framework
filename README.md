@@ -5,7 +5,7 @@
 
 <p align="center">
   <a href="https://onebot.dev/">
-    <img src="https://img.shields.io/badge/OneBot-11-black?style=flat-square" alt="OneBot">
+    <img src="https://img.shields.io/badge/OneBot-12-black?style=flat-square" alt="OneBot">
   </a>
 
   <a href="https://github.com/zhamao-robot/zhamao-framework/actions">
