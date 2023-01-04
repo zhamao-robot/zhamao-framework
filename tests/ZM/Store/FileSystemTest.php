@@ -127,7 +127,7 @@ class FileSystemTest extends TestCase
         $old_perm = $this->vfs->getPermissions();
         $this->vfs->chmod(0000);
         FileSystem::scanDirFiles($this->vfs->url());
-        $this->assertLogged('warning', zm_internal_errcode('E00080') . '扫描目录失败，目录无法读取: ' . $this->vfs->url());
+        $this->assertLogged('warning', zm_internal_errcode('E00080') . '扫描目录失败，目录不可读');
         $this->vfs->chmod($old_perm);
     }
 }

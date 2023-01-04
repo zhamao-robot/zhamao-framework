@@ -25,6 +25,11 @@ class FileSystem
             logger()->warning(zm_internal_errcode('E00080') . '扫描目录失败，目录不存在');
             return false;
         }
+        // 检查目录是否可读
+        if (!is_readable($dir)) {
+            logger()->warning(zm_internal_errcode('E00080') . '扫描目录失败，目录不可读');
+            return false;
+        }
         logger()->debug('扫描' . $dir);
         // 套上 zm_dir
         $scan_list = scandir($dir);
