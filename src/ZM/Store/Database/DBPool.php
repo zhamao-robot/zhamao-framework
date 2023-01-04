@@ -53,6 +53,19 @@ class DBPool
                 $args = [];
                 $connect_str = str_replace(array_keys($table), array_values($table), $connect_str);
                 break;
+            case 'postgres':
+            case 'pgsql':
+                $connect_str = 'pgsql:host={host};port={port};dbname={dbname};user={username};password={password}';
+                $table = [
+                    '{host}' => $config['host'],
+                    '{port}' => $config['port'],
+                    '{dbname}' => $config['dbname'],
+                    '{username}' => $config['username'],
+                    '{password}' => $config['password'],
+                ];
+                $connect_str = str_replace(array_keys($table), array_values($table), $connect_str);
+                $args = [];
+                break;
             default:
                 throw new DBException('type ' . $config['type'] . ' not supported yet');
         }
@@ -75,6 +88,15 @@ class DBPool
                 break;
             case 'mysql':
                 // TODO: 编写验证 MySQL 连接有效性的功能
+                break;
+            case 'postgres':
+            case 'pgsql':
+                $pool = self::$pools[$name]->get();
+                $a = $pool->query('select version();')->fetchAll()[0][0] ?? '';
+                if (str_starts_with($a, 'PostgreSQL')) {
+                    logger()->debug('pgsql ' . $name . ' connected');
+                }
+                self::$pools[$name]->put($pool);
                 break;
         }
     }
