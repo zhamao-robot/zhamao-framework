@@ -6,12 +6,15 @@ namespace ZM\Context;
 
 use DI\DependencyException;
 use DI\NotFoundException;
+use OneBot\Driver\Coroutine\Adaptive;
 use OneBot\Driver\Event\Http\HttpRequestEvent;
 use OneBot\Driver\Event\WebSocket\WebSocketMessageEvent;
 use OneBot\V12\Object\MessageSegment;
 use OneBot\V12\Object\OneBotEvent;
 use ZM\Context\Trait\BotActionTrait;
 use ZM\Exception\OneBot12Exception;
+use ZM\Exception\WaitTimeoutException;
+use ZM\Plugin\OneBot12Adapter;
 use ZM\Utils\MessageUtil;
 
 class BotContext implements ContextInterface
@@ -72,6 +75,58 @@ class BotContext implements ContextInterface
             return $this->sendMessage($msg, $event->detail_type, $event->jsonSerialize());
         }
         throw new OneBot12Exception('bot()->reply() can only be used in message event.');
+    }
+
+    /**
+     * 在当前会话等待用户一条消息
+     * 如果是私聊，就在对应的机器人私聊环境下等待
+     * 如果是单级群组，就在对应的群组下等待当前消息人的消息
+     * 如果是多级群组，则等待最小级下当前消息人的消息
+     *
+     * @param  array|MessageSegment|string|\Stringable $prompt         等待前发送的消息文本
+     * @param  int                                     $timeout        等待超时时间（单位为秒，默认为 600 秒）
+     * @param  string                                  $timeout_prompt 超时后提示的消息内容
+     * @param  bool                                    $return_string  是否只返回 text 格式的字符串消息（默认为 false）
+     * @throws DependencyException
+     * @throws NotFoundException
+     * @throws OneBot12Exception
+     * @throws WaitTimeoutException
+     */
+    public function prompt(string|\Stringable|MessageSegment|array $prompt = '', int $timeout = 600, string $timeout_prompt = '', bool $return_string = false): array|string
+    {
+        if (!container()->has('bot.event')) {
+            throw new OneBot12Exception('bot()->prompt() can only be used in message event');
+        }
+        /** @var OneBotEvent $event */
+        $event = container()->get('bot.event');
+        if ($event->type !== 'message') {
+            throw new OneBot12Exception('bot()->prompt() can only be used in message event');
+        }
+        // 开始等待输入
+        logger()->debug('Waiting user for prompt...');
+        if ($prompt !== '') {
+            $this->reply($prompt);
+        }
+        if (($co = Adaptive::getCoroutine()) === null) {
+            throw new OneBot12Exception('Coroutine is not supported yet, prompt() not works');
+        }
+        $cid = $co->getCid();
+        OneBot12Adapter::addContextPrompt($cid, $event);
+        $co->create(function () use ($cid, $timeout) {
+            Adaptive::sleep($timeout);
+            if (OneBot12Adapter::isContextPromptExists($cid)) {
+                Adaptive::getCoroutine()->resume($cid, '');
+            }
+        });
+        $result = $co->suspend();
+        OneBot12Adapter::removeContextPrompt($cid);
+        if ($result === '') {
+            throw new WaitTimeoutException($this, $timeout_prompt);
+        }
+        if ($result instanceof OneBotEvent && $result->type === 'message') {
+            return $return_string ? $result->getMessageString() : $result->getMessage();
+        }
+        throw new OneBot12Exception('Internal error for resuming prompt: unknown type ' . gettype($result));
     }
 
     /**
