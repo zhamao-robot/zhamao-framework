@@ -1,7 +1,7 @@
 <div align="center">
   <img src="https://cdn.jsdelivr.net/gh/zhamao-robot/zhamao-framework/resources/images/logo_trans.png" width = "150" height = "150" alt="炸毛框架"><br>
   <h2>炸毛框架</h2>
-  炸毛框架 (zhamao-framework) 是一个协程高性能的聊天机器人 + Web 服务器开发框架<br><br>
+  炸毛框架 (zhamao-framework) 是一个高性能的聊天机器人 + Web 服务器开发框架<br><br>
 
 <p align="center">
   <a href="https://onebot.dev/">
@@ -24,19 +24,8 @@
     <img src="https://img.shields.io/github/license/zhamao-robot/zhamao-framework?label=License&style=flat-square" alt="开源协议">
   </a>
 
-  <a href="https://wpa.qq.com/msgrd?v=3&uin=627577391&site=qq&menu=yes">
-    <img src="https://img.shields.io/badge/作者QQ-627577391-orange?style=flat-square" alt="作者QQ">
-  </a>
-
-  <br>
-  <br>
-
-  <a href="https://github.com/zhamao-robot/zhamao-framework/search?q=AnnotationBase">
-    <img src="https://img.shields.io/github/search/zhamao-robot/zhamao-framework/AnnotationBase?label=Annotations&style=flat-square" alt="注解数量">
-  </a>
-
   <a href="https://github.com/zhamao-robot/zhamao-framework/search?q=TODO">
-    <img src="https://img.shields.io/github/search/zhamao-robot/zhamao-framework/TODO?label=TODO&style=flat-square" alt="TODO">
+    <img src="https://img.shields.io/github/search/zhamao-robot/zhamao-framework/TODO?label=TODO%20Counter&style=flat-square" alt="TODO">
   </a>
 </p>
 
@@ -68,12 +57,12 @@ public function index() {
 
 ## 开始
 
-框架目前支持 Linux、WSL、macOS 环境直接运行，上述环境可直接使用下方一键安装脚本。
+框架目前支持 Linux、WSL、macOS、Windows 环境直接运行，其中 Linux、macOS 环境可直接使用下方一键安装脚本。
 
-> 如果你想在其他环境安装部署，可使用 Docker、Cygwin，详见文档。
+> 如果你想在其他环境安装部署，可使用 Docker 快速部署或手动安装环境后安装框架，详见文档。
 
 ```bash
-# 检测PHP环境、安装框架
+# Linux、macOS 下一键检测 PHP 环境、安装框架
 bash <(curl -fsSL https://zhamao.xin/v3.sh)
 
 # 启动框架
@@ -96,7 +85,7 @@ export ZM_COMPOSER_PACKAGIST="yes"
 bash <(curl -fsSL https://zhamao.xin/v3.sh)
 ```
 
-关于其他安装方式，请参阅[文档](https://framework.zhamao.xin/guide/installation.html) 。
+关于其他安装方式，请参阅 [文档](https://framework.zhamao.xin/guide/installation.html) 。
 
 ## 文档
 
@@ -114,13 +103,13 @@ bash <(curl -fsSL https://zhamao.xin/v3.sh)
 - 常驻内存，全局缓存变量随处使用，提供多种缓存方案
 - 自带 MySQL、SQLite、Redis 等数据库连接池
 - 本身为 HTTP 服务器、WebSocket 服务器，可以构建属于自己的 HTTP API 接口
-- 自带 PHP 环境，无需手动编译安装，by [crazywhalecc/static-php-cli](https://github.com/crazywhalecc/static-php-cli)
+- 可选自带 PHP 环境，无需手动编译安装，by [crazywhalecc/static-php-cli](https://github.com/crazywhalecc/static-php-cli)
 
 ## 贡献和捐赠
 
 如果你在使用过程中发现任何问题，可以提交 Issue 或自行 Fork 后修改并提交 Pull Request。
 
-目前项目仅一人维护，耗费精力较大，所以非常欢迎对框架的贡献。
+目前项目仅两人维护，耗费精力较大，所以非常欢迎对框架的贡献。
 
 本项目为作者闲暇时间开发，如果觉得好用，不妨进行捐助～你的捐助会让我更加有动力完善插件，感谢你的支持！
 
@@ -138,8 +127,7 @@ bash <(curl -fsSL https://zhamao.xin/v3.sh)
 
 作者的炸毛机器人已从2018年初起稳定运行了**五年**，并且持续迭代。
 
-可以加作者 QQ（[627577391](http://wpa.qq.com/msgrd?v=3&uin=627577391&site=qq&menu=yes)）
-或提交 [Issue](https://github.com/zhamao-robot/zhamao-framework/issues/new/choose) 进行疑难解答。
+可以提交 [Issue](https://github.com/zhamao-robot/zhamao-framework/issues/new/choose) 或 [加群(670821194)](https://jq.qq.com/?_wv=1027&k=YkNI3AIr) 进行疑难解答。
 
 本项目在更新内容时，请及时关注 GitHub 动态，更新前请将自己的插件或项目代码做好备份。
 
