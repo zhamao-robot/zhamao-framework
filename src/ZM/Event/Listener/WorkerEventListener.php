@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ZM\Event\Listener;
 
 use OneBot\Driver\Coroutine\Adaptive;
+use OneBot\Driver\Coroutine\CoroutineInterface;
 use OneBot\Driver\Process\ProcessManager;
 use OneBot\Util\Singleton;
 use ZM\Annotation\AnnotationHandler;
@@ -96,9 +97,13 @@ class WorkerEventListener
         $this->initUserPlugins();
 
         // handle @Init annotation
-        Adaptive::getCoroutine()->create(function () {
+        if (Adaptive::getCoroutine() instanceof CoroutineInterface) {
+            Adaptive::getCoroutine()->create(function () {
+                $this->dispatchInit();
+            });
+        } else {
             $this->dispatchInit();
-        });
+        }
         // 回显 debug 日志：进程占用的内存
         $memory_total = memory_get_usage() / 1024 / 1024;
         logger()->debug('Worker process used ' . round($memory_total, 3) . ' MB');
