@@ -31,6 +31,11 @@ const ZM_ERR_METHOD_NOT_FOUND = 1;      // 找不到方法
 const ZM_ERR_ROUTE_NOT_FOUND = 2;       // 找不到路由
 const ZM_ERR_ROUTE_METHOD_NOT_ALLOWED = 3; // 路由方法不允许
 
+/** 定义 BotContext 下 reply 回复的模式 */
+const ZM_REPLY_NONE = 0;                // 默认回复，不带任何东西
+const ZM_REPLY_MENTION = 1;             // 回复时 @ 该用户
+const ZM_REPLY_QUOTE = 2;               // 回复时引用该消息
+
 const LOAD_MODE_VENDOR = 0; // 从 vendor 加载
 const LOAD_MODE_SRC = 1;    // 从 src 加载
 
