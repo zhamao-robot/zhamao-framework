@@ -64,7 +64,7 @@ if ($param === 'before') {
     exec('rm -rf docs/.vuepress/public/doxy');
 
     // 授予目录权限：doxy/html
-    exec('chmod -R 644 doxy/html');
+    exec('sudo chmod -R 644 doxy/html');
 
     // 移动新文档到 docs 目录
     exec('mv doxy/html docs/.vuepress/public/doxy');
