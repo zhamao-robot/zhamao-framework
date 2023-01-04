@@ -294,6 +294,9 @@ class OneBot12Adapter extends ZMPlugin
                 return $event->retcode === null || $event->retcode === $resp->retcode;
             });
             $handler->handleAll($resp);
+
+            // 如果有协程，并且该 echo 记录在案的话，就恢复协程
+            BotContext::tryResume($resp);
         }
     }
 
