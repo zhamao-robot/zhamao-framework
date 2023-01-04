@@ -1,8 +1,0 @@
-<map id="类继承关系图" name="类继承关系图">
-<area shape="rect" id="node1" title=" " alt="" coords="5,81,95,108"/>
-<area shape="rect" id="node2" href="$class_z_m_1_1_command_1_1_server_1_1_server_command.html" title=" " alt="" coords="143,81,273,108"/>
-<area shape="rect" id="node3" href="$class_z_m_1_1_command_1_1_server_1_1_server_reload_command.html" title=" " alt="" coords="321,5,497,32"/>
-<area shape="rect" id="node4" href="$class_z_m_1_1_command_1_1_server_1_1_server_start_command.html" title=" " alt="" coords="328,56,491,83"/>
-<area shape="rect" id="node5" href="$class_z_m_1_1_command_1_1_server_1_1_server_status_command.html" title=" " alt="" coords="323,107,495,133"/>
-<area shape="rect" id="node6" href="$class_z_m_1_1_command_1_1_server_1_1_server_stop_command.html" title=" " alt="" coords="329,157,489,184"/>
-</map>

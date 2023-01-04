@@ -1,8 +1,0 @@
-<map id="ServerCommand" name="ServerCommand">
-<area shape="rect" id="node1" title=" " alt="" coords="317,80,448,107"/>
-<area shape="rect" id="node3" href="$class_z_m_1_1_command_1_1_server_1_1_server_reload_command.html" title=" " alt="" coords="5,155,181,181"/>
-<area shape="rect" id="node4" href="$class_z_m_1_1_command_1_1_server_1_1_server_start_command.html" title=" " alt="" coords="205,155,368,181"/>
-<area shape="rect" id="node5" href="$class_z_m_1_1_command_1_1_server_1_1_server_status_command.html" title=" " alt="" coords="393,155,565,181"/>
-<area shape="rect" id="node6" href="$class_z_m_1_1_command_1_1_server_1_1_server_stop_command.html" title=" " alt="" coords="589,155,749,181"/>
-<area shape="rect" id="node2" title=" " alt="" coords="338,5,427,32"/>
-</map>
