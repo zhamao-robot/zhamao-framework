@@ -15,6 +15,7 @@ use ZM\Store\Database\DBException;
 use ZM\Store\Database\DBQueryBuilder;
 use ZM\Store\Database\DBWrapper;
 use ZM\Store\KV\KVInterface;
+use ZM\Store\KV\Redis\RedisWrapper;
 
 // 防止重复引用引发报错
 if (function_exists('zm_internal_errcode')) {
@@ -214,6 +215,16 @@ function db(string $name = '')
 function sql_builder(string $name = ''): DBQueryBuilder
 {
     return (new DBWrapper($name))->createQueryBuilder();
+}
+
+/**
+ * 获取 Redis 操作类
+ *
+ * @param string $name 使用的 Redis 连接名称
+ */
+function redis(string $name = 'default'): RedisWrapper
+{
+    return new RedisWrapper($name);
 }
 
 /**
