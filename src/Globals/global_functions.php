@@ -221,7 +221,6 @@ function sql_builder(string $name = ''): DBQueryBuilder
  * 获取 Redis 操作类
  *
  * @param string $name 使用的 Redis 连接名称
- * @return RedisWrapper
  */
 function redis(string $name = 'default'): RedisWrapper
 {
