@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ZM\Plugin;
 
 use Choir\Http\HttpFactory;
+use OneBot\Driver\Coroutine\Adaptive;
 use OneBot\Driver\Event\StopException;
 use OneBot\Driver\Event\WebSocket\WebSocketMessageEvent;
 use OneBot\Driver\Event\WebSocket\WebSocketOpenEvent;
@@ -34,13 +35,19 @@ class OneBot12Adapter extends ZMPlugin
 {
     /**
      * 缓存待询问参数的队列
-     *
      * 0: 代表 OneBotEvent 对象，即用于判断是否为同一会话环境
      * 1: \Generator 生成器，协程，不多讲
      * 2: BotCommand 注解对象
      * 3: match_result（array）匹配到一半的结果
+     *
+     * @var array<int, array> 队列
      */
-    private static array $prompt_queue = [];
+    private static array $argument_prompt_queue = [];
+
+    /**
+     * @var array<int, OneBotEvent> 队列
+     */
+    private static array $context_prompt_queue = [];
 
     public function __construct(string $submodule = '', ?AnnotationParser $parser = null)
     {
@@ -54,7 +61,8 @@ class OneBot12Adapter extends ZMPlugin
                 // 在 BotEvent 内处理 BotCommand
                 $this->addBotEvent(BotEvent::make(type: 'message', level: 15)->on([$this, 'handleBotCommand']));
                 // 在 BotEvent 内处理需要等待回复的 CommandArgument
-                $this->addBotEvent(BotEvent::make(type: 'message', level: 20)->on([$this, 'handlePrompt']));
+                $this->addBotEvent(BotEvent::make(type: 'message', level: 49)->on([$this, 'handleCommandArgument']));
+                $this->addBotEvent(BotEvent::make(type: 'message', level: 50)->on([$this, 'handleContextPrompt']));
                 // 处理和声明所有 BotCommand 下的 CommandArgument
                 $parser->addSpecialParser(BotCommand::class, [$this, 'parseBotCommand']);
                 // 不需要给列表写入 CommandArgument
@@ -65,6 +73,34 @@ class OneBot12Adapter extends ZMPlugin
                 $this->addEvent(WebSocketOpenEvent::class, [$this, 'handleUnknownWSReverseInput'], 1);
                 break;
         }
+    }
+
+    /**
+     * @internal 只允许内部使用
+     * @param int         $cid   协程 ID
+     * @param OneBotEvent $event 事件对象
+     */
+    public static function addContextPrompt(int $cid, OneBotEvent $event): void
+    {
+        self::$context_prompt_queue[$cid] = $event;
+    }
+
+    /**
+     * @internal 只允许内部使用
+     * @param int $cid 协程 ID
+     */
+    public static function removeContextPrompt(int $cid): void
+    {
+        unset(self::$context_prompt_queue[$cid]);
+    }
+
+    /**
+     * @internal 只允许内部使用
+     * @param int $cid 协程 ID
+     */
+    public static function isContextPromptExists(int $cid): bool
+    {
+        return isset(self::$context_prompt_queue[$cid]);
     }
 
     /**
@@ -122,7 +158,7 @@ class OneBot12Adapter extends ZMPlugin
             $message = MessageSegment::text($argument->prompt === '' ? ('请输入' . $argument->name) : $argument->prompt);
             $ctx->reply([$message]);
             // 然后将此事件放入等待队列
-            self::$prompt_queue[] = [$ctx->getEvent(), $arguments, $command, $match_result];
+            self::$argument_prompt_queue[] = [$ctx->getEvent(), $arguments, $command, $match_result];
             return;
         }
         $ctx->setParams($arguments);
@@ -139,12 +175,12 @@ class OneBot12Adapter extends ZMPlugin
      * @throws OneBot12Exception
      * @throws \Throwable
      */
-    public function handlePrompt(BotContext $ctx)
+    public function handleCommandArgument(BotContext $ctx)
     {
         // 需要先从队列里找到定义当前会话的 prompt
         // 定义一个会话的标准是：事件的 detail_type，user_id，[group_id]，[guild_id，channel_id] 全部相同
         $new_event = $ctx->getEvent();
-        foreach (self::$prompt_queue as $k => $v) {
+        foreach (self::$argument_prompt_queue as $k => $v) {
             /** @var OneBotEvent $old_event */
             $old_event = $v[0];
             if ($old_event->detail_type !== $new_event->detail_type) {
@@ -159,7 +195,7 @@ class OneBot12Adapter extends ZMPlugin
             if (!$matched) {
                 continue;
             }
-            array_splice(self::$prompt_queue, $k, 1);
+            array_splice(self::$argument_prompt_queue, $k, 1);
             // 找到了，开始处理
             /** @var \Generator $arguments */
             $arguments = $v[1];
@@ -171,13 +207,45 @@ class OneBot12Adapter extends ZMPlugin
                 $message = MessageSegment::text($argument->prompt === '' ? ('请输入' . $argument->name) : $argument->prompt);
                 $ctx->reply([$message]);
                 // 然后将此事件放入等待队列
-                self::$prompt_queue[] = [$ctx->getEvent(), $arguments, $v[2], $v[3]];
+                self::$argument_prompt_queue[] = [$ctx->getEvent(), $arguments, $v[2], $v[3]];
             } else {
                 // 所有参数都已经获取到了，调用方法
                 $ctx->setParams($arguments->getReturn());
                 $this->callBotCommand($ctx, $v[2]);
             }
             return;
+        }
+    }
+
+    /**
+     * [CALLBACK] 处理需要等待回复的 bot()->prompt() 会话消息
+     *
+     * @param  BotContext         $ctx   机器人上下文
+     * @param  OneBotEvent        $event 当前事件对象
+     * @throws InterruptException
+     */
+    public function handleContextPrompt(BotContext $ctx, OneBotEvent $event)
+    {
+        // 必须支持协程才能用
+        if (($co = Adaptive::getCoroutine()) === null) {
+            return;
+        }
+        // 遍历等待的信息会话列表
+        foreach (self::$context_prompt_queue as $cid => $v) {
+            // 类型得一样
+            if ($v->detail_type !== $event->detail_type) {
+                continue;
+            }
+            $matched = match ($v->detail_type) {
+                'private' => $v->getUserId() === $event->getUserId(),
+                'group' => $v->getGroupId() === $event->getGroupId() && $v->getUserId() === $event->getUserId(),
+                'channel' => $v->getGuildId() === $event->getGuildId() && $v->getChannelId() === $event->getChannelId() && $v->getUserId() === $event->getUserId(),
+                default => false,
+            };
+            if ($matched) {
+                $co->resume($cid, $event);
+                AnnotationHandler::interrupt();
+            }
         }
     }
 
