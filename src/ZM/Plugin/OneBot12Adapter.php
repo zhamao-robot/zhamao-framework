@@ -283,7 +283,8 @@ class OneBot12Adapter extends ZMPlugin
             $resp->retcode = $body['retcode'];
             $resp->status = $body['status'];
             $resp->message = $body['message'] ?? '';
-            $resp->data = $body['data'] ?? null;
+            $resp->data = $body['data'] ?? [];
+            $resp->echo = $body['echo'] ?? null;
 
             ContainerRegistrant::registerOBActionResponseServices($resp);
 
