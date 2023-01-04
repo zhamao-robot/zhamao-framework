@@ -600,6 +600,7 @@ class DBWrapper
         return match ($type) {
             'mysql' => MySQLDriver::class,
             'sqlite' => SQLiteDriver::class,
+            'pgsql', 'postgres' => PgSQLDriver::class,
             default => throw new DBException('Unknown database type: ' . $type),
         };
     }

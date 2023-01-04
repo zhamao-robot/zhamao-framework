@@ -324,7 +324,7 @@ class Framework
             }
             $properties['db[' . $name . ']'] = match ($db['type']) {
                 'sqlite' => $db['type'] . '://' . $db['dbname'],
-                'mysql' => $db['type'] . '://' . $db['host'] . ':' . $db['port'] . '/' . $db['dbname'],
+                'mysql', 'pgsql' => $db['type'] . '://' . $db['host'] . ':' . $db['port'] . '/' . $db['dbname'],
                 default => '未知数据库类型',
             };
         }
