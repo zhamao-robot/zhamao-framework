@@ -5,6 +5,7 @@
 - 一键脚本
 - Docker
 - Composer
+- Phar 发行模式
 
 ## 一键脚本
 
@@ -44,6 +45,17 @@ composer require zhamao/framework
 ./zhamao plugin:make
 ```
 
+## Phar 发行模式
+
+如果你对框架本身不感兴趣，只是想使用框架提供的功能，你可以直接下载 Phar 发行模式的框架，然后在任意目录下使用。
+
+你可以到 GitHub Release 下载框架的自动打包 Phar 版本，同时下载一个静态的 PHP 运行时，然后将二者放在同一目录下，即可使用。
+但请注意，测试版一般不会发布 Phar 包，因此你需要自行构建。
+
+如果你的操作系统已经安装好了 PHP 并设置了环境变量，你也可以直接使用 `./zhamao.phar` 来运行框架。
+
+> 如果在 Linux、macOS 环境下提示权限不足，请使用 `chmod +x zhamao.phar` 来授予执行权限。
+
 ## Windows 安装方法
 
 由于 Windows 系统下的 PHP 环境配置较为复杂，我们推荐使用 Docker 或一键脚本来进行安装。
@@ -79,9 +91,13 @@ cd zhamao-v3
 3. 从 PHP 官网下载 PHP，选择 `Non Thread Safe` 版本，PHP 版本选择 8.0 ~ 8.2 均可（推荐 8.1），下载完成后解压到框架目录下的 `runtime\php` 目录，例如 `D:\zhamao-v3\runtime\php\`。
 4. 从 [Composer 官网](https://getcomposer.org/download/) 或 [阿里云镜像](https://mirrors.aliyun.com/composer/composer.phar) 下载 Composer，下载到 `runtime\` 目录。
 5. 在你的脚手架目录下执行 `.\runtime\php\php.exe .\runtime\composer.phar install` 安装框架依赖。
-6. 执行框架初始化命令：`./zhamao init`。
+6. 执行框架初始化命令：`./zhamao init`。（如果提示没有 `./zhamao` 文件，本步骤可尝试使用 `.\runtime\php\php.exe .\vendor\bin\zhamao init` 来执行）
 7. 接下来你就可以使用和上方所有框架操作指令相同的内容了，例如 `./zhamao plugin:make`、`./zhamao server` 等。
 8. 如果你需要使用 Composer，你可以使用 `.\runtime\php\php.exe .\runtime\composer.phar` 来代替 `composer` 命令。
+
+## 提升性能
+
+如果你打算让你的框架提升处理性能，我们建议你为 PHP 安装 Swoole 扩展、libevent 扩展，或将 PHP 版本提升到 8.1 及以上。
 
 ## 更多的环境部署和开发方式
 

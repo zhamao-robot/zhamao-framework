@@ -27,6 +27,7 @@ module.exports = {
         nav: [
             { text: '指南', link: '/guide/' },
             { text: '事件', link: '/event/' },
+            { text: '组件', link: '/components/bot/bot-context' },
             { text: 'API 文档', link: '/doxy/', target: '_blank' },
             { text: '炸毛框架 v2', link: 'https://docs-v2.zhamao.xin/' }
         ],
@@ -57,6 +58,17 @@ module.exports = {
                         'middleware',
                         'framework',
                         'extend',
+                    ]
+                }
+            ],
+            '/components/': [
+                {
+                    title: '组件',
+                    collapsable: false,
+                    sidebarDepth: 2,
+                    children: [
+                        'bot/bot-context',
+                        'bot/message-segment',
                     ]
                 }
             ]

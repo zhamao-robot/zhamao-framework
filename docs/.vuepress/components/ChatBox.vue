@@ -4,7 +4,7 @@
     <div v-for="i in chat" v-bind="i">
       <div class="doc-chat-row" v-if="i.type === 0">
         <div class="doc-chat-box">{{ i.content }}</div>
-        <img class="doc-chat-avatar" src="https://api.btstu.cn/sjtx/api.php"  alt=""/>
+        <img class="doc-chat-avatar" src="https://zhamao.xin/images/customer_avatar.png"  alt=""/>
       </div>
       <div class="doc-chat-row doc-chat-row-robot" v-else-if="i.type === 1">
         <img class="doc-chat-avatar" src="https://docs-v1.zhamao.xin/logo.png" alt=""/>
@@ -19,6 +19,13 @@
         <img class="doc-chat-avatar" src="https://docs-v1.zhamao.xin/logo.png" alt=""/>
         <div class="doc-chat-box doc-chat-box-robot">
           <img :src="i.content" alt="" />
+        </div>
+      </div>
+      <div class="doc-chat-row doc-chat-row-robot" v-else-if="i.type === 4">
+        <img class="doc-chat-avatar" src="https://docs-v1.zhamao.xin/logo.png" alt=""/>
+        <div class="doc-chat-box doc-chat-box-robot">
+          <div class="doc-chat-box-quote">{{ i.quote }}</div>
+          <span v-for="(p,index) in i.content.split('\n')">{{p}}<br v-if="index !== i.content.length - 1"></span>
         </div>
       </div>
     </div>
@@ -83,6 +90,14 @@ export default {
 
 .doc-chat-row-robot {
   justify-content: flex-start !important;
+}
+
+.doc-chat-box-quote {
+  background-color: #cecece;
+  margin: .4rem .2rem;
+  border-radius: .3rem;
+  padding: .4rem .6rem;
+  font-size: 12px;
 }
 
 .doc-chat-box {
