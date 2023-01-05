@@ -83,6 +83,10 @@ cd zhamao-v3
 7. 接下来你就可以使用和上方所有框架操作指令相同的内容了，例如 `./zhamao plugin:make`、`./zhamao server` 等。
 8. 如果你需要使用 Composer，你可以使用 `.\runtime\php\php.exe .\runtime\composer.phar` 来代替 `composer` 命令。
 
+## 提升性能
+
+如果你打算让你的框架提升处理性能，我们建议你为 PHP 安装 Swoole 扩展、libevent 扩展，或将 PHP 版本提升到 8.1 及以上。
+
 ## 更多的环境部署和开发方式
 
 除了上述方式之外，框架还支持源码模式、守护进程等运行方式，详情请参阅 [进阶开发]。
