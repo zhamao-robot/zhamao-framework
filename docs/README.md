@@ -19,7 +19,7 @@ features:
 - title: 接口直观
   details: 支持命令、普通文本、正则匹配、自然语言处理等多种对话解析方式，利用协程巧妙实现了直观的交互式会话模式，同时支持多种富文本的处理。
 footer: |
-  Apache-2.0 Licensed &nbsp;|&nbsp; Copyright © 2019-2022 Zhamao Developer Team &nbsp;|&nbsp; <a href="http://beian.miit.gov.cn">沪ICP备2021010446号-1</a>
+  Apache-2.0 Licensed &nbsp;|&nbsp; Copyright © 2019-2023 Zhamao Developer Team &nbsp;|&nbsp; <a href="http://beian.miit.gov.cn">沪ICP备2021010446号-1</a>
 ---
 
 # 快速上手
