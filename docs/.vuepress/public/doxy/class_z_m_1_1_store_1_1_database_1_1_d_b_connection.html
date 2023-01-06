@@ -1,0 +1,472 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.9.5"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Zhamao Framework: DBConnection类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectalign">
+   <div id="projectname">Zhamao Framework<span id="projectnumber">&#160;3.0.0-beta5</span>
+   </div>
+   <div id="projectbrief">A high-performance chatbot + web framework</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.9.5 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','搜索');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('class_z_m_1_1_store_1_1_database_1_1_d_b_connection.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public 成员函数</a>  </div>
+  <div class="headertitle"><div class="title">DBConnection类 参考</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="dynheader">
+类 DBConnection 继承关系图:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="class_z_m_1_1_store_1_1_database_1_1_d_b_connection__inherit__graph.svg" width="116" height="110"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">图例</a>]</span></center></div>
+<div class="dynheader">
+DBConnection 的协作图:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="class_z_m_1_1_store_1_1_database_1_1_d_b_connection__coll__graph.svg" width="116" height="110"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">图例</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:a9162320adff1a1a4afd7f2372f753a3e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_store_1_1_database_1_1_d_b_connection.html#a9162320adff1a1a4afd7f2372f753a3e">__construct</a> ($params)</td></tr>
+<tr class="separator:a9162320adff1a1a4afd7f2372f753a3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a421831a265621325e1fdd19aace0c758"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_store_1_1_database_1_1_d_b_connection.html#a421831a265621325e1fdd19aace0c758">__destruct</a> ()</td></tr>
+<tr class="separator:a421831a265621325e1fdd19aace0c758"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab62fe348997905e95319ac84b3d304f7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_store_1_1_database_1_1_d_b_connection.html#ab62fe348997905e95319ac84b3d304f7">prepare</a> ($sql, $options=[])</td></tr>
+<tr class="separator:ab62fe348997905e95319ac84b3d304f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a30a1ad04b51258177af63e89f000dd41"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_store_1_1_database_1_1_d_b_connection.html#a30a1ad04b51258177af63e89f000dd41">query</a> (... $args)</td></tr>
+<tr class="separator:a30a1ad04b51258177af63e89f000dd41"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab156fe0296cd40afecf0c10f5f1256cc"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_store_1_1_database_1_1_d_b_connection.html#ab156fe0296cd40afecf0c10f5f1256cc">quote</a> ($value, $type=ParameterType::STRING)</td></tr>
+<tr class="separator:ab156fe0296cd40afecf0c10f5f1256cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa66dd9b75483d3d4cf93b6f8788bbd90"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_store_1_1_database_1_1_d_b_connection.html#aa66dd9b75483d3d4cf93b6f8788bbd90">exec</a> ($sql)</td></tr>
+<tr class="separator:aa66dd9b75483d3d4cf93b6f8788bbd90"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9f9cb8ca720d7bbcb03869def521336e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_store_1_1_database_1_1_d_b_connection.html#a9f9cb8ca720d7bbcb03869def521336e">lastInsertId</a> ($name=null)</td></tr>
+<tr class="separator:a9f9cb8ca720d7bbcb03869def521336e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af3380f3b13931d581fa973a382946b32"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_store_1_1_database_1_1_d_b_connection.html#af3380f3b13931d581fa973a382946b32">beginTransaction</a> ()</td></tr>
+<tr class="separator:af3380f3b13931d581fa973a382946b32"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af5674c27d4a92f6228565010eacbb9cb"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_store_1_1_database_1_1_d_b_connection.html#af5674c27d4a92f6228565010eacbb9cb">commit</a> ()</td></tr>
+<tr class="separator:af5674c27d4a92f6228565010eacbb9cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aebaea4cae21e0e75ec1489c1648caeb3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_store_1_1_database_1_1_d_b_connection.html#aebaea4cae21e0e75ec1489c1648caeb3">rollBack</a> ()</td></tr>
+<tr class="separator:aebaea4cae21e0e75ec1489c1648caeb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a928a98b280c4dd8971ce6998eb157409"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_store_1_1_database_1_1_d_b_connection.html#a928a98b280c4dd8971ce6998eb157409">errorCode</a> ()</td></tr>
+<tr class="separator:a928a98b280c4dd8971ce6998eb157409"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac5230ce6cd46c5e922146a441d807877"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_store_1_1_database_1_1_d_b_connection.html#ac5230ce6cd46c5e922146a441d807877">errorInfo</a> ()</td></tr>
+<tr class="separator:ac5230ce6cd46c5e922146a441d807877"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a00016cd5c0a8d5114e473292b7d9c32f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_store_1_1_database_1_1_d_b_connection.html#a00016cd5c0a8d5114e473292b7d9c32f">getPoolName</a> ()</td></tr>
+<tr class="separator:a00016cd5c0a8d5114e473292b7d9c32f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">构造及析构函数说明</h2>
+<a id="a9162320adff1a1a4afd7f2372f753a3e" name="a9162320adff1a1a4afd7f2372f753a3e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9162320adff1a1a4afd7f2372f753a3e">&#9670;&#160;</a></span>__construct()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">__construct </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>$params</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="class_z_m_1_1_store_1_1_database_1_1_d_b_connection_a9162320adff1a1a4afd7f2372f753a3e_cgraph.svg" width="360" height="86"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+</div>
+
+</div>
+</div>
+<a id="a421831a265621325e1fdd19aace0c758" name="a421831a265621325e1fdd19aace0c758"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a421831a265621325e1fdd19aace0c758">&#9670;&#160;</a></span>__destruct()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">__destruct </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="class_z_m_1_1_store_1_1_database_1_1_d_b_connection_a421831a265621325e1fdd19aace0c758_cgraph.svg" width="352" height="86"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+</div>
+
+</div>
+</div>
+<h2 class="groupheader">成员函数说明</h2>
+<a id="af3380f3b13931d581fa973a382946b32" name="af3380f3b13931d581fa973a382946b32"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af3380f3b13931d581fa973a382946b32">&#9670;&#160;</a></span>beginTransaction()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">beginTransaction </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af5674c27d4a92f6228565010eacbb9cb" name="af5674c27d4a92f6228565010eacbb9cb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af5674c27d4a92f6228565010eacbb9cb">&#9670;&#160;</a></span>commit()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">commit </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a928a98b280c4dd8971ce6998eb157409" name="a928a98b280c4dd8971ce6998eb157409"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a928a98b280c4dd8971ce6998eb157409">&#9670;&#160;</a></span>errorCode()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">errorCode </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac5230ce6cd46c5e922146a441d807877" name="ac5230ce6cd46c5e922146a441d807877"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac5230ce6cd46c5e922146a441d807877">&#9670;&#160;</a></span>errorInfo()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">errorInfo </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa66dd9b75483d3d4cf93b6f8788bbd90" name="aa66dd9b75483d3d4cf93b6f8788bbd90"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa66dd9b75483d3d4cf93b6f8788bbd90">&#9670;&#160;</a></span>exec()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">exec </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>$sql</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramtype">mixed</td><td class="paramname">$sql</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>异常</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname"><a class="el" href="class_z_m_1_1_store_1_1_database_1_1_d_b_exception.html">DBException</a></td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="class_z_m_1_1_store_1_1_database_1_1_d_b_connection_aa66dd9b75483d3d4cf93b6f8788bbd90_cgraph.svg" width="166" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+</div>
+
+</div>
+</div>
+<a id="a00016cd5c0a8d5114e473292b7d9c32f" name="a00016cd5c0a8d5114e473292b7d9c32f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a00016cd5c0a8d5114e473292b7d9c32f">&#9670;&#160;</a></span>getPoolName()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">getPoolName </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="section return"><dt>返回</dt><dd>mixed </dd></dl>
+
+</div>
+</div>
+<a id="a9f9cb8ca720d7bbcb03869def521336e" name="a9f9cb8ca720d7bbcb03869def521336e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9f9cb8ca720d7bbcb03869def521336e">&#9670;&#160;</a></span>lastInsertId()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">lastInsertId </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>$name</em> = <code>null</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramtype">null&#160;|&#160;mixed</td><td class="paramname">$name</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>异常</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname"><a class="el" href="class_z_m_1_1_store_1_1_database_1_1_d_b_exception.html">DBException</a></td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ab62fe348997905e95319ac84b3d304f7" name="ab62fe348997905e95319ac84b3d304f7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab62fe348997905e95319ac84b3d304f7">&#9670;&#160;</a></span>prepare()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">prepare </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>$sql</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>$options</em> = <code>[]</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramtype">mixed</td><td class="paramname">$sql</td><td></td></tr>
+    <tr><td class="paramtype">mixed</td><td class="paramname">$options</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>异常</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname"><a class="el" href="class_z_m_1_1_store_1_1_database_1_1_d_b_exception.html">DBException</a></td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="class_z_m_1_1_store_1_1_database_1_1_d_b_connection_ab62fe348997905e95319ac84b3d304f7_cgraph.svg" width="182" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+</div>
+
+</div>
+</div>
+<a id="a30a1ad04b51258177af63e89f000dd41" name="a30a1ad04b51258177af63e89f000dd41"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a30a1ad04b51258177af63e89f000dd41">&#9670;&#160;</a></span>query()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">query </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>$args</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="exception"><dt>异常</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname"><a class="el" href="class_z_m_1_1_store_1_1_database_1_1_d_b_exception.html">DBException</a></td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ab156fe0296cd40afecf0c10f5f1256cc" name="ab156fe0296cd40afecf0c10f5f1256cc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab156fe0296cd40afecf0c10f5f1256cc">&#9670;&#160;</a></span>quote()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">quote </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>$value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>$type</em> = <code>ParameterType::STRING</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aebaea4cae21e0e75ec1489c1648caeb3" name="aebaea4cae21e0e75ec1489c1648caeb3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aebaea4cae21e0e75ec1489c1648caeb3">&#9670;&#160;</a></span>rollBack()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">rollBack </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>src/ZM/Store/Database/<a class="el" href="_d_b_connection_8php.html">DBConnection.php</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="namespace_z_m.html">ZM</a></li><li class="navelem"><a class="el" href="namespace_z_m_1_1_store.html">Store</a></li><li class="navelem"><a class="el" href="namespace_z_m_1_1_store_1_1_database.html">Database</a></li><li class="navelem"><a class="el" href="class_z_m_1_1_store_1_1_database_1_1_d_b_connection.html">DBConnection</a></li>
+    <li class="footer">制作者 <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.5 </li>
+  </ul>
+</div>
+</body>
+</html>

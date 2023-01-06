@@ -1,0 +1,461 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.9.5"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Zhamao Framework: LightCache类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectalign">
+   <div id="projectname">Zhamao Framework<span id="projectnumber">&#160;3.0.0-beta5</span>
+   </div>
+   <div id="projectbrief">A high-performance chatbot + web framework</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.9.5 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','搜索');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('class_z_m_1_1_store_1_1_k_v_1_1_light_cache.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public 成员函数</a> &#124;
+<a href="#pub-static-methods">静态 Public 成员函数</a>  </div>
+  <div class="headertitle"><div class="title">LightCache类 参考</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="dynheader">
+类 LightCache 继承关系图:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="class_z_m_1_1_store_1_1_k_v_1_1_light_cache__inherit__graph.svg" width="238" height="110"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">图例</a>]</span></center></div>
+<div class="dynheader">
+LightCache 的协作图:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="class_z_m_1_1_store_1_1_k_v_1_1_light_cache__coll__graph.svg" width="238" height="110"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">图例</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:aba32e95e2008290bf8c7ea2367cf8760"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_store_1_1_k_v_1_1_light_cache.html#aba32e95e2008290bf8c7ea2367cf8760">__construct</a> (private string $name='', string $find_str='')</td></tr>
+<tr class="separator:aba32e95e2008290bf8c7ea2367cf8760"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afc8a3c62679cf00ade9f15fb2a6d6132"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_store_1_1_k_v_1_1_light_cache.html#afc8a3c62679cf00ade9f15fb2a6d6132">save</a> ()</td></tr>
+<tr class="separator:afc8a3c62679cf00ade9f15fb2a6d6132"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4d1ec84d2ad9eee94a297ff6db1c0add"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_store_1_1_k_v_1_1_light_cache.html#a4d1ec84d2ad9eee94a297ff6db1c0add">get</a> (string $key, mixed $default=null)</td></tr>
+<tr class="separator:a4d1ec84d2ad9eee94a297ff6db1c0add"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a823026abf2f77b9ce2e65e9513727844"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_store_1_1_k_v_1_1_light_cache.html#a823026abf2f77b9ce2e65e9513727844">set</a> (string $key, mixed $value, null|int|\DateInterval $ttl=null)</td></tr>
+<tr class="separator:a823026abf2f77b9ce2e65e9513727844"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac03d0331371567f0a97a6782746abd55"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_store_1_1_k_v_1_1_light_cache.html#ac03d0331371567f0a97a6782746abd55">delete</a> (string $key)</td></tr>
+<tr class="separator:ac03d0331371567f0a97a6782746abd55"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa821bec12eaa7e0f649397c9675ff505"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_store_1_1_k_v_1_1_light_cache.html#aa821bec12eaa7e0f649397c9675ff505">clear</a> ()</td></tr>
+<tr class="separator:aa821bec12eaa7e0f649397c9675ff505"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afabdec401f7e2063ddfca6780b1439b7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_store_1_1_k_v_1_1_light_cache.html#afabdec401f7e2063ddfca6780b1439b7">getMultiple</a> (iterable $keys, mixed $default=null)</td></tr>
+<tr class="separator:afabdec401f7e2063ddfca6780b1439b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3f67d6727e507d6296cb06e25ce064fd"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_store_1_1_k_v_1_1_light_cache.html#a3f67d6727e507d6296cb06e25ce064fd">setMultiple</a> (iterable $values, \DateInterval|int|null $ttl=null)</td></tr>
+<tr class="separator:a3f67d6727e507d6296cb06e25ce064fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5b922bd8e1e39dea9b57d7a4128a9fb9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_store_1_1_k_v_1_1_light_cache.html#a5b922bd8e1e39dea9b57d7a4128a9fb9">deleteMultiple</a> (iterable $keys)</td></tr>
+<tr class="separator:a5b922bd8e1e39dea9b57d7a4128a9fb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afdce603da130f170b2e650649949b544"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_store_1_1_k_v_1_1_light_cache.html#afdce603da130f170b2e650649949b544">has</a> (string $key)</td></tr>
+<tr class="separator:afdce603da130f170b2e650649949b544"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
+静态 Public 成员函数</h2></td></tr>
+<tr class="memitem:ac7d8ccad8dc25ddbe2c47e6e56b04cf7"><td class="memItemLeft" align="right" valign="top">static&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_store_1_1_k_v_1_1_light_cache.html#ac7d8ccad8dc25ddbe2c47e6e56b04cf7">open</a> (string $name='')</td></tr>
+<tr class="separator:ac7d8ccad8dc25ddbe2c47e6e56b04cf7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac7d8ccad8dc25ddbe2c47e6e56b04cf7"><td class="memItemLeft" align="right" valign="top">static&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interface_z_m_1_1_store_1_1_k_v_1_1_k_v_interface.html#ac7d8ccad8dc25ddbe2c47e6e56b04cf7">open</a> (string $name='')</td></tr>
+<tr class="separator:ac7d8ccad8dc25ddbe2c47e6e56b04cf7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
+<div class="textblock"><p >轻量、基于本地 JSON 文件的 <a class="el" href="namespace_z_m_1_1_store_1_1_k_v.html">KV</a> 键值对缓存 </p>
+</div><h2 class="groupheader">构造及析构函数说明</h2>
+<a id="aba32e95e2008290bf8c7ea2367cf8760" name="aba32e95e2008290bf8c7ea2367cf8760"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aba32e95e2008290bf8c7ea2367cf8760">&#9670;&#160;</a></span>__construct()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">__construct </td>
+          <td>(</td>
+          <td class="paramtype">private string&#160;</td>
+          <td class="paramname"><em>$name</em> = <code>''</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>$find_str</em> = <code>''</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="exception"><dt>异常</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">InvalidArgumentException</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="class_z_m_1_1_store_1_1_k_v_1_1_light_cache_aba32e95e2008290bf8c7ea2367cf8760_cgraph.svg" width="295" height="151"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+</div>
+
+</div>
+</div>
+<h2 class="groupheader">成员函数说明</h2>
+<a id="aa821bec12eaa7e0f649397c9675ff505" name="aa821bec12eaa7e0f649397c9675ff505"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa821bec12eaa7e0f649397c9675ff505">&#9670;&#160;</a></span>clear()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">clear </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac03d0331371567f0a97a6782746abd55" name="ac03d0331371567f0a97a6782746abd55"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac03d0331371567f0a97a6782746abd55">&#9670;&#160;</a></span>delete()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">delete </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>$key</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5b922bd8e1e39dea9b57d7a4128a9fb9" name="a5b922bd8e1e39dea9b57d7a4128a9fb9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5b922bd8e1e39dea9b57d7a4128a9fb9">&#9670;&#160;</a></span>deleteMultiple()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">deleteMultiple </td>
+          <td>(</td>
+          <td class="paramtype">iterable&#160;</td>
+          <td class="paramname"><em>$keys</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4d1ec84d2ad9eee94a297ff6db1c0add" name="a4d1ec84d2ad9eee94a297ff6db1c0add"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4d1ec84d2ad9eee94a297ff6db1c0add">&#9670;&#160;</a></span>get()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">get </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>$key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">mixed&#160;</td>
+          <td class="paramname"><em>$default</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afabdec401f7e2063ddfca6780b1439b7" name="afabdec401f7e2063ddfca6780b1439b7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afabdec401f7e2063ddfca6780b1439b7">&#9670;&#160;</a></span>getMultiple()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">getMultiple </td>
+          <td>(</td>
+          <td class="paramtype">iterable&#160;</td>
+          <td class="paramname"><em>$keys</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">mixed&#160;</td>
+          <td class="paramname"><em>$default</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afdce603da130f170b2e650649949b544" name="afdce603da130f170b2e650649949b544"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afdce603da130f170b2e650649949b544">&#9670;&#160;</a></span>has()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">has </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>$key</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac7d8ccad8dc25ddbe2c47e6e56b04cf7" name="ac7d8ccad8dc25ddbe2c47e6e56b04cf7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac7d8ccad8dc25ddbe2c47e6e56b04cf7">&#9670;&#160;</a></span>open()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static open </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>$name</em> = <code>''</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="exception"><dt>异常</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">InvalidArgumentException</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>实现了 <a class="el" href="interface_z_m_1_1_store_1_1_k_v_1_1_k_v_interface.html#ac7d8ccad8dc25ddbe2c47e6e56b04cf7">KVInterface</a>.</p>
+
+</div>
+</div>
+<a id="afc8a3c62679cf00ade9f15fb2a6d6132" name="afc8a3c62679cf00ade9f15fb2a6d6132"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afc8a3c62679cf00ade9f15fb2a6d6132">&#9670;&#160;</a></span>save()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">save </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >保存 <a class="el" href="namespace_z_m_1_1_store_1_1_k_v.html">KV</a> 库的数据到文件</p>
+<dl class="exception"><dt>异常</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname"></td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<p>JsonException </p>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="class_z_m_1_1_store_1_1_k_v_1_1_light_cache_afc8a3c62679cf00ade9f15fb2a6d6132_cgraph.svg" width="170" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+</div>
+
+</div>
+</div>
+<a id="a823026abf2f77b9ce2e65e9513727844" name="a823026abf2f77b9ce2e65e9513727844"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a823026abf2f77b9ce2e65e9513727844">&#9670;&#160;</a></span>set()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">set </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>$key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">mixed&#160;</td>
+          <td class="paramname"><em>$value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">null|int|\DateInterval&#160;</td>
+          <td class="paramname"><em>$ttl</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="exception"><dt>异常</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">InvalidArgumentException</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a3f67d6727e507d6296cb06e25ce064fd" name="a3f67d6727e507d6296cb06e25ce064fd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3f67d6727e507d6296cb06e25ce064fd">&#9670;&#160;</a></span>setMultiple()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">setMultiple </td>
+          <td>(</td>
+          <td class="paramtype">iterable&#160;</td>
+          <td class="paramname"><em>$values</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">\DateInterval|int|null&#160;</td>
+          <td class="paramname"><em>$ttl</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>src/ZM/Store/KV/<a class="el" href="_light_cache_8php.html">LightCache.php</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="namespace_z_m.html">ZM</a></li><li class="navelem"><a class="el" href="namespace_z_m_1_1_store.html">Store</a></li><li class="navelem"><a class="el" href="namespace_z_m_1_1_store_1_1_k_v.html">KV</a></li><li class="navelem"><a class="el" href="class_z_m_1_1_store_1_1_k_v_1_1_light_cache.html">LightCache</a></li>
+    <li class="footer">制作者 <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.5 </li>
+  </ul>
+</div>
+</body>
+</html>
