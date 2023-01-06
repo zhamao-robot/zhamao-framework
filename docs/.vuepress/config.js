@@ -28,7 +28,7 @@ module.exports = {
             { text: '指南', link: '/guide/' },
             { text: '事件', link: '/event/' },
             { text: '组件', link: '/components/bot/bot-context' },
-            { text: '更新日志', link: '/update/v2' },
+            { text: '更新日志', link: '/update/v3' },
             { text: 'API 文档', link: '/doxy/', target: '_blank' },
             { text: '炸毛框架 v2', link: 'https://docs-v2.zhamao.xin/' }
         ],
