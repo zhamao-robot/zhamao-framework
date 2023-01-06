@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ZM\Command\Generate;
 
-use Jelix\Version\VersionComparator;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use ZM\Command\Command;
