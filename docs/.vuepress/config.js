@@ -28,6 +28,7 @@ module.exports = {
             { text: '指南', link: '/guide/' },
             { text: '事件', link: '/event/' },
             { text: '组件', link: '/components/bot/bot-context' },
+            { text: '更新日志', link: '/update/v2' },
             { text: 'API 文档', link: '/doxy/', target: '_blank' },
             { text: '炸毛框架 v2', link: 'https://docs-v2.zhamao.xin/' }
         ],
@@ -62,14 +63,39 @@ module.exports = {
                 }
             ],
             '/components/': [
+                '',
                 {
-                    title: '组件',
+                    title: '机器人组件',
                     collapsable: true,
                     sidebarDepth: 2,
                     children: [
                         'bot/bot-context',
                         'bot/message-segment',
+                    ]
+                },
+                {
+                    title: 'HTTP 组件',
+                    collapsable: true,
+                    sidebarDepth: 2,
+                    children: [],
+                },
+                {
+                    title: '框架通用组件',
+                    collapsable: true,
+                    sidebarDepth: 2,
+                    children: [
                         'common/class-alias',
+                    ]
+                }
+            ],
+            '/update/': [
+                {
+                    title: '更新日志',
+                    collapsable: true,
+                    sidebarDepth: 0,
+                    children: [
+                        'v3',
+                        'v2',
                     ]
                 }
             ]
