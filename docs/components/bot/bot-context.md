@@ -40,7 +40,6 @@ public function sos()
 - `ZM_REPLY_NONE`：仅回复文本本身，直接发送消息。
 - `ZM_REPLY_MENTION`：回复并 @ 消息发送者。
 - `ZM_REPLY_QUOTE`：回复并引用消息。
-- `ZM_REPLY_`
 
 其中 `$message` 和下方的 `sendMessage()` 内的 `$message` 参数格式一致，可参考下方。
 `$reply_mode` 可以通过 `ZM_REPLY_MENTION` 和 `ZM_REPLY_QUOTE` 两个常量来设置，例如：
