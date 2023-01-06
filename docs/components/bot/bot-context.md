@@ -16,7 +16,11 @@ public function sos(\BotContext $ctx)
 关于 BotContext 机器人上下文，如果你不喜欢上方通过参数绑定的依赖注入（DI）形式获取，还可以在相关事件内使用全局函数 `bot()` 获取：
 
 ```php
-bot()->reply('牛逼');
+#[\BotCommand(match: 'SOS')]
+public function sos()
+{
+    bot()->reply('不许求救！');
+}
 ```
 
 ## reply() - 快速回复消息
@@ -33,7 +37,7 @@ bot()->reply('牛逼');
 
 回复模式说明：
 
-- `ZM_REPLY_NONE`：不回复，直接发送消息。
+- `ZM_REPLY_NONE`：仅回复文本本身，直接发送消息。
 - `ZM_REPLY_MENTION`：回复并 @ 消息发送者。
 - `ZM_REPLY_QUOTE`：回复并引用消息。
 
