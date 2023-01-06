@@ -64,11 +64,12 @@ module.exports = {
             '/components/': [
                 {
                     title: '组件',
-                    collapsable: false,
+                    collapsable: true,
                     sidebarDepth: 2,
                     children: [
                         'bot/bot-context',
                         'bot/message-segment',
+                        'common/class-alias',
                     ]
                 }
             ]
