@@ -107,4 +107,11 @@ var menudata={children:[
 {text:"w",url:"globals.html#index_w"},
 {text:"z",url:"globals.html#index_z"}]},
 {text:"函数",url:"globals_func.html"},
-{text:"变量",url:"globals_vars.html"}]}]}]}
+{text:"变量",url:"globals_vars.html",children:[
+{text:"e",url:"globals_vars.html#index_e"},
+{text:"f",url:"globals_vars.html#index_f"},
+{text:"l",url:"globals_vars.html#index_l"},
+{text:"s",url:"globals_vars.html#index_s"},
+{text:"t",url:"globals_vars.html#index_t"},
+{text:"w",url:"globals_vars.html#index_w"},
+{text:"z",url:"globals_vars.html#index_z"}]}]}]}]}

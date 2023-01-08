@@ -10,10 +10,16 @@ var searchData=
   ['zm_5fprocess_5ftaskworker_7',['ZM_PROCESS_TASKWORKER',['../global__defines__app_8php.html#a8d974ca14b9ae5f51e38c4d18a710aa9',1,'global_defines_app.php']]],
   ['zm_5fprocess_5fuser_8',['ZM_PROCESS_USER',['../global__defines__app_8php.html#a4546469a87ec03c63b68ac9776c20351',1,'global_defines_app.php']]],
   ['zm_5fprocess_5fworker_9',['ZM_PROCESS_WORKER',['../global__defines__app_8php.html#a1578f640732080a047ade7dfd94ee13b',1,'global_defines_app.php']]],
-  ['zm_5freply_5fmention_10',['ZM_REPLY_MENTION',['../global__defines__app_8php.html#a1f7bd423a8db5f2772478b9a64eeeca7',1,'global_defines_app.php']]],
-  ['zm_5freply_5fnone_11',['ZM_REPLY_NONE',['../global__defines__app_8php.html#a6799bc056e2c6ee166accb04ab44eb47',1,'global_defines_app.php']]],
-  ['zm_5freply_5fquote_12',['ZM_REPLY_QUOTE',['../global__defines__app_8php.html#af616dca4ea6151351ae9a257d20fe468',1,'global_defines_app.php']]],
-  ['zm_5fstate_5fdir_13',['ZM_STATE_DIR',['../global__defines__app_8php.html#aa6af9bdbeab8d4e84ed9ce32a3c48631',1,'global_defines_app.php']]],
-  ['zm_5fversion_14',['ZM_VERSION',['../global__defines__app_8php.html#a9777505eac16abae068fb12cd5ca1da9',1,'global_defines_app.php']]],
-  ['zm_5fversion_5fid_15',['ZM_VERSION_ID',['../global__defines__app_8php.html#abb29026a255a33be4fb7d449fd3cff88',1,'global_defines_app.php']]]
+  ['zm_5fprompt_5fmention_5fuser_10',['ZM_PROMPT_MENTION_USER',['../global__defines__app_8php.html#af6554380996b7777e68a081682a163f5',1,'global_defines_app.php']]],
+  ['zm_5fprompt_5fnone_11',['ZM_PROMPT_NONE',['../global__defines__app_8php.html#a0e7d7bc4b747a1673a171d598832fc6c',1,'global_defines_app.php']]],
+  ['zm_5fprompt_5fquote_5fuser_12',['ZM_PROMPT_QUOTE_USER',['../global__defines__app_8php.html#a616695dd2f62780f3f7acb8800c4918c',1,'global_defines_app.php']]],
+  ['zm_5fprompt_5ftimeout_5fmention_5fuser_13',['ZM_PROMPT_TIMEOUT_MENTION_USER',['../global__defines__app_8php.html#ac11227636c25e035b9f7f4ea3c8401d4',1,'global_defines_app.php']]],
+  ['zm_5fprompt_5ftimeout_5fquote_5fself_14',['ZM_PROMPT_TIMEOUT_QUOTE_SELF',['../global__defines__app_8php.html#a54474f46d1ce9acdaed0051bba89ffc4',1,'global_defines_app.php']]],
+  ['zm_5fprompt_5ftimeout_5fquote_5fuser_15',['ZM_PROMPT_TIMEOUT_QUOTE_USER',['../global__defines__app_8php.html#af15159e7cbf0bcade802b122f37da5ec',1,'global_defines_app.php']]],
+  ['zm_5freply_5fmention_16',['ZM_REPLY_MENTION',['../global__defines__app_8php.html#a1f7bd423a8db5f2772478b9a64eeeca7',1,'global_defines_app.php']]],
+  ['zm_5freply_5fnone_17',['ZM_REPLY_NONE',['../global__defines__app_8php.html#a6799bc056e2c6ee166accb04ab44eb47',1,'global_defines_app.php']]],
+  ['zm_5freply_5fquote_18',['ZM_REPLY_QUOTE',['../global__defines__app_8php.html#af616dca4ea6151351ae9a257d20fe468',1,'global_defines_app.php']]],
+  ['zm_5fstate_5fdir_19',['ZM_STATE_DIR',['../global__defines__app_8php.html#aa6af9bdbeab8d4e84ed9ce32a3c48631',1,'global_defines_app.php']]],
+  ['zm_5fversion_20',['ZM_VERSION',['../global__defines__app_8php.html#a9777505eac16abae068fb12cd5ca1da9',1,'global_defines_app.php']]],
+  ['zm_5fversion_5fid_21',['ZM_VERSION_ID',['../global__defines__app_8php.html#abb29026a255a33be4fb7d449fd3cff88',1,'global_defines_app.php']]]
 ];

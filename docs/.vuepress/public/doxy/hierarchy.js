@@ -23,8 +23,7 @@ var hierarchy =
     [ "ContainerHolder", "class_z_m_1_1_container_1_1_container_holder.html", null ],
     [ "ContainerRegistrant", "class_z_m_1_1_container_1_1_container_registrant.html", null ],
     [ "ContextInterface", "interface_z_m_1_1_context_1_1_context_interface.html", [
-      [ "BotContext", "class_z_m_1_1_context_1_1_bot_context.html", null ],
-      [ "Context", "class_z_m_1_1_context_1_1_context.html", null ]
+      [ "BotContext", "class_z_m_1_1_context_1_1_bot_context.html", null ]
     ] ],
     [ "CustomAnnotation", "interface_z_m_1_1_annotation_1_1_interfaces_1_1_custom_annotation.html", null ],
     [ "DBPool", "class_z_m_1_1_store_1_1_database_1_1_d_b_pool.html", null ],
