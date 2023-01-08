@@ -13,8 +13,6 @@ use OneBot\V12\Object\ActionResponse;
 use OneBot\V12\Object\OneBotEvent;
 use Psr\Http\Message\ServerRequestInterface;
 use ZM\Context\BotContext;
-use ZM\Context\Context;
-use ZM\Context\ContextInterface;
 
 class ContainerRegistrant
 {
@@ -59,7 +57,6 @@ class ContainerRegistrant
             'http.request.event' => DI\get(HttpRequestEvent::class),
             ServerRequestInterface::class => fn () => $event->getRequest(),
             'http.request' => DI\get(ServerRequestInterface::class),
-            ContextInterface::class => Context::class,
         ]);
     }
 
