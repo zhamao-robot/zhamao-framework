@@ -36,6 +36,13 @@ const ZM_REPLY_NONE = 0;                // 默认回复，不带任何东西
 const ZM_REPLY_MENTION = 1;             // 回复时 @ 该用户
 const ZM_REPLY_QUOTE = 2;               // 回复时引用该消息
 
+const ZM_PROMPT_NONE = 0;                       // 使用 prompt() 不附加任何内容
+const ZM_PROMPT_MENTION_USER = 1;               // 回复提示语句时 at 该用户
+const ZM_PROMPT_QUOTE_USER = 2;                 // 回复提示语句时引用该用户的消息
+const ZM_PROMPT_TIMEOUT_MENTION_USER = 4;       // 回复超时时 at 该用户
+const ZM_PROMPT_TIMEOUT_QUOTE_SELF = 8;         // 回复超时时引用自己回复的提示语句
+const ZM_PROMPT_TIMEOUT_QUOTE_USER = 16;        // 回复超时时引用用户的消息
+
 const LOAD_MODE_VENDOR = 0; // 从 vendor 加载
 const LOAD_MODE_SRC = 1;    // 从 src 加载
 

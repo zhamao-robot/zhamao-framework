@@ -9,6 +9,7 @@ use DI\NotFoundException;
 use OneBot\Driver\Coroutine\Adaptive;
 use OneBot\Driver\Event\Http\HttpRequestEvent;
 use OneBot\Driver\Event\WebSocket\WebSocketMessageEvent;
+use OneBot\V12\Object\ActionResponse;
 use OneBot\V12\Object\MessageSegment;
 use OneBot\V12\Object\OneBotEvent;
 use ZM\Context\Trait\BotActionTrait;
@@ -85,14 +86,15 @@ class BotContext implements ContextInterface
      *
      * @param  array|MessageSegment|string|\Stringable $prompt         等待前发送的消息文本
      * @param  int                                     $timeout        等待超时时间（单位为秒，默认为 600 秒）
-     * @param  string                                  $timeout_prompt 超时后提示的消息内容
+     * @param  array|MessageSegment|string|\Stringable $timeout_prompt 超时后提示的消息内容
      * @param  bool                                    $return_string  是否只返回 text 格式的字符串消息（默认为 false）
+     * @param  int                                     $option         prompt 功能的选项参数
      * @throws DependencyException
      * @throws NotFoundException
      * @throws OneBot12Exception
      * @throws WaitTimeoutException
      */
-    public function prompt(string|\Stringable|MessageSegment|array $prompt = '', int $timeout = 600, string $timeout_prompt = '', bool $return_string = false): array|string
+    public function prompt(string|\Stringable|MessageSegment|array $prompt = '', int $timeout = 600, string|\Stringable|MessageSegment|array $timeout_prompt = '', bool $return_string = false, int $option = ZM_PROMPT_NONE): array|string
     {
         if (!container()->has('bot.event')) {
             throw new OneBot12Exception('bot()->prompt() can only be used in message event');
@@ -105,7 +107,8 @@ class BotContext implements ContextInterface
         // 开始等待输入
         logger()->debug('Waiting user for prompt...');
         if ($prompt !== '') {
-            $this->reply($prompt);
+            $prompt = $this->applyPromptMode($option, $prompt, $event);
+            $reply_resp = $this->reply($prompt);
         }
         if (($co = Adaptive::getCoroutine()) === null) {
             throw new OneBot12Exception('Coroutine is not supported yet, prompt() not works');
@@ -121,7 +124,13 @@ class BotContext implements ContextInterface
         $result = $co->suspend();
         OneBot12Adapter::removeContextPrompt($cid);
         if ($result === '') {
-            throw new WaitTimeoutException($this, $timeout_prompt);
+            throw new WaitTimeoutException(
+                $this,
+                $timeout_prompt,
+                prompt_response: isset($reply_resp) && $reply_resp instanceof ActionResponse ? $reply_resp : null,
+                user_event: $event,
+                prompt_option: $option
+            );
         }
         if ($result instanceof OneBotEvent && $result->type === 'message') {
             return $return_string ? $result->getMessageString() : $result->getMessage();
@@ -213,5 +222,31 @@ class BotContext implements ContextInterface
         if (($reply_mode & ZM_REPLY_MENTION) === ZM_REPLY_MENTION) {
             array_unshift($message_segments, new MessageSegment('mention', ['user_id' => $event->getUserId()]));
         }
+    }
+
+    /**
+     * 匹配更改 prompt reply 的特殊格式
+     *
+     * @param  int                                     $option prompt 模式
+     * @param  array|MessageSegment|string|\Stringable $prompt 消息或消息段
+     * @param  OneBotEvent                             $event  事件对象
+     * @return array                                   消息段
+     */
+    private function applyPromptMode(int $option, array|string|\Stringable|MessageSegment $prompt, OneBotEvent $event): array
+    {
+        // 先格式化消息
+        if ($prompt instanceof MessageSegment) {
+            $prompt = [$prompt];
+        } elseif (is_string($prompt) || $prompt instanceof \Stringable) {
+            $prompt = [strval($prompt)];
+        }
+        // 然后这里只验证 MENTION 和 QUOTE
+        if (($option & ZM_PROMPT_MENTION_USER) === ZM_PROMPT_MENTION_USER) {
+            $prompt = [new MessageSegment('mention', ['user_id' => $event->getUserId()]), ...$prompt];
+        }
+        if (($option & ZM_PROMPT_QUOTE_USER) === ZM_PROMPT_QUOTE_USER) {
+            $prompt = [new MessageSegment('reply', ['message_id' => $event->getMessageId(), 'user_id' => $event->getUserId()]), ...$prompt];
+        }
+        return $prompt;
     }
 }
