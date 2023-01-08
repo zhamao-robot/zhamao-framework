@@ -343,7 +343,19 @@ class OneBot12Adapter extends ZMPlugin
             try {
                 $handler->handleAll($obj);
             } catch (WaitTimeoutException $e) {
-                bot()->reply($e->getMessage());
+                // 这里是处理 prompt() 下超时的情况的
+                if ($e->getTimeoutPrompt() === null) {
+                    return;
+                }
+                if (($e->getPromptOption() & ZM_PROMPT_TIMEOUT_MENTION_USER) === ZM_PROMPT_TIMEOUT_MENTION_USER && ($ev = $e->getUserEvent()) !== null) {
+                    $prompt = [MessageSegment::mention($ev->getUserId()), ...$e->getTimeoutPrompt()];
+                }
+                if (($e->getPromptOption() & ZM_PROMPT_TIMEOUT_QUOTE_SELF) === ZM_PROMPT_TIMEOUT_QUOTE_SELF && ($rsp = $e->getPromptResponse()) !== null && ($ev = $e->getUserEvent()) !== null) {
+                    $prompt = [MessageSegment::reply($rsp->data['message_id'], $ev->self['user_id']), ...$e->getTimeoutPrompt()];
+                } elseif (($e->getPromptOption() & ZM_PROMPT_TIMEOUT_QUOTE_USER) === ZM_PROMPT_TIMEOUT_QUOTE_USER && ($ev = $e->getUserEvent()) !== null) {
+                    $prompt = [MessageSegment::reply($ev->getMessageId(), $ev->getUserId()), ...$e->getTimeoutPrompt()];
+                }
+                bot()->reply($prompt ?? $e->getTimeoutPrompt());
             }
         } elseif (isset($body['status'], $body['retcode'])) {
             // 如果含有 status，retcode 字段，表明是 action 的 response
