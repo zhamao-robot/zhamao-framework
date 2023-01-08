@@ -57,6 +57,10 @@ class ZMRequest
             'url' => ($url instanceof UriInterface ? $url->__toString() : $url),
         ], $config));
         $socket->withoutAsync();
+        if (is_array($data)) {
+            $data = http_build_query($data);
+            $header['Content-Type'] = 'application/x-www-form-urlencoded';
+        }
         $obj = $socket->post($data, $header, fn (ResponseInterface $response) => $response, fn () => false);
         if ($obj instanceof ResponseInterface) {
             if ($obj->getStatusCode() !== 200 && $only_body) {
