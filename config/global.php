@@ -54,9 +54,6 @@ $config['runtime'] = [
     'timezone' => 'Asia/Shanghai',
 ];
 
-/* 上下文接口类 implemented from ContextInterface */
-$config['context_class'] = \ZM\Context\Context::class;
-
 /* 允许加载插件形式 */
 $config['plugin'] = [
     'enable' => true,
