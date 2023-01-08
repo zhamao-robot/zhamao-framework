@@ -86,6 +86,14 @@ module.exports = {
                     children: [
                         'common/class-alias',
                     ]
+                },
+                {
+                    title: '存储组件',
+                    collapsable: true,
+                    sidebarDepth: 2,
+                    children: [
+                        'store/file-system',
+                    ]
                 }
             ],
             '/update/': [
