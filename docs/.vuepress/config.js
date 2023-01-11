@@ -85,6 +85,7 @@ module.exports = {
                     sidebarDepth: 2,
                     children: [
                         'common/class-alias',
+                        'common/global-defines'
                     ]
                 },
                 {
