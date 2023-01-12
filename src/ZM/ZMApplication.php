@@ -7,6 +7,7 @@ namespace ZM;
 use ZM\Command\Server\ServerStartCommand;
 use ZM\Exception\SingletonViolationException;
 use ZM\Plugin\PluginManager;
+use ZM\Plugin\PluginMeta;
 use ZM\Plugin\ZMPlugin;
 
 class ZMApplication extends ZMPlugin
@@ -20,13 +21,12 @@ class ZMApplication extends ZMPlugin
     /**
      * @throws SingletonViolationException
      */
-    public function __construct(mixed $dir = null)
+    public function __construct()
     {
         if (self::$obj !== null) {
             throw new SingletonViolationException(self::class);
         }
         self::$obj = $this; // 用于标记已经初始化完成
-        parent::__construct($dir ?? (__DIR__ . '/../..'));
         $this->args = ServerStartCommand::exportOptionArray();
     }
 
@@ -47,7 +47,9 @@ class ZMApplication extends ZMPlugin
      */
     public function run()
     {
-        PluginManager::addPlugin(['name' => 'native-app', 'object' => $this]);
+        $meta = new PluginMeta(['name' => 'native'], ZM_PLUGIN_TYPE_NATIVE);
+        $meta->bindEntity($this);
+        PluginManager::addPlugin($meta);
         (new Framework($this->args))->init()->start();
     }
 }
