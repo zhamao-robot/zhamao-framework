@@ -38,6 +38,19 @@ class AnnotationMap
     }
 
     /**
+     * 添加一个独立的注解到全局注解列表中
+     *
+     * @param AnnotationBase $annotation 注解对象
+     */
+    public static function addSingleAnnotation(AnnotationBase $annotation): void
+    {
+        self::$_list[get_class($annotation)][] = $annotation;
+        if ($annotation->class !== '') {
+            self::$_map[$annotation->class][$annotation->method][] = $annotation;
+        }
+    }
+
+    /**
      * @return AnnotationBase[]
      */
     public static function getAnnotationList(string $class_name): array
