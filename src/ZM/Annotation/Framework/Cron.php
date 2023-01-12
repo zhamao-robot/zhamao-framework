@@ -31,4 +31,9 @@ class Cron extends AnnotationBase
     ) {
         $this->expression = new CronExpression($expression);
     }
+
+    public static function make(string $expression, int $worker_id = 0, bool $no_overlap = false): Cron
+    {
+        return new Cron($expression, $worker_id, $no_overlap);
+    }
 }

@@ -51,8 +51,6 @@ class CommandManualPlugin extends ZMPlugin
 
     public function __construct(AnnotationParser $parser)
     {
-        parent::__construct(__DIR__);
-
         if (config('command_manual.template') !== null) {
             $this->template = config('command_manual.template');
         }

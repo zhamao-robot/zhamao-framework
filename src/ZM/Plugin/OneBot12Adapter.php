@@ -51,7 +51,6 @@ class OneBot12Adapter extends ZMPlugin
 
     public function __construct(string $submodule = '', ?AnnotationParser $parser = null)
     {
-        parent::__construct(__DIR__);
         switch ($submodule) {
             case '':
             case 'onebot12':
