@@ -12,11 +12,13 @@ use ZM\Annotation\AnnotationHandler;
 use ZM\Annotation\AnnotationMap;
 use ZM\Annotation\AnnotationParser;
 use ZM\Annotation\Framework\Init;
+use ZM\Exception\PluginException;
 use ZM\Exception\ZMKnownException;
 use ZM\Framework;
 use ZM\Plugin\CommandManual\CommandManualPlugin;
 use ZM\Plugin\OneBot12Adapter;
 use ZM\Plugin\PluginManager;
+use ZM\Plugin\PluginMeta;
 use ZM\Process\ProcessStateManager;
 use ZM\Store\Database\DBException;
 use ZM\Store\Database\DBPool;
@@ -167,11 +169,15 @@ class WorkerEventListener
             if (!$enable) {
                 continue;
             }
-            match ($name) {
-                'onebot12' => PluginManager::addPlugin(['name' => $name, 'version' => '1.0', 'internal' => true, 'object' => new OneBot12Adapter(parser: $parser)]),
-                'onebot12-ban-other-ws' => PluginManager::addPlugin(['name' => $name, 'version' => '1.0', 'internal' => true, 'object' => new OneBot12Adapter(submodule: $name)]),
-                'command-manual' => PluginManager::addPlugin(['name' => $name, 'version' => '1.0', 'internal' => true, 'object' => new CommandManualPlugin($parser)]),
+            $plugin = match ($name) {
+                'onebot12' => new OneBot12Adapter(parser: $parser),
+                'onebot12-ban-other-ws' => new OneBot12Adapter(submodule: $name),
+                'command-manual' => new CommandManualPlugin($parser),
+                default => throw new PluginException('Unknown native plugin: ' . $name),
             };
+            $meta = new PluginMeta(['name' => $name], ZM_PLUGIN_TYPE_NATIVE);
+            $meta->bindEntity($plugin);
+            PluginManager::addPlugin($meta);
         }
 
         // 然后加载插件目录的插件
@@ -184,8 +190,19 @@ class WorkerEventListener
             }
             $load_dir = zm_dir($load_dir);
 
+            // 从 plugins 目录加载插件，包含 phar 和文件夹形式
             $count = PluginManager::addPluginsFromDir($load_dir);
-            logger()->info('Loaded ' . $count . ' user plugins');
+            if ($count !== 0) {
+                logger()->info('Loaded ' . $count . ' user plugins from plugin dir');
+            }
+
+            // 从 composer 依赖加载插件
+            if (config('global.plugin.composer_plugin_enable', true)) {
+                $count = PluginManager::addPluginsFromComposer();
+                if ($count !== 0) {
+                    logger()->info('Loaded ' . $count . ' user plugins from composer');
+                }
+            }
 
             // 启用并初始化插件
             PluginManager::enablePlugins($parser);
@@ -225,6 +242,7 @@ class WorkerEventListener
         foreach (DBPool::getAllPools() as $name => $pool) {
             DBPool::destroyPool($name);
         }
+        // 清空 Redis 连接池
         foreach (RedisPool::getAllPools() as $name => $pool) {
             RedisPool::destroyPool($name);
         }

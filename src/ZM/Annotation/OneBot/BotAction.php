@@ -21,6 +21,13 @@ class BotAction extends AnnotationBase implements Level
     {
     }
 
+    public static function make(callable $callback, string $action, bool $need_response = false, int $level = 20): BotAction
+    {
+        $action = new BotAction($action, $need_response, $level);
+        $action->on($callback);
+        return $action;
+    }
+
     public function getLevel()
     {
         return $this->level;

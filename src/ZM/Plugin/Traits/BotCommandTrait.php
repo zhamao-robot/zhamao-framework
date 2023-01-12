@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ZM\Plugin\Traits;
 
 use ZM\Annotation\OneBot\BotCommand;

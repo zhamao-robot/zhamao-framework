@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ZM\Plugin\Traits;
 
 use ZM\Annotation\Framework\Cron;
@@ -13,7 +15,6 @@ trait CronTrait
      * 添加一个计划任务
      *
      * @param Cron $cron 计划任务注解对象
-     * @return void
      */
     public function addCron(Cron $cron): void
     {
@@ -22,7 +23,6 @@ trait CronTrait
 
     /**
      * @internal
-     * @return array
      */
     public function getCrons(): array
     {
