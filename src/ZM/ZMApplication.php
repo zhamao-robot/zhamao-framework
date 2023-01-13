@@ -10,6 +10,9 @@ use ZM\Plugin\PluginManager;
 use ZM\Plugin\PluginMeta;
 use ZM\Plugin\ZMPlugin;
 
+/**
+ * 这是一个可以将框架以代码形式启动的一个类，且继承于插件，可以以插件的方式绑定事件回调等
+ */
 class ZMApplication extends ZMPlugin
 {
     /** @var null|ZMApplication 存储单例类的变量 */
