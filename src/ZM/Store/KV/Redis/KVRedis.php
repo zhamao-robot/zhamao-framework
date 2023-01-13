@@ -7,7 +7,7 @@ namespace ZM\Store\KV\Redis;
 use Psr\SimpleCache\CacheInterface;
 use ZM\Store\KV\KVInterface;
 
-class KVRedis implements CacheInterface, KVInterface
+class KVRedis implements KVInterface
 {
     private string $pool_name;
 
