@@ -255,7 +255,8 @@ class OneBot12Adapter extends ZMPlugin
     {
         // 判断是不是 OneBot 12 反向 WS 连进来的，通过 Sec-WebSocket-Protocol 头
         $line = explode('.', $event->getRequest()->getHeaderLine('Sec-WebSocket-Protocol'), 2);
-        if ($line[0] !== '12') {
+        // 如果不是 12 并且在这个最低等级事件之前还没有设置了连接信息的，一律干掉
+        if (empty(ConnectionUtil::getConnection($event->getFd())) && $line[0] !== '12') {
             logger()->warning('不允许接入除 OneBot 12 以外的 WebSocket Client');
             $event->withResponse(HttpFactory::createResponse(403, 'Forbidden'));
             $event->stopPropagation();
