@@ -24,7 +24,7 @@ class PluginMeta implements \JsonSerializable
     private array $dependencies;
 
     /** @var null|string 插件的根目录 */
-    private ?string $root_dir = null;
+    private ?string $root_dir;
 
     /** @var int 插件类型 */
     private int $plugin_type;

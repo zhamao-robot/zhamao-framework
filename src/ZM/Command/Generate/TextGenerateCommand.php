@@ -68,6 +68,7 @@ class TextGenerateCommand extends Command
                 continue;
             }
             $time = '> 更新时间：' . date('Y-m-d', strtotime($v['published_at']));
+            // TODO: 匹配用户名 @xxx 和 PR 链接 https://xxx.com，添加可点击的访问链接
             $line .= '## v' . $v['tag_name'] . "\r\n\r\n" . $time . "\r\n\r\n" . trim(str_replace("## What's Changed", '', $v['body'])) . "\r\n\r\n";
         }
         $line = str_replace("\r\n", "\n", $line);
