@@ -68,10 +68,19 @@ class TextGenerateCommand extends Command
                 continue;
             }
             $time = '> 更新时间：' . date('Y-m-d', strtotime($v['published_at']));
-            // TODO: 匹配用户名 @xxx 和 PR 链接 https://xxx.com，添加可点击的访问链接
             $line .= '## v' . $v['tag_name'] . "\r\n\r\n" . $time . "\r\n\r\n" . trim(str_replace("## What's Changed", '', $v['body'])) . "\r\n\r\n";
         }
         $line = str_replace("\r\n", "\n", $line);
+
+        // 将所有的链接转换为可点击的链接，例如 https://example.com -> <https://example.com>
+        $line = preg_replace('/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&\/=]*)/', '<$0>', $line);
+
+        // 替换 PR 链接，例如 <.../pull/123> -> [PR#123](.../pull/123)
+        $line = preg_replace('/<(https:\/\/github\.com\S+zhamao-framework\/pull\/(\d+))>/', '[PR#$2]($1)', $line);
+
+        // 将 mention 转换为可点击的链接，例如 @sunxyw -> [@sunxyw](https://github.com/sunxyw)
+        $line = preg_replace('/(?<=^|\s)@([\w.]+)(?<!\.)/', '[@$1](https://github.com/$1)', $line);
+
         file_put_contents(FRAMEWORK_ROOT_DIR . '/docs/update/v3.md', $line);
         return static::SUCCESS;
     }
