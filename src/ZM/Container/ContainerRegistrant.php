@@ -19,7 +19,7 @@ class ContainerRegistrant
     /**
      * 应在收到 OneBot 事件时调用
      */
-    public static function registerOBEventServices(OneBotEvent $event): void
+    public static function registerOBEventServices(OneBotEvent $event, string $bot_context = BotContext::class): void
     {
         self::addServices([
             OneBotEvent::class => $event,
@@ -28,7 +28,7 @@ class ContainerRegistrant
 
         if (isset($event->self['platform'])) {
             self::addServices([
-                BotContext::class => DI\autowire(BotContext::class)->constructor(
+                BotContext::class => DI\autowire($bot_context)->constructor(
                     $event->self['user_id'] ?? '',
                     $event->self['platform'],
                 ),
