@@ -24,6 +24,7 @@ use ZM\Store\Database\DBException;
 use ZM\Store\Database\DBPool;
 use ZM\Store\FileSystem;
 use ZM\Store\KV\LightCache;
+use ZM\Store\KV\Redis\RedisException;
 use ZM\Store\KV\Redis\RedisPool;
 use ZM\Utils\ZMUtil;
 
@@ -105,6 +106,10 @@ class WorkerEventListener
             });
         } else {
             $this->dispatchInit();
+        }
+        // Windows 系统的 CtrlC 由于和 Select 有一定的冲突，如果没事件解析的话 CtrlC 会阻塞，所以必须添加一个空的计时器
+        if (PHP_OS_FAMILY === 'Windows') {
+            Framework::getInstance()->getDriver()->getEventLoop()->addTimer(1000, function () {}, 0);
         }
         // 回显 debug 日志：进程占用的内存
         $memory_total = memory_get_usage() / 1024 / 1024;
@@ -232,9 +237,7 @@ class WorkerEventListener
     /**
      * 初始化各种连接池
      *
-     * TODO：未来新增其他db的连接池
-     *
-     * @throws DBException
+     * @throws DBException|RedisException
      */
     private function initConnectionPool(): void
     {
@@ -247,7 +250,7 @@ class WorkerEventListener
             RedisPool::destroyPool($name);
         }
 
-        // 读取 MySQL 配置文件
+        // 读取 MySQL/PostgresSQL/SQLite 配置文件并创建连接池
         $conf = config('global.database');
         // 如果有多个数据库连接，则遍历
         foreach ($conf as $name => $conn_conf) {
@@ -256,6 +259,7 @@ class WorkerEventListener
             }
         }
 
+        // 读取 Redis 配置文件并创建池
         $redis_conf = config('global.redis');
         foreach ($redis_conf as $name => $conn_conf) {
             if (($conn_conf['enable'] ?? true) !== false) {
