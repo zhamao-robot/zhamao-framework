@@ -12,16 +12,19 @@ use ZM\Annotation\AnnotationHandler;
 use ZM\Annotation\AnnotationMap;
 use ZM\Annotation\AnnotationParser;
 use ZM\Annotation\Framework\Init;
+use ZM\Exception\PluginException;
 use ZM\Exception\ZMKnownException;
 use ZM\Framework;
 use ZM\Plugin\CommandManual\CommandManualPlugin;
 use ZM\Plugin\OneBot12Adapter;
 use ZM\Plugin\PluginManager;
+use ZM\Plugin\PluginMeta;
 use ZM\Process\ProcessStateManager;
 use ZM\Store\Database\DBException;
 use ZM\Store\Database\DBPool;
 use ZM\Store\FileSystem;
 use ZM\Store\KV\LightCache;
+use ZM\Store\KV\Redis\RedisException;
 use ZM\Store\KV\Redis\RedisPool;
 use ZM\Utils\ZMUtil;
 
@@ -104,6 +107,10 @@ class WorkerEventListener
         } else {
             $this->dispatchInit();
         }
+        // Windows 系统的 CtrlC 由于和 Select 有一定的冲突，如果没事件解析的话 CtrlC 会阻塞，所以必须添加一个空的计时器
+        if (PHP_OS_FAMILY === 'Windows') {
+            Framework::getInstance()->getDriver()->getEventLoop()->addTimer(1000, function () {}, 0);
+        }
         // 回显 debug 日志：进程占用的内存
         $memory_total = memory_get_usage() / 1024 / 1024;
         logger()->debug('Worker process used ' . round($memory_total, 3) . ' MB');
@@ -167,11 +174,15 @@ class WorkerEventListener
             if (!$enable) {
                 continue;
             }
-            match ($name) {
-                'onebot12' => PluginManager::addPlugin(['name' => $name, 'version' => '1.0', 'internal' => true, 'object' => new OneBot12Adapter(parser: $parser)]),
-                'onebot12-ban-other-ws' => PluginManager::addPlugin(['name' => $name, 'version' => '1.0', 'internal' => true, 'object' => new OneBot12Adapter(submodule: $name)]),
-                'command-manual' => PluginManager::addPlugin(['name' => $name, 'version' => '1.0', 'internal' => true, 'object' => new CommandManualPlugin($parser)]),
+            $plugin = match ($name) {
+                'onebot12' => new OneBot12Adapter(parser: $parser),
+                'onebot12-ban-other-ws' => new OneBot12Adapter(submodule: $name),
+                'command-manual' => new CommandManualPlugin($parser),
+                default => throw new PluginException('Unknown native plugin: ' . $name),
             };
+            $meta = new PluginMeta(['name' => $name], ZM_PLUGIN_TYPE_NATIVE);
+            $meta->bindEntity($plugin);
+            PluginManager::addPlugin($meta);
         }
 
         // 然后加载插件目录的插件
@@ -184,8 +195,19 @@ class WorkerEventListener
             }
             $load_dir = zm_dir($load_dir);
 
+            // 从 plugins 目录加载插件，包含 phar 和文件夹形式
             $count = PluginManager::addPluginsFromDir($load_dir);
-            logger()->info('Loaded ' . $count . ' user plugins');
+            if ($count !== 0) {
+                logger()->info('Loaded ' . $count . ' user plugins from plugin dir');
+            }
+
+            // 从 composer 依赖加载插件
+            if (config('global.plugin.composer_plugin_enable', true)) {
+                $count = PluginManager::addPluginsFromComposer();
+                if ($count !== 0) {
+                    logger()->info('Loaded ' . $count . ' user plugins from composer');
+                }
+            }
 
             // 启用并初始化插件
             PluginManager::enablePlugins($parser);
@@ -215,9 +237,7 @@ class WorkerEventListener
     /**
      * 初始化各种连接池
      *
-     * TODO：未来新增其他db的连接池
-     *
-     * @throws DBException
+     * @throws DBException|RedisException
      */
     private function initConnectionPool(): void
     {
@@ -225,11 +245,12 @@ class WorkerEventListener
         foreach (DBPool::getAllPools() as $name => $pool) {
             DBPool::destroyPool($name);
         }
+        // 清空 Redis 连接池
         foreach (RedisPool::getAllPools() as $name => $pool) {
             RedisPool::destroyPool($name);
         }
 
-        // 读取 MySQL 配置文件
+        // 读取 MySQL/PostgresSQL/SQLite 配置文件并创建连接池
         $conf = config('global.database');
         // 如果有多个数据库连接，则遍历
         foreach ($conf as $name => $conn_conf) {
@@ -238,6 +259,7 @@ class WorkerEventListener
             }
         }
 
+        // 读取 Redis 配置文件并创建池
         $redis_conf = config('global.redis');
         foreach ($redis_conf as $name => $conn_conf) {
             if (($conn_conf['enable'] ?? true) !== false) {

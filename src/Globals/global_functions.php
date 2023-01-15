@@ -7,6 +7,7 @@ use OneBot\Driver\Coroutine\CoroutineInterface;
 use OneBot\Driver\Process\ExecutionResult;
 use OneBot\V12\Object\MessageSegment;
 use Psr\Log\LoggerInterface;
+use Psr\SimpleCache\CacheInterface;
 use ZM\Config\Environment;
 use ZM\Config\ZMConfig;
 use ZM\Container\ContainerHolder;
@@ -260,6 +261,12 @@ function bot(): ZM\Context\BotContext
     return new \ZM\Context\BotContext('', '');
 }
 
+/**
+ * 获取一个 KV 库实例
+ *
+ * @param  string         $name KV 库名称
+ * @return CacheInterface
+ */
 function kv(string $name = ''): Psr\SimpleCache\CacheInterface
 {
     global $kv_class;

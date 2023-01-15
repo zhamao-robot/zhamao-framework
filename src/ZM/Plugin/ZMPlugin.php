@@ -4,77 +4,17 @@ declare(strict_types=1);
 
 namespace ZM\Plugin;
 
-use ZM\Annotation\Http\Route;
-use ZM\Annotation\OneBot\BotCommand;
-use ZM\Annotation\OneBot\BotEvent;
-
 /**
  * 单文件插件声明类
  */
 class ZMPlugin
 {
-    /** @var string 插件目录 */
-    protected string $dir;
-
-    /** @var array 机器人事件列表 */
-    protected array $bot_events = [];
-
-    /** @var array 机器人指令列表 */
-    protected array $bot_commands = [];
-
-    /** @var array 全局的事件列表 */
-    protected array $events = [];
-
-    /** @var array 注册的路由列表 */
-    protected array $routes = [];
-
-    public function __construct(string $dir)
-    {
-        $this->dir = $dir;
-    }
-
-    public function getDir(): string
-    {
-        return $this->dir;
-    }
-
-    public function addBotEvent(BotEvent $event)
-    {
-        $this->bot_events[] = $event;
-    }
-
-    public function addBotCommand(BotCommand $command)
-    {
-        $this->bot_commands[] = $command;
-    }
-
-    public function addEvent(string $event_name, callable $callback, int $level = 20)
-    {
-        $this->events[] = [$event_name, $callback, $level];
-    }
-
-    public function addHttpRoute(Route $route)
-    {
-        $this->routes[] = $route;
-    }
-
-    public function getBotEvents(): array
-    {
-        return $this->bot_events;
-    }
-
-    public function getBotCommands(): array
-    {
-        return $this->bot_commands;
-    }
-
-    public function getEvents(): array
-    {
-        return $this->events;
-    }
-
-    public function getRoutes(): array
-    {
-        return $this->routes;
-    }
+    use Traits\BotActionTrait;
+    use Traits\BotCommandTrait;
+    use Traits\BotEventTrait;
+    use Traits\CronTrait;
+    use Traits\EventTrait;
+    use Traits\InitTrait;
+    use Traits\PluginLoadTrait;
+    use Traits\RouteTrait;
 }

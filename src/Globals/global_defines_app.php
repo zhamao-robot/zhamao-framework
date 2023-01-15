@@ -43,6 +43,11 @@ const ZM_PROMPT_TIMEOUT_MENTION_USER = 4;       // 回复超时时 at 该用户
 const ZM_PROMPT_TIMEOUT_QUOTE_SELF = 8;         // 回复超时时引用自己回复的提示语句
 const ZM_PROMPT_TIMEOUT_QUOTE_USER = 16;        // 回复超时时引用用户的消息
 
+const ZM_PLUGIN_TYPE_NATIVE = 0;                // 原生类型的插件，特指内部插件、ZMApplication 继承的插件
+const ZM_PLUGIN_TYPE_PHAR = 1;                  // Phar 类型的插件
+const ZM_PLUGIN_TYPE_SOURCE = 2;                // 源码类型的插件
+const ZM_PLUGIN_TYPE_COMPOSER = 3;              // Composer 依赖的插件
+
 const LOAD_MODE_VENDOR = 0; // 从 vendor 加载
 const LOAD_MODE_SRC = 1;    // 从 src 加载
 

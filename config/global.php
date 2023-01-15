@@ -56,8 +56,9 @@ $config['runtime'] = [
 
 /* 允许加载插件形式 */
 $config['plugin'] = [
-    'enable' => true,
-    'load_dir' => 'plugins',
+    'enable' => true,                   // 是否启动插件系统，默认为 true，如果为否则只能使用 src 模式编写用户代码
+    'load_dir' => 'plugins',            // 插件目录，相对目录时，代表WORKING_DIR下的目录，绝对目录按照绝对目录来
+    'composer_plugin_enable' => true,   // 是否加载 Composer 依赖的插件，如果为 true 则读取 vendor/composer/installed.json 遍历加载
 ];
 
 /* 内部默认启用的插件 */

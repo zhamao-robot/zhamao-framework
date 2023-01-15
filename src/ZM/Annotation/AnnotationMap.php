@@ -38,6 +38,24 @@ class AnnotationMap
     }
 
     /**
+     * 添加一个独立的注解到全局注解列表中
+     *
+     * @param AnnotationBase $annotation 注解对象
+     * @param bool           $sort       是否在添加后排序（默认为 False）
+     */
+    public static function addSingleAnnotation(AnnotationBase $annotation, bool $sort = false): void
+    {
+        self::$_list[get_class($annotation)][] = $annotation;
+        if ($annotation->class !== '') {
+            self::$_map[$annotation->class][$annotation->method][] = $annotation;
+        }
+
+        if ($sort) {
+            self::sortAnnotationList();
+        }
+    }
+
+    /**
      * @return AnnotationBase[]
      */
     public static function getAnnotationList(string $class_name): array
@@ -46,7 +64,7 @@ class AnnotationMap
     }
 
     /**
-     * 排序所有的注解
+     * 排序所有的注解（仅排序 List，不排序 Map）
      */
     public static function sortAnnotationList(): void
     {

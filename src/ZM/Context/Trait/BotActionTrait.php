@@ -22,9 +22,9 @@ trait BotActionTrait
     /**
      * @var array<string, int> 一个记录 echo 对应协程 ID 的列表，用于恢复协程
      */
-    private static array $coroutine_list = [];
+    protected static array $coroutine_list = [];
 
-    private null|WebSocketMessageEvent|HttpRequestEvent $base_event;
+    protected null|WebSocketMessageEvent|HttpRequestEvent $base_event;
 
     /**
      * @internal 只允许内部调用
@@ -32,8 +32,8 @@ trait BotActionTrait
      */
     public static function tryResume(ActionResponse $response): void
     {
-        if (($co = Adaptive::getCoroutine()) !== null && isset(self::$coroutine_list[$response->echo ?? ''])) {
-            $co->resume(self::$coroutine_list[$response->echo ?? ''], $response);
+        if (($co = Adaptive::getCoroutine()) !== null && isset(static::$coroutine_list[$response->echo ?? ''])) {
+            $co->resume(static::$coroutine_list[$response->echo ?? ''], $response);
         }
     }
 
@@ -90,7 +90,7 @@ trait BotActionTrait
         }
         // 如果开启了协程，并且成功发送，那就进入协程等待，挂起等待结果返回一个 ActionResponse 对象
         if (($result ?? false) === true && ($co = Adaptive::getCoroutine()) !== null) {
-            self::$coroutine_list[$a->echo] = $co->getCid();
+            static::$coroutine_list[$a->echo] = $co->getCid();
             $response = $co->suspend();
             if ($response instanceof ActionResponse) {
                 return $response;

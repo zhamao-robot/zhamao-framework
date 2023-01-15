@@ -12,7 +12,7 @@ use ZM\Store\FileSystem;
 /**
  * 轻量、基于本地 JSON 文件的 KV 键值对缓存
  */
-class LightCache implements CacheInterface, KVInterface
+class LightCache implements KVInterface
 {
     /** @var array 存放库对象的列表 */
     private static array $objs = [];

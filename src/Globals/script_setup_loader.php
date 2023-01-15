@@ -33,7 +33,7 @@ function _zm_setup_loader()
             return true;
         });
 
-        // TODO: 然后加载插件目录下的插件
+        // 这里好像没必要加载插件目录的插件，插件理论上不能在 Master 被加载
 
         // 解析所有注册路径的文件，获取注解
         $parser->parse();

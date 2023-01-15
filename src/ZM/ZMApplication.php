@@ -7,8 +7,12 @@ namespace ZM;
 use ZM\Command\Server\ServerStartCommand;
 use ZM\Exception\SingletonViolationException;
 use ZM\Plugin\PluginManager;
+use ZM\Plugin\PluginMeta;
 use ZM\Plugin\ZMPlugin;
 
+/**
+ * 这是一个可以将框架以代码形式启动的一个类，且继承于插件，可以以插件的方式绑定事件回调等
+ */
 class ZMApplication extends ZMPlugin
 {
     /** @var null|ZMApplication 存储单例类的变量 */
@@ -20,13 +24,12 @@ class ZMApplication extends ZMPlugin
     /**
      * @throws SingletonViolationException
      */
-    public function __construct(mixed $dir = null)
+    public function __construct()
     {
         if (self::$obj !== null) {
             throw new SingletonViolationException(self::class);
         }
         self::$obj = $this; // 用于标记已经初始化完成
-        parent::__construct($dir ?? (__DIR__ . '/../..'));
         $this->args = ServerStartCommand::exportOptionArray();
     }
 
@@ -47,7 +50,9 @@ class ZMApplication extends ZMPlugin
      */
     public function run()
     {
-        PluginManager::addPlugin(['name' => 'native-app', 'object' => $this]);
+        $meta = new PluginMeta(['name' => 'native'], ZM_PLUGIN_TYPE_NATIVE);
+        $meta->bindEntity($this);
+        PluginManager::addPlugin($meta);
         (new Framework($this->args))->init()->start();
     }
 }

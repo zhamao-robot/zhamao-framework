@@ -8,31 +8,12 @@ use Jelix\Version\VersionComparator;
 use ZM\Annotation\AnnotationMap;
 use ZM\Annotation\AnnotationParser;
 use ZM\Annotation\Framework\BindEvent;
-use ZM\Annotation\OneBot\BotCommand;
-use ZM\Annotation\OneBot\BotEvent;
 use ZM\Exception\PluginException;
 use ZM\Store\FileSystem;
 
 class PluginManager
 {
-    private const DEFAULT_META = [
-        'name' => '<anonymous>',
-        'version' => 'dev',
-        'dir' => '',
-        'object' => null,
-        'entry_file' => null,
-        'autoload' => null,
-        'dependencies' => [],
-    ];
-
-    /** @var array|string[] 缺省的自动加载插件的入口文件 */
-    public static array $default_entries = [
-        'main.php',
-        'entry.php',
-        'index.php',
-    ];
-
-    /** @var array 插件信息列表 */
+    /** @var array<string, PluginMeta> 插件信息列表 */
     private static array $plugins = [];
 
     /**
@@ -51,117 +32,158 @@ class PluginManager
         $list = FileSystem::scanDirFiles($dir, false, false, true);
         $cnt = 0;
         foreach ($list as $item) {
+            // 检查是不是 phar 格式的插件
+            if (is_file($item) && pathinfo($item, PATHINFO_EXTENSION) === 'phar') {
+                // 如果是PHP文件，尝试添加插件
+                self::addPluginFromPhar($item);
+                ++$cnt;
+                continue;
+            }
+
             // 必须是目录形式的插件
             if (!is_dir($item)) {
                 continue;
             }
-            $plugin_meta = self::DEFAULT_META;
-            $plugin_meta['dir'] = $item;
 
-            // 看看有没有插件信息文件
-            $info_file = $item . '/zmplugin.json';
-            $main_file = '';
-            // 如果有的话，就从插件信息文件中找到插件信息
-            if (is_file($info_file)) {
-                $info = json_decode(file_get_contents($info_file), true);
-                if (json_last_error() !== JSON_ERROR_NONE) {
-                    logger()->error('插件信息文件解析失败: ' . json_last_error_msg());
-                    continue;
-                }
-                // 设置名称（如果有）
-                $plugin_meta['name'] = $info['name'] ?? ('<anonymous:' . pathinfo($item, PATHINFO_BASENAME) . '>');
-                // 设置版本（如果有）
-                if (isset($info['version'])) {
-                    $plugin_meta['version'] = $info['version'];
-                }
-                // 设置了入口文件，则遵循这个入口文件
-                if (isset($info['main'])) {
-                    $main_file = FileSystem::isRelativePath($info['main']) ? ($item . '/' . $info['main']) : $info['main'];
-                } else {
-                    $main_file = self::matchDefaultEntry($item);
-                }
-
-                // 检查有没有 composer.json 和 vendor/autoload.php 自动加载，如果有的话，那就写上去
-                $composer_file = $item . '/composer.json';
-                if (is_file(zm_dir($composer_file))) {
-                    // composer.json 存在，那么就加载这个插件
-                    $composer = json_decode(file_get_contents($composer_file), true);
-                    if (json_last_error() !== JSON_ERROR_NONE) {
-                        logger()->error('插件 composer.json 文件解析失败: ' . json_last_error_msg());
-                        continue;
-                    }
-                    if (isset($composer['autoload']['psr-4']) && is_assoc_array($composer['autoload']['psr-4'])) {
-                        $plugin_meta['autoload'] = $composer['autoload']['psr-4'];
-                    }
-                }
-
-                // 主文件存在，则加载
-                if (is_file(zm_dir($main_file))) {
-                    // 如果入口文件存在，那么就加载这个插件
-                    $plugin_meta['entry_file'] = $main_file;
-                }
-
-                // composer.json 不存在，那么就忽略这个插件，并报 warning
-                if (!is_file(zm_dir($composer_file)) && $plugin_meta['entry_file'] === null) {
-                    logger()->warning('插件 ' . $item . ' 不存在入口文件，也没有自动加载文件和内建 Composer，跳过加载');
-                    continue;
-                }
-            } else {
-                $plugin_meta['name'] = '<unnamed:' . pathinfo($item, PATHINFO_BASENAME) . '>';
-                // 到这里，说明没有 zmplugin.json 这个文件，那么我们就直接匹配
-                $main_file = self::matchDefaultEntry($item);
-                if (is_file(zm_dir($main_file))) {
-                    // 如果入口文件存在，那么就加载这个插件
-                    $plugin_meta['entry_file'] = $main_file;
-                } else {
-                    continue;
-                }
+            // 先看有没有 zmplugin.json，没有则不是正常的插件，发个 notice 然后跳过
+            $meta_file = $item . '/zmplugin.json';
+            if (!is_file($meta_file)) {
+                logger()->notice('插件目录 {dir} 没有插件元信息（zmplugin.json），跳过扫描。', ['dir' => $item]);
+                continue;
             }
 
-            // 到这里，说明插件信息收集齐了，只需要加载就行了
-            self::addPlugin($plugin_meta);
+            // 检验元信息是否合法，不合法发个 notice 然后跳过
+            $json_meta = json_decode(file_get_contents($meta_file), true);
+            if (!is_array($json_meta)) {
+                logger()->notice('插件目录 {dir} 的插件元信息（zmplugin.json）不是有效的 JSON，跳过扫描。', ['dir' => $item]);
+                continue;
+            }
+
+            // 构造一个元信息对象
+            $meta = new PluginMeta($json_meta, ZM_PLUGIN_TYPE_SOURCE, $item);
+            if ($meta->getEntryFile() === null && $meta->getAutoloadFile() === null) {
+                logger()->notice('插件 ' . $item . ' 不存在入口文件，也没有自动加载文件和内建 Composer，跳过加载');
+                continue;
+            }
+
+            // 添加插件到全局列表
+            self::addPlugin($meta);
             ++$cnt;
         }
         return $cnt;
     }
 
     /**
-     * 添加插件到全局注册中
+     * 添加一个 Phar 文件形式的插件
      *
      * @throws PluginException
      */
-    public static function addPlugin(array $meta = []): void
+    public static function addPluginFromPhar(string $phar_path): void
     {
-        if (!isset($meta['name'])) {
-            throw new PluginException('Plugin must have a name!');
-        }
-        logger()->debug('Adding plugin: ' . $meta['name']);
-
-        self::$plugins[$meta['name']] = $meta;
-
-        // 存在直接声明的对象，那么直接初始化
-        if (isset($meta['object']) && $meta['object'] instanceof ZMPlugin) {
-            return;
-        }
-
-        // 存在入口文件（单文件），从单文件加载
-        if (isset($meta['entry_file']) && is_file(zm_dir($meta['entry_file']))) {
-            $zmplugin = self::$plugins[$meta['name']]['object'] = require $meta['entry_file'];
-            if (!$zmplugin instanceof ZMPlugin) {
-                unset(self::$plugins[$meta['name']]);
-                throw new PluginException('插件 ' . $meta['name'] . ' 的入口文件 ' . $meta['entry_file'] . ' 必须返回一个 ZMPlugin 对象');
+        $meta = [];
+        try {
+            // 加载这个 Phar 文件
+            $phar = require $phar_path;
+            // 读取元信息
+            $plugin_file_path = zm_dir('phar://' . $phar_path . '/zmplugin.json');
+            if (!file_exists($plugin_file_path)) {
+                throw new PluginException('插件元信息 zmplugin.json 文件不存在');
             }
-            return;
+            // 解析元信息的 JSON
+            $meta_json = json_decode(file_get_contents($plugin_file_path), true);
+            // 失败抛出异常
+            if (!is_array($meta_json)) {
+                throw new PluginException('插件信息文件解析失败');
+            }
+            // $phar 这时应该是一个 ZMPlugin 对象，写入元信息
+            $meta = new PluginMeta($meta_json, ZM_PLUGIN_TYPE_PHAR, zm_dir('phar://' . $phar_path));
+            // 如果已经返回了一个插件对象，那么直接塞进去实体
+            if ($phar instanceof ZMPlugin) {
+                $meta->bindEntity($phar);
+            }
+            // 添加到插件列表
+            self::addPlugin($meta);
+        } catch (\Throwable $e) {
+            throw new PluginException('Phar 插件 ' . $phar_path . ' 加载失败: ' . $e->getMessage(), previous: $e);
         }
+    }
 
-        // 存在自动加载，检测 vendor/autoload.php 是否存在，如果存在，那么就加载
-        if (isset($meta['autoload'], $meta['dir']) && $meta['dir'] !== '' && is_file($meta['dir'] . '/vendor/autoload.php')) {
-            require_once $meta['dir'] . '/vendor/autoload.php';
-            return;
+    /**
+     * 从 Composer 添加插件
+     * @throws PluginException
+     */
+    public static function addPluginsFromComposer(): int
+    {
+        $installed_file = SOURCE_ROOT_DIR . '/vendor/composer/installed.json';
+        if (!file_exists($installed_file)) {
+            logger()->notice('找不到 Composer 的 installed.json 文件，跳过扫描 Composer 插件');
+            return 0;
         }
-        // 如果都不存在，那是不可能的事情，抛出一个谁都没见过的异常
-        unset(self::$plugins[$meta['name']]);
-        throw new PluginException('插件 ' . $meta['name'] . ' 无法加载，因为没有入口文件，也没有自动加载文件和内建 Composer');
+        $json = json_decode(file_get_contents($installed_file), true);
+        if (!is_array($json)) {
+            logger()->notice('Composer 的 installed.json 文件解析失败，跳过扫描 Composer 插件');
+            return 0;
+        }
+        $cnt = 0;
+        foreach ($json['packages'] as $item) {
+            $root_dir = SOURCE_ROOT_DIR . '/vendor/' . $item['name'];
+            $meta_file = zm_dir($root_dir . '/zmplugin.json');
+            if (!file_exists($meta_file)) {
+                continue;
+            }
+
+            // 检验元信息是否合法，不合法发个 notice 然后跳过
+            $json_meta = json_decode(file_get_contents($meta_file), true);
+            if (!is_array($json_meta)) {
+                logger()->notice('插件目录 {dir} 的插件元信息（zmplugin.json）不是有效的 JSON，跳过扫描。', ['dir' => $item]);
+                continue;
+            }
+
+            // 构造一个元信息对象
+            $meta = new PluginMeta($json_meta, ZM_PLUGIN_TYPE_COMPOSER, zm_dir($root_dir));
+            if ($meta->getEntryFile() === null && $meta->getAutoloadFile() === null) {
+                logger()->notice('插件 ' . $item . ' 不存在入口文件，也没有自动加载文件和内建 Composer，跳过加载');
+                continue;
+            }
+
+            // 添加插件到全局列表
+            self::addPlugin($meta);
+            ++$cnt;
+        }
+        return $cnt;
+    }
+
+    /**
+     * 根据插件元信息对象添加一个插件到框架的全局插件库中
+     *
+     * @throws PluginException
+     */
+    public static function addPlugin(PluginMeta $meta): void
+    {
+        logger()->debug('Adding plugin: ' . $meta->getName());
+        // 首先看看有没有 entity，如果还没有 entity，且 entry_file 有东西，那么就从 entry_file 获取 ZMPlugin 对象
+        if ($meta->getEntity() === null) {
+            if (($entry_file = $meta->getEntryFile()) !== null) {
+                $entity = require $entry_file;
+                if ($entity instanceof ZMPlugin) {
+                    $meta->bindEntity($entity);
+                }
+            }
+        }
+        // 如果设置了 ZMPlugin entity，并且已设置了 PluginLoad 事件，那就回调
+        // 接下来看看有没有 autoload，有的话 require_once 一下
+        if (($autoload = $meta->getAutoloadFile()) !== null) {
+            require_once $autoload;
+        }
+        // 如果既没有 entity，也没有 autoload，那就要抛出异常了
+        if ($meta->getEntity() === null && $meta->getAutoloadFile() === null) {
+            throw new PluginException('插件 ' . $meta->getName() . ' 既没有入口文件，也没有自动加载文件，无法加载');
+        }
+        // 检查同名插件，如果有同名插件，则抛出异常
+        if (isset(self::$plugins[$meta->getName()])) {
+            throw new PluginException('插件 ' . $meta->getName() . ' 已经存在，无法加载同名插件或重复加载！');
+        }
+        self::$plugins[$meta->getName()] = $meta;
     }
 
     /**
@@ -172,59 +194,88 @@ class PluginManager
      */
     public static function enablePlugins(AnnotationParser $parser): void
     {
-        foreach (self::$plugins as $name => $plugin) {
-            if (!isset($plugin['internal'])) {
+        foreach (self::$plugins as $name => $meta) {
+            // 除了内建插件外，输出 log 告知启动插件
+            if ($meta->getPluginType() !== ZM_PLUGIN_TYPE_NATIVE) {
                 logger()->info('Enabling plugin: ' . $name);
             }
-            // 先判断下依赖关系，如果声明了依赖，但依赖不合规直接报错崩溃
-            foreach (($plugin['dependencies'] ?? []) as $dep_name => $dep_version) {
+            // 先判断依赖关系，如果声明了依赖，但依赖不合规则报错崩溃
+            foreach ($meta->getDependencies() as $dep_name => $dep_version) {
+                // 缺少依赖的插件，不行
                 if (!isset(self::$plugins[$dep_name])) {
                     throw new PluginException('插件 ' . $name . ' 依赖插件 ' . $dep_name . '，但是没有找到这个插件');
                 }
-                if (VersionComparator::compareVersionRange(self::$plugins[$dep_name]['version'] ?? '1.0', $dep_version) === false) {
+                // 依赖的插件版本不对，不行
+                if (VersionComparator::compareVersionRange(self::$plugins[$dep_name]->getVersion(), $dep_version) === false) {
                     throw new PluginException('插件 ' . $name . ' 依赖插件 ' . $dep_name . '，但是这个插件的版本不符合要求');
                 }
             }
-            if (isset($plugin['object']) && $plugin['object'] instanceof ZMPlugin) {
-                $obj = $plugin['object'];
+            // 如果插件为单文件形式，且设置了 pluginLoad 事件，那就调用
+            $meta->getEntity()?->emitPluginLoad($parser);
+            if (($entity = $meta->getEntity()) instanceof ZMPlugin) {
+                // 将 BotAction 加入事件监听
+                foreach ($entity->getBotActions() as $action) {
+                    AnnotationMap::addSingleAnnotation($action);
+                    $parser->parseSpecial($action);
+                }
+                // 将 BotCommand 加入事件监听
+                foreach ($entity->getBotCommands() as $cmd) {
+                    AnnotationMap::addSingleAnnotation($cmd);
+                    $parser->parseSpecial($cmd);
+                }
                 // 将 Event 加入事件监听
-                foreach ($obj->getEvents() as $event) {
+                foreach ($entity->getEvents() as $event) {
                     $bind = new BindEvent($event[0], $event[2]);
                     $bind->on($event[1]);
-                    AnnotationMap::$_list[BindEvent::class][] = $bind;
+                    AnnotationMap::addSingleAnnotation($bind);
                 }
                 // 将 Routes 加入事件监听
-                foreach ($obj->getRoutes() as $route) {
+                foreach ($entity->getRoutes() as $route) {
                     $parser->parseSpecial($route);
                 }
                 // 将 BotEvents 加入事件监听
-                foreach ($obj->getBotEvents() as $event) {
-                    AnnotationMap::$_list[BotEvent::class][] = $event;
+                foreach ($entity->getBotEvents() as $event) {
+                    AnnotationMap::addSingleAnnotation($event);
                 }
-                // 将 BotCommand 加入事件监听
-                foreach ($obj->getBotCommands() as $cmd) {
-                    AnnotationMap::$_list[BotCommand::class][] = $cmd;
-                    $parser->parseSpecial($cmd);
+                // 将 Cron 加入注解
+                foreach ($entity->getCrons() as $cron) {
+                    AnnotationMap::addSingleAnnotation($cron);
+                    $parser->parseSpecial($cron);
                 }
-            } elseif (isset($plugin['autoload'], $plugin['dir'])) {
-                foreach ($plugin['autoload'] as $k => $v) {
-                    $parser->addPsr4Path($plugin['dir'] . '/' . $v . '/', trim($k, '\\'));
+                // 设置 @Init 注解
+                foreach ($entity->getInits() as $init) {
+                    AnnotationMap::addSingleAnnotation($init);
                 }
+            }
+            // 如果设置了 Autoload file，那么将会把 psr-4 的加载路径丢进 parser
+            foreach ($meta->getAutoloadPsr4() as $namespace => $path) {
+                $parser->addPsr4Path($meta->getRootDir() . '/' . $path . '/', trim($namespace, '\\'));
             }
         }
     }
 
-    private static function matchDefaultEntry(string $dir): string
+    /**
+     * 打包插件到 Phar
+     *
+     * @throws PluginException
+     */
+    public static function packPlugin(string $name): string
     {
-        $main = '';
-        // 没有设置入口文件，则遍历默认入口文件列表
-        foreach (self::$default_entries as $entry) {
-            $main_file = $dir . '/' . $entry;
-            if (is_file(zm_dir($main_file))) {
-                $main = $main_file;
-                break;
-            }
+        // 先遍历下插件目录下是否有这个插件，没有这个插件则不能打包
+        $plugin_dir = config('global.plugin.load_dir', SOURCE_ROOT_DIR . '/plugins');
+        // 模拟加载一遍插件
+        self::addPluginsFromDir($plugin_dir);
+
+        // 必须是源码模式才行
+        if (!isset(self::$plugins[$name]) || self::$plugins[$name]->getPluginType() !== ZM_PLUGIN_TYPE_SOURCE) {
+            throw new PluginException("没有找到名字为 {$name} 的插件（要打包的插件必须是源码模式）。");
         }
-        return $main;
+
+        $plugin = self::$plugins[$name];
+        // 插件目录
+        $dir = $plugin->getRootDir();
+        // TODO: 写到这了
+        // 插件加载方式判断
+        return '';
     }
 }
