@@ -4,7 +4,7 @@ var indexSectionsWithContent =
   1: "abcdefhiklmoprstwz",
   2: "mz",
   3: "abcdefghiklmnoprstwz",
-  4: "_abcdefghiklmopqrstuvwz",
+  4: "_abcdefghiklmnopqrstuvwz",
   5: "$beflstuvwz",
   6: "弃"
 };

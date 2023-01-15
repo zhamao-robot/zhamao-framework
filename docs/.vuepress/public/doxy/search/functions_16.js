@@ -1,8 +1,8 @@
 var searchData=
 [
-  ['zm_5fdir_0',['zm_dir',['../global__functions_8php.html#a5ffdd3528ee418f5b556be8335641705',1,'global_functions.php']]],
-  ['zm_5fexec_1',['zm_exec',['../global__functions_8php.html#a49a9c9fabfe3e76c1535ea0a42407b15',1,'global_functions.php']]],
-  ['zm_5finstance_5fid_2',['zm_instance_id',['../global__functions_8php.html#aedf626b8ff5c2b782908eb6756780eb7',1,'global_functions.php']]],
-  ['zm_5finternal_5ferrcode_3',['zm_internal_errcode',['../global__functions_8php.html#ab6532d66138e9cf91863546fc93556a1',1,'global_functions.php']]],
-  ['zm_5fsleep_4',['zm_sleep',['../global__functions_8php.html#a6195e0d6bb303cd1161beefcdc9173af',1,'global_functions.php']]]
+  ['withargs_0',['withArgs',['../class_z_m_1_1_z_m_application.html#afc7ff28f6c2a0264e9961d0c8241d917',1,'ZM::ZMApplication']]],
+  ['withargument_1',['withArgument',['../class_z_m_1_1_annotation_1_1_one_bot_1_1_bot_command.html#a5cd1ff53883567f6988debbbed94fb51',1,'ZM::Annotation::OneBot::BotCommand']]],
+  ['withargumentobject_2',['withArgumentObject',['../class_z_m_1_1_annotation_1_1_one_bot_1_1_bot_command.html#a2bbb7dda33ee621637843f5e8444ffe2',1,'ZM::Annotation::OneBot::BotCommand']]],
+  ['withconfig_3',['withConfig',['../class_z_m_1_1_z_m_application.html#ad0e7eaedf0171a0d763ead5afea334c3',1,'ZM::ZMApplication']]],
+  ['write_4',['write',['../class_z_m_1_1_command_1_1_command.html#a0bdac9ff13b56ac6334f64e094a9073a',1,'ZM::Command::Command']]]
 ];

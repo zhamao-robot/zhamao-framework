@@ -75,6 +75,8 @@ var annotated_dup =
       ] ],
       [ "Config", "namespace_z_m_1_1_config.html", [
         [ "ConfigTracer", "class_z_m_1_1_config_1_1_config_tracer.html", "class_z_m_1_1_config_1_1_config_tracer" ],
+        [ "Environment", "class_z_m_1_1_config_1_1_environment.html", "class_z_m_1_1_config_1_1_environment" ],
+        [ "EnvironmentInterface", "interface_z_m_1_1_config_1_1_environment_interface.html", "interface_z_m_1_1_config_1_1_environment_interface" ],
         [ "ZMConfig", "class_z_m_1_1_config_1_1_z_m_config.html", "class_z_m_1_1_config_1_1_z_m_config" ]
       ] ],
       [ "Container", "namespace_z_m_1_1_container.html", [

@@ -5,6 +5,7 @@ var global__functions_8php =
     [ "container", "global__functions_8php.html#aeacc0140de439ebab9a5466c45d38191", null ],
     [ "coroutine", "global__functions_8php.html#aea4203b9b3d3a0cecaad1479e2978e16", null ],
     [ "db", "global__functions_8php.html#abb1a3a76f52074604156a3da9ead1a98", null ],
+    [ "env", "global__functions_8php.html#ae249520bbbb558ac0e1928446ea2c0ca", null ],
     [ "is_assoc_array", "global__functions_8php.html#a872aa6d894a402d6faa4dbac803dd523", null ],
     [ "kv", "global__functions_8php.html#a30f74b242a48e72ec1245e31dbd4db6d", null ],
     [ "logger", "global__functions_8php.html#a97e3b3adabf67bc7d3650ed14214ddaa", null ],
