@@ -5,6 +5,8 @@ declare(strict_types=1);
 use OneBot\Driver\Driver;
 use OneBot\Driver\Process\ProcessManager;
 use Psr\Log\LoggerInterface;
+use ZM\Config\Environment;
+use ZM\Config\EnvironmentInterface;
 use ZM\Framework;
 
 /*
@@ -24,5 +26,6 @@ return [
         'worker_id' => fn () => ProcessManager::getProcessId(),
         Driver::class => fn () => Framework::getInstance()->getDriver(),
         LoggerInterface::class => fn () => logger(),
+        EnvironmentInterface::class => Environment::class,
     ],
 ];
