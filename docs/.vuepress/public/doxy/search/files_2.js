@@ -17,5 +17,6 @@ var searchData=
   ['contextinterface_2ephp_14',['ContextInterface.php',['../_context_interface_8php.html',1,'']]],
   ['controller_2ephp_15',['Controller.php',['../_controller_8php.html',1,'']]],
   ['cron_2ephp_16',['Cron.php',['../_cron_8php.html',1,'']]],
-  ['customannotation_2ephp_17',['CustomAnnotation.php',['../_custom_annotation_8php.html',1,'']]]
+  ['crontrait_2ephp_17',['CronTrait.php',['../_cron_trait_8php.html',1,'']]],
+  ['customannotation_2ephp_18',['CustomAnnotation.php',['../_custom_annotation_8php.html',1,'']]]
 ];

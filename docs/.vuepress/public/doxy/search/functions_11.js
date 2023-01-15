@@ -1,25 +1,7 @@
 var searchData=
 [
-  ['redis_0',['redis',['../global__functions_8php.html#a9c69dfaa68f571577df4965bfed5ec79',1,'global_functions.php']]],
-  ['registerafter_1',['registerAfter',['../class_z_m_1_1_middleware_1_1_middleware_handler.html#ad0359a31fbb8e5d23e5a9dff9a1509f7',1,'ZM::Middleware::MiddlewareHandler']]],
-  ['registerbefore_2',['registerBefore',['../class_z_m_1_1_middleware_1_1_middleware_handler.html#aa53187a09a5b43228d6c90231c89f047',1,'ZM::Middleware::MiddlewareHandler']]],
-  ['registerexception_3',['registerException',['../class_z_m_1_1_middleware_1_1_middleware_handler.html#a95f9026736b6521a00f7795459961b15',1,'ZM::Middleware::MiddlewareHandler']]],
-  ['registerhttprequestservices_4',['registerHttpRequestServices',['../class_z_m_1_1_container_1_1_container_registrant.html#ad4f7a1fc0d24abdab5c1e6888a09ffd9',1,'ZM::Container::ContainerRegistrant']]],
-  ['registerobactionresponseservices_5',['registerOBActionResponseServices',['../class_z_m_1_1_container_1_1_container_registrant.html#a01877afc121c0e22378ab9eeffd94bfe',1,'ZM::Container::ContainerRegistrant']]],
-  ['registerobeventservices_6',['registerOBEventServices',['../class_z_m_1_1_container_1_1_container_registrant.html#af3c9076547ae1fad9bcd70eea03e6f74',1,'ZM::Container::ContainerRegistrant']]],
-  ['registerwscloseservices_7',['registerWSCloseServices',['../class_z_m_1_1_container_1_1_container_registrant.html#af128f7b0d9ea116376b27357157c740e',1,'ZM::Container::ContainerRegistrant']]],
-  ['registerwsmessageservices_8',['registerWSMessageServices',['../class_z_m_1_1_container_1_1_container_registrant.html#a60e490c8d535850f24c0e56b03c85936',1,'ZM::Container::ContainerRegistrant']]],
-  ['registerwsopenservices_9',['registerWSOpenServices',['../class_z_m_1_1_container_1_1_container_registrant.html#a71ddb6df480fc9444e592bd5bc678881',1,'ZM::Container::ContainerRegistrant']]],
-  ['releasesavepoint_10',['releaseSavepoint',['../class_z_m_1_1_store_1_1_database_1_1_d_b_wrapper.html#a92a6b8f856eee5aaa30de8dcf6a9e122',1,'ZM::Store::Database::DBWrapper']]],
-  ['reload_11',['reload',['../class_z_m_1_1_config_1_1_z_m_config.html#a7b2a44f6ec87a111c1bc3cc911cd15f5',1,'ZM\Config\ZMConfig\reload()'],['../class_z_m_1_1_framework.html#a7b2a44f6ec87a111c1bc3cc911cd15f5',1,'ZM\Framework\reload()']]],
-  ['removeconnection_12',['removeConnection',['../class_z_m_1_1_utils_1_1_connection_util.html#a80abd0ec46bb79867148f3b0e254f5e2',1,'ZM::Utils::ConnectionUtil']]],
-  ['removecontextprompt_13',['removeContextPrompt',['../class_z_m_1_1_plugin_1_1_one_bot12_adapter.html#a8b2d9c459850cb31e0f049884697fd59',1,'ZM::Plugin::OneBot12Adapter']]],
-  ['removeprocessstate_14',['removeProcessState',['../class_z_m_1_1_process_1_1_process_state_manager.html#acf2c7a3ae8e91f7d962a880c01bccdf4',1,'ZM::Process::ProcessStateManager']]],
-  ['repeat_15',['repeat',['../class_module_1_1_example_1_1_hello123.html#a7da39ea9baab6da88af5268739c3b900',1,'Module::Example::Hello123']]],
-  ['resolve_16',['resolve',['../global__functions_8php.html#a72209840841640a3706f6393aa3bc0bc',1,'global_functions.php']]],
-  ['rollback_17',['rollBack',['../class_z_m_1_1_store_1_1_database_1_1_d_b_connection.html#aebaea4cae21e0e75ec1489c1648caeb3',1,'ZM\Store\Database\DBConnection\rollBack()'],['../class_z_m_1_1_store_1_1_database_1_1_d_b_wrapper.html#aebaea4cae21e0e75ec1489c1648caeb3',1,'ZM\Store\Database\DBWrapper\rollBack()']]],
-  ['rollbacksavepoint_18',['rollbackSavepoint',['../class_z_m_1_1_store_1_1_database_1_1_d_b_wrapper.html#a439f5cd29a7897d1a8d8382b5400f3f7',1,'ZM::Store::Database::DBWrapper']]],
-  ['route_19',['route',['../class_module_1_1_example_1_1_hello123.html#ab7083f7ff045dc98f3217982f921f079',1,'Module::Example::Hello123']]],
-  ['rowcount_20',['rowCount',['../class_z_m_1_1_store_1_1_database_1_1_d_b_statement.html#a82b073888555fc72e57142fe913db377',1,'ZM\Store\Database\DBStatement\rowCount()'],['../class_z_m_1_1_store_1_1_database_1_1_d_b_statement_wrapper.html#a82b073888555fc72e57142fe913db377',1,'ZM\Store\Database\DBStatementWrapper\rowCount()']]],
-  ['run_21',['run',['../class_z_m_1_1_console_application.html#a05dd9c0ddaec72a715c26082770151e1',1,'ZM\ConsoleApplication\run()'],['../class_z_m_1_1_schedule_1_1_schedule.html#afb0fafe7e02a3ae1993c01c19fad2bae',1,'ZM\Schedule\Schedule\run()'],['../class_z_m_1_1_z_m_application.html#afb0fafe7e02a3ae1993c01c19fad2bae',1,'ZM\ZMApplication\run()']]]
+  ['query_0',['query',['../class_z_m_1_1_store_1_1_database_1_1_d_b_connection.html#a30a1ad04b51258177af63e89f000dd41',1,'ZM::Store::Database::DBConnection']]],
+  ['question_1',['question',['../class_z_m_1_1_command_1_1_command.html#a76a3ddf5d91681b9d7960eea9ac2dac7',1,'ZM::Command::Command']]],
+  ['quote_2',['quote',['../class_z_m_1_1_store_1_1_database_1_1_d_b_connection.html#ab156fe0296cd40afecf0c10f5f1256cc',1,'ZM\Store\Database\DBConnection\quote()'],['../class_z_m_1_1_store_1_1_database_1_1_d_b_wrapper.html#ab02a089ab75fd13290064989db7ee89b',1,'ZM\Store\Database\DBWrapper\quote(mixed $value, $type=ParameterType::STRING)']]],
+  ['quoteidentifier_3',['quoteIdentifier',['../class_z_m_1_1_store_1_1_database_1_1_d_b_wrapper.html#ad176acd72f09a8a7645a11d4c401d491',1,'ZM::Store::Database::DBWrapper']]]
 ];

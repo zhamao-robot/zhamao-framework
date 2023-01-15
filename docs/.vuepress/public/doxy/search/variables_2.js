@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['else_0',['else',['../global__defines__app_8php.html#afd476b438a444073dea7473ad8e0c0c9',1,'global_defines_app.php']]]
+  ['crontrait_0',['CronTrait',['../namespace_z_m_1_1_plugin_1_1_traits.html#a5a744732152e091ea9fccf5df1324d0b',1,'ZM::Plugin::Traits']]]
 ];

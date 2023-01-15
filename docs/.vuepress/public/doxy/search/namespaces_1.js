@@ -29,6 +29,7 @@ var searchData=
   ['solution_26',['Solution',['../namespace_z_m_1_1_exception_1_1_solution.html',1,'ZM::Exception']]],
   ['store_27',['Store',['../namespace_z_m_1_1_store.html',1,'ZM']]],
   ['trait_28',['Trait',['../namespace_z_m_1_1_context_1_1_trait.html',1,'ZM::Context']]],
-  ['utils_29',['Utils',['../namespace_z_m_1_1_utils.html',1,'ZM']]],
-  ['zm_30',['ZM',['../namespace_z_m.html',1,'']]]
+  ['traits_29',['Traits',['../namespace_z_m_1_1_plugin_1_1_traits.html',1,'ZM::Plugin']]],
+  ['utils_30',['Utils',['../namespace_z_m_1_1_utils.html',1,'ZM']]],
+  ['zm_31',['ZM',['../namespace_z_m.html',1,'']]]
 ];

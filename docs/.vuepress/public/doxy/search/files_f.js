@@ -8,5 +8,6 @@ var searchData=
   ['registerlogger_2ephp_5',['RegisterLogger.php',['../_register_logger_8php.html',1,'']]],
   ['replcommand_2ephp_6',['ReplCommand.php',['../_repl_command_8php.html',1,'']]],
   ['route_2ephp_7',['Route.php',['../_route_8php.html',1,'']]],
-  ['rule_2ephp_8',['Rule.php',['../_rule_8php.html',1,'']]]
+  ['routetrait_2ephp_8',['RouteTrait.php',['../_route_trait_8php.html',1,'']]],
+  ['rule_2ephp_9',['Rule.php',['../_rule_8php.html',1,'']]]
 ];

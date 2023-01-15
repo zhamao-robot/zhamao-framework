@@ -6,5 +6,6 @@ var searchData=
   ['environmentinterface_2ephp_3',['EnvironmentInterface.php',['../_environment_interface_8php.html',1,'']]],
   ['ergodicannotation_2ephp_4',['ErgodicAnnotation.php',['../_ergodic_annotation_8php.html',1,'']]],
   ['eventdispatcher_2ephp_5',['EventDispatcher.php',['../_event_dispatcher_8php.html',1,'']]],
-  ['eventprovider_2ephp_6',['EventProvider.php',['../_event_provider_8php.html',1,'']]]
+  ['eventprovider_2ephp_6',['EventProvider.php',['../_event_provider_8php.html',1,'']]],
+  ['eventtrait_2ephp_7',['EventTrait.php',['../_event_trait_8php.html',1,'']]]
 ];

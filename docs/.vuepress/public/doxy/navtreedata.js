@@ -58,11 +58,11 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "_alias_definition_source_8php.html",
-"class_z_m_1_1_annotation_1_1_one_bot_1_1_bot_action_response.html#a0b759f4af85ea8fe8967823a30d54f0c",
-"class_z_m_1_1_context_1_1_bot_context.html#ac005ebb1f545cd032a917e89944ac673",
-"class_z_m_1_1_plugin_1_1_z_m_plugin.html#ab194285ef841b4ca18b97990071f92ed",
-"class_z_m_1_1_store_1_1_file_system.html",
-"globals.html"
+"class_z_m_1_1_annotation_1_1_framework_1_1_cron.html#a58753b3bc06544a27254db84b3f660ed",
+"class_z_m_1_1_config_1_1_z_m_config.html#ab8acb5f7930d2f1a934e2a7482ae5dc8",
+"class_z_m_1_1_plugin_1_1_one_bot12_adapter.html",
+"class_z_m_1_1_store_1_1_database_1_1_d_b_wrapper.html#adec4c9208c0bc954eb1e787fb01858c9",
+"global__defines__app_8php.html#a3277fc2f89a40896bf30cdf7d0203a0b"
 ];
 
 var SYNCONMSG = '点击 关闭 面板同步';

@@ -105,6 +105,8 @@ $(document).ready(function(){initNavTree('class_z_m_1_1_annotation_1_1_annotatio
 <tr class="separator:aa5d68a363f1f57eec251379061ec3a56"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0765e296a5adcb15827fcbebb95a17f2"><td class="memItemLeft" align="right" valign="top">static&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_annotation_1_1_annotation_map.html#a0765e296a5adcb15827fcbebb95a17f2">loadAnnotationMap</a> (array $map)</td></tr>
 <tr class="separator:a0765e296a5adcb15827fcbebb95a17f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a470048892cd0307142b52f0c161915fe"><td class="memItemLeft" align="right" valign="top">static&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_annotation_1_1_annotation_map.html#a470048892cd0307142b52f0c161915fe">addSingleAnnotation</a> (<a class="el" href="class_z_m_1_1_annotation_1_1_annotation_base.html">AnnotationBase</a> $annotation, bool $sort=false)</td></tr>
+<tr class="separator:a470048892cd0307142b52f0c161915fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6e35969426885f792d1a1023ce3b574b"><td class="memItemLeft" align="right" valign="top">static&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_annotation_1_1_annotation_map.html#a6e35969426885f792d1a1023ce3b574b">getAnnotationList</a> (string $class_name)</td></tr>
 <tr class="separator:a6e35969426885f792d1a1023ce3b574b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a63efa5e81e1278b229b8f3a2be72cd44"><td class="memItemLeft" align="right" valign="top">static&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_annotation_1_1_annotation_map.html#a63efa5e81e1278b229b8f3a2be72cd44">sortAnnotationList</a> ()</td></tr>
@@ -120,6 +122,56 @@ $(document).ready(function(){initNavTree('class_z_m_1_1_annotation_1_1_annotatio
 <a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
 <div class="textblock"><p >注解全局存取位置 </p>
 </div><h2 class="groupheader">成员函数说明</h2>
+<a id="a470048892cd0307142b52f0c161915fe" name="a470048892cd0307142b52f0c161915fe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a470048892cd0307142b52f0c161915fe">&#9670;&#160;</a></span>addSingleAnnotation()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static addSingleAnnotation </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="class_z_m_1_1_annotation_1_1_annotation_base.html">AnnotationBase</a>&#160;</td>
+          <td class="paramname"><em>$annotation</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>$sort</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >添加一个独立的注解到全局注解列表中</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramtype"><a class="el" href="class_z_m_1_1_annotation_1_1_annotation_base.html">AnnotationBase</a></td><td class="paramname">$annotation</td><td>注解对象 </td></tr>
+    <tr><td class="paramtype">bool</td><td class="paramname">$sort</td><td>是否在添加后排序（默认为 False） </td></tr>
+  </table>
+  </dd>
+</dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="class_z_m_1_1_annotation_1_1_annotation_map_a470048892cd0307142b52f0c161915fe_cgraph.svg" width="328" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+</div>
+
+</div>
+</div>
 <a id="a6e35969426885f792d1a1023ce3b574b" name="a6e35969426885f792d1a1023ce3b574b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6e35969426885f792d1a1023ce3b574b">&#9670;&#160;</a></span>getAnnotationList()</h2>
 
@@ -221,7 +273,7 @@ $(document).ready(function(){initNavTree('class_z_m_1_1_annotation_1_1_annotatio
   </tr>
 </table>
 </div><div class="memdoc">
-<p >排序所有的注解 </p>
+<p >排序所有的注解（仅排序 List，不排序 Map） </p>
 <p >@phpstan-ignore-line</p>
 
 </div>

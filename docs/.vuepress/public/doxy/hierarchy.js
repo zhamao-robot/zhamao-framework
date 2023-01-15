@@ -13,6 +13,7 @@ var hierarchy =
         [ "TextGenerateCommand", "class_z_m_1_1_command_1_1_generate_1_1_text_generate_command.html", null ],
         [ "InitCommand", "class_z_m_1_1_command_1_1_init_command.html", null ],
         [ "PluginMakeCommand", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_make_command.html", null ],
+        [ "PluginPackCommand", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_pack_command.html", null ],
         [ "ProxyServerCommand", "class_z_m_1_1_command_1_1_proxy_server_command.html", null ],
         [ "ReplCommand", "class_z_m_1_1_command_1_1_repl_command.html", null ]
       ] ]
@@ -87,9 +88,8 @@ var hierarchy =
       ] ],
       [ "DBStatement", "class_z_m_1_1_store_1_1_database_1_1_d_b_statement.html", null ]
     ] ],
-    [ "KVInterface", "interface_z_m_1_1_store_1_1_k_v_1_1_k_v_interface.html", [
-      [ "LightCache", "class_z_m_1_1_store_1_1_k_v_1_1_light_cache.html", null ],
-      [ "KVRedis", "class_z_m_1_1_store_1_1_k_v_1_1_redis_1_1_k_v_redis.html", null ]
+    [ "JsonSerializable", null, [
+      [ "PluginMeta", "class_z_m_1_1_plugin_1_1_plugin_meta.html", null ]
     ] ],
     [ "Level", "interface_z_m_1_1_annotation_1_1_interfaces_1_1_level.html", [
       [ "BindEvent", "class_z_m_1_1_annotation_1_1_framework_1_1_bind_event.html", null ],
@@ -152,8 +152,10 @@ var hierarchy =
       [ "ConsoleApplication", "class_z_m_1_1_console_application.html", null ]
     ] ],
     [ "CacheInterface", null, [
-      [ "LightCache", "class_z_m_1_1_store_1_1_k_v_1_1_light_cache.html", null ],
-      [ "KVRedis", "class_z_m_1_1_store_1_1_k_v_1_1_redis_1_1_k_v_redis.html", null ]
+      [ "KVInterface", "interface_z_m_1_1_store_1_1_k_v_1_1_k_v_interface.html", [
+        [ "LightCache", "class_z_m_1_1_store_1_1_k_v_1_1_light_cache.html", null ],
+        [ "KVRedis", "class_z_m_1_1_store_1_1_k_v_1_1_redis_1_1_k_v_redis.html", null ]
+      ] ]
     ] ],
     [ "Command", null, [
       [ "ServerCommand", "class_z_m_1_1_command_1_1_server_1_1_server_command.html", [

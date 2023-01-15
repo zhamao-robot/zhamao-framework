@@ -57,7 +57,8 @@ var annotated_dup =
           [ "TextGenerateCommand", "class_z_m_1_1_command_1_1_generate_1_1_text_generate_command.html", "class_z_m_1_1_command_1_1_generate_1_1_text_generate_command" ]
         ] ],
         [ "Plugin", "namespace_z_m_1_1_command_1_1_plugin.html", [
-          [ "PluginMakeCommand", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_make_command.html", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_make_command" ]
+          [ "PluginMakeCommand", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_make_command.html", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_make_command" ],
+          [ "PluginPackCommand", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_pack_command.html", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_pack_command" ]
         ] ],
         [ "Server", "namespace_z_m_1_1_command_1_1_server.html", [
           [ "ServerCommand", "class_z_m_1_1_command_1_1_server_1_1_server_command.html", "class_z_m_1_1_command_1_1_server_1_1_server_command" ],
@@ -132,7 +133,8 @@ var annotated_dup =
         ] ],
         [ "OneBot12Adapter", "class_z_m_1_1_plugin_1_1_one_bot12_adapter.html", "class_z_m_1_1_plugin_1_1_one_bot12_adapter" ],
         [ "PluginManager", "class_z_m_1_1_plugin_1_1_plugin_manager.html", null ],
-        [ "ZMPlugin", "class_z_m_1_1_plugin_1_1_z_m_plugin.html", "class_z_m_1_1_plugin_1_1_z_m_plugin" ]
+        [ "PluginMeta", "class_z_m_1_1_plugin_1_1_plugin_meta.html", "class_z_m_1_1_plugin_1_1_plugin_meta" ],
+        [ "ZMPlugin", "class_z_m_1_1_plugin_1_1_z_m_plugin.html", null ]
       ] ],
       [ "Process", "namespace_z_m_1_1_process.html", [
         [ "ProcessStateManager", "class_z_m_1_1_process_1_1_process_state_manager.html", null ]

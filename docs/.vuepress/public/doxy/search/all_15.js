@@ -1,10 +1,12 @@
 var searchData=
 [
-  ['udpworkeronmessage_0',['udpWorkerOnMessage',['../class_z_m_1_1_command_1_1_proxy_server_command.html#aed3a43533311a345ab54f4406753d5d2',1,'ZM::Command::ProxyServerCommand']]],
-  ['unlock_1',['unlock',['../class_z_m_1_1_store_1_1_lock_1_1_file_lock.html#aa9086cee2cdba427d36c9a1087d7e405',1,'ZM::Store::Lock::FileLock']]],
-  ['unsupported_5ffile_5ftype_2',['UNSUPPORTED_FILE_TYPE',['../class_z_m_1_1_exception_1_1_config_exception.html#a7f55a7dd8e350ad420d05a38fcda32ac',1,'ZM::Exception::ConfigException']]],
-  ['unsupportedfiletype_3',['unsupportedFileType',['../class_z_m_1_1_exception_1_1_config_exception.html#a3528a0e71dd42a2385e50dedd7fe00f5',1,'ZM::Exception::ConfigException']]],
-  ['update_4',['update',['../class_z_m_1_1_store_1_1_database_1_1_d_b_wrapper.html#ac694580d7409c217f90061b9cf6bb3a9',1,'ZM::Store::Database::DBWrapper']]],
-  ['uploadfrompath_5',['uploadFromPath',['../class_z_m_1_1_utils_1_1_one_bot12_file_uploader.html#aa6fa7b1297a8b7f50b16b9ec612f662d',1,'ZM::Utils::OneBot12FileUploader']]],
-  ['uploadfromstring_6',['uploadFromString',['../class_z_m_1_1_utils_1_1_one_bot12_file_uploader.html#a4845ce385f279c0a2e1787fed2ebc630',1,'ZM::Utils::OneBot12FileUploader']]]
+  ['textgeneratecommand_0',['TextGenerateCommand',['../class_z_m_1_1_command_1_1_generate_1_1_text_generate_command.html',1,'ZM::Command::Generate']]],
+  ['textgeneratecommand_2ephp_1',['TextGenerateCommand.php',['../_text_generate_command_8php.html',1,'']]],
+  ['then_2',['then',['../class_z_m_1_1_middleware_1_1_pipeline.html#a0cfb44d4bbc5d9b3b4d49ce097f92c85',1,'ZM::Middleware::Pipeline']]],
+  ['through_3',['through',['../class_z_m_1_1_middleware_1_1_pipeline.html#a894fdb760d56349b03f768c78d67ec62',1,'ZM::Middleware::Pipeline']]],
+  ['timermiddleware_4',['TimerMiddleware',['../class_z_m_1_1_middleware_1_1_timer_middleware.html',1,'ZM::Middleware']]],
+  ['timermiddleware_2ephp_5',['TimerMiddleware.php',['../_timer_middleware_8php.html',1,'']]],
+  ['transactional_6',['transactional',['../class_z_m_1_1_store_1_1_database_1_1_d_b_wrapper.html#ac104d5eef6b70b01a24b8e3e31b08ae9',1,'ZM::Store::Database::DBWrapper']]],
+  ['true_5flist_7',['TRUE_LIST',['../global__defines__app_8php.html#a87445f0514d6784e5f6dfa1388307da3',1,'global_defines_app.php']]],
+  ['try_8',['try',['../entry_8php.html#aa7e681480c285def1d50a329274b6f9e',1,'entry.php']]]
 ];
