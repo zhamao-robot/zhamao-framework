@@ -8,6 +8,7 @@ use OneBot\Driver\Process\ExecutionResult;
 use OneBot\V12\Object\MessageSegment;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
+use ZM\Config\Environment;
 use ZM\Config\ZMConfig;
 use ZM\Container\ContainerHolder;
 use ZM\Logger\ConsoleLogger;
@@ -274,4 +275,13 @@ function kv(string $name = ''): Psr\SimpleCache\CacheInterface
     }
     /* @phpstan-ignore-next-line */
     return is_a($kv_class, KVInterface::class, true) ? $kv_class::open($name) : new $kv_class($name);
+}
+
+/**
+ * 获取环境变量
+ */
+function env(string $key, mixed $default = null): mixed
+{
+    // TODO: 重新思考容器绑定的加载方式，从而在此处使用 interface
+    return resolve(Environment::class)->get($key, $default);
 }

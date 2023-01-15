@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /* 启动框架的底层驱动（原生支持 swoole、workerman 两种） */
-$config['driver'] = 'workerman';
+$config['driver'] = env('DRIVER', 'workerman');
 
 /* 要启动的服务器监听端口及协议 */
 $config['servers'] = [
@@ -22,14 +22,14 @@ $config['servers'] = [
 
 /* Workerman 驱动相关配置 */
 $config['workerman_options'] = [
-    'worker_num' => 1,          // 如果你只有一个 OneBot 实例连接到框架并且代码没有复杂的CPU密集计算，则可把这里改为1使用全局变量
+    'worker_num' => env('WORKER_NUM', 1),          // 如果你只有一个 OneBot 实例连接到框架并且代码没有复杂的CPU密集计算，则可把这里改为1使用全局变量
 ];
 
 /* Swoole 驱动相关配置 */
 $config['swoole_options'] = [
     'coroutine_hook_flags' => SWOOLE_HOOK_ALL & (~SWOOLE_HOOK_CURL),    // 协程 Hook 内容
     'swoole_set' => [
-        'worker_num' => 1,                  // 如果你只有一个 OneBot 实例连接到框架并且代码没有复杂的CPU密集计算，则可把这里改为1使用全局变量
+        'worker_num' => env('WORKER_NUM', 1),                  // 如果你只有一个 OneBot 实例连接到框架并且代码没有复杂的CPU密集计算，则可把这里改为1使用全局变量
         'dispatch_mode' => 2,               // 包分配原则，见 https://wiki.swoole.com/#/server/setting?id=dispatch_mode
         'max_coroutine' => 300000,          // 允许最大的协程数
         'max_wait_time' => 5,               // 安全退出模式下允许等待 Worker 的最长秒数
@@ -51,7 +51,7 @@ $config['runtime'] = [
         ],
         'namespace' => [],
     ],
-    'timezone' => 'Asia/Shanghai',
+    'timezone' => env('TIMEZONE', 'Asia/Shanghai'),
 ];
 
 /* 允许加载插件形式 */

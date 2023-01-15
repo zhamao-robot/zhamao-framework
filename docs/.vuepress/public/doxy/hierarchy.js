@@ -34,6 +34,9 @@ var hierarchy =
       [ "SQLiteDriver", "class_z_m_1_1_store_1_1_database_1_1_s_q_lite_driver.html", null ]
     ] ],
     [ "EasterEgg", "class_z_m_1_1_utils_1_1_easter_egg.html", null ],
+    [ "EnvironmentInterface", "interface_z_m_1_1_config_1_1_environment_interface.html", [
+      [ "Environment", "class_z_m_1_1_config_1_1_environment.html", null ]
+    ] ],
     [ "ErgodicAnnotation", "interface_z_m_1_1_annotation_1_1_interfaces_1_1_ergodic_annotation.html", [
       [ "Controller", "class_z_m_1_1_annotation_1_1_http_1_1_controller.html", null ],
       [ "Middleware", "class_z_m_1_1_annotation_1_1_middleware_1_1_middleware.html", null ],
