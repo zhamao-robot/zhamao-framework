@@ -94,6 +94,7 @@ module.exports = {
                     sidebarDepth: 2,
                     children: [
                         'store/file-system',
+                        'store/cache',
                     ]
                 }
             ],
