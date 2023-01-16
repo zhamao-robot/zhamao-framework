@@ -71,6 +71,7 @@ module.exports = {
                     children: [
                         'bot/bot-context',
                         'bot/message-segment',
+                        'bot/authorization',
                     ]
                 },
                 {
