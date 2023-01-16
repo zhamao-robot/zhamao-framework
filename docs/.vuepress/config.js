@@ -100,6 +100,7 @@ module.exports = {
                     children: [
                         'store/file-system',
                         'store/cache',
+                        'store/redis',
                     ]
                 }
             ],
