@@ -44,6 +44,7 @@ module.exports = {
                         'configuration',
                         'structure',
                         'get_started',
+                        'debugging',
                     ]
                 }
             ],
@@ -85,7 +86,8 @@ module.exports = {
                     sidebarDepth: 2,
                     children: [
                         'common/class-alias',
-                        'common/global-defines'
+                        'common/global-defines',
+                        'common/logging',
                     ]
                 },
                 {
