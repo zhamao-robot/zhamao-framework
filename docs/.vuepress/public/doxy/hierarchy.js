@@ -12,8 +12,11 @@ var hierarchy =
         [ "SystemdGenerateCommand", "class_z_m_1_1_command_1_1_generate_1_1_systemd_generate_command.html", null ],
         [ "TextGenerateCommand", "class_z_m_1_1_command_1_1_generate_1_1_text_generate_command.html", null ],
         [ "InitCommand", "class_z_m_1_1_command_1_1_init_command.html", null ],
-        [ "PluginMakeCommand", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_make_command.html", null ],
-        [ "PluginPackCommand", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_pack_command.html", null ],
+        [ "PluginCommand", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_command.html", [
+          [ "PluginInstallCommand", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_install_command.html", null ],
+          [ "PluginMakeCommand", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_make_command.html", null ],
+          [ "PluginPackCommand", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_pack_command.html", null ]
+        ] ],
         [ "ProxyServerCommand", "class_z_m_1_1_command_1_1_proxy_server_command.html", null ],
         [ "ReplCommand", "class_z_m_1_1_command_1_1_repl_command.html", null ]
       ] ]
@@ -101,6 +104,7 @@ var hierarchy =
     ] ],
     [ "LoadConfiguration", "class_z_m_1_1_bootstrap_1_1_load_configuration.html", null ],
     [ "LoadGlobalDefines", "class_z_m_1_1_bootstrap_1_1_load_global_defines.html", null ],
+    [ "LoadPlugins", "class_z_m_1_1_bootstrap_1_1_load_plugins.html", null ],
     [ "ManagerEventListener", "class_z_m_1_1_event_1_1_listener_1_1_manager_event_listener.html", null ],
     [ "MasterEventListener", "class_z_m_1_1_event_1_1_listener_1_1_master_event_listener.html", null ],
     [ "MessageUtil", "class_z_m_1_1_utils_1_1_message_util.html", null ],

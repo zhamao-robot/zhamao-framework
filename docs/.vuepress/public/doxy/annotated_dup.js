@@ -44,6 +44,7 @@ var annotated_dup =
         [ "HandleExceptions", "class_z_m_1_1_bootstrap_1_1_handle_exceptions.html", "class_z_m_1_1_bootstrap_1_1_handle_exceptions" ],
         [ "LoadConfiguration", "class_z_m_1_1_bootstrap_1_1_load_configuration.html", "class_z_m_1_1_bootstrap_1_1_load_configuration" ],
         [ "LoadGlobalDefines", "class_z_m_1_1_bootstrap_1_1_load_global_defines.html", "class_z_m_1_1_bootstrap_1_1_load_global_defines" ],
+        [ "LoadPlugins", "class_z_m_1_1_bootstrap_1_1_load_plugins.html", "class_z_m_1_1_bootstrap_1_1_load_plugins" ],
         [ "RegisterEventProvider", "class_z_m_1_1_bootstrap_1_1_register_event_provider.html", "class_z_m_1_1_bootstrap_1_1_register_event_provider" ],
         [ "RegisterLogger", "class_z_m_1_1_bootstrap_1_1_register_logger.html", "class_z_m_1_1_bootstrap_1_1_register_logger" ],
         [ "SetInternalTimezone", "class_z_m_1_1_bootstrap_1_1_set_internal_timezone.html", "class_z_m_1_1_bootstrap_1_1_set_internal_timezone" ]
@@ -57,6 +58,8 @@ var annotated_dup =
           [ "TextGenerateCommand", "class_z_m_1_1_command_1_1_generate_1_1_text_generate_command.html", "class_z_m_1_1_command_1_1_generate_1_1_text_generate_command" ]
         ] ],
         [ "Plugin", "namespace_z_m_1_1_command_1_1_plugin.html", [
+          [ "PluginCommand", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_command.html", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_command" ],
+          [ "PluginInstallCommand", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_install_command.html", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_install_command" ],
           [ "PluginMakeCommand", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_make_command.html", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_make_command" ],
           [ "PluginPackCommand", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_pack_command.html", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_pack_command" ]
         ] ],

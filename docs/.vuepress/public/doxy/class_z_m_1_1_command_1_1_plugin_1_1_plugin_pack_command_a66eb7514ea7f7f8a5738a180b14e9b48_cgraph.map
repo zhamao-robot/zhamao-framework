@@ -1,17 +1,5 @@
 <map id="handle" name="handle">
-<area shape="rect" id="node1" title=" " alt="" coords="5,45,65,71"/>
-<area shape="rect" id="node2" href="$class_z_m_1_1_command_1_1_command.html#ab14503d56a09a2442ceab3808644ac55" title=" " alt="" coords="115,6,282,46"/>
-<area shape="rect" id="node4" href="$class_z_m_1_1_plugin_1_1_plugin_manager.html#ae9ad761436a2e08738f741ebd4e24b65" title=" " alt="" coords="113,70,284,110"/>
-<area shape="rect" id="node3" href="$class_z_m_1_1_command_1_1_command.html#a0bdac9ff13b56ac6334f64e094a9073a" title=" " alt="" coords="334,6,501,46"/>
-<area shape="rect" id="node5" href="$class_z_m_1_1_plugin_1_1_plugin_manager.html#a7c36526e9fc860a499d66b0f0a8d951f" title=" " alt="" coords="332,123,503,163"/>
-<area shape="rect" id="node15" href="$global__functions_8php.html#a71de63d02514c7e74d68338f4424139f" title=" " alt="" coords="389,73,445,99"/>
-<area shape="rect" id="node6" href="$class_z_m_1_1_plugin_1_1_plugin_manager.html#a85222daa68211a9ba7354178f7e5fd48" title=" " alt="" coords="769,151,940,191"/>
-<area shape="rect" id="node13" href="$global__functions_8php.html#a97e3b3adabf67bc7d3650ed14214ddaa" title=" " alt="" coords="1035,5,1092,31"/>
-<area shape="rect" id="node14" href="$class_z_m_1_1_plugin_1_1_plugin_manager.html#a384aa2ec57a0ed5ed25c6f606b80d1ab" title=" " alt="" coords="551,181,721,221"/>
-<area shape="rect" id="node7" href="$class_z_m_1_1_plugin_1_1_plugin_meta.html#a749ae077a869a3043d150b6535f52280" title=" " alt="" coords="988,119,1139,159"/>
-<area shape="rect" id="node8" href="$class_z_m_1_1_plugin_1_1_plugin_meta.html#ad32c02bb4ac332516d71ef811c903225" title=" " alt="" coords="988,183,1139,223"/>
-<area shape="rect" id="node10" href="$class_z_m_1_1_plugin_1_1_plugin_meta.html#a0848c661e55b6027e3794d16cad5d501" title=" " alt="" coords="988,247,1139,287"/>
-<area shape="rect" id="node11" href="$class_z_m_1_1_plugin_1_1_plugin_meta.html#a88bfe747dda2cc3a3ea10a1561da6ec1" title=" " alt="" coords="988,311,1139,351"/>
-<area shape="rect" id="node12" href="$class_z_m_1_1_plugin_1_1_plugin_meta.html#a3d0963e68bb313b163a73f2803c64600" title=" " alt="" coords="988,55,1139,95"/>
-<area shape="rect" id="node9" href="$global__functions_8php.html#a5ffdd3528ee418f5b556be8335641705" title=" " alt="" coords="1187,319,1247,344"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,13,65,38"/>
+<area shape="rect" id="node2" href="$class_z_m_1_1_command_1_1_command.html#ab14503d56a09a2442ceab3808644ac55" title=" " alt="" coords="113,5,280,45"/>
+<area shape="rect" id="node3" href="$class_z_m_1_1_command_1_1_command.html#a0bdac9ff13b56ac6334f64e094a9073a" title=" " alt="" coords="328,5,495,45"/>
 </map>

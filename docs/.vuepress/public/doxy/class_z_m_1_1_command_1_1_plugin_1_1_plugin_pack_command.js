@@ -1,6 +1,5 @@
 var class_z_m_1_1_command_1_1_plugin_1_1_plugin_pack_command =
 [
     [ "configure", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_pack_command.html#a9be5e0bdb5720efed6ddb6426c5c16ee", null ],
-    [ "handle", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_pack_command.html#a66eb7514ea7f7f8a5738a180b14e9b48", null ],
-    [ "$bootstrappers", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_pack_command.html#a204c8c9af4afd3a0254d46aaf263e1b1", null ]
+    [ "handle", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_pack_command.html#a66eb7514ea7f7f8a5738a180b14e9b48", null ]
 ];

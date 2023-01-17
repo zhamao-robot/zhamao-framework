@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['lastinsertid_0',['lastInsertId',['../class_z_m_1_1_store_1_1_database_1_1_d_b_connection.html#a9f9cb8ca720d7bbcb03869def521336e',1,'ZM\Store\Database\DBConnection\lastInsertId()'],['../class_z_m_1_1_store_1_1_database_1_1_d_b_wrapper.html#a8558be23bc732b08b23a89903d8cae36',1,'ZM\Store\Database\DBWrapper\lastInsertId()']]],
+  ['lastinsertid_0',['lastInsertId',['../class_z_m_1_1_store_1_1_database_1_1_d_b_wrapper.html#a8558be23bc732b08b23a89903d8cae36',1,'ZM\Store\Database\DBWrapper\lastInsertId()'],['../class_z_m_1_1_store_1_1_database_1_1_d_b_connection.html#a9f9cb8ca720d7bbcb03869def521336e',1,'ZM\Store\Database\DBConnection\lastInsertId()']]],
   ['level_1',['Level',['../interface_z_m_1_1_annotation_1_1_interfaces_1_1_level.html',1,'ZM::Annotation::Interfaces']]],
   ['level_2ephp_2',['Level.php',['../_level_8php.html',1,'']]],
   ['lightcache_3',['LightCache',['../class_z_m_1_1_store_1_1_k_v_1_1_light_cache.html',1,'ZM::Store::KV']]],
@@ -19,8 +19,10 @@ var searchData=
   ['loadfiles_16',['loadFiles',['../class_z_m_1_1_config_1_1_z_m_config.html#a3ebd7435a2c8d19720a6328048a029e6',1,'ZM::Config::ZMConfig']]],
   ['loadglobaldefines_17',['LoadGlobalDefines',['../class_z_m_1_1_bootstrap_1_1_load_global_defines.html',1,'ZM::Bootstrap']]],
   ['loadglobaldefines_2ephp_18',['LoadGlobalDefines.php',['../_load_global_defines_8php.html',1,'']]],
-  ['lock_19',['lock',['../class_z_m_1_1_store_1_1_lock_1_1_file_lock.html#afd4c91c41adf87d78e20c7f17e3862bc',1,'ZM::Store::Lock::FileLock']]],
-  ['logger_20',['logger',['../global__functions_8php.html#a97e3b3adabf67bc7d3650ed14214ddaa',1,'global_functions.php']]],
-  ['logtime_21',['logTime',['../class_module_1_1_example_1_1_hello123.html#aa69e80cb614ab65dac73c9112a0d5444',1,'Module::Example::Hello123']]],
-  ['logtime2_22',['logTime2',['../class_module_1_1_example_1_1_hello123.html#a63074cad03166463e7387e4bf3b0c778',1,'Module::Example::Hello123']]]
+  ['loadplugins_19',['LoadPlugins',['../class_z_m_1_1_bootstrap_1_1_load_plugins.html',1,'ZM::Bootstrap']]],
+  ['loadplugins_2ephp_20',['LoadPlugins.php',['../_load_plugins_8php.html',1,'']]],
+  ['lock_21',['lock',['../class_z_m_1_1_store_1_1_lock_1_1_file_lock.html#afd4c91c41adf87d78e20c7f17e3862bc',1,'ZM::Store::Lock::FileLock']]],
+  ['logger_22',['logger',['../global__functions_8php.html#a97e3b3adabf67bc7d3650ed14214ddaa',1,'global_functions.php']]],
+  ['logtime_23',['logTime',['../class_module_1_1_example_1_1_hello123.html#aa69e80cb614ab65dac73c9112a0d5444',1,'Module::Example::Hello123']]],
+  ['logtime2_24',['logTime2',['../class_module_1_1_example_1_1_hello123.html#a63074cad03166463e7387e4bf3b0c778',1,'Module::Example::Hello123']]]
 ];
