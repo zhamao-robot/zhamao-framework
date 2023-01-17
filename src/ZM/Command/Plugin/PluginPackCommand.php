@@ -6,23 +6,19 @@ namespace ZM\Command\Plugin;
 
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
-use ZM\Bootstrap;
-use ZM\Command\Command;
+use Symfony\Component\Console\Input\InputOption;
 use ZM\Exception\PluginException;
 use ZM\Plugin\PluginManager;
 
 #[AsCommand(name: 'plugin:pack', description: '打包插件到 Phar 格式')]
-class PluginPackCommand extends Command
+class PluginPackCommand extends PluginCommand
 {
-    protected array $bootstrappers = [
-        BootStrap\RegisterLogger::class,
-        Bootstrap\SetInternalTimezone::class,
-        Bootstrap\LoadConfiguration::class,
-    ];
-
     protected function configure()
     {
         $this->addArgument('name', InputArgument::REQUIRED, '要打包的插件名称');
+
+        // 下面是辅助用的，和 server:start 一样
+        $this->addOption('config-dir', null, InputOption::VALUE_REQUIRED, '指定其他配置文件目录');
     }
 
     /**

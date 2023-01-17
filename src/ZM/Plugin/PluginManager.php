@@ -160,7 +160,7 @@ class PluginManager
      */
     public static function addPlugin(PluginMeta $meta): void
     {
-        logger()->debug('Adding plugin: ' . $meta->getName());
+        logger()->debug('Adding plugin: ' . $meta->getName() . '(type:' . $meta->getPluginType() . ')');
         // 首先看看有没有 entity，如果还没有 entity，且 entry_file 有东西，那么就从 entry_file 获取 ZMPlugin 对象
         if ($meta->getEntity() === null) {
             if (($entry_file = $meta->getEntryFile()) !== null) {
@@ -181,7 +181,7 @@ class PluginManager
         }
         // 检查同名插件，如果有同名插件，则抛出异常
         if (isset(self::$plugins[$meta->getName()])) {
-            throw new PluginException('插件 ' . $meta->getName() . ' 已经存在，无法加载同名插件或重复加载！');
+            throw new PluginException('插件 ' . $meta->getName() . ' 已经存在（类型为' . self::$plugins[$meta->getName()]->getPluginType() . '），无法加载同名插件或重复加载！');
         }
         self::$plugins[$meta->getName()] = $meta;
     }
@@ -261,11 +261,6 @@ class PluginManager
      */
     public static function packPlugin(string $name): string
     {
-        // 先遍历下插件目录下是否有这个插件，没有这个插件则不能打包
-        $plugin_dir = config('global.plugin.load_dir', SOURCE_ROOT_DIR . '/plugins');
-        // 模拟加载一遍插件
-        self::addPluginsFromDir($plugin_dir);
-
         // 必须是源码模式才行
         if (!isset(self::$plugins[$name]) || self::$plugins[$name]->getPluginType() !== ZM_PLUGIN_TYPE_SOURCE) {
             throw new PluginException("没有找到名字为 {$name} 的插件（要打包的插件必须是源码模式）。");
@@ -277,5 +272,15 @@ class PluginManager
         // TODO: 写到这了
         // 插件加载方式判断
         return '';
+    }
+
+    /**
+     * 检查插件是否被加载
+     *
+     * @param string $name 插件名称
+     */
+    public static function isPluginExists(string $name): bool
+    {
+        return isset(self::$plugins[$name]);
     }
 }

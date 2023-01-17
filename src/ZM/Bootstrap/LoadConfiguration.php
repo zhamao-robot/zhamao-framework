@@ -26,7 +26,7 @@ class LoadConfiguration
 
     private function getConfigDir(array $config): string
     {
-        $config_dir = $config['config-dir'];
+        $config_dir = $config['config-dir'] ?? null;
         // 默认配置文件目录
         $find_dir = [
             WORKING_DIR . '/config',
