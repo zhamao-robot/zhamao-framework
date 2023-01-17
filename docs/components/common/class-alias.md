@@ -31,6 +31,7 @@
 | `\ZM\Annotation\Closed`                                | `Closed`                |
 | `\ZM\Plugin\ZMPlugin`                                  | `ZMPlugin`              |
 | `\ZM\Context\BotContext`                               | `BotContext`            |
+| `\ZM\Utils\ZMRequest`                                  | `ZMRequest`             |
 | `\ZM\Store\KV\LightCache`                              | `LightCache`            |
 | `\ZM\Store\KV\Redis\KVRedis`                           | `KVRedis`               |
 | `\OneBot\Driver\Event\WebSocket\WebSocketOpenEvent`    | `WebSocketOpenEvent`    |

@@ -23,6 +23,7 @@ class_alias(\ZM\Annotation\Closed::class, 'Closed');
 
 class_alias(\ZM\Plugin\ZMPlugin::class, 'ZMPlugin');
 class_alias(\ZM\Context\BotContext::class, 'BotContext');
+class_alias(\ZM\Utils\ZMRequest::class, 'ZMRequest');
 class_alias(\ZM\Store\KV\LightCache::class, 'LightCache');
 class_alias(\ZM\Store\KV\Redis\KVRedis::class, 'KVRedis');
 

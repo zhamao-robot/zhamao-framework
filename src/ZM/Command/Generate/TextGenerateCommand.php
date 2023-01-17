@@ -15,6 +15,7 @@ class TextGenerateCommand extends Command
     protected function configure()
     {
         $this->addArgument('name', InputArgument::REQUIRED, '生成的文本内容');
+        $this->setDescription('生成一些框架本身的文本（内部' . PHP_EOL . '当前包含：class-alias-md，update-log-md');
     }
 
     /**
