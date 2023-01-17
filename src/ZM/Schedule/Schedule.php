@@ -78,7 +78,7 @@ class Schedule
             $this->executing[] = $cron;
             // 新建一个协程运行排程任务，避免阻塞
             Adaptive::getCoroutine()->create(function () use ($cron) {
-                $callable = [$cron->class, $cron->method];
+                $callable = $cron->class === '' ? $cron->method : [$cron->class, $cron->method];
                 container()->call($callable);
                 $this->executing = array_diff($this->executing, [$cron]);
             });
