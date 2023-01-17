@@ -10,20 +10,12 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
-use ZM\Bootstrap;
-use ZM\Command\Command;
 use ZM\Store\FileSystem;
 use ZM\Utils\CodeGenerator\PluginGenerator;
 
 #[AsCommand(name: 'plugin:make', description: '创建一个新的插件')]
-class PluginMakeCommand extends Command
+class PluginMakeCommand extends PluginCommand
 {
-    protected array $bootstrappers = [
-        BootStrap\RegisterLogger::class,
-        Bootstrap\SetInternalTimezone::class,
-        Bootstrap\LoadConfiguration::class,
-    ];
-
     protected function configure()
     {
         $this->addArgument('name', InputArgument::OPTIONAL, '插件名称', null);
