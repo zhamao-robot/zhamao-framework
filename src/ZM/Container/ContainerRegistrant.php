@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ZM\Container;
 
+use Choir\WebSocket\FrameInterface;
 use DI;
 use OneBot\Driver\Event\Http\HttpRequestEvent;
 use OneBot\Driver\Event\WebSocket\WebSocketCloseEvent;
@@ -79,6 +80,8 @@ class ContainerRegistrant
         self::addServices([
             WebSocketMessageEvent::class => $event,
             'ws.message.event' => DI\get(WebSocketMessageEvent::class),
+            FrameInterface::class => $event->getFrame(),
+            'ws.message.frame' => DI\get(FrameInterface::class),
         ]);
     }
 
