@@ -79,7 +79,9 @@ module.exports = {
                     title: 'HTTP 组件',
                     collapsable: true,
                     sidebarDepth: 2,
-                    children: [],
+                    children: [
+                        'http/zmrequest',
+                    ],
                 },
                 {
                     title: '框架通用组件',
