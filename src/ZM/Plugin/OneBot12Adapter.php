@@ -286,7 +286,13 @@ class OneBot12Adapter extends ZMPlugin
                     $token = $request->getQueryParams()['access_token'] ?? '';
                 }
                 $token = explode('Bearer ', $token);
-                if (!isset($token[1]) || $token[1] !== $stored_token) { // 没有 token，鉴权失败
+                // 动态和静态鉴权
+                if ($stored_token instanceof \Closure) {
+                    $stored_token = $stored_token($token[1] ?? null);
+                } else {
+                    $stored_token = !isset($token[1]) || $token[1] !== $stored_token;
+                }
+                if (!$stored_token) { // 没有 token，鉴权失败
                     logger()->warning('OneBot 12 反向 WS 连接鉴权失败，拒绝接入');
                     $event->withResponse(HttpFactory::createResponse(401, 'Unauthorized'));
                     $event->stopPropagation();

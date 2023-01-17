@@ -46,7 +46,7 @@ class Framework
     public const VERSION_ID = 674;
 
     /** @var string 版本名称 */
-    public const VERSION = '3.0.0-beta6';
+    public const VERSION = '3.0.0-beta7';
 
     /** @var array 传入的参数 */
     protected array $argv;
