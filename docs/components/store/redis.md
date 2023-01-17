@@ -36,6 +36,8 @@ $redis->set('key', 'value');
 
 你可以通过 `RedisWrapper` 中的各种方法来操作 Redis 数据库，例如 `set`，`get`，`del` 等。
 
+详情请参考 [redis 全局函数](/components/common/global-defines.html#redis)。
+
 ## 连接池
 
 框架会自动为每个 Redis 连接创建一个连接池，你可以通过 `pool_size` 配置项来设置连接池的大小。
