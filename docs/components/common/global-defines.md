@@ -263,7 +263,7 @@ $result = sql_builder('mydb')->select('*')->from('users')->where('username = :us
 
 ### redis()
 
-获取 Redis 操作类。有关 Redis 的更多详情和配置，见 [组件 - Redis（TODO）]()。
+获取 Redis 操作类。有关 Redis 的更多详情和配置，见 [Redis 数据库组件](/components/store/redis)。
 
 - 定义：`redis(string $name = 'default')`
 - 返回：`ZM\Store\KV\Redis\RedisWrapper`
