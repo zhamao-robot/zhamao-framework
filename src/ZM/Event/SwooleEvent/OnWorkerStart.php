@@ -130,6 +130,15 @@ class OnWorkerStart implements SwooleEvent
             Framework::saveProcessState(ZM_PROCESS_TASKWORKER, $server->worker_pid, ['worker_id' => $worker_id]);
             try {
                 Framework::$server = $server;
+                $this->initMySQLPool();
+                $redis = ZMConfig::get('global', 'redis_config');
+                if ($redis !== null && $redis['host'] != '') {
+                    if (!extension_loaded('redis')) {
+                        Console::error(zm_internal_errcode('E00029') . "Can not find redis extension.\n");
+                    } else {
+                        ZMRedisPool::init($redis);
+                    }
+                }
                 $this->loadAnnotations();
                 Console::success('TaskWorker #' . $server->worker_id . ' started');
             } catch (Exception $e) {
