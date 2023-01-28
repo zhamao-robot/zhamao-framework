@@ -190,9 +190,9 @@ class WorkerEventListener
         if (config('global.plugin.enable')) {
             $load_dir = config('global.plugin.load_dir');
             if (empty($load_dir)) {
-                $load_dir = SOURCE_ROOT_DIR . '/plugins';
+                $load_dir = WORKING_DIR . '/plugins';
             } elseif (FileSystem::isRelativePath($load_dir)) {
-                $load_dir = SOURCE_ROOT_DIR . '/' . $load_dir;
+                $load_dir = WORKING_DIR . '/' . $load_dir;
             }
             $load_dir = zm_dir($load_dir);
 
