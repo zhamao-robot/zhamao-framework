@@ -69,7 +69,7 @@ class PluginInstallCommand extends PluginCommand
             return static::FAILURE;
         }
         if (!file_exists($plugin_dir . '/' . $name . '/zmplugin.json')) {
-            $this->error('项目不存在 zmplugin.json 插件元信息，无法安装');
+            $this->error('项目不存在 zmplugin.json 插件元信息，无法安装，请手动删除目录 ' . $name);
             // TODO: 使用 rmdir 和 unlink 删除 git 目录
             return static::FAILURE;
         }
