@@ -114,19 +114,28 @@ class PluginManager
      */
     public static function addPluginsFromComposer(): int
     {
-        $installed_file = SOURCE_ROOT_DIR . '/vendor/composer/installed.json';
-        if (!file_exists($installed_file)) {
+        $try_list = [
+            SOURCE_ROOT_DIR . '/vendor',
+            WORKING_DIR . '/vendor',
+        ];
+        foreach ($try_list as $v) {
+            if (file_exists($v . '/composer/installed.json')) {
+                $vendor_dir = $v;
+                break;
+            }
+        }
+        if (!isset($vendor_dir)) {
             logger()->notice('找不到 Composer 的 installed.json 文件，跳过扫描 Composer 插件');
             return 0;
         }
-        $json = json_decode(file_get_contents($installed_file), true);
+        $json = json_decode(file_get_contents($vendor_dir . '/composer/installed.json'), true);
         if (!is_array($json)) {
             logger()->notice('Composer 的 installed.json 文件解析失败，跳过扫描 Composer 插件');
             return 0;
         }
         $cnt = 0;
         foreach ($json['packages'] as $item) {
-            $root_dir = SOURCE_ROOT_DIR . '/vendor/' . $item['name'];
+            $root_dir = $vendor_dir . '/' . $item['name'];
             $meta_file = zm_dir($root_dir . '/zmplugin.json');
             if (!file_exists($meta_file)) {
                 continue;
@@ -249,7 +258,9 @@ class PluginManager
             }
             // 如果设置了 Autoload file，那么将会把 psr-4 的加载路径丢进 parser
             foreach ($meta->getAutoloadPsr4() as $namespace => $path) {
-                $parser->addPsr4Path($meta->getRootDir() . '/' . $path . '/', trim($namespace, '\\'));
+                $parser->addPsr4Path($meta->getRootDir() . '/' . $path . '/', trim($namespace, '\\'), [
+                    'plugin:' . $name,
+                ]);
             }
         }
     }
