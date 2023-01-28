@@ -26,6 +26,8 @@ class AnnotationParser
      */
     private array $class_list = [];
 
+    private array $class_bind_group_list = [];
+
     /**
      * @var float 用于计算解析时间用的
      */
@@ -174,6 +176,11 @@ class AnnotationParser
                     continue 2;
                 }
                 $annotation_list[get_class($vs)][] = $vs;
+
+                // 预处理4：加入组
+                if (isset($this->class_bind_group_list[get_class($vs)])) {
+                    $vs->group = array_merge($vs->group, $this->class_bind_group_list[get_class($vs)]);
+                }
             }
 
             // 预处理3：处理每个函数上面的特殊注解，就是需要操作一些东西的
@@ -249,11 +256,17 @@ class AnnotationParser
      *
      * @param string $path        注册解析注解的路径
      * @param string $indoor_name 起始命名空间的名称
+     * @param array  $join_groups 此类命名空间解析出来的注解要加入的组
      */
-    public function addPsr4Path(string $path, string $indoor_name)
+    public function addPsr4Path(string $path, string $indoor_name, array $join_groups = []): void
     {
         logger()->debug('Add register path: ' . $path . ' => ' . $indoor_name);
-        $all_class = FileSystem::getClassesPsr4($path, $indoor_name);
+        $all_class = FileSystem::getClassesPsr4($path, $indoor_name, return_path_value: false);
+        if (!empty($join_groups)) {
+            foreach ($all_class as $v) {
+                $this->class_bind_group_list[$v] = $join_groups;
+            }
+        }
         $this->class_list = array_merge($this->class_list, $all_class);
     }
 

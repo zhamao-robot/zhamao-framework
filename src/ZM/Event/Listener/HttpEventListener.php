@@ -30,7 +30,6 @@ class HttpEventListener
     {
         // 注册容器
         ContainerRegistrant::registerHttpRequestServices($event);
-        // TODO: 这里有个bug，如果是用的Workerman+Fiber协程的话，有个前置协程挂起，这里获取到的Event是被挂起的Event对象，触发两次事件才能归正
         // 跑一遍 BindEvent 绑定了 HttpRequestEvent 的注解
         $handler = new AnnotationHandler(BindEvent::class);
         $handler->setRuleCallback(fn (BindEvent $anno) => is_a($anno->event_class, HttpRequestEvent::class, true));
@@ -49,7 +48,6 @@ class HttpEventListener
                     $div = new Route($node['route']);
                     $div->params = $params;
                     $div->method = $node['method'];
-                    // TODO：这里有个bug，逻辑上 request_method 应该是个数组，而不是字符串，但是这里 $node['method'] 是字符串，所以这里只能用字符串来判断
                     // $div->request_method = $node['request_method'];
                     $div->class = $node['class'];
                     $route_handler->handle($div, null, $params, $event->getRequest(), $event);
