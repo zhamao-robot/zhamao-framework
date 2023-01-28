@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ZM\Process;
 
+use OneBot\Driver\Process\ProcessManager;
 use ZM\Exception\ZMKnownException;
 use ZM\Store\FileSystem;
 
@@ -12,10 +13,25 @@ class ProcessStateManager
     public static array $process_mode = [];
 
     /**
+     * 查看是否为多 Worker 模式，插件可能用得到
+     */
+    public static function isMultiWorkers(): bool
+    {
+        return (self::$process_mode['worker'] ?? 1) > 1;
+    }
+
+    public static function isTaskWorker(): bool
+    {
+        return (ProcessManager::getProcessType() & ONEBOT_PROCESS_TASKWORKER) !== 0;
+    }
+
+    /**
+     * 删除进程运行状态
+     *
      * @throws ZMKnownException
      * @internal
      */
-    public static function removeProcessState(int $type, int|string $id_or_name = null)
+    public static function removeProcessState(int $type, int|string $id_or_name = null): void
     {
         switch ($type) {
             case ZM_PROCESS_MASTER:
@@ -67,7 +83,7 @@ class ProcessStateManager
      * @throws ZMKnownException
      * @internal
      */
-    public static function getProcessState(int $type, mixed $id_or_name = null)
+    public static function getProcessState(int $type, mixed $id_or_name = null): mixed
     {
         $file = ZM_STATE_DIR;
         switch ($type) {
@@ -116,7 +132,7 @@ class ProcessStateManager
      *
      * @internal
      */
-    public static function saveProcessState(int $type, int|string $pid, array $data = [])
+    public static function saveProcessState(int $type, int|string $pid, array $data = []): void
     {
         switch ($type) {
             case ZM_PROCESS_MASTER:
