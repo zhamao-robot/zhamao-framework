@@ -41,4 +41,4 @@ cd zhamao-v3/
 
 ## 效果图
 
-![index_demo](/index_demo.png)
+![index_demo](https://img.zhamao.xin/framework/framework-demo.png)
