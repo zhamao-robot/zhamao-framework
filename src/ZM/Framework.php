@@ -43,7 +43,7 @@ class Framework
     use Singleton;
 
     /** @var int 版本ID */
-    public const VERSION_ID = 676;
+    public const VERSION_ID = 677;
 
     /** @var string 版本名称 */
     public const VERSION = '3.0.0-beta7';
