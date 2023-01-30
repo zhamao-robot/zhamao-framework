@@ -375,4 +375,4 @@ public function testRoute(HttpRequestEvent $event)
 
 获取一个 KV 库实例。
 
-有关 KV 库的使用，见 [组件 - KV 库（TODO）]()。
+有关 KV 库的使用，见 [组件 - KV 缓存](/components/store/cache)。

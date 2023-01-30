@@ -32,7 +32,7 @@ class ServerStartCommand extends ServerCommand
             new InputOption('log-level', null, InputOption::VALUE_REQUIRED, '调整消息等级到debug (log-level=4)'),
             new InputOption('daemon', null, null, '以守护进程的方式运行框架'),
             new InputOption('worker-num', null, InputOption::VALUE_REQUIRED, '启动框架时运行的 Worker 进程数量'),
-            new InputOption('watch', null, null, '监听 src/ 目录的文件变化并热更新'),
+            new InputOption('watch', null, null, '监听 plugins/ 目录下各个插件的文件变化并热更新（还不能用）'),
             new InputOption('env', null, InputOption::VALUE_REQUIRED, '设置环境类型 (production, development, staging)'),
             new InputOption('disable-safe-exit', null, null, '关闭安全退出（关闭后按CtrlC时直接杀死进程）'),
             new InputOption('no-state-check', null, null, '关闭启动前框架运行状态检查'),
@@ -44,19 +44,11 @@ class ServerStartCommand extends ServerCommand
 
     /**
      * @throws ZMKnownException
-     * @throws InitException
      * @throws \Exception
      * @noinspection PhpComposerExtensionStubsInspection
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        // 这段用于config的环境解析，但显然不是很好的方式，应该改成一个独立的方法，不应该在这里检查，但暂时搁置，TODO
-        /* if (($opt = $input->getOption('env')) !== null) {
-            if (!in_array($opt, ['production', 'staging', 'development', ''])) {
-                $output->writeln('<error> "--env" option only accept production, development, staging and [empty] ! </error>');
-                return 1;
-            }
-        }*/
         // 如果是支持多进程模式的，那么就检查框架进程的状态
         if (ProcessManager::isSupportedMultiProcess()) {
             $state = ProcessStateManager::getProcessState(ZM_PROCESS_MASTER);

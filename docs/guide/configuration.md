@@ -32,7 +32,7 @@ $config['servers'] = [
 
 `driver` 配置项用于指定框架的底层驱动，目前支持以下驱动：
 
-- `swoole`：基于 Swoole，需要安装 `swoole` 扩展
+- `swoole`：基于 Swoole，需要安装 `swoole` 扩展，协程支持很好
 - `workerman`：基于 Workerman，无需安装额外扩展，但在 PHP 8.0 下无法使用协程
 - `choir`：基于 Choir，尚未完成，不建议使用
 
@@ -43,12 +43,11 @@ $config['servers'] = [
 - `http`：基础的 HTTP 服务（监听传入的 HTTP 请求）
     - `host`：监听地址
     - `port`：监听端口
-    - `flags`：
+    - `flags`：一个 int 值，用于在事件中获取源于哪一个 HTTP 监听的地址和端口
 - `websocket`：WebSocket 服务（允许其他客户端接入）
     - `host`：监听地址
     - `port`：监听端口
-- `websocket_reverse`：反向 WebSocket 服务（框架主动发起连接）
-    - `url`：连接地址
+    - `flags`：同上方 HTTP 的 `flags`
 
 以上所有服务器均支持 `access_token` 配置项，用于指定[鉴权方式](/components/bot/authorization.md)。
 

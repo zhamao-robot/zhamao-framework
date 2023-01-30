@@ -18,7 +18,17 @@ dump($var);
 
 根据运行环境的不同（Swoole、Workerman 等），你可以使用不同的调试工具。
 
-例如，你可以使用 [Xdebug](https://xdebug.org/) 或 [yasd](https://github.com/swoole/yasd) 等。
+例如，你可以使用 [Xdebug](https://xdebug.org/) 或 [yasd](https://github.com/swoole/yasd) 等。这类工具的使用方式可参照对应文档。
+
+或者，你也可以在代码中使用 psysh 下断点并查看变量。但在使用 psysh 时要注意，在多进程模式（多 Worker、含用户进程、TaskWorker 等模式）下，会出现未定义的行为，最好在单进程模式下使用。
+
+```php
+$x = 123;
+// ... 你的代码
+eval(\Psy\sh()); // 下断点位置
+// ... 你的代码
+$y = 456;
+```
 
 ## 热更新
 

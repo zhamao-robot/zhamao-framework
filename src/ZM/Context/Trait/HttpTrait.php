@@ -31,9 +31,6 @@ trait HttpTrait
         return $obj;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function withResponse(ResponseInterface $response)
     {
         $this->getHttpRequestEvent()->withResponse($response);

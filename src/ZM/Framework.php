@@ -226,6 +226,7 @@ class Framework
             $this->printMotd();
         }
 
+        // 注册添加容器依赖的事件
         ContainerBindingListener::listenForEvents();
 
         // 添加框架需要监听的顶层事件监听器

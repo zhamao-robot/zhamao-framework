@@ -28,6 +28,7 @@ module.exports = {
             { text: '指南', link: '/guide/' },
             { text: '事件', link: '/event/' },
             { text: '组件', link: '/components/bot/bot-context' },
+            { text: '进阶', link: '/advanced/' },
             { text: '更新日志', link: '/update/v3' },
             { text: 'API 文档', link: '/doxy/', target: '_blank' },
             { text: '炸毛框架 v2', link: 'https://docs-v2.zhamao.xin/' }
@@ -43,7 +44,7 @@ module.exports = {
                         'installation',
                         'configuration',
                         'structure',
-                        'get_started',
+                        'get-started',
                         'debugging',
                     ]
                 }
@@ -91,6 +92,7 @@ module.exports = {
                         'common/class-alias',
                         'common/global-defines',
                         'common/logging',
+                        'common/hot-update',
                     ]
                 },
                 {
@@ -101,6 +103,18 @@ module.exports = {
                         'store/file-system',
                         'store/cache',
                         'store/redis',
+                    ]
+                }
+            ],
+            '/advanced/': [
+                {
+                    title: '进阶',
+                    collapsable: false,
+                    sidebarDepth: 1,
+                    children: [
+                        '',
+                        'multi-process',
+                        'custom-start',
                     ]
                 }
             ],
