@@ -114,7 +114,7 @@ $result = \ZM\Store\FileSystem::getClassesPsr4('src/TestApp', 'TestApp\\');
 
 无论在使用 `FileSystem` 类上方列举提供的扩充功能，还是 PHP 原生的读写文件方式，在框架内涉及目录的位置尽量使用绝对路径。
 
-框架提供了一系列目录常量，可以配合目录常量来构成绝对路径。有关常量的定义，见 [留个空TODO]()。
+框架提供了一系列目录常量，可以配合目录常量来构成绝对路径。有关常量的定义，见 [常量列表](/components/common/global-defines)。
 
 ```php
 $file = file_get_contents(WORKING_DIR . '/composer.json');

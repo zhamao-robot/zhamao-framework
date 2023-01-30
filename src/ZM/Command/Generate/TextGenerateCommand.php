@@ -62,15 +62,35 @@ class TextGenerateCommand extends Command
             return static::FAILURE;
         }
         $json = json_decode($api, true);
-        $line = '# 更新日志' . "\r\n\r\n> 本页面由框架自动生成\r\n\r\n";
+        $line = '# 更新日志' . "\r\n\r\n> 本页面由框架命令 `./zhamao generate:text update-log-md` 自动生成\r\n\r\n";
         foreach ($json as $v) {
             $version = $v['tag_name'];
             if (str_starts_with($version, '2.')) {
                 continue;
             }
+            $doc_count = 0;
             $time = '> 更新时间：' . date('Y-m-d', strtotime($v['published_at']));
-            $line .= '## v' . $v['tag_name'] . "\r\n\r\n" . $time . "\r\n\r\n" . trim(str_replace("## What's Changed", '', $v['body'])) . "\r\n\r\n";
+            $line .= '## v' . $v['tag_name'] . "\r\n\r\n" . $time . "\r\n\r\n";
+            $v['body'] = trim(str_replace("## What's Changed", '', $v['body']));
+            $bodies = explode("\r\n", $v['body']);
+            foreach ($bodies as $ks => $vs) {
+                if (str_contains($vs, '文档')) {
+                    ++$doc_count;
+                    if ($doc_count === 1) {
+                        $bodies[$ks] = '* 本次更新包含文档更新内容 {cnt} 个';
+                    }
+                }
+            }
+            $v['body'] = implode("\r\n", $bodies);
+            if ($doc_count > 0) {
+                $v['body'] = str_replace('{cnt}', strval($doc_count), $v['body']);
+            }
+            $line .= $v['body'] . "\r\n\r\n";
         }
+        // 将双空行转换为单空行
+        $line = str_replace("\r\n\r\n\r\n", "\r\n\r\n", $line);
+
+        // 转换文本换行符格式为 LF
         $line = str_replace("\r\n", "\n", $line);
 
         // 将所有的链接转换为可点击的链接，例如 https://example.com -> <https://example.com>
@@ -81,6 +101,13 @@ class TextGenerateCommand extends Command
 
         // 将 mention 转换为可点击的链接，例如 @sunxyw -> [@sunxyw](https://github.com/sunxyw)
         $line = preg_replace('/(?<=^|\s)@([\w.]+)(?<!\.)/', '[@$1](https://github.com/$1)', $line);
+
+        // 将 Full Changelog 转换为“源码变更记录”
+        $line = str_replace('Full Changelog', '源码变更记录', $line);
+
+        if (isset($doc_count) && $doc_count > 0) {
+            $line = str_replace('{cnt}', strval($doc_count), $line);
+        }
 
         file_put_contents(FRAMEWORK_ROOT_DIR . '/docs/update/v3.md', $line);
         return static::SUCCESS;
