@@ -16,6 +16,7 @@ class PluginPackCommand extends PluginCommand
     protected function configure()
     {
         $this->addArgument('name', InputArgument::REQUIRED, '要打包的插件名称');
+        $this->addOption('build-dir', 'D', InputOption::VALUE_REQUIRED, '指定输出文件位置', WORKING_DIR . '/build');
 
         // 下面是辅助用的，和 server:start 一样
         $this->addOption('config-dir', null, InputOption::VALUE_REQUIRED, '指定其他配置文件目录');
@@ -27,7 +28,12 @@ class PluginPackCommand extends PluginCommand
     protected function handle(): int
     {
         try {
-            PluginManager::packPlugin($this->input->getArgument('name'));
+            $outpupt = PluginManager::packPlugin(
+                plugin_name: $this->input->getArgument('name'),
+                build_dir: $this->input->getOption('build-dir'),
+                command_context: $this
+            );
+            $this->info("插件打包完成，输出文件：{$outpupt}");
         } catch (PluginException $e) {
             $this->error($e->getMessage());
         }

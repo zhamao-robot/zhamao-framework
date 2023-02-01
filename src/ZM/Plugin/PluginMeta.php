@@ -44,7 +44,7 @@ class PluginMeta implements \JsonSerializable
         // 设置名称
         $this->name = $meta['name'] ?? '<anonymous>';
         // 设置版本
-        $this->version = $meta['version'] ?? '1.0.0';
+        $this->version = $meta['version'] ?? '1.0-dev';
         // 设置描述
         $this->description = $meta['description'] ?? '';
         // 设置依赖
@@ -52,7 +52,7 @@ class PluginMeta implements \JsonSerializable
         $this->metas = $meta;
         // 设置插件根目录
         $this->plugin_type = $plugin_type;
-        // 设置插件类型
+        // 设置插件根目录
         $this->root_dir = $root_dir;
     }
 

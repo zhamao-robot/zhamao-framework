@@ -8,8 +8,10 @@ use Jelix\Version\VersionComparator;
 use ZM\Annotation\AnnotationMap;
 use ZM\Annotation\AnnotationParser;
 use ZM\Annotation\Framework\BindEvent;
+use ZM\Command\Command;
 use ZM\Exception\PluginException;
 use ZM\Store\FileSystem;
+use ZM\Store\PharHelper;
 
 class PluginManager
 {
@@ -270,19 +272,80 @@ class PluginManager
      *
      * @throws PluginException
      */
-    public static function packPlugin(string $name): string
+    public static function packPlugin(string $plugin_name, string $build_dir, ?Command $command_context = null): string
     {
         // 必须是源码模式才行
-        if (!isset(self::$plugins[$name]) || self::$plugins[$name]->getPluginType() !== ZM_PLUGIN_TYPE_SOURCE) {
-            throw new PluginException("没有找到名字为 {$name} 的插件（要打包的插件必须是源码模式）。");
+        if (!isset(self::$plugins[$plugin_name]) || self::$plugins[$plugin_name]->getPluginType() !== ZM_PLUGIN_TYPE_SOURCE) {
+            throw new PluginException("没有找到名字为 {$plugin_name} 的插件（要打包的插件必须是源码模式）。");
         }
-
-        $plugin = self::$plugins[$name];
-        // 插件目录
-        $dir = $plugin->getRootDir();
-        // TODO: 写到这了
-        // 插件加载方式判断
-        return '';
+        try {
+            // 创建目录
+            FileSystem::createDir($build_dir);
+            $plugin = self::$plugins[$plugin_name];
+            // 插件目录
+            $dir = $plugin->getRootDir();
+            // 先判断是不是可写的
+            PharHelper::ensurePharWritable();
+            // 拼接 phar 名称，通过插件名和版本号（如果没有版本号则使用 1.0-dev 作为版本号）
+            $phar_name = $plugin->getName() . '_' . $plugin->getVersion() . '.phar';
+            $phar_name = zm_dir($build_dir . '/' . $phar_name);
+            // 判断文件如果存在的话是否是可写的
+            PharHelper::ensurePharFileWritable($phar_name);
+            // 文件存在先删除
+            if (file_exists($phar_name)) {
+                $command_context?->info('Phar 文件 ' . $phar_name . ' 已存在，删除中...');
+                unlink($phar_name);
+            }
+            // 先执行一些打包前检查的 bootstrap
+            // 1. 检查插件是否引用了 require-dev 的内容（检查 --no-dev）
+            if (file_exists($dir . '/composer.json') && file_exists($dir . '/vendor/composer/installed.json')) {
+                $json = json_decode(file_get_contents($dir . '/vendor/composer/installed.json'), true);
+                if (!isset($json['dev'])) {
+                    $command_context?->error('插件的 Composer 未正确配置，忽略检查 dev 模式！');
+                } elseif ($json['dev'] === true) {
+                    throw new PluginException(
+                        "插件的 Composer 配置了 dev 模式，但是打包时没有使用 --no-dev 选项，无法打包\n" .
+                        '请先进入插件目录，执行 composer update --no-dev'
+                    );
+                }
+            }
+            // 创建 Phar 对象
+            $phar = new \Phar($phar_name, 0);
+            // 调用插件的打包的用户自定义前置方法
+            $plugin->getEntity()?->emitPack();
+            // 扫描插件目录
+            $dir_list = FileSystem::scanDirFiles($dir, true, true);
+            if ($command_context instanceof Command) {
+                $dir_list = $command_context->progress()->iterate($dir_list);
+            }
+            $file_added = 0;
+            $file_ignored = 0;
+            foreach ($dir_list as $v) {
+                // 过滤文件
+                if ($plugin->getEntity()?->emitFilterPack($v) === false) {
+                    ++$file_ignored;
+                    continue;
+                }
+                // 添加文件
+                $phar->addFromString($v, php_strip_whitespace(zm_dir($dir . '/' . $v)));
+                ++$file_added;
+            }
+            // 找有没有 main，没有 main 就不添加 stub
+            $main = (json_decode(file_get_contents($dir . '/zmplugin.json'), true)['main'] ?? 'main.php');
+            if (file_exists(zm_dir($dir . '/' . $main)) && $phar->offsetExists($main)) {
+                $command_context?->info('设置插件默认入口文件 ' . $main);
+                $phar->setStub($phar->setDefaultStub($main));
+            } else {
+                $phar->setStub('<?php __HALT_COMPILER();');
+            }
+            // 停止
+            $phar->stopBuffering();
+            // 输出结果
+            $command_context?->info("共添加 {$file_added} 个文件" . ($file_ignored > 0 ? "，忽略 {$file_ignored} 个文件" : ''));
+            return $phar_name;
+        } catch (\PharException $e) {
+            throw new PluginException("插件 {$plugin_name} 打包失败，原因为 Phar 异常：\n" . $e->getMessage(), previous: $e);
+        }
     }
 
     /**
