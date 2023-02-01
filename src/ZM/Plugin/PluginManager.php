@@ -290,7 +290,7 @@ class PluginManager
             $phar_name = $plugin->getName() . '_' . $plugin->getVersion() . '.phar';
             $phar_name = zm_dir($build_dir . '/' . $phar_name);
             // 判断文件如果存在的话是否是可写的
-            PharHelper::ensurePharFileWritable($phar_name);
+            FileSystem::ensureFileWritable($phar_name);
             // 文件存在先删除
             if (file_exists($phar_name)) {
                 $command_context?->info('Phar 文件 ' . $phar_name . ' 已存在，删除中...');

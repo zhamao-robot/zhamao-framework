@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ZM\Store;
 
+use ZM\Exception\FileSystemException;
 use ZM\Utils\ZMUtil;
 
 class FileSystem
@@ -83,12 +84,24 @@ class FileSystem
     /**
      * 创建目录（如果不存在）
      *
-     * @param string $path 目录路径
+     * @param  string              $path 目录路径
+     * @throws FileSystemException
      */
     public static function createDir(string $path): void
     {
         if (!is_dir($path) && !mkdir($path, 0755, true) && !is_dir($path)) {
-            throw new \RuntimeException(sprintf('无法建立目录：%s', $path));
+            throw new FileSystemException(sprintf('无法建立目录：%s', $path));
+        }
+    }
+
+    /**
+     * 调用该方法将确认传入的文件是否可写，如果不可写将抛出 FileSystemException 异常。
+     * @throws FileSystemException
+     */
+    public static function ensureFileWritable(string $phar_path): void
+    {
+        if (file_exists($phar_path) && !is_writable($phar_path)) {
+            throw new FileSystemException('目标文件不可写：' . $phar_path);
         }
     }
 

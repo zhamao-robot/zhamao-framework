@@ -6,6 +6,7 @@ namespace ZM\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
+use ZM\Exception\FileSystemException;
 use ZM\Store\FileSystem;
 use ZM\Store\PharHelper;
 
@@ -27,6 +28,7 @@ class BuildCommand extends Command
 
     /**
      * @throws \PharException
+     * @throws FileSystemException
      */
     protected function handle(): int
     {
@@ -40,7 +42,7 @@ class BuildCommand extends Command
         }
         $target = $build_dir . '/' . $target;
         // 确认 Phar 文件可以写入
-        PharHelper::ensurePharFileWritable($target);
+        FileSystem::ensureFileWritable($target);
 
         $this->comment("目标文件：{$target}");
 
