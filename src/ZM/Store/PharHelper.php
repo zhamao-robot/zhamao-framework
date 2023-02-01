@@ -37,16 +37,4 @@ class PharHelper
             }
         }
     }
-
-    /**
-     * 调用该方法将确认传入的 Phar 文件是否可写，如果不可写将抛出 \PharException 异常。
-     *
-     * @throws \PharException
-     */
-    public static function ensurePharFileWritable(string $phar_path): void
-    {
-        if (file_exists($phar_path) && !is_writable($phar_path)) {
-            throw new \PharException('目标文件不可写：' . $phar_path);
-        }
-    }
 }
