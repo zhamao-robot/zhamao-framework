@@ -17,4 +17,5 @@ class ZMPlugin
     use Traits\InitTrait;
     use Traits\PluginLoadTrait;
     use Traits\RouteTrait;
+    use Traits\PluginPackTrait;
 }
