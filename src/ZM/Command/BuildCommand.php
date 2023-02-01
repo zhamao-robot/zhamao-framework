@@ -53,7 +53,7 @@ class BuildCommand extends Command
 
         $this->build(
             $target,
-            LOAD_MODE === LOAD_MODE_VENDOR ? 'src/entry.php' : 'vendor/zhamao/framework/src/entry.php',
+            LOAD_MODE === LOAD_MODE_SRC ? 'src/entry.php' : 'vendor/zhamao/framework/src/entry.php',
         );
 
         $this->info('Phar 包构建完成');
