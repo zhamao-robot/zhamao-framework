@@ -28,12 +28,12 @@ class PluginPackCommand extends PluginCommand
     protected function handle(): int
     {
         try {
-            $outpupt = PluginManager::packPlugin(
+            $output = PluginManager::packPlugin(
                 plugin_name: $this->input->getArgument('name'),
                 build_dir: $this->input->getOption('build-dir'),
                 command_context: $this
             );
-            $this->info("插件打包完成，输出文件：{$outpupt}");
+            $this->info("插件打包完成，输出文件：{$output}");
         } catch (PluginException $e) {
             $this->error($e->getMessage());
         }
