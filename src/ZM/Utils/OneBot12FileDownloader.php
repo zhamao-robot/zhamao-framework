@@ -6,6 +6,7 @@ namespace ZM\Utils;
 
 use OneBot\V12\Object\ActionResponse;
 use ZM\Context\BotContext;
+use ZM\Exception\FileSystemException;
 use ZM\Store\FileSystem;
 
 /**
@@ -30,7 +31,7 @@ class OneBot12FileDownloader
         try {
             FileSystem::createDir($this->download_path);
             return true;
-        } catch (\RuntimeException $e) {
+        } catch (FileSystemException $e) {
             $this->err = $e->getMessage();
             return false;
         }
