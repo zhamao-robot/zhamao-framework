@@ -14,7 +14,6 @@ trait PluginPackTrait
      * 设置插件被打包前执行的回调函数
      *
      * @param callable $callback 回调函数
-     * @return void
      */
     public function onPack(callable $callback): void
     {
