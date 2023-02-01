@@ -26,49 +26,13 @@ abstract class Command extends \Symfony\Component\Console\Command\Command
     protected OutputInterface $output;
 
     /**
-     * {@inheritdoc}
-     * @internal 不建议覆写此方法，建议使用 {@see handle()} 方法
-     */
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $this->input = $input;
-        $this->output = $output;
-        if ($this->shouldExecute()) {
-            if (property_exists($this, 'bootstrappers')) {
-                foreach ($this->bootstrappers as $bootstrapper) {
-                    (new $bootstrapper())->bootstrap($this->input->getOptions());
-                }
-            }
-            return $this->handle();
-        }
-        return self::SUCCESS;
-    }
-
-    /**
-     * 是否应该执行
-     *
-     * @return bool 返回 true 以继续执行，返回 false 以中断执行
-     */
-    protected function shouldExecute(): bool
-    {
-        return true;
-    }
-
-    /**
-     * 命令的主体
-     *
-     * @return int 命令执行结果 {@see self::SUCCESS} 或 {@see self::FAILURE} 或 {@see self::INVALID}
-     */
-    abstract protected function handle(): int;
-
-    /**
      * 输出一段文本，默认样式
      *
      * @param string $message 要输出的文本
      * @param bool   $newline 是否在文本后换行
      * @see OutputInterface::write()
      */
-    protected function write(string $message, bool $newline = true): void
+    public function write(string $message, bool $newline = true): void
     {
         $this->output->write($message, $newline);
     }
@@ -79,7 +43,7 @@ abstract class Command extends \Symfony\Component\Console\Command\Command
      * @param string $message 要输出的文本
      * @param bool   $newline 是否在文本后换行
      */
-    protected function info(string $message, bool $newline = true): void
+    public function info(string $message, bool $newline = true): void
     {
         $this->write("<info>{$message}</info>", $newline);
     }
@@ -90,7 +54,7 @@ abstract class Command extends \Symfony\Component\Console\Command\Command
      * @param string $message 要输出的文本
      * @param bool   $newline 是否在文本后换行
      */
-    protected function error(string $message, bool $newline = true): void
+    public function error(string $message, bool $newline = true): void
     {
         $this->write("<error>{$message}</error>", $newline);
     }
@@ -101,7 +65,7 @@ abstract class Command extends \Symfony\Component\Console\Command\Command
      * @param string $message 要输出的文本
      * @param bool   $newline 是否在文本后换行
      */
-    protected function comment(string $message, bool $newline = true): void
+    public function comment(string $message, bool $newline = true): void
     {
         $this->write("<comment>{$message}</comment>", $newline);
     }
@@ -112,7 +76,7 @@ abstract class Command extends \Symfony\Component\Console\Command\Command
      * @param string $message 要输出的文本
      * @param bool   $newline 是否在文本后换行
      */
-    protected function question(string $message, bool $newline = true): void
+    public function question(string $message, bool $newline = true): void
     {
         $this->write("<question>{$message}</question>", $newline);
     }
@@ -123,7 +87,7 @@ abstract class Command extends \Symfony\Component\Console\Command\Command
      * @param string $message 要输出的文本
      * @param bool   $newline 是否在文本后换行
      */
-    protected function detail(string $message, bool $newline = true): void
+    public function detail(string $message, bool $newline = true): void
     {
         $this->write("<fg=gray>{$message}</>", $newline);
     }
@@ -136,7 +100,7 @@ abstract class Command extends \Symfony\Component\Console\Command\Command
      * @param string   $message  作为标题的文本
      * @param callable $callback 回调函数，接收一个参数，类型为 {@see ConsoleSectionOutput}
      */
-    protected function section(string $message, callable $callback): void
+    public function section(string $message, callable $callback): void
     {
         $output = $this->output;
         if (!$output instanceof ConsoleOutputInterface) {
@@ -158,7 +122,7 @@ abstract class Command extends \Symfony\Component\Console\Command\Command
      *
      * @param int $max 最大进度值，可以稍后再设置
      */
-    protected function progress(int $max = 0): ProgressBar
+    public function progress(int $max = 0): ProgressBar
     {
         $progress = new ProgressBar($this->output, $max);
         $progress->setBarCharacter('<fg=green>⚬</>');
@@ -169,4 +133,48 @@ abstract class Command extends \Symfony\Component\Console\Command\Command
         );
         return $progress;
     }
+
+    /**
+     * {@inheritdoc}
+     * @internal 不建议覆写此方法，建议使用 {@see handle()} 方法
+     */
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $this->input = $input;
+        $this->output = $output;
+        if ($this->shouldExecute()) {
+            if (property_exists($this, 'bootstrappers')) {
+                foreach ($this->bootstrappers as $bootstrapper) {
+                    (new $bootstrapper())->bootstrap($this->input->getOptions());
+                }
+            }
+            try {
+                return $this->handle();
+            } catch (\Throwable $e) {
+                $msg = explode("\n", $e->getMessage());
+                foreach ($msg as $v) {
+                    $this->error($v);
+                }
+                return self::FAILURE;
+            }
+        }
+        return self::SUCCESS;
+    }
+
+    /**
+     * 是否应该执行
+     *
+     * @return bool 返回 true 以继续执行，返回 false 以中断执行
+     */
+    protected function shouldExecute(): bool
+    {
+        return true;
+    }
+
+    /**
+     * 命令的主体
+     *
+     * @return int 命令执行结果 {@see self::SUCCESS} 或 {@see self::FAILURE} 或 {@see self::INVALID}
+     */
+    abstract protected function handle(): int;
 }
