@@ -111,6 +111,7 @@ var annotated_dup =
           [ "SolutionRepository", "class_z_m_1_1_exception_1_1_solution_1_1_solution_repository.html", "class_z_m_1_1_exception_1_1_solution_1_1_solution_repository" ]
         ] ],
         [ "ConfigException", "class_z_m_1_1_exception_1_1_config_exception.html", "class_z_m_1_1_exception_1_1_config_exception" ],
+        [ "FileSystemException", "class_z_m_1_1_exception_1_1_file_system_exception.html", null ],
         [ "Handler", "class_z_m_1_1_exception_1_1_handler.html", "class_z_m_1_1_exception_1_1_handler" ],
         [ "InitException", "class_z_m_1_1_exception_1_1_init_exception.html", null ],
         [ "InterruptException", "class_z_m_1_1_exception_1_1_interrupt_exception.html", "class_z_m_1_1_exception_1_1_interrupt_exception" ],
@@ -135,7 +136,6 @@ var annotated_dup =
           [ "StaticManualFactory", "class_z_m_1_1_plugin_1_1_command_manual_1_1_static_manual_factory.html", "class_z_m_1_1_plugin_1_1_command_manual_1_1_static_manual_factory" ]
         ] ],
         [ "OneBot12Adapter", "class_z_m_1_1_plugin_1_1_one_bot12_adapter.html", "class_z_m_1_1_plugin_1_1_one_bot12_adapter" ],
-        [ "PluginManager", "class_z_m_1_1_plugin_1_1_plugin_manager.html", null ],
         [ "PluginMeta", "class_z_m_1_1_plugin_1_1_plugin_meta.html", "class_z_m_1_1_plugin_1_1_plugin_meta" ],
         [ "ZMPlugin", "class_z_m_1_1_plugin_1_1_z_m_plugin.html", null ]
       ] ],
@@ -173,7 +173,8 @@ var annotated_dup =
           [ "FileLock", "class_z_m_1_1_store_1_1_lock_1_1_file_lock.html", null ]
         ] ],
         [ "FileSystem", "class_z_m_1_1_store_1_1_file_system.html", null ],
-        [ "MockAtomic", "class_z_m_1_1_store_1_1_mock_atomic.html", "class_z_m_1_1_store_1_1_mock_atomic" ]
+        [ "MockAtomic", "class_z_m_1_1_store_1_1_mock_atomic.html", "class_z_m_1_1_store_1_1_mock_atomic" ],
+        [ "PharHelper", "class_z_m_1_1_store_1_1_phar_helper.html", null ]
       ] ],
       [ "Utils", "namespace_z_m_1_1_utils.html", [
         [ "CodeGenerator", "namespace_z_m_1_1_utils_1_1_code_generator.html", [

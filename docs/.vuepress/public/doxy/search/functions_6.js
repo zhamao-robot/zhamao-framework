@@ -11,7 +11,8 @@ var searchData=
   ['fetchfirstcolumn_8',['fetchFirstColumn',['../class_z_m_1_1_store_1_1_database_1_1_d_b_statement_wrapper.html#aa4acf15da214da2075aeab7afc40e946',1,'ZM\Store\Database\DBStatementWrapper\fetchFirstColumn()'],['../class_z_m_1_1_store_1_1_database_1_1_d_b_wrapper.html#a820934ba5ce283b27303aebdac37b6c5',1,'ZM\Store\Database\DBWrapper\fetchFirstColumn()']]],
   ['fetchnumeric_9',['fetchNumeric',['../class_z_m_1_1_store_1_1_database_1_1_d_b_statement_wrapper.html#a47c5efffd190648c764c7eb9ab92260e',1,'ZM\Store\Database\DBStatementWrapper\fetchNumeric()'],['../class_z_m_1_1_store_1_1_database_1_1_d_b_wrapper.html#ab8b3ed1bf614064d5b21b906b52879ff',1,'ZM\Store\Database\DBWrapper\fetchNumeric()']]],
   ['fetchone_10',['fetchOne',['../class_z_m_1_1_store_1_1_database_1_1_d_b_statement_wrapper.html#a3cffcf6fc76e32aa2524c8526c880227',1,'ZM\Store\Database\DBStatementWrapper\fetchOne()'],['../class_z_m_1_1_store_1_1_database_1_1_d_b_wrapper.html#a223d913b0766f60b93b4fd990dec3366',1,'ZM\Store\Database\DBWrapper\fetchOne()']]],
-  ['fixtypename_11',['fixTypeName',['../class_z_m_1_1_annotation_1_1_one_bot_1_1_command_argument.html#a0948c9d8b33ec17f5603ed82f9e823fe',1,'ZM::Annotation::OneBot::CommandArgument']]],
-  ['free_12',['free',['../class_z_m_1_1_store_1_1_database_1_1_d_b_statement_wrapper.html#a5ad8044ee4b8a2c8bdb8b5c3dc786424',1,'ZM::Store::Database::DBStatementWrapper']]],
-  ['fromsegment_13',['fromSegment',['../class_z_m_1_1_utils_1_1_cat_code.html#a7d83bf875cb983ae021208e8b09324a1',1,'ZM::Utils::CatCode']]]
+  ['filterpack_11',['filterPack',['../namespace_z_m_1_1_plugin_1_1_traits.html#af0ac37d8568c12cc24ee9c167180d63c',1,'ZM::Plugin::Traits']]],
+  ['fixtypename_12',['fixTypeName',['../class_z_m_1_1_annotation_1_1_one_bot_1_1_command_argument.html#a0948c9d8b33ec17f5603ed82f9e823fe',1,'ZM::Annotation::OneBot::CommandArgument']]],
+  ['free_13',['free',['../class_z_m_1_1_store_1_1_database_1_1_d_b_statement_wrapper.html#a5ad8044ee4b8a2c8bdb8b5c3dc786424',1,'ZM::Store::Database::DBStatementWrapper']]],
+  ['fromsegment_14',['fromSegment',['../class_z_m_1_1_utils_1_1_cat_code.html#a7d83bf875cb983ae021208e8b09324a1',1,'ZM::Utils::CatCode']]]
 ];

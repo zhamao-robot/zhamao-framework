@@ -106,6 +106,8 @@ $(document).ready(function(){initNavTree('class_z_m_1_1_store_1_1_file_system.ht
 <tr class="separator:a6dc2be903342a1b4d8cbe72603670622"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5307180a31adb7a0aae35addd32565fd"><td class="memItemLeft" align="right" valign="top">static&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_store_1_1_file_system.html#a5307180a31adb7a0aae35addd32565fd">createDir</a> (string $path)</td></tr>
 <tr class="separator:a5307180a31adb7a0aae35addd32565fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a07bb1cd132f98ba6a737ef71f1721142"><td class="memItemLeft" align="right" valign="top">static&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_store_1_1_file_system.html#a07bb1cd132f98ba6a737ef71f1721142">ensureFileWritable</a> (string $phar_path)</td></tr>
+<tr class="separator:a07bb1cd132f98ba6a737ef71f1721142"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8e259d4bbfb02ccae9284fd5dc90dc17"><td class="memItemLeft" align="right" valign="top">static&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_store_1_1_file_system.html#a8e259d4bbfb02ccae9284fd5dc90dc17">getReloadableFiles</a> ()</td></tr>
 <tr class="separator:a8e259d4bbfb02ccae9284fd5dc90dc17"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a35c4565f64178d3978fe3d8ebd23938f"><td class="memItemLeft" align="right" valign="top">static&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_store_1_1_file_system.html#a35c4565f64178d3978fe3d8ebd23938f">getClassesPsr4</a> (string $dir, string $base_namespace, mixed $rule=null, bool|string $return_path_value=false)</td></tr>
@@ -139,6 +141,44 @@ $(document).ready(function(){initNavTree('class_z_m_1_1_store_1_1_file_system.ht
 <dl class="params"><dt>参数</dt><dd>
   <table class="params">
     <tr><td class="paramtype">string</td><td class="paramname">$path</td><td>目录路径 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>异常</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">FileSystemException</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a07bb1cd132f98ba6a737ef71f1721142" name="a07bb1cd132f98ba6a737ef71f1721142"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a07bb1cd132f98ba6a737ef71f1721142">&#9670;&#160;</a></span>ensureFileWritable()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static ensureFileWritable </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>$phar_path</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >调用该方法将确认传入的文件是否可写，如果不可写将抛出 FileSystemException 异常。 </p><dl class="exception"><dt>异常</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">FileSystemException</td><td></td></tr>
   </table>
   </dd>
 </dl>

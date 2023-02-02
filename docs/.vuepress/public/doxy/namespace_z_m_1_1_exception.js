@@ -2,6 +2,7 @@ var namespace_z_m_1_1_exception =
 [
     [ "Solution", "namespace_z_m_1_1_exception_1_1_solution.html", "namespace_z_m_1_1_exception_1_1_solution" ],
     [ "ConfigException", "class_z_m_1_1_exception_1_1_config_exception.html", "class_z_m_1_1_exception_1_1_config_exception" ],
+    [ "FileSystemException", "class_z_m_1_1_exception_1_1_file_system_exception.html", null ],
     [ "Handler", "class_z_m_1_1_exception_1_1_handler.html", "class_z_m_1_1_exception_1_1_handler" ],
     [ "InitException", "class_z_m_1_1_exception_1_1_init_exception.html", null ],
     [ "InterruptException", "class_z_m_1_1_exception_1_1_interrupt_exception.html", "class_z_m_1_1_exception_1_1_interrupt_exception" ],

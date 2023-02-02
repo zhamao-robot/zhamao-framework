@@ -52,6 +52,7 @@ var hierarchy =
     [ "Exception", null, [
       [ "ZMException", "class_z_m_1_1_exception_1_1_z_m_exception.html", [
         [ "ConfigException", "class_z_m_1_1_exception_1_1_config_exception.html", null ],
+        [ "FileSystemException", "class_z_m_1_1_exception_1_1_file_system_exception.html", null ],
         [ "InitException", "class_z_m_1_1_exception_1_1_init_exception.html", null ],
         [ "InterruptException", "class_z_m_1_1_exception_1_1_interrupt_exception.html", null ],
         [ "InvalidArgumentException", "class_z_m_1_1_exception_1_1_invalid_argument_exception.html", null ],
@@ -115,12 +116,12 @@ var hierarchy =
     [ "MockAtomic", "class_z_m_1_1_store_1_1_mock_atomic.html", null ],
     [ "OneBot12FileDownloader", "class_z_m_1_1_utils_1_1_one_bot12_file_downloader.html", null ],
     [ "OneBot12FileUploader", "class_z_m_1_1_utils_1_1_one_bot12_file_uploader.html", null ],
+    [ "PharHelper", "class_z_m_1_1_store_1_1_phar_helper.html", null ],
     [ "Pipeline", "class_z_m_1_1_middleware_1_1_pipeline.html", null ],
     [ "PipelineInterface", "interface_z_m_1_1_middleware_1_1_pipeline_interface.html", [
       [ "TimerMiddleware", "class_z_m_1_1_middleware_1_1_timer_middleware.html", null ]
     ] ],
     [ "PluginGenerator", "class_z_m_1_1_utils_1_1_code_generator_1_1_plugin_generator.html", null ],
-    [ "PluginManager", "class_z_m_1_1_plugin_1_1_plugin_manager.html", null ],
     [ "ProcessStateManager", "class_z_m_1_1_process_1_1_process_state_manager.html", null ],
     [ "Redis", null, [
       [ "ZMRedis", "class_z_m_1_1_store_1_1_k_v_1_1_redis_1_1_z_m_redis.html", null ]
