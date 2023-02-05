@@ -78,6 +78,8 @@ class TextGenerateCommand extends Command
                     ++$doc_count;
                     if ($doc_count === 1) {
                         $bodies[$ks] = '* 本次更新包含文档更新内容 {cnt} 个';
+                    } else {
+                        unset($bodies[$ks]);
                     }
                 }
             }
