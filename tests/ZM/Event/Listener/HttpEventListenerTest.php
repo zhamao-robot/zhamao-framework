@@ -99,11 +99,7 @@ class HttpEventListenerTest extends TestCase
     {
         $handler = $this->prophesize(self::class);
         if ($should_be_called) {
-            $handler->fakeHandler(
-                Argument::type('array'),
-                Argument::type(ServerRequest::class),
-                Argument::type(\HttpRequestEvent::class)
-            )->will(fn () => $callback ? $callback() : 'OK!')->shouldBeCalledOnce();
+            $handler->fakeHandler()->will(fn () => $callback ? $callback() : 'OK!')->shouldBeCalledOnce();
         } else {
             $handler->fakeHandler(Argument::cetera())->shouldNotBeCalled();
         }
