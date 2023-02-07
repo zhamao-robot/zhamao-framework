@@ -94,9 +94,7 @@ class MiddlewareHandler
                     }
                 }
                 if ($return !== false) {
-                    // 也许我们不需要显式传入参数，而是绑定到容器后自动解析，这样可以避免参数不匹配的问题
-                    $result = container()->call($callback);
-//                    $result = container()->call($callback, $args);
+                    $result = container()->call($callback, $args);
                 }
                 while (isset($this->stack[$stack_id]) && ($item = array_pop($this->stack[$stack_id])) !== null) {
                     // 如果是 pipeline 形式的中间件，则使用闭包回去
