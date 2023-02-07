@@ -1,7 +1,7 @@
 {
   "dependencies": {
-    "vuepress-theme-antdocs": "^1.4.5",
-    "vuepress": "^1.9.7"
+    "vuepress": "^1.9.8",
+    "vuepress-theme-antdocs": "^1.4.6"
   },
   "scripts": {
     "docs:dev": "vuepress dev docs",

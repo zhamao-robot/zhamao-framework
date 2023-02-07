@@ -104,6 +104,16 @@ module.exports = {
                         'store/cache',
                         'store/redis',
                     ]
+                },
+                {
+                    title: '依赖注入组件',
+                    collapsable: true,
+                    sidebarDepth: 2,
+                    children: [
+                        'container/dependency-injection',
+                        'container/configuration',
+                        'container/dependencies',
+                    ],
                 }
             ],
             '/advanced/': [
