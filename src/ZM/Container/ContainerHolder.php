@@ -38,6 +38,21 @@ class ContainerHolder
         );
         $builder->useAutowiring(true);
         $builder->useAttributes(true);
+
+        // 容器缓存
+        $enable_cache = config('container.cache.enable', false);
+        if (is_callable($enable_cache)) {
+            $enable_cache = $enable_cache();
+        }
+        if ($enable_cache) {
+            // 检查 APCu 扩展是否可用
+            if (!extension_loaded('apcu')) {
+                logger()->warning('APCu 扩展未加载，容器缓存将不可用');
+            } else {
+                $builder->enableDefinitionCache(config('container.cache.namespace', ''));
+            }
+        }
+
         return $builder->build();
     }
 }

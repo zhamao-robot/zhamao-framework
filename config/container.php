@@ -7,6 +7,7 @@ use OneBot\Driver\Process\ProcessManager;
 use Psr\Log\LoggerInterface;
 use ZM\Config\Environment;
 use ZM\Config\EnvironmentInterface;
+use ZM\Config\ZMConfig;
 use ZM\Framework;
 
 /*
@@ -27,5 +28,16 @@ return [
         Driver::class => fn () => Framework::getInstance()->getDriver(),
         LoggerInterface::class => fn () => logger(),
         EnvironmentInterface::class => Environment::class,
+    ],
+
+    // 容器的缓存配置，默认情况下，只有在生产环境下才会启用缓存
+    // 启用缓存后可以减少重复反射的开销，在首次解析后直接从缓存中读取
+    // 此功能要求 APCu 扩展，如果你没有安装，将会输出警告并禁用缓存
+    // 请在更新容器配置后手动执行 `apcu_clear_cache()` 来清除缓存
+    // 详细介绍请参阅：https://php-di.org/doc/performances.html#caching
+    'cache' => [
+        // 是否启用缓存，支持 bool、callable
+        'enable' => fn () => ZMConfig::getInstance()->getEnvironment() === 'production',
+        'namespace' => 'zm',
     ],
 ];
