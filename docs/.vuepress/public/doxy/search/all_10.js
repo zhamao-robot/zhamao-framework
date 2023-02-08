@@ -16,7 +16,7 @@ var searchData=
   ['onmanagerstop_13',['onManagerStop',['../class_z_m_1_1_event_1_1_listener_1_1_manager_event_listener.html#ab809d80de6cca58e62f00eb6a7145d17',1,'ZM::Event::Listener::ManagerEventListener']]],
   ['onmasterstart_14',['onMasterStart',['../class_z_m_1_1_event_1_1_listener_1_1_master_event_listener.html#ad0dde501c4d69cd6d0ff431ecb28119a',1,'ZM::Event::Listener::MasterEventListener']]],
   ['onmasterstop_15',['onMasterStop',['../class_z_m_1_1_event_1_1_listener_1_1_master_event_listener.html#a2f79b5717d444ca29e6b000872534ca3',1,'ZM::Event::Listener::MasterEventListener']]],
-  ['onobevent_16',['onOBEvent',['../class_module_1_1_example_1_1_hello123.html#adfe96757d250c1d348c8ba30d7e3e947',1,'Module::Example::Hello123']]],
+  ['onobevent_16',['onOBEvent',['../class_module_1_1_example_1_1_hello123.html#a0ee3d852534d06fb70fa5a68b88e2009',1,'Module::Example::Hello123']]],
   ['onpack_17',['onPack',['../namespace_z_m_1_1_plugin_1_1_traits.html#ad555edfdfc25efd29a218a4572a86ff3',1,'ZM::Plugin::Traits']]],
   ['onpluginload_18',['onPluginLoad',['../namespace_z_m_1_1_plugin_1_1_traits.html#a4d1ac878c83dcba5559081cd701835ed',1,'ZM::Plugin::Traits']]],
   ['onrequest1_19',['onRequest1',['../class_z_m_1_1_event_1_1_listener_1_1_http_event_listener.html#a0511062aadac3a43e57a0e0f8fb999d8',1,'ZM::Event::Listener::HttpEventListener']]],
@@ -29,5 +29,6 @@ var searchData=
   ['onworkerstart999_26',['onWorkerStart999',['../class_z_m_1_1_event_1_1_listener_1_1_worker_event_listener.html#a1b7ec901e1c44478171f7fa2476ad746',1,'ZM::Event::Listener::WorkerEventListener']]],
   ['onworkerstop1_27',['onWorkerStop1',['../class_z_m_1_1_event_1_1_listener_1_1_worker_event_listener.html#a34708d9b3e62bcf9bff8472ac6ca9fe7',1,'ZM::Event::Listener::WorkerEventListener']]],
   ['onworkerstop999_28',['onWorkerStop999',['../class_z_m_1_1_event_1_1_listener_1_1_worker_event_listener.html#a339924f120992579d5f652a2c3a87b07',1,'ZM::Event::Listener::WorkerEventListener']]],
-  ['open_29',['open',['../interface_z_m_1_1_store_1_1_k_v_1_1_k_v_interface.html#ac7d8ccad8dc25ddbe2c47e6e56b04cf7',1,'ZM\Store\KV\KVInterface\open()'],['../class_z_m_1_1_store_1_1_k_v_1_1_light_cache.html#ac7d8ccad8dc25ddbe2c47e6e56b04cf7',1,'ZM\Store\KV\LightCache\open()'],['../class_z_m_1_1_store_1_1_k_v_1_1_redis_1_1_k_v_redis.html#ac7d8ccad8dc25ddbe2c47e6e56b04cf7',1,'ZM\Store\KV\Redis\KVRedis\open()']]]
+  ['onwsmessage_29',['onWSMessage',['../class_module_1_1_example_1_1_hello123.html#a6ac41f59e93a6ff5c461f53413bec7c6',1,'Module::Example::Hello123']]],
+  ['open_30',['open',['../interface_z_m_1_1_store_1_1_k_v_1_1_k_v_interface.html#ac7d8ccad8dc25ddbe2c47e6e56b04cf7',1,'ZM\Store\KV\KVInterface\open()'],['../class_z_m_1_1_store_1_1_k_v_1_1_light_cache.html#ac7d8ccad8dc25ddbe2c47e6e56b04cf7',1,'ZM\Store\KV\LightCache\open()'],['../class_z_m_1_1_store_1_1_k_v_1_1_redis_1_1_k_v_redis.html#ac7d8ccad8dc25ddbe2c47e6e56b04cf7',1,'ZM\Store\KV\Redis\KVRedis\open()']]]
 ];
