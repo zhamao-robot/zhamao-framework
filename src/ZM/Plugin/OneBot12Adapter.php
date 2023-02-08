@@ -75,9 +75,9 @@ class OneBot12Adapter extends ZMPlugin
     }
 
     /**
-     * @internal 只允许内部使用
      * @param int         $cid   协程 ID
      * @param OneBotEvent $event 事件对象
+     * @internal 只允许内部使用
      */
     public static function addContextPrompt(int $cid, OneBotEvent $event): void
     {
@@ -85,8 +85,8 @@ class OneBot12Adapter extends ZMPlugin
     }
 
     /**
-     * @internal 只允许内部使用
      * @param int $cid 协程 ID
+     * @internal 只允许内部使用
      */
     public static function removeContextPrompt(int $cid): void
     {
@@ -94,8 +94,8 @@ class OneBot12Adapter extends ZMPlugin
     }
 
     /**
-     * @internal 只允许内部使用
      * @param int $cid 协程 ID
+     * @internal 只允许内部使用
      */
     public static function isContextPromptExists(int $cid): bool
     {
@@ -347,7 +347,7 @@ class OneBot12Adapter extends ZMPlugin
                     && ($event->detail_type === null || $event->detail_type === $obj->detail_type);
             });
             try {
-                $handler->handleAll($obj);
+                $handler->handleAll();
             } catch (WaitTimeoutException $e) {
                 // 这里是处理 prompt() 下超时的情况的
                 if ($e->getTimeoutPrompt() === null) {
