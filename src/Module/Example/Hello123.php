@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Module\Example;
 
+use Choir\WebSocket\FrameInterface;
 use OneBot\Driver\Coroutine\Adaptive;
 use OneBot\Driver\Event\WebSocket\WebSocketMessageEvent;
+use ZM\Annotation\Framework\BindEvent;
 use ZM\Annotation\Framework\Cron;
 use ZM\Annotation\Http\Route;
 use ZM\Annotation\Middleware\Middleware;
@@ -19,14 +21,15 @@ use ZM\Middleware\TimerMiddleware;
 class Hello123
 {
     #[Route('/route', request_method: ['GET'])]
+    #[Route('/route/{id}', request_method: ['GET'])]
     #[Middleware(TimerMiddleware::class)]
-    public function route()
+    public function route(array $params)
     {
-        return 'Hello Zhamao！This is the first 3.0 page！';
+        return 'Hello Zhamao！This is the first 3.0 page！' . ($params['id'] ?? '');
     }
 
     #[BotEvent()]
-    public function onOBEvent(\OneBotEvent $event, WebSocketMessageEvent $messageEvent): void
+    public function onOBEvent(WebSocketMessageEvent $messageEvent, \OneBotEvent $event): void
     {
         logger()->info("收到了 {$event->getType()}.{$event->getDetailType()} 事件");
     }
@@ -37,6 +40,12 @@ class Hello123
     public function repeat(\OneBotEvent $event, BotContext $context): void
     {
         $context->reply($event->getMessage());
+    }
+
+    #[BindEvent(WebSocketMessageEvent::class)]
+    public function onWSMessage(FrameInterface $frame, WebSocketMessageEvent $event): void
+    {
+        logger()->info('收到了 WebSocket 消息');
     }
 
     #[Cron('* * * * *', no_overlap: true)]

@@ -94,6 +94,9 @@ class MiddlewareHandler
                     }
                 }
                 if ($return !== false) {
+                    // $args 传递数字索引可能会在部分情况下引发解析错误，应尽量避免
+                    // 并尽量避免传递已经绑定入容器的实例
+                    // TODO: 可能需要更好的解决方案
                     $result = container()->call($callback, $args);
                 }
                 while (isset($this->stack[$stack_id]) && ($item = array_pop($this->stack[$stack_id])) !== null) {
