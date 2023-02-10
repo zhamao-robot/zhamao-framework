@@ -31,8 +31,6 @@ bash <(curl -fsSL https://zhamao.xin/v3.sh)
 
 如果你已经有了必要的 PHP 环境和 Composer 工具，你可以直接在任意目录下初始化框架。
 
-> 由于目前 3.0 仍处于预发布阶段，请使用 `composer require zhamao/framework:^3` 来安装
-
 ```shell
 # 在当前目录初始化框架
 composer require zhamao/framework
