@@ -16,11 +16,12 @@ var searchData=
   ['onwebsocketclose_13',['onWebSocketClose',['../class_z_m_1_1_event_1_1_listener_1_1_w_s_event_listener.html#ac863ac595a8a010778b12bf00101e70b',1,'ZM::Event::Listener::WSEventListener']]],
   ['onwebsocketmessage_14',['onWebSocketMessage',['../class_z_m_1_1_event_1_1_listener_1_1_w_s_event_listener.html#a48190b0e59f627e9ce62b76ac6ab482b',1,'ZM::Event::Listener::WSEventListener']]],
   ['onwebsocketopen_15',['onWebSocketOpen',['../class_z_m_1_1_event_1_1_listener_1_1_w_s_event_listener.html#a48e7937eb06a163347c72f294f843174',1,'ZM::Event::Listener::WSEventListener']]],
-  ['onworkerint_16',['onWorkerInt',['../class_z_m_1_1_event_1_1_listener_1_1_signal_listener.html#ae10bce4b1ac10cb7fd352428d03c7b6e',1,'ZM::Event::Listener::SignalListener']]],
-  ['onworkerstart1_17',['onWorkerStart1',['../class_z_m_1_1_event_1_1_listener_1_1_worker_event_listener.html#a00da3f49464d2d0e9653971cc21e5351',1,'ZM::Event::Listener::WorkerEventListener']]],
-  ['onworkerstart999_18',['onWorkerStart999',['../class_z_m_1_1_event_1_1_listener_1_1_worker_event_listener.html#a1b7ec901e1c44478171f7fa2476ad746',1,'ZM::Event::Listener::WorkerEventListener']]],
-  ['onworkerstop1_19',['onWorkerStop1',['../class_z_m_1_1_event_1_1_listener_1_1_worker_event_listener.html#a34708d9b3e62bcf9bff8472ac6ca9fe7',1,'ZM::Event::Listener::WorkerEventListener']]],
-  ['onworkerstop999_20',['onWorkerStop999',['../class_z_m_1_1_event_1_1_listener_1_1_worker_event_listener.html#a339924f120992579d5f652a2c3a87b07',1,'ZM::Event::Listener::WorkerEventListener']]],
-  ['onwsmessage_21',['onWSMessage',['../class_module_1_1_example_1_1_hello123.html#a6ac41f59e93a6ff5c461f53413bec7c6',1,'Module::Example::Hello123']]],
-  ['open_22',['open',['../interface_z_m_1_1_store_1_1_k_v_1_1_k_v_interface.html#ac7d8ccad8dc25ddbe2c47e6e56b04cf7',1,'ZM\Store\KV\KVInterface\open()'],['../class_z_m_1_1_store_1_1_k_v_1_1_light_cache.html#ac7d8ccad8dc25ddbe2c47e6e56b04cf7',1,'ZM\Store\KV\LightCache\open()'],['../class_z_m_1_1_store_1_1_k_v_1_1_redis_1_1_k_v_redis.html#ac7d8ccad8dc25ddbe2c47e6e56b04cf7',1,'ZM\Store\KV\Redis\KVRedis\open()']]]
+  ['onworkerexit_16',['onWorkerExit',['../class_z_m_1_1_event_1_1_listener_1_1_worker_event_listener.html#a868890314c48f2da5c6fca32289325f9',1,'ZM::Event::Listener::WorkerEventListener']]],
+  ['onworkerint_17',['onWorkerInt',['../class_z_m_1_1_event_1_1_listener_1_1_signal_listener.html#ae10bce4b1ac10cb7fd352428d03c7b6e',1,'ZM::Event::Listener::SignalListener']]],
+  ['onworkerstart1_18',['onWorkerStart1',['../class_z_m_1_1_event_1_1_listener_1_1_worker_event_listener.html#a00da3f49464d2d0e9653971cc21e5351',1,'ZM::Event::Listener::WorkerEventListener']]],
+  ['onworkerstart999_19',['onWorkerStart999',['../class_z_m_1_1_event_1_1_listener_1_1_worker_event_listener.html#a1b7ec901e1c44478171f7fa2476ad746',1,'ZM::Event::Listener::WorkerEventListener']]],
+  ['onworkerstop1_20',['onWorkerStop1',['../class_z_m_1_1_event_1_1_listener_1_1_worker_event_listener.html#a34708d9b3e62bcf9bff8472ac6ca9fe7',1,'ZM::Event::Listener::WorkerEventListener']]],
+  ['onworkerstop999_21',['onWorkerStop999',['../class_z_m_1_1_event_1_1_listener_1_1_worker_event_listener.html#a339924f120992579d5f652a2c3a87b07',1,'ZM::Event::Listener::WorkerEventListener']]],
+  ['onwsmessage_22',['onWSMessage',['../class_module_1_1_example_1_1_hello123.html#a6ac41f59e93a6ff5c461f53413bec7c6',1,'Module::Example::Hello123']]],
+  ['open_23',['open',['../interface_z_m_1_1_store_1_1_k_v_1_1_k_v_interface.html#ac7d8ccad8dc25ddbe2c47e6e56b04cf7',1,'ZM\Store\KV\KVInterface\open()'],['../class_z_m_1_1_store_1_1_k_v_1_1_light_cache.html#ac7d8ccad8dc25ddbe2c47e6e56b04cf7',1,'ZM\Store\KV\LightCache\open()'],['../class_z_m_1_1_store_1_1_k_v_1_1_redis_1_1_k_v_redis.html#ac7d8ccad8dc25ddbe2c47e6e56b04cf7',1,'ZM\Store\KV\Redis\KVRedis\open()']]]
 ];

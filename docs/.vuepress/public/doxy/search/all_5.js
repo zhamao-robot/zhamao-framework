@@ -20,6 +20,6 @@ var searchData=
   ['deletemultiple_17',['deleteMultiple',['../class_z_m_1_1_store_1_1_k_v_1_1_light_cache.html#a5b922bd8e1e39dea9b57d7a4128a9fb9',1,'ZM::Store::KV::LightCache']]],
   ['destroypool_18',['destroyPool',['../class_z_m_1_1_store_1_1_database_1_1_d_b_pool.html#abeafe92a8e01fa3343da7cbd88ae4942',1,'ZM\Store\Database\DBPool\destroyPool()'],['../class_z_m_1_1_store_1_1_k_v_1_1_redis_1_1_redis_pool.html#abeafe92a8e01fa3343da7cbd88ae4942',1,'ZM\Store\KV\Redis\RedisPool\destroyPool()']]],
   ['detail_19',['detail',['../class_z_m_1_1_command_1_1_command.html#a83256ea818e4e319a533663fc323c288',1,'ZM::Command::Command']]],
-  ['downloadfile_20',['downloadFile',['../class_z_m_1_1_utils_1_1_one_bot12_file_downloader.html#ad557a652b1540e26064891aaf7fb6924',1,'ZM::Utils::OneBot12FileDownloader']]],
-  ['due_21',['due',['../class_z_m_1_1_schedule_1_1_schedule.html#afc1c444a2cd7afe7b13e5a15568f881a',1,'ZM::Schedule::Schedule']]]
+  ['dispatch_20',['dispatch',['../class_z_m_1_1_schedule_1_1_schedule.html#ae170c33194dbdbf84d2adf3fbb5d390c',1,'ZM::Schedule::Schedule']]],
+  ['downloadfile_21',['downloadFile',['../class_z_m_1_1_utils_1_1_one_bot12_file_downloader.html#ad557a652b1540e26064891aaf7fb6924',1,'ZM::Utils::OneBot12FileDownloader']]]
 ];
