@@ -9,14 +9,12 @@ use Symfony\Component\Console\Attribute\AsCommand;
 #[AsCommand(name: 'check:config', description: '检查配置文件是否和框架当前版本有更新')]
 class CheckConfigCommand extends Command
 {
-    use SourceLoadModeOnly;
-
     private bool $need_update = false;
 
     protected function handle(): int
     {
         $current_cfg = SOURCE_ROOT_DIR . '/config/';
-        $remote_cfg = include FRAMEWORK_ROOT_DIR . '/config/global_old.php';
+        $remote_cfg = include FRAMEWORK_ROOT_DIR . '/config/global.php';
         if (file_exists($current_cfg . 'global.php')) {
             $this->check($remote_cfg, 'global.php');
         }
