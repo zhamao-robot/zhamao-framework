@@ -299,6 +299,8 @@ class OneBot12Adapter extends ZMPlugin
                 }
             }
             logger()->info('OneBot 12 反向 WS 连接鉴权成功，接入成功[' . $event->getFd() . ']');
+            // 接入 onebots 等实现需要回传 Sec-WebSocket-Protocol 头
+            $event->withResponse(HttpFactory::createResponse(101, headers: ['Sec-WebSocket-Protocol' => $event->getRequest()->getHeaderLine('Sec-WebSocket-Protocol')]));
         }
         // 设置 OneBot 相关的东西
         ConnectionUtil::setConnection($event->getFd(), $info ?? []);
