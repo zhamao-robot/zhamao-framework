@@ -9,6 +9,7 @@ use OneBot\Driver\Event\DriverInitEvent;
 use OneBot\Driver\Event\Http\HttpRequestEvent;
 use OneBot\Driver\Event\Process\ManagerStartEvent;
 use OneBot\Driver\Event\Process\ManagerStopEvent;
+use OneBot\Driver\Event\Process\WorkerExitEvent;
 use OneBot\Driver\Event\Process\WorkerStartEvent;
 use OneBot\Driver\Event\Process\WorkerStopEvent;
 use OneBot\Driver\Event\WebSocket\WebSocketCloseEvent;
@@ -235,6 +236,7 @@ class Framework
         ob_event_provider()->addEventListener(WorkerStartEvent::getName(), [WorkerEventListener::getInstance(), 'onWorkerStart1'], 1);
         ob_event_provider()->addEventListener(WorkerStopEvent::getName(), [WorkerEventListener::getInstance(), 'onWorkerStop999'], 999);
         ob_event_provider()->addEventListener(WorkerStopEvent::getName(), [WorkerEventListener::getInstance(), 'onWorkerStop1'], 1);
+        ob_event_provider()->addEventListener(WorkerExitEvent::getName(), [WorkerEventListener::getInstance(), 'onWorkerExit'], 999);
         // Http 事件
         ob_event_provider()->addEventListener(HttpRequestEvent::getName(), [HttpEventListener::getInstance(), 'onRequest999'], 999);
         ob_event_provider()->addEventListener(HttpRequestEvent::getName(), [HttpEventListener::getInstance(), 'onRequest1'], 1);

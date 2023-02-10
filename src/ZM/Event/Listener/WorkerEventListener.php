@@ -109,7 +109,8 @@ class WorkerEventListener
         }
         // Windows 系统的 CtrlC 由于和 Select 有一定的冲突，如果没事件解析的话 CtrlC 会阻塞，所以必须添加一个空的计时器
         if (PHP_OS_FAMILY === 'Windows') {
-            Framework::getInstance()->getDriver()->getEventLoop()->addTimer(1000, function () {}, 0);
+            Framework::getInstance()->getDriver()->getEventLoop()->addTimer(1000, function () {
+            }, 0);
         }
         // 回显 debug 日志：进程占用的内存
         $memory_total = memory_get_usage() / 1024 / 1024;
@@ -119,6 +120,14 @@ class WorkerEventListener
     public function onWorkerStart1(): void
     {
         logger()->debug('{is_task}Worker 进程 #{id} 已启动', ['is_task' => ProcessStateManager::isTaskWorker() ? 'Task' : '', 'id' => ProcessManager::getProcessId()]);
+    }
+
+    public function onWorkerExit(): void
+    {
+        // 清除计时器
+        Framework::getInstance()->getDriver()->getEventLoop()->clearAllTimer();
+        $worker_id = ProcessManager::getProcessId();
+        logger()->notice('正在结束 Worker #' . $worker_id . ' 中的任务...');
     }
 
     /**
@@ -131,6 +140,11 @@ class WorkerEventListener
             LightCache::saveAll();
         }
         logger()->debug('{is_task}Worker 进程 #{id} 正在停止', ['is_task' => ProcessStateManager::isTaskWorker() ? 'Task' : '', 'id' => ProcessManager::getProcessId()]);
+
+        if (Framework::getInstance()->getDriver()->getName() !== 'swoole') {
+            logger()->debug('清除计时器中');
+            Framework::getInstance()->getDriver()->getEventLoop()->clearAllTimer();
+        }
 
         if (DIRECTORY_SEPARATOR !== '\\') {
             ProcessStateManager::removeProcessState(ProcessStateManager::isTaskWorker() ? ZM_PROCESS_TASKWORKER : ZM_PROCESS_WORKER, ProcessManager::getProcessId());
