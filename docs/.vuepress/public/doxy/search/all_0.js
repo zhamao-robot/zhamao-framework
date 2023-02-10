@@ -23,5 +23,6 @@ var searchData=
   ['_24reg_5fmap_20',['$reg_map',['../class_z_m_1_1_middleware_1_1_middleware_handler.html#a3170258a6a61526e4d49c00b835ae0e3',1,'ZM::Middleware::MiddlewareHandler']]],
   ['_24setup_5fannotations_21',['$setup_annotations',['../class_z_m_1_1_framework.html#a6ba8a77cc9dfe7ba4232c32cabf2f84b',1,'ZM::Framework']]],
   ['_24stack_22',['$stack',['../class_z_m_1_1_middleware_1_1_middleware_handler.html#a8e0a11e5b8e5fd838ba5d796ec6f5b49',1,'ZM::Middleware::MiddlewareHandler']]],
-  ['_24type_23',['$type',['../class_z_m_1_1_annotation_1_1_one_bot_1_1_command_argument.html#aa40cc7876dc0b694eda3c898140a0ac8',1,'ZM::Annotation::OneBot::CommandArgument']]]
+  ['_24tick_5fms_23',['$tick_ms',['../class_z_m_1_1_annotation_1_1_framework_1_1_tick.html#a4f0b531ca9216f60b237cfc084054405',1,'ZM::Annotation::Framework::Tick']]],
+  ['_24type_24',['$type',['../class_z_m_1_1_annotation_1_1_one_bot_1_1_command_argument.html#aa40cc7876dc0b694eda3c898140a0ac8',1,'ZM::Annotation::OneBot::CommandArgument']]]
 ];

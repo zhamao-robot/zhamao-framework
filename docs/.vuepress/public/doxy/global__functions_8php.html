@@ -27,7 +27,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Zhamao Framework<span id="projectnumber">&#160;3.0.0-beta7</span>
+   <div id="projectname">Zhamao Framework<span id="projectnumber">&#160;3.0.0-beta8</span>
    </div>
    <div id="projectbrief">A high-performance chatbot + web framework</div>
   </td>
@@ -106,6 +106,10 @@ $(document).ready(function(){initNavTree('global__functions_8php.html',''); init
 <tr class="separator:a49a9c9fabfe3e76c1535ea0a42407b15"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6195e0d6bb303cd1161beefcdc9173af"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="global__functions_8php.html#a6195e0d6bb303cd1161beefcdc9173af">zm_sleep</a> (float|int $time)</td></tr>
 <tr class="separator:a6195e0d6bb303cd1161beefcdc9173af"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a123ebc065b28f7c59b53a70d87b5e4ce"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="global__functions_8php.html#a123ebc065b28f7c59b53a70d87b5e4ce">zm_timer_tick</a> (int $ms, callable $callback, int $times=0)</td></tr>
+<tr class="separator:a123ebc065b28f7c59b53a70d87b5e4ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a79804576df10fd58f9d569e823e6aa9f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="global__functions_8php.html#a79804576df10fd58f9d569e823e6aa9f">zm_timer_after</a> (int $ms, callable $callback)</td></tr>
+<tr class="separator:a79804576df10fd58f9d569e823e6aa9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aea4203b9b3d3a0cecaad1479e2978e16"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="global__functions_8php.html#aea4203b9b3d3a0cecaad1479e2978e16">coroutine</a> ()</td></tr>
 <tr class="separator:aea4203b9b3d3a0cecaad1479e2978e16"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab6532d66138e9cf91863546fc93556a1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="global__functions_8php.html#ab6532d66138e9cf91863546fc93556a1">zm_internal_errcode</a> (int|string $code)</td></tr>
@@ -685,6 +689,85 @@ $(document).ready(function(){initNavTree('global__functions_8php.html',''); init
       </table>
 </div><div class="memdoc">
 <p >sleep 指定时间，单位为秒（最小单位为1毫秒，即0.001） </p>
+
+</div>
+</div>
+<a id="a79804576df10fd58f9d569e823e6aa9f" name="a79804576df10fd58f9d569e823e6aa9f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a79804576df10fd58f9d569e823e6aa9f">&#9670;&#160;</a></span>zm_timer_after()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">zm_timer_after </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>$ms</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">callable&#160;</td>
+          <td class="paramname"><em>$callback</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >创建一个延后一次性计时器，只在指定毫秒后执行一次即销毁（Timer::after() 的别名）</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramtype">int</td><td class="paramname">$ms</td><td>时间（毫秒） </td></tr>
+    <tr><td class="paramtype">callable</td><td class="paramname">$callback</td><td>回调函数 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a123ebc065b28f7c59b53a70d87b5e4ce" name="a123ebc065b28f7c59b53a70d87b5e4ce"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a123ebc065b28f7c59b53a70d87b5e4ce">&#9670;&#160;</a></span>zm_timer_tick()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">zm_timer_tick </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>$ms</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">callable&#160;</td>
+          <td class="paramname"><em>$callback</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>$times</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >创建一个计时器（Timer::tick() 的别名）</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramtype">int</td><td class="paramname">$ms</td><td>时间（毫秒） </td></tr>
+    <tr><td class="paramtype">callable</td><td class="paramname">$callback</td><td>回调函数 </td></tr>
+    <tr><td class="paramtype">int</td><td class="paramname">$times</td><td>重复次数（如果为 0 或 -1，则永久循环，其他大于 0 的数为限定次数） </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

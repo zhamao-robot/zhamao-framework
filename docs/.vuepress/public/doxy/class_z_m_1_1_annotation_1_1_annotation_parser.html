@@ -27,7 +27,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Zhamao Framework<span id="projectnumber">&#160;3.0.0-beta7</span>
+   <div id="projectname">Zhamao Framework<span id="projectnumber">&#160;3.0.0-beta8</span>
    </div>
    <div id="projectbrief">A high-performance chatbot + web framework</div>
   </td>
@@ -108,8 +108,8 @@ Public 成员函数</h2></td></tr>
 <tr class="separator:a38d99acc70a1d8fd8f94455743b2d237"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1e643eeb0fd28944d155a033cc1fdd3e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_annotation_1_1_annotation_parser.html#a1e643eeb0fd28944d155a033cc1fdd3e">generateAnnotationListFromMap</a> ()</td></tr>
 <tr class="separator:a1e643eeb0fd28944d155a033cc1fdd3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a92ef0b15f9f2d6188755bf1e5822c574"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_annotation_1_1_annotation_parser.html#a92ef0b15f9f2d6188755bf1e5822c574">parseSpecial</a> ($annotation, $same_method_annotations=null)</td></tr>
-<tr class="separator:a92ef0b15f9f2d6188755bf1e5822c574"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a775eafdccac18876952bca9ab91bcf96"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_annotation_1_1_annotation_parser.html#a775eafdccac18876952bca9ab91bcf96">parseSpecial</a> (object|string $annotation, ?array $same_method_annotations=null)</td></tr>
+<tr class="separator:a775eafdccac18876952bca9ab91bcf96"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8dbe194765af3050a62161d498748673"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_annotation_1_1_annotation_parser.html#a8dbe194765af3050a62161d498748673">addPsr4Path</a> (string $path, string $indoor_name, array $join_groups=[])</td></tr>
 <tr class="separator:a8dbe194765af3050a62161d498748673"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad4f104ad30b380ab934a51c63e228b05"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_annotation_1_1_annotation_parser.html#ad4f104ad30b380ab934a51c63e228b05">getUsedTime</a> ()</td></tr>
@@ -317,8 +317,8 @@ Public 成员函数</h2></td></tr>
 
 </div>
 </div>
-<a id="a92ef0b15f9f2d6188755bf1e5822c574" name="a92ef0b15f9f2d6188755bf1e5822c574"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a92ef0b15f9f2d6188755bf1e5822c574">&#9670;&#160;</a></span>parseSpecial()</h2>
+<a id="a775eafdccac18876952bca9ab91bcf96" name="a775eafdccac18876952bca9ab91bcf96"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a775eafdccac18876952bca9ab91bcf96">&#9670;&#160;</a></span>parseSpecial()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -326,13 +326,13 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname">parseSpecial </td>
           <td>(</td>
-          <td class="paramtype">&#160;</td>
+          <td class="paramtype">object|string&#160;</td>
           <td class="paramname"><em>$annotation</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">&#160;</td>
+          <td class="paramtype">?array&#160;</td>
           <td class="paramname"><em>$same_method_annotations</em> = <code>null</code>&#160;</td>
         </tr>
         <tr>
@@ -342,6 +342,14 @@ Public 成员函数</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p >单独解析特殊注解</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramtype">object&#160;|&#160;string</td><td class="paramname">$annotation</td><td>注解对象 </td></tr>
+    <tr><td class="paramtype">null&#160;|&#160;array</td><td class="paramname">$same_method_annotations</td><td>相同方法下的其他注解列表（可为数组或 null） </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

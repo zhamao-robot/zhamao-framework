@@ -7,6 +7,7 @@ var namespace_z_m_1_1_plugin =
       [ "addCron", "namespace_z_m_1_1_plugin_1_1_traits.html#a1900c40593a4cc506bc328da992129e1", null ],
       [ "addEvent", "namespace_z_m_1_1_plugin_1_1_traits.html#a17a9cd93208eb3a3d75e5faded3bc202", null ],
       [ "addHttpRoute", "namespace_z_m_1_1_plugin_1_1_traits.html#a5dd06534b5562bd044fca08054063eb8", null ],
+      [ "addTimerTick", "namespace_z_m_1_1_plugin_1_1_traits.html#ac339eeac84c9fe0a6f1dc38e63f4e4bf", null ],
       [ "emitFilterPack", "namespace_z_m_1_1_plugin_1_1_traits.html#afb106ba10cf1ca7556e178c08f9f3cb0", null ],
       [ "emitPack", "namespace_z_m_1_1_plugin_1_1_traits.html#a3bd80caa7b9a00734baaed72bd486988", null ],
       [ "emitPluginLoad", "namespace_z_m_1_1_plugin_1_1_traits.html#a6cd8b4460deffc802a7fe4e3ef0d682d", null ],
@@ -18,6 +19,7 @@ var namespace_z_m_1_1_plugin =
       [ "getEvents", "namespace_z_m_1_1_plugin_1_1_traits.html#a54ecee00f83d387598096653b07f10c5", null ],
       [ "getInits", "namespace_z_m_1_1_plugin_1_1_traits.html#a29a27fcbbc7a045be9872ef71d26a7dc", null ],
       [ "getRoutes", "namespace_z_m_1_1_plugin_1_1_traits.html#a18da86bf318ebe47e501aaad267d59ed", null ],
+      [ "getTimerTicks", "namespace_z_m_1_1_plugin_1_1_traits.html#a3771f4c71c017201b0472de68ebc9962", null ],
       [ "onBotAction", "namespace_z_m_1_1_plugin_1_1_traits.html#a084d3c0af903855c5295e8858d2f2512", null ],
       [ "onInit", "namespace_z_m_1_1_plugin_1_1_traits.html#a8519be113c21b8b145a742323ec9aa27", null ],
       [ "onPack", "namespace_z_m_1_1_plugin_1_1_traits.html#ad555edfdfc25efd29a218a4572a86ff3", null ],
@@ -31,7 +33,8 @@ var namespace_z_m_1_1_plugin =
       [ "InitTrait", "namespace_z_m_1_1_plugin_1_1_traits.html#af4a5a2ab625f62dd4f58f508c9e50c5b", null ],
       [ "PluginLoadTrait", "namespace_z_m_1_1_plugin_1_1_traits.html#acce770cb6ab511ad71da8794ba33f3df", null ],
       [ "PluginPackTrait", "namespace_z_m_1_1_plugin_1_1_traits.html#a5142deee75df3b69f916595d7a4759f6", null ],
-      [ "RouteTrait", "namespace_z_m_1_1_plugin_1_1_traits.html#a137922a82f833ad67494c152d0fcc7d0", null ]
+      [ "RouteTrait", "namespace_z_m_1_1_plugin_1_1_traits.html#a137922a82f833ad67494c152d0fcc7d0", null ],
+      [ "TickTrait", "namespace_z_m_1_1_plugin_1_1_traits.html#a36dd348cb10a14202d9602701e2d480e", null ]
     ] ],
     [ "OneBot12Adapter", "class_z_m_1_1_plugin_1_1_one_bot12_adapter.html", "class_z_m_1_1_plugin_1_1_one_bot12_adapter" ],
     [ "PluginMeta", "class_z_m_1_1_plugin_1_1_plugin_meta.html", "class_z_m_1_1_plugin_1_1_plugin_meta" ],

@@ -40,7 +40,8 @@ var menudata={children:[
 {text:"o",url:"namespacemembers.html#index_o"},
 {text:"p",url:"namespacemembers.html#index_p"},
 {text:"r",url:"namespacemembers.html#index_r"},
-{text:"s",url:"namespacemembers.html#index_s"}]},
+{text:"s",url:"namespacemembers.html#index_s"},
+{text:"t",url:"namespacemembers.html#index_t"}]},
 {text:"函数",url:"namespacemembers_func.html"},
 {text:"变量",url:"namespacemembers_vars.html"}]}]},
 {text:"结构体",url:"annotated.html",children:[

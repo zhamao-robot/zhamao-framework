@@ -1,19 +1,20 @@
 <map id="AnnotationBase" name="AnnotationBase">
-<area shape="rect" id="node1" title=" " alt="" coords="176,327,291,352"/>
+<area shape="rect" id="node1" title=" " alt="" coords="176,351,291,376"/>
 <area shape="rect" id="node4" href="$class_z_m_1_1_annotation_1_1_closed.html" title=" " alt="" coords="376,5,439,31"/>
 <area shape="rect" id="node5" href="$class_z_m_1_1_annotation_1_1_framework_1_1_bind_event.html" title=" " alt="" coords="367,55,448,80"/>
 <area shape="rect" id="node6" href="$class_z_m_1_1_annotation_1_1_framework_1_1_cron.html" title=" " alt="" coords="383,104,432,129"/>
 <area shape="rect" id="node7" href="$class_z_m_1_1_annotation_1_1_framework_1_1_init.html" title=" " alt="" coords="387,153,427,179"/>
 <area shape="rect" id="node8" href="$class_z_m_1_1_annotation_1_1_framework_1_1_setup.html" title=" " alt="" coords="379,203,435,228"/>
-<area shape="rect" id="node9" href="$class_z_m_1_1_annotation_1_1_http_1_1_controller.html" title=" " alt="" coords="369,252,446,277"/>
-<area shape="rect" id="node10" href="$class_z_m_1_1_annotation_1_1_http_1_1_route.html" title=" " alt="" coords="379,301,435,327"/>
-<area shape="rect" id="node11" href="$class_z_m_1_1_annotation_1_1_middleware_1_1_middleware.html" title=" " alt="" coords="363,351,451,376"/>
-<area shape="rect" id="node12" href="$class_z_m_1_1_annotation_1_1_one_bot_1_1_bot_action.html" title=" " alt="" coords="368,400,447,425"/>
-<area shape="rect" id="node13" href="$class_z_m_1_1_annotation_1_1_one_bot_1_1_bot_action_response.html" title=" " alt="" coords="339,449,476,475"/>
-<area shape="rect" id="node14" href="$class_z_m_1_1_annotation_1_1_one_bot_1_1_bot_command.html" title=" " alt="" coords="357,499,458,524"/>
-<area shape="rect" id="node15" href="$class_z_m_1_1_annotation_1_1_one_bot_1_1_bot_event.html" title=" " alt="" coords="370,548,445,573"/>
-<area shape="rect" id="node16" href="$class_z_m_1_1_annotation_1_1_one_bot_1_1_command_argument.html" title=" " alt="" coords="339,597,476,623"/>
-<area shape="rect" id="node17" href="$class_z_m_1_1_annotation_1_1_one_bot_1_1_command_help.html" title=" " alt="" coords="353,647,461,672"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,301,128,327"/>
-<area shape="rect" id="node3" title=" " alt="" coords="27,351,107,376"/>
+<area shape="rect" id="node9" href="$class_z_m_1_1_annotation_1_1_framework_1_1_tick.html" title=" " alt="" coords="384,252,431,277"/>
+<area shape="rect" id="node10" href="$class_z_m_1_1_annotation_1_1_http_1_1_controller.html" title=" " alt="" coords="369,301,446,327"/>
+<area shape="rect" id="node11" href="$class_z_m_1_1_annotation_1_1_http_1_1_route.html" title=" " alt="" coords="379,351,435,376"/>
+<area shape="rect" id="node12" href="$class_z_m_1_1_annotation_1_1_middleware_1_1_middleware.html" title=" " alt="" coords="363,400,451,425"/>
+<area shape="rect" id="node13" href="$class_z_m_1_1_annotation_1_1_one_bot_1_1_bot_action.html" title=" " alt="" coords="368,449,447,475"/>
+<area shape="rect" id="node14" href="$class_z_m_1_1_annotation_1_1_one_bot_1_1_bot_action_response.html" title=" " alt="" coords="339,499,476,524"/>
+<area shape="rect" id="node15" href="$class_z_m_1_1_annotation_1_1_one_bot_1_1_bot_command.html" title=" " alt="" coords="357,548,458,573"/>
+<area shape="rect" id="node16" href="$class_z_m_1_1_annotation_1_1_one_bot_1_1_bot_event.html" title=" " alt="" coords="370,597,445,623"/>
+<area shape="rect" id="node17" href="$class_z_m_1_1_annotation_1_1_one_bot_1_1_command_argument.html" title=" " alt="" coords="339,647,476,672"/>
+<area shape="rect" id="node18" href="$class_z_m_1_1_annotation_1_1_one_bot_1_1_command_help.html" title=" " alt="" coords="353,696,461,721"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,325,128,351"/>
+<area shape="rect" id="node3" title=" " alt="" coords="27,375,107,400"/>
 </map>

@@ -11,7 +11,8 @@ var annotated_dup =
           [ "BindEvent", "class_z_m_1_1_annotation_1_1_framework_1_1_bind_event.html", "class_z_m_1_1_annotation_1_1_framework_1_1_bind_event" ],
           [ "Cron", "class_z_m_1_1_annotation_1_1_framework_1_1_cron.html", "class_z_m_1_1_annotation_1_1_framework_1_1_cron" ],
           [ "Init", "class_z_m_1_1_annotation_1_1_framework_1_1_init.html", "class_z_m_1_1_annotation_1_1_framework_1_1_init" ],
-          [ "Setup", "class_z_m_1_1_annotation_1_1_framework_1_1_setup.html", null ]
+          [ "Setup", "class_z_m_1_1_annotation_1_1_framework_1_1_setup.html", null ],
+          [ "Tick", "class_z_m_1_1_annotation_1_1_framework_1_1_tick.html", "class_z_m_1_1_annotation_1_1_framework_1_1_tick" ]
         ] ],
         [ "Http", "namespace_z_m_1_1_annotation_1_1_http.html", [
           [ "Controller", "class_z_m_1_1_annotation_1_1_http_1_1_controller.html", "class_z_m_1_1_annotation_1_1_http_1_1_controller" ],
@@ -143,7 +144,8 @@ var annotated_dup =
         [ "ProcessStateManager", "class_z_m_1_1_process_1_1_process_state_manager.html", null ]
       ] ],
       [ "Schedule", "namespace_z_m_1_1_schedule.html", [
-        [ "Schedule", "class_z_m_1_1_schedule_1_1_schedule.html", "class_z_m_1_1_schedule_1_1_schedule" ]
+        [ "Schedule", "class_z_m_1_1_schedule_1_1_schedule.html", "class_z_m_1_1_schedule_1_1_schedule" ],
+        [ "Timer", "class_z_m_1_1_schedule_1_1_timer.html", null ]
       ] ],
       [ "Store", "namespace_z_m_1_1_store.html", [
         [ "Database", "namespace_z_m_1_1_store_1_1_database.html", [

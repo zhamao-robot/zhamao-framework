@@ -80,6 +80,7 @@ var hierarchy =
         [ "Cron", "class_z_m_1_1_annotation_1_1_framework_1_1_cron.html", null ],
         [ "Init", "class_z_m_1_1_annotation_1_1_framework_1_1_init.html", null ],
         [ "Setup", "class_z_m_1_1_annotation_1_1_framework_1_1_setup.html", null ],
+        [ "Tick", "class_z_m_1_1_annotation_1_1_framework_1_1_tick.html", null ],
         [ "Controller", "class_z_m_1_1_annotation_1_1_http_1_1_controller.html", null ],
         [ "Route", "class_z_m_1_1_annotation_1_1_http_1_1_route.html", null ],
         [ "Middleware", "class_z_m_1_1_annotation_1_1_middleware_1_1_middleware.html", null ],
@@ -140,6 +141,7 @@ var hierarchy =
     [ "Stringable", null, [
       [ "AnnotationBase", "class_z_m_1_1_annotation_1_1_annotation_base.html", null ]
     ] ],
+    [ "Timer", "class_z_m_1_1_schedule_1_1_timer.html", null ],
     [ "WorkerEventListener", "class_z_m_1_1_event_1_1_listener_1_1_worker_event_listener.html", null ],
     [ "WSEventListener", "class_z_m_1_1_event_1_1_listener_1_1_w_s_event_listener.html", null ],
     [ "ZMConfig", "class_z_m_1_1_config_1_1_z_m_config.html", null ],
