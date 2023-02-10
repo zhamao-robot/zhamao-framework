@@ -299,7 +299,7 @@ class OneBot12Adapter extends ZMPlugin
                 }
             }
             logger()->info('OneBot 12 反向 WS 连接鉴权成功，接入成功[' . $event->getFd() . ']');
-            // 接入 onebots 等实现需要回传 Sec-WebSocket-Protocol 头
+            // 接入 onebots 等实现需要回传 Sec-WebSocket-Protocol 头（这要求 libob 版本必须在 0.5.7 及以上）
             $event->withResponse(HttpFactory::createResponse(101, headers: ['Sec-WebSocket-Protocol' => $event->getRequest()->getHeaderLine('Sec-WebSocket-Protocol')]));
         }
         // 设置 OneBot 相关的东西
