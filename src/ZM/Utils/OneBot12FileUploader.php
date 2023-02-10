@@ -56,7 +56,7 @@ class OneBot12FileUploader
             }
             return $obj->data['file_id'];
         }
-        logger()->info('分 ' . ceil($size / $this->buffer_size) . ' 个片');
+        logger()->debug('分 ' . ceil($size / $this->buffer_size) . ' 个片');
         // 其他情况，使用分片的方式发送，依次调用 prepare, transfer, finish
         $obj = $this->ctx->sendAction('upload_file_fragmented', [
             'stage' => 'prepare',
