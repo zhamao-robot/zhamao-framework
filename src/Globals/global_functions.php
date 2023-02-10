@@ -13,6 +13,7 @@ use ZM\Config\ZMConfig;
 use ZM\Container\ContainerHolder;
 use ZM\Logger\ConsoleLogger;
 use ZM\Middleware\MiddlewareHandler;
+use ZM\Schedule\Timer;
 use ZM\Store\Database\DBException;
 use ZM\Store\Database\DBQueryBuilder;
 use ZM\Store\Database\DBWrapper;
@@ -53,6 +54,29 @@ function zm_exec(string $cmd): ExecutionResult
 function zm_sleep(float|int $time)
 {
     Adaptive::sleep($time);
+}
+
+/**
+ * 创建一个计时器（Timer::tick() 的别名）
+ *
+ * @param int      $ms       时间（毫秒）
+ * @param callable $callback 回调函数
+ * @param int      $times    重复次数（如果为 0 或 -1，则永久循环，其他大于 0 的数为限定次数）
+ */
+function zm_timer_tick(int $ms, callable $callback, int $times = 0): int
+{
+    return Timer::tick($ms, $callback, $times);
+}
+
+/**
+ * 创建一个延后一次性计时器，只在指定毫秒后执行一次即销毁（Timer::after() 的别名）
+ *
+ * @param int      $ms       时间（毫秒）
+ * @param callable $callback 回调函数
+ */
+function zm_timer_after(int $ms, callable $callback): int
+{
+    return Timer::after($ms, $callback);
 }
 
 /**

@@ -8,11 +8,13 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Koriym\Attributes\AttributeReader;
 use Koriym\Attributes\DualReader;
 use ZM\Annotation\Framework\Cron;
+use ZM\Annotation\Framework\Tick;
 use ZM\Annotation\Http\Controller;
 use ZM\Annotation\Http\Route;
 use ZM\Annotation\Interfaces\ErgodicAnnotation;
 use ZM\Annotation\Middleware\Middleware;
 use ZM\Schedule\Schedule;
+use ZM\Schedule\Timer;
 use ZM\Store\FileSystem;
 use ZM\Utils\HttpUtil;
 
@@ -62,6 +64,7 @@ class AnnotationParser
                 Route::class => [[$this, 'addRouteAnnotation']],
                 Closed::class => [fn () => false],
                 Cron::class => [[resolve(Schedule::class), 'addSchedule']],
+                Tick::class => [[Timer::class, 'registerTick']],
             ];
         }
     }
@@ -240,7 +243,13 @@ class AnnotationParser
         return $o;
     }
 
-    public function parseSpecial($annotation, $same_method_annotations = null): ?bool
+    /**
+     * 单独解析特殊注解
+     *
+     * @param object|string $annotation              注解对象
+     * @param null|array    $same_method_annotations 相同方法下的其他注解列表（可为数组或 null）
+     */
+    public function parseSpecial(object|string $annotation, ?array $same_method_annotations = null): ?bool
     {
         foreach (($this->special_parsers[$annotation::class] ?? []) as $parser) {
             $result = $parser($annotation, $same_method_annotations);

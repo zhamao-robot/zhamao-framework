@@ -18,4 +18,5 @@ class ZMPlugin
     use Traits\PluginLoadTrait;
     use Traits\RouteTrait;
     use Traits\PluginPackTrait;
+    use Traits\TickTrait;
 }
