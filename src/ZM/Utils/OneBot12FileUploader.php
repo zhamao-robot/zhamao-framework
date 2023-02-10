@@ -20,7 +20,7 @@ class OneBot12FileUploader
      * @param BotContext $ctx         机器人上下文，用于调用发送动作
      * @param int        $buffer_size 分片传输的大小，默认为 65536 字节，建议调整小于 2MB
      */
-    public function __construct(private BotContext $ctx, private int $buffer_size = 1048576)
+    public function __construct(private BotContext $ctx, private int $buffer_size = 131072)
     {
     }
 
@@ -35,8 +35,7 @@ class OneBot12FileUploader
      */
     public function uploadFromString(string $filename, string $content): bool|string
     {
-        logger()->info('Uploading file, size: ' . strlen($content));
-
+        logger()->info('Uploading file, size: ' . strlen($content) . ', sha256: ' . hash('sha256', $content));
         $size = strlen($content);
         $offset = 0;
         // 文件本身小于分片大小，直接一个包发送
@@ -57,6 +56,7 @@ class OneBot12FileUploader
             }
             return $obj->data['file_id'];
         }
+        logger()->info('分 ' . ceil($size / $this->buffer_size) . ' 个片');
         // 其他情况，使用分片的方式发送，依次调用 prepare, transfer, finish
         $obj = $this->ctx->sendAction('upload_file_fragmented', [
             'stage' => 'prepare',

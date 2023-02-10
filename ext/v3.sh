@@ -240,7 +240,7 @@ function install_framework() {
         $composer_executable init --name="zhamao/zhamao-v3-app" -n -q && \
         if_use_aliyun && \
         echo "$(nhead) 从 Composer 拉取框架 ..." && \
-        echo '{"minimum-stability":"dev"}' > composer.json && composer require -n zhamao/framework:^3 && \
+        echo '{"minimum-stability":"dev","prefer-stable":true}' > composer.json && composer require -n zhamao/framework:^3.0 && \
         $composer_executable require -n --dev swoole/ide-helper:^4.5 && \
         if_restore_native_runtime && \
         echo "$(nhead) 初始化框架脚手架文件 ..." && \
