@@ -12,13 +12,13 @@
 `\ZM\Annotation\OneBot\BotCommand` 注解事件类，在经过全局别名后，你也可以使用 `\BotCommand` 作为注解事件，效果相同。
 
 ## 别名列表
-
 | 全类名                                                    | 别名                      |
 |--------------------------------------------------------|-------------------------|
 | `\ZM\Annotation\Framework\BindEvent`                   | `BindEvent`             |
 | `\ZM\Annotation\Framework\Cron`                        | `Cron`                  |
 | `\ZM\Annotation\Framework\Init`                        | `Init`                  |
 | `\ZM\Annotation\Framework\Setup`                       | `Setup`                 |
+| `\ZM\Annotation\Framework\Tick`                        | `Tick`                  |
 | `\ZM\Annotation\Http\Controller`                       | `Controller`            |
 | `\ZM\Annotation\Http\Route`                            | `Route`                 |
 | `\ZM\Annotation\Middleware\Middleware`                 | `Middleware`            |

@@ -208,7 +208,7 @@ class PluginManager
         foreach (self::$plugins as $name => $meta) {
             // 除了内建插件外，输出 log 告知启动插件
             if ($meta->getPluginType() !== ZM_PLUGIN_TYPE_NATIVE) {
-                logger()->info('Enabling plugin: ' . $name);
+                logger()->info('正在启用插件 ' . $name);
             }
             // 先判断依赖关系，如果声明了依赖，但依赖不合规则报错崩溃
             foreach ($meta->getDependencies() as $dep_name => $dep_version) {
@@ -256,6 +256,11 @@ class PluginManager
                 // 设置 @Init 注解
                 foreach ($entity->getInits() as $init) {
                     AnnotationMap::addSingleAnnotation($init);
+                }
+                // 设置 TimerTick 注解
+                foreach ($entity->getTimerTicks() as $tick) {
+                    AnnotationMap::addSingleAnnotation($tick);
+                    $parser->parseSpecial($tick);
                 }
             }
             // 如果设置了 Autoload file，那么将会把 psr-4 的加载路径丢进 parser

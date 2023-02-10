@@ -199,14 +199,14 @@ class WorkerEventListener
             // 从 plugins 目录加载插件，包含 phar 和文件夹形式
             $count = PluginManager::addPluginsFromDir($load_dir);
             if ($count !== 0) {
-                logger()->info('Loaded ' . $count . ' user plugins from plugin dir');
+                logger()->debug('已加载 ' . $count . ' 个普通插件');
             }
 
             // 从 composer 依赖加载插件
             if (config('global.plugin.composer_plugin_enable', true)) {
                 $count = PluginManager::addPluginsFromComposer();
                 if ($count !== 0) {
-                    logger()->info('Loaded ' . $count . ' user plugins from composer');
+                    logger()->info('已加载 ' . $count . ' 个 Composer 插件');
                 }
             }
 
