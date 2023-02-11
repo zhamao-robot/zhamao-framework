@@ -52,6 +52,7 @@ class AnnotationHandler
      */
     public static function interrupt(mixed $return_var = null)
     {
+        logger()->debug('阻断事件！');
         throw new InterruptException($return_var);
     }
 
