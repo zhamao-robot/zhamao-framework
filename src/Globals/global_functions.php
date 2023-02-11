@@ -2,10 +2,12 @@
 
 declare(strict_types=1);
 
+use Choir\Http\HttpFactory;
 use OneBot\Driver\Coroutine\Adaptive;
 use OneBot\Driver\Coroutine\CoroutineInterface;
 use OneBot\Driver\Process\ExecutionResult;
 use OneBot\V12\Object\MessageSegment;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 use ZM\Config\Environment;
@@ -308,4 +310,18 @@ function env(string $key, mixed $default = null): mixed
 {
     // TODO: 重新思考容器绑定的加载方式，从而在此处使用 interface
     return resolve(Environment::class)->get($key, $default);
+}
+
+/**
+ * 【助手函数】HttpFactory 快速创建一个 Response
+ *
+ * @param int         $status_code 状态码
+ * @param null|string $reason      原因（留空则使用状态码本身的）
+ * @param array       $headers     请求头
+ * @param mixed       $body        HTTP Body
+ * @param string      $protocol    HTTP 协议版本
+ */
+function zm_http_response(int $status_code = 200, ?string $reason = null, array $headers = [], mixed $body = null, string $protocol = '1.1'): ResponseInterface
+{
+    return HttpFactory::createResponse($status_code, $reason, $headers, $body, $protocol);
 }
