@@ -98,7 +98,7 @@ class PluginInstallCommand extends PluginCommand
             // 使用内建 Composer
             if (file_exists(WORKING_DIR . '/runtime/composer.phar')) {
                 $this->info('使用内建 Composer');
-                passthru('php ' . escapeshellarg(WORKING_DIR . '/runtime/composer.phar') . ' install --no-dev', $code);
+                passthru(PHP_BINARY . ' ' . escapeshellarg(WORKING_DIR . '/runtime/composer.phar') . ' install --no-dev', $code);
             } else {
                 $this->info('使用系统 Composer');
                 passthru('composer install --no-dev', $code);
