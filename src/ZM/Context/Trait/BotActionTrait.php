@@ -72,9 +72,11 @@ trait BotActionTrait
 
         // 调用机器人连接发送 Action，首先试试看是不是 WebSocket
         if ($this->base_event instanceof WebSocketMessageEvent) {
+            logger()->debug('使用传入的 base_event 发送消息');
             $result = $this->base_event->send(json_encode($a->jsonSerialize()));
         }
         if (!isset($result) && container()->has('ws.message.event')) {
+            logger()->debug('使用容器的 Event 发送消息');
             $result = container()->get('ws.message.event')->send(json_encode($a->jsonSerialize()));
         }
         // 如果是 HTTP WebHook 的形式，那么直接调用 Response

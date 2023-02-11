@@ -61,23 +61,20 @@ class MessageUtil
         return $arr;
     }
 
-    public static function convertToArr(MessageSegment|\Stringable|array|string $message)
+    public static function convertToArr(MessageSegment|\Stringable|array|string $message): array
     {
         if (is_array($message)) {
             foreach ($message as $k => $v) {
                 if (is_string($v)) {
-                    $message[$k] = new MessageSegment('text', ['text' => $v]);
+                    $message[$k] = segment('text', ['text' => $v])->jsonSerialize();
                 }
             }
             return $message;
         }
         if ($message instanceof MessageSegment) {
-            return [$message];
+            return [$message->jsonSerialize()];
         }
-        if ($message instanceof \Stringable) {
-            return new MessageSegment('text', ['text' => $message->__toString()]);
-        }
-        return new MessageSegment('text', ['text' => $message]);
+        return [segment('text', ['text' => $message])->jsonSerialize()];
     }
 
     /**
