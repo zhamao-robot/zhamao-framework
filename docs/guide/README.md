@@ -14,7 +14,10 @@
 
 - PHP 8.0 或以上版本（使用命令 `php -v` 检查）
 - Tokenizer 扩展（使用命令 `php -m | grep tokenizer` 检查）
+- PDO 扩展（使用命令 `php -m | grep pdo` 检查）
 - Composer 工具（使用命令 `composer` 检查）
+
+框架推荐使用 PHP 8.1 及以上版本，或安装 Swoole 后 使用 Swoole 驱动，以使用协程等特性，同时提升框架性能。
 
 ## 框架特色
 
