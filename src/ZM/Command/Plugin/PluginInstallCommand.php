@@ -7,6 +7,7 @@ namespace ZM\Command\Plugin;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use ZM\Exception\FileSystemException;
 use ZM\Plugin\PluginManager;
 use ZM\Store\FileSystem;
 use ZM\Utils\ZMRequest;
@@ -63,6 +64,12 @@ class PluginInstallCommand extends PluginCommand
             }
         }
         $this->info('正在从 ' . $addr . ' 克隆插件仓库');
+        try {
+            FileSystem::createDir($plugin_dir);
+        } catch (FileSystemException $exception) {
+            $this->error("无法创建插件目录 {$plugin_dir}：{$exception->getMessage()}");
+            return static::FAILURE;
+        }
         passthru('cd ' . escapeshellarg($plugin_dir) . ' && git clone --depth=1 ' . escapeshellarg($addr) . ' ' . $name, $code);
         if ($code !== 0) {
             $this->error('无法从指定 Git 地址拉取项目，请检查地址名是否正确');
