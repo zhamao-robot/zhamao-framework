@@ -35,3 +35,6 @@ class_alias(\OneBot\Driver\Event\WebSocket\WebSocketMessageEvent::class, 'WebSoc
 class_alias(\OneBot\Driver\Event\Http\HttpRequestEvent::class, 'HttpRequestEvent');
 
 class_alias(\OneBot\V12\Object\OneBotEvent::class, 'OneBotEvent');
+
+// 下面是 Choir 相关的全局别称
+class_alias(\Choir\Http\HttpFactory::class, 'HttpFactory');
