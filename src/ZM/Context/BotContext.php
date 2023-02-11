@@ -16,6 +16,7 @@ use ZM\Context\Trait\BotActionTrait;
 use ZM\Exception\OneBot12Exception;
 use ZM\Exception\WaitTimeoutException;
 use ZM\Plugin\OneBot12Adapter;
+use ZM\Schedule\Timer;
 use ZM\Utils\MessageUtil;
 
 class BotContext implements ContextInterface
@@ -114,14 +115,14 @@ class BotContext implements ContextInterface
         }
         $cid = $co->getCid();
         OneBot12Adapter::addContextPrompt($cid, $event);
-        $co->create(function () use ($cid, $timeout) {
-            Adaptive::sleep($timeout);
+        $timer_id = zm_timer_after($timeout * 1000, function () use ($cid) {
             if (OneBot12Adapter::isContextPromptExists($cid)) {
                 Adaptive::getCoroutine()->resume($cid, '');
             }
         });
         $result = $co->suspend();
         OneBot12Adapter::removeContextPrompt($cid);
+        Timer::del($timer_id);
         if ($result === '') {
             throw new WaitTimeoutException(
                 $this,

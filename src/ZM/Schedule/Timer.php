@@ -19,6 +19,11 @@ class Timer
         return Framework::getInstance()->getDriver()->getEventLoop()->addTimer($ms, $callback);
     }
 
+    public static function del(int $timer_id): void
+    {
+        Framework::getInstance()->getDriver()->getEventLoop()->clearTimer($timer_id);
+    }
+
     public static function registerTick(Tick $v): void
     {
         if ($v->class !== '' && $v->method !== '') {
