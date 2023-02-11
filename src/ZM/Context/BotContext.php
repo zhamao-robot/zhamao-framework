@@ -57,8 +57,10 @@ class BotContext implements ContextInterface
      *
      * @param array|MessageSegment|string|\Stringable $message    消息内容、消息段或消息段数组
      * @param int                                     $reply_mode 回复消息模式，默认为空，可选 ZM_REPLY_MENTION（at 用户）、ZM_REPLY_QUOTE（引用消息）
+     * @noinspection PhpDocMissingThrowsInspection
+     * @noinspection PhpUnhandledExceptionInspection
      */
-    public function reply(\Stringable|MessageSegment|array|string $message, int $reply_mode = ZM_REPLY_NONE)
+    public function reply(\Stringable|MessageSegment|array|string $message, int $reply_mode = ZM_REPLY_NONE): ActionResponse|bool
     {
         if (container()->has('bot.event')) {
             // 这里直接使用当前上下文的事件里面的参数，不再重新挨个获取怎么发消息的参数
@@ -84,17 +86,14 @@ class BotContext implements ContextInterface
      * 如果是单级群组，就在对应的群组下等待当前消息人的消息
      * 如果是多级群组，则等待最小级下当前消息人的消息
      *
-     * @param  array|MessageSegment|string|\Stringable $prompt         等待前发送的消息文本
-     * @param  int                                     $timeout        等待超时时间（单位为秒，默认为 600 秒）
-     * @param  array|MessageSegment|string|\Stringable $timeout_prompt 超时后提示的消息内容
-     * @param  bool                                    $return_string  是否只返回 text 格式的字符串消息（默认为 false）
-     * @param  int                                     $option         prompt 功能的选项参数
-     * @throws DependencyException
-     * @throws NotFoundException
-     * @throws OneBot12Exception
-     * @throws WaitTimeoutException
+     * @param array|MessageSegment|string|\Stringable $prompt         等待前发送的消息文本
+     * @param int                                     $timeout        等待超时时间（单位为秒，默认为 600 秒）
+     * @param array|MessageSegment|string|\Stringable $timeout_prompt 超时后提示的消息内容
+     * @param int                                     $option         prompt 功能的选项参数
+     * @noinspection PhpDocMissingThrowsInspection
+     * @noinspection PhpUnhandledExceptionInspection
      */
-    public function prompt(string|\Stringable|MessageSegment|array $prompt = '', int $timeout = 600, string|\Stringable|MessageSegment|array $timeout_prompt = '', bool $return_string = false, int $option = ZM_PROMPT_NONE): array|string
+    public function prompt(string|\Stringable|MessageSegment|array $prompt = '', int $timeout = 600, string|\Stringable|MessageSegment|array $timeout_prompt = '', int $option = ZM_PROMPT_NONE): null|OneBotEvent|array|string
     {
         if (!container()->has('bot.event')) {
             throw new OneBot12Exception('bot()->prompt() can only be used in message event');
@@ -132,10 +131,19 @@ class BotContext implements ContextInterface
                 prompt_option: $option
             );
         }
-        if ($result instanceof OneBotEvent && $result->type === 'message') {
-            return $return_string ? $result->getMessageString() : $result->getMessage();
-        }
-        throw new OneBot12Exception('Internal error for resuming prompt: unknown type ' . gettype($result));
+        return $this->applyPromptReturn($result, $option);
+    }
+
+    /**
+     * 在当前会话等待用户一条消息，且直接返回消息的字符串形式
+     * 如果是私聊，就在对应的机器人私聊环境下等待
+     * 如果是单级群组，就在对应的群组下等待当前消息人的消息
+     * 如果是多级群组，则等待最小级下当前消息人的消息
+     * @noinspection PhpUnhandledExceptionInspection
+     */
+    public function promptString(string|\Stringable|MessageSegment|array $prompt = '', int $timeout = 600, string|\Stringable|MessageSegment|array $timeout_prompt = '', int $option = ZM_PROMPT_NONE): string
+    {
+        return $this->prompt($prompt, $timeout, $timeout_prompt, $option | ZM_PROMPT_RETURN_STRING);
     }
 
     /**
@@ -248,5 +256,30 @@ class BotContext implements ContextInterface
             $prompt = [new MessageSegment('reply', ['message_id' => $event->getMessageId(), 'user_id' => $event->getUserId()]), ...$prompt];
         }
         return $prompt;
+    }
+
+    /**
+     * 匹配 prompt 返回的值类型
+     *
+     * @param  mixed                         $result 结果
+     * @param  int                           $option 传入的选项参数
+     * @return null|array|OneBotEvent|string 根据不同匹配类型返回不同的东西
+     * @throws OneBot12Exception
+     */
+    private function applyPromptReturn(mixed $result, int $option): null|OneBotEvent|array|string
+    {
+        // 必须是 OneBotEvent 且是消息类型
+        if (!$result instanceof OneBotEvent || $result->type !== 'message') {
+            throw new OneBot12Exception('Internal error for resuming prompt: unknown type ' . gettype($result));
+        }
+        // 是否为 string 回复
+        if (($option & ZM_PROMPT_RETURN_STRING) === ZM_PROMPT_RETURN_STRING) {
+            return $result->getMessageString();
+        }
+        // 是否为 event 回复
+        if (($option & ZM_PROMPT_RETURN_EVENT) === ZM_PROMPT_RETURN_EVENT) {
+            return $result;
+        }
+        return $result->getMessage();
     }
 }

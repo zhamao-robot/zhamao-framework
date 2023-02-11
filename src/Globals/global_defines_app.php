@@ -42,6 +42,9 @@ const ZM_PROMPT_QUOTE_USER = 2;                 // 回复提示语句时引用�
 const ZM_PROMPT_TIMEOUT_MENTION_USER = 4;       // 回复超时时 at 该用户
 const ZM_PROMPT_TIMEOUT_QUOTE_SELF = 8;         // 回复超时时引用自己回复的提示语句
 const ZM_PROMPT_TIMEOUT_QUOTE_USER = 16;        // 回复超时时引用用户的消息
+const ZM_PROMPT_RETURN_STRING = 32;             // 回复返回 string 格式
+const ZM_PROMPT_RETURN_ARRAY = 0;               // 回复返回消息段格式
+const ZM_PROMPT_RETURN_EVENT = 64;              // 回复返回 prompt 消息所对应的事件对象格式
 
 const ZM_PLUGIN_TYPE_NATIVE = 0;                // 原生类型的插件，特指内部插件、ZMApplication 继承的插件
 const ZM_PLUGIN_TYPE_PHAR = 1;                  // Phar 类型的插件
