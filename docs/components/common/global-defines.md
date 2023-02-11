@@ -376,3 +376,9 @@ public function testRoute(HttpRequestEvent $event)
 获取一个 KV 库实例。
 
 有关 KV 库的使用，见 [组件 - KV 缓存](/components/store/cache)。
+
+### zm_http_response()
+
+快速生成一个符合 PSR-7 的 HTTP Response 对象。
+
+有关参数，等同于 HttpFactory 对象，详见 HttpFactory 文档（TODO）。
