@@ -125,7 +125,7 @@ class InitCommand extends Command
         $files = [];
         foreach ($patterns as $pattern) {
             // TODO: 优化代码，避免在循环中使用 array_merge 以减少资源消耗
-            $files = array_merge($files, glob($this->getVendorPath($pattern), GLOB_BRACE));
+            $files = array_merge($files, glob($this->getVendorPath($pattern)));
         }
         return array_map(fn ($file) => str_replace($this->getVendorPath(''), '', $file), $files);
     }
