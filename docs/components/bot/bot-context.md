@@ -170,7 +170,7 @@ if ($response instanceof \ActionResponse) {
 - `ZM_PROMPT_TIMEOUT_QUOTE_SELF`：在询问参数超时时，如果 `$timeout_prompt` 和 `$prompt` 均不为空，则在发送超时提示语时引用自己发送的 `$prompt` 提示语。
 - `ZM_PROMPT_TIMEOUT_QUOTE_USER`：在询问参数超时时，如果超时的消息不为空则引用用户最开始触发该注解的消息。
 - `ZM_PROMPT_RETURN_STRING`：在获取到询问回复时，该函数返回消息的字符串格式。
-- `ZM_PROMPT_RETURN_SEGMENT`：在获取到询问回复时，该函数返回消息的消息段格式。
+- `ZM_PROMPT_RETURN_ARRAY`：在获取到询问回复时，该函数返回消息的消息段格式（默认）。
 - `ZM_PROMPT_RETURN_EVENT`：在获取到询问回复时，该函数返回消息对应的 OneBotEvent 对象格式。
 
 示例：
@@ -190,7 +190,7 @@ public function testSegment(\BotContext $ctx)
 public function testString(\BotContext $ctx)
 {
     // 等待用户回复一条消息
-    $reply = $ctx->prompt('请回复一条消息', 600, '你超时了', ZM_PROMPT_RETURN_STRING);
+    $reply = $ctx->promptString('请回复一条消息', 600, '你超时了');
     // 如果用户回复了消息，那么 reply 将是一个字符串
     // 如果用户没有回复消息，超时了，那下方的代码不会被执行，此处的事件流程将强制中断
     $ctx->reply('你回复了：' . $reply);
@@ -215,6 +215,10 @@ public function testString(\BotContext $ctx)
 {type:2,content:'等待 30 秒以上'},
 {type:4,quote:'请再回复一条消息',content:'你又超时了'},
 ]" />
+
+## promptString() - 等待一条消息回复并以字符串格式返回
+
+该方法参数完全等同 `prompt()`，只是在返回的值方面，此方法会返回 string 类型，等同于 `$option` 参数设置了 `ZM_PROMPT_RETURN_STRING` 参数。
 
 ## hasReplied() - 检查是否已回复
 
