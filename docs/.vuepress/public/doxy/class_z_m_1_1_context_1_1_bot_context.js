@@ -8,5 +8,6 @@ var class_z_m_1_1_context_1_1_bot_context =
     [ "getParamString", "class_z_m_1_1_context_1_1_bot_context.html#a8fe780d9692d6a76308059304a849059", null ],
     [ "getSelf", "class_z_m_1_1_context_1_1_bot_context.html#ab5aad5fd49197b75ad66d28c0150c528", null ],
     [ "hasReplied", "class_z_m_1_1_context_1_1_bot_context.html#ac005ebb1f545cd032a917e89944ac673", null ],
+    [ "promptString", "class_z_m_1_1_context_1_1_bot_context.html#a658777d23d340b09fe9af94c5f9d1591", null ],
     [ "setParams", "class_z_m_1_1_context_1_1_bot_context.html#a490ec24c6b656e391669feb5ddcd6620", null ]
 ];

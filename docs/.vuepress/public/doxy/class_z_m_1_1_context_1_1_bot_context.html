@@ -116,6 +116,8 @@ Public 成员函数</h2></td></tr>
 <tr class="separator:a9323b6e57862a91bfb83b8cafb2a68ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a055bcb2a2b197f7d31e1dd99d9eb62f7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_context_1_1_bot_context.html#a055bcb2a2b197f7d31e1dd99d9eb62f7">getEvent</a> ()</td></tr>
 <tr class="separator:a055bcb2a2b197f7d31e1dd99d9eb62f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a658777d23d340b09fe9af94c5f9d1591"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_context_1_1_bot_context.html#a658777d23d340b09fe9af94c5f9d1591">promptString</a> (string|\Stringable|MessageSegment|array $prompt='', int $timeout=600, string|\Stringable|MessageSegment|array $timeout_prompt='', int $option=<a class="el" href="global__defines__app_8php.html#a0e7d7bc4b747a1673a171d598832fc6c">ZM_PROMPT_NONE</a>)</td></tr>
+<tr class="separator:a658777d23d340b09fe9af94c5f9d1591"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac005ebb1f545cd032a917e89944ac673"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_context_1_1_bot_context.html#ac005ebb1f545cd032a917e89944ac673">hasReplied</a> ()</td></tr>
 <tr class="separator:ac005ebb1f545cd032a917e89944ac673"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a69cef040a9384052c9256696c9c04165"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_context_1_1_bot_context.html#a69cef040a9384052c9256696c9c04165">getBot</a> (string $bot_id, string $platform='')</td></tr>
@@ -339,6 +341,47 @@ Public 成员函数</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p >返回是否已经调用过回复了 </p>
+
+</div>
+</div>
+<a id="a658777d23d340b09fe9af94c5f9d1591" name="a658777d23d340b09fe9af94c5f9d1591"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a658777d23d340b09fe9af94c5f9d1591">&#9670;&#160;</a></span>promptString()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">promptString </td>
+          <td>(</td>
+          <td class="paramtype">string|\Stringable|MessageSegment|array&#160;</td>
+          <td class="paramname"><em>$prompt</em> = <code>''</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>$timeout</em> = <code>600</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string|\Stringable|MessageSegment|array&#160;</td>
+          <td class="paramname"><em>$timeout_prompt</em> = <code>''</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>$option</em> = <code><a class="el" href="global__defines__app_8php.html#a0e7d7bc4b747a1673a171d598832fc6c">ZM_PROMPT_NONE</a></code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >在当前会话等待用户一条消息，且直接返回消息的字符串形式 如果是私聊，就在对应的机器人私聊环境下等待 如果是单级群组，就在对应的群组下等待当前消息人的消息 如果是多级群组，则等待最小级下当前消息人的消息 @noinspection PhpUnhandledExceptionInspection </p>
 
 </div>
 </div>

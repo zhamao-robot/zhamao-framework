@@ -18,6 +18,7 @@ var global__functions_8php =
     [ "sql_builder", "global__functions_8php.html#a5e5e46262ccc376a933859820eaee89f", null ],
     [ "zm_dir", "global__functions_8php.html#a5ffdd3528ee418f5b556be8335641705", null ],
     [ "zm_exec", "global__functions_8php.html#a49a9c9fabfe3e76c1535ea0a42407b15", null ],
+    [ "zm_http_response", "global__functions_8php.html#ae77ae8234f42c23b690431e8313b8c69", null ],
     [ "zm_instance_id", "global__functions_8php.html#aedf626b8ff5c2b782908eb6756780eb7", null ],
     [ "zm_internal_errcode", "global__functions_8php.html#ab6532d66138e9cf91863546fc93556a1", null ],
     [ "zm_sleep", "global__functions_8php.html#a6195e0d6bb303cd1161beefcdc9173af", null ],

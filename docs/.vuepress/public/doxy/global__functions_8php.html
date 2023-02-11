@@ -146,6 +146,8 @@ $(document).ready(function(){initNavTree('global__functions_8php.html',''); init
 <tr class="separator:a30f74b242a48e72ec1245e31dbd4db6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae249520bbbb558ac0e1928446ea2c0ca"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="global__functions_8php.html#ae249520bbbb558ac0e1928446ea2c0ca">env</a> (string $key, mixed $default=null)</td></tr>
 <tr class="separator:ae249520bbbb558ac0e1928446ea2c0ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae77ae8234f42c23b690431e8313b8c69"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="global__functions_8php.html#ae77ae8234f42c23b690431e8313b8c69">zm_http_response</a> (int $status_code=200, ?string $reason=null, array $headers=[], mixed $body=null, string $protocol='1.1')</td></tr>
+<tr class="separator:ae77ae8234f42c23b690431e8313b8c69"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">函数说明</h2>
 <a id="af9e36b31fab375707e181526bd590d61" name="af9e36b31fab375707e181526bd590d61"></a>
@@ -630,6 +632,63 @@ $(document).ready(function(){initNavTree('global__functions_8php.html',''); init
 <dl class="params"><dt>参数</dt><dd>
   <table class="params">
     <tr><td class="paramtype">string</td><td class="paramname">$cmd</td><td>命令行 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ae77ae8234f42c23b690431e8313b8c69" name="ae77ae8234f42c23b690431e8313b8c69"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae77ae8234f42c23b690431e8313b8c69">&#9670;&#160;</a></span>zm_http_response()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">zm_http_response </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>$status_code</em> = <code>200</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">?string&#160;</td>
+          <td class="paramname"><em>$reason</em> = <code>null</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">array&#160;</td>
+          <td class="paramname"><em>$headers</em> = <code>[]</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">mixed&#160;</td>
+          <td class="paramname"><em>$body</em> = <code>null</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>$protocol</em> = <code>'1.1'</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >【助手函数】HttpFactory 快速创建一个 Response</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramtype">int</td><td class="paramname">$status_code</td><td>状态码 </td></tr>
+    <tr><td class="paramtype">null&#160;|&#160;string</td><td class="paramname">$reason</td><td>原因（留空则使用状态码本身的） </td></tr>
+    <tr><td class="paramtype">array</td><td class="paramname">$headers</td><td>请求头 </td></tr>
+    <tr><td class="paramtype">mixed</td><td class="paramname">$body</td><td>HTTP Body </td></tr>
+    <tr><td class="paramtype">string</td><td class="paramname">$protocol</td><td>HTTP 协议版本 </td></tr>
   </table>
   </dd>
 </dl>
