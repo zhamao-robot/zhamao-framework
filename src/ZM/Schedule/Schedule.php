@@ -25,9 +25,6 @@ class Schedule
     {
         $c = Adaptive::getCoroutine();
         $this->available = $c instanceof CoroutineInterface;
-        if (!$this->available) {
-            logger()->error('排程任务只能在协程环境下使用');
-        }
     }
 
     /**
@@ -38,6 +35,8 @@ class Schedule
     public function addSchedule(Cron $cron): void
     {
         if (!$this->available) {
+            $location = $cron->class === '' ? $cron->method : $cron->class . '::' . $cron->method;
+            logger()->error('排程任务只能在协程环境下使用，排程任务 {location} 将不会被执行', ['location' => $location]);
             return;
         }
         $next_run = $cron->expression->getNextRunDate()->getTimestamp();
