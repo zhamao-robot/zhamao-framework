@@ -62,7 +62,7 @@ class InitCommand extends Command
                 if (!isset($composer['autoload'])) {
                     $composer['autoload'] = $autoload;
                 } else {
-                    $composer['autoload'] = array_merge_recursive($composer['autoload'], $autoload);
+                    $composer['autoload'] = array_merge($composer['autoload'], $autoload);
                 }
 
                 try {
