@@ -39,3 +39,4 @@
 | `\OneBot\Driver\Event\WebSocket\WebSocketMessageEvent` | `WebSocketMessageEvent` |
 | `\OneBot\Driver\Event\Http\HttpRequestEvent`           | `HttpRequestEvent`      |
 | `\OneBot\V12\Object\OneBotEvent`                       | `OneBotEvent`           |
+| `\Choir\Http\HttpFactory`                              | `HttpFactory`           |
