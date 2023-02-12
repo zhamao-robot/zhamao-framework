@@ -19,6 +19,7 @@ module.exports = {
     ],
     themeConfig: {
         repo: 'zhamao-robot/zhamao-framework',
+        docsBranch: 'main',
         logo: '/logo_trans.png',
         docsDir: 'docs',
         editLinks: true,

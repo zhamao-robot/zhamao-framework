@@ -6,8 +6,8 @@ actions:
     link: /guide/
     type: primary
     size: large
-  - text: 快速上手（v2 旧版）
-    link: https://docs-v2.zhamao.xin/
+  - text: 插件市场
+    link: /plugin-market/
     type: primary
     ghost: true
     size: large
