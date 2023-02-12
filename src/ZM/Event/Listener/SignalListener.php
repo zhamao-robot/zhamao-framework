@@ -32,12 +32,11 @@ class SignalListener
                 Process::signal(SIGINT, [$this, 'onWorkerInt']);
                 break;
             case 'workerman':
-                if (!extension_loaded('pcntl')) {
-                    logger()->error('请安装 PCNTL 扩展以支持 SIGINT 监听');
-                    break;
+                Worker::$globalEvent->add(SIGINT, EventInterface::EV_SIGNAL, [$this, 'onWorkerInt']);
+                Worker::$globalEvent->add(SIGTERM, EventInterface::EV_SIGNAL, fn () => Worker::stopAll(15));
+                if (function_exists('pcntl_signal')) {
+                    pcntl_signal(SIGUSR1, SIG_IGN, false);
                 }
-                pcntl_signal(SIGINT, [$this, 'onWorkerInt']);
-                pcntl_signal(SIGUSR1, SIG_IGN, false);
                 Worker::$globalEvent->add(SIGUSR1, EventInterface::EV_SIGNAL, '\Workerman\Worker::signalHandler');
                 break;
         }
