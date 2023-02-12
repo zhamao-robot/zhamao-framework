@@ -7,6 +7,7 @@ namespace ZM\Event\Listener;
 use OneBot\Driver\Coroutine\Adaptive;
 use OneBot\Driver\Coroutine\CoroutineInterface;
 use OneBot\Driver\Process\ProcessManager;
+use OneBot\Driver\Workerman\Worker;
 use OneBot\Util\Singleton;
 use ZM\Annotation\AnnotationHandler;
 use ZM\Annotation\AnnotationMap;
@@ -85,9 +86,9 @@ class WorkerEventListener
         register_shutdown_function(function () {
             $error = error_get_last();
             // 下面这段代码的作用就是，不是错误引发的退出时照常退出即可
-            if (($error['type'] ?? 0) != 0) {
+            if (($error['type'] ?? 0) === 1) {
                 logger()->emergency(zm_internal_errcode('E00027') . 'Internal fatal error: ' . $error['message'] . ' at ' . $error['file'] . "({$error['line']})");
-            } elseif (!isset($error['type'])) {
+            } else {
                 return;
             }
             Framework::getInstance()->stop();
@@ -119,6 +120,9 @@ class WorkerEventListener
 
     public function onWorkerStart1(): void
     {
+        if (Framework::getInstance()->getDriver()->getName() === 'workerman') {
+            logger()->debug('Workerman 使用了事件循环：' . Worker::$eventLoopClass);
+        }
         logger()->debug('{is_task}Worker 进程 #{id} 已启动', ['is_task' => ProcessStateManager::isTaskWorker() ? 'Task' : '', 'id' => ProcessManager::getProcessId()]);
     }
 
