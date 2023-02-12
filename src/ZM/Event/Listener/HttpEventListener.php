@@ -8,6 +8,7 @@ use Choir\Http\HttpFactory;
 use Choir\Http\Stream;
 use OneBot\Driver\Event\Http\HttpRequestEvent;
 use OneBot\Util\Singleton;
+use Psr\Http\Message\ResponseInterface;
 use ZM\Annotation\AnnotationHandler;
 use ZM\Annotation\Framework\BindEvent;
 use ZM\Annotation\Http\Route;
@@ -51,7 +52,10 @@ class HttpEventListener
                     // $div->request_method = $node['request_method'];
                     $div->class = $node['class'];
                     $route_handler->handle($div, null, $params, $event->getRequest(), $event);
-                    if (is_string($val = $route_handler->getReturnVal()) || ($val instanceof \Stringable)) {
+                    $val = $route_handler->getReturnVal();
+                    if ($val instanceof ResponseInterface) {
+                        $event->withResponse($val);
+                    } elseif (is_string($val)) {
                         // 返回的内容是可以被字符串化的，就当作 Body 来返回，状态码 200
                         $event->withResponse(HttpFactory::createResponse(200, null, [], Stream::create($val)));
                     } elseif ($event->getResponse() === null) {
