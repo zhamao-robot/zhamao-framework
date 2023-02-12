@@ -72,9 +72,14 @@ class InitCommand extends Command
                 }
 
                 $section->writeln('<info>完成</info>');
-
                 $section->write('<fg=gray>执行 composer dump-autoload ... </>');
-                exec('composer dump-autoload');
+
+                // 兼容内建 Composer
+                $env = getenv('COMPOSER_EXECUTABLE');
+                if ($env === false) {
+                    $env = 'composer';
+                }
+                passthru(PHP_BINARY . ' ' . escapeshellcmd($env) . ' dump-autoload');
 
                 $section->writeln('<info>完成</info>');
             });

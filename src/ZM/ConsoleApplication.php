@@ -41,6 +41,11 @@ final class ConsoleApplication extends Application
                 FileSystem::getClassesPsr4(SOURCE_ROOT_DIR . '/src/Command', 'Command')
             );
         }
+        // 初始化 Composer 变量
+        if (file_exists(WORKING_DIR . '/runtime/composer.phar')) {
+            echo '* Using native composer' . PHP_EOL;
+            putenv('COMPOSER_EXECUTABLE=' . WORKING_DIR . '/runtime/composer.phar');
+        }
         $commands = [];
         foreach ($command_classes as $command_class) {
             try {
