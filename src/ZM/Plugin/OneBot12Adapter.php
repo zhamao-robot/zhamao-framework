@@ -464,6 +464,7 @@ class OneBot12Adapter extends ZMPlugin
             }
             // 测试 regex
             if ($v->regex !== '' && preg_match('/' . $v->regex . '/u', $full_str, $match) !== 0) {
+                array_shift($match);
                 return [$v, $match, $full_str];
             }
             // 测试 start_with
