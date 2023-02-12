@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Module\Example;
 
+use Choir\Http\ServerRequest;
 use Choir\WebSocket\FrameInterface;
 use OneBot\Driver\Coroutine\Adaptive;
 use OneBot\Driver\Event\WebSocket\WebSocketMessageEvent;
@@ -23,8 +24,10 @@ class Hello123
     #[Route('/route', request_method: ['GET'])]
     #[Route('/route/{id}', request_method: ['GET'])]
     #[Middleware(TimerMiddleware::class)]
-    public function route(array $params)
+    public function route(array $params, ServerRequest $request, \HttpRequestEvent $event)
     {
+        // 目前因内部实现限制，路由方法的参数必须按照这个顺序定义，可以省略，但是不能乱序
+        // 如果希望获取其他依赖，可以在现有参数后面继续添加
         return 'Hello Zhamao！This is the first 3.0 page！' . ($params['id'] ?? '');
     }
 
