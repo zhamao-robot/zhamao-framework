@@ -16,10 +16,11 @@ var searchData=
   ['dbwrapper_13',['DBWrapper',['../class_z_m_1_1_store_1_1_database_1_1_d_b_wrapper.html',1,'ZM::Store::Database']]],
   ['dbwrapper_2ephp_14',['DBWrapper.php',['../_d_b_wrapper_8php.html',1,'']]],
   ['decode_15',['decode',['../class_z_m_1_1_utils_1_1_cat_code.html#a1b56a3efae526395a1e1784b9f045c1f',1,'ZM::Utils::CatCode']]],
-  ['delete_16',['delete',['../class_z_m_1_1_store_1_1_database_1_1_d_b_wrapper.html#a53899c47e26349d9120cf8b876e4f922',1,'ZM\Store\Database\DBWrapper\delete()'],['../class_z_m_1_1_store_1_1_k_v_1_1_light_cache.html#ac03d0331371567f0a97a6782746abd55',1,'ZM\Store\KV\LightCache\delete(string $key)']]],
-  ['deletemultiple_17',['deleteMultiple',['../class_z_m_1_1_store_1_1_k_v_1_1_light_cache.html#a5b922bd8e1e39dea9b57d7a4128a9fb9',1,'ZM::Store::KV::LightCache']]],
-  ['destroypool_18',['destroyPool',['../class_z_m_1_1_store_1_1_database_1_1_d_b_pool.html#abeafe92a8e01fa3343da7cbd88ae4942',1,'ZM\Store\Database\DBPool\destroyPool()'],['../class_z_m_1_1_store_1_1_k_v_1_1_redis_1_1_redis_pool.html#abeafe92a8e01fa3343da7cbd88ae4942',1,'ZM\Store\KV\Redis\RedisPool\destroyPool()']]],
-  ['detail_19',['detail',['../class_z_m_1_1_command_1_1_command.html#a83256ea818e4e319a533663fc323c288',1,'ZM::Command::Command']]],
-  ['dispatch_20',['dispatch',['../class_z_m_1_1_schedule_1_1_schedule.html#ae170c33194dbdbf84d2adf3fbb5d390c',1,'ZM::Schedule::Schedule']]],
-  ['downloadfile_21',['downloadFile',['../class_z_m_1_1_utils_1_1_one_bot12_file_downloader.html#ad557a652b1540e26064891aaf7fb6924',1,'ZM::Utils::OneBot12FileDownloader']]]
+  ['del_16',['del',['../class_z_m_1_1_schedule_1_1_timer.html#afe5337dc0cdfc32c6713bc4227ba79be',1,'ZM::Schedule::Timer']]],
+  ['delete_17',['delete',['../class_z_m_1_1_store_1_1_database_1_1_d_b_wrapper.html#a53899c47e26349d9120cf8b876e4f922',1,'ZM\Store\Database\DBWrapper\delete()'],['../class_z_m_1_1_store_1_1_k_v_1_1_light_cache.html#ac03d0331371567f0a97a6782746abd55',1,'ZM\Store\KV\LightCache\delete(string $key)']]],
+  ['deletemultiple_18',['deleteMultiple',['../class_z_m_1_1_store_1_1_k_v_1_1_light_cache.html#a5b922bd8e1e39dea9b57d7a4128a9fb9',1,'ZM::Store::KV::LightCache']]],
+  ['destroypool_19',['destroyPool',['../class_z_m_1_1_store_1_1_database_1_1_d_b_pool.html#abeafe92a8e01fa3343da7cbd88ae4942',1,'ZM\Store\Database\DBPool\destroyPool()'],['../class_z_m_1_1_store_1_1_k_v_1_1_redis_1_1_redis_pool.html#abeafe92a8e01fa3343da7cbd88ae4942',1,'ZM\Store\KV\Redis\RedisPool\destroyPool()']]],
+  ['detail_20',['detail',['../class_z_m_1_1_command_1_1_command.html#a83256ea818e4e319a533663fc323c288',1,'ZM::Command::Command']]],
+  ['dispatch_21',['dispatch',['../class_z_m_1_1_schedule_1_1_schedule.html#ae170c33194dbdbf84d2adf3fbb5d390c',1,'ZM::Schedule::Schedule']]],
+  ['downloadfile_22',['downloadFile',['../class_z_m_1_1_utils_1_1_one_bot12_file_downloader.html#ad557a652b1540e26064891aaf7fb6924',1,'ZM::Utils::OneBot12FileDownloader']]]
 ];
