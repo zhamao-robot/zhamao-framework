@@ -75,7 +75,7 @@ class LightCache
                 } else {
                     return false;
                 }
-                $result = self::$kv_table->set($k, [
+                $result = self::$kv_table->set((string)$k, [
                     'value' => $value,
                     'expire' => $v['expire'],
                     'data_type' => $data_type,
