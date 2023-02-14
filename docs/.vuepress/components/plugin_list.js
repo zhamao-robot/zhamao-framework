@@ -20,8 +20,8 @@ module.exports = [
     {
         name: 'plugin-handle',
         description: '炸毛框架的猜成语插件，仅适配 onebots 实现。',
-        avatar: 'https://portrait.gitee.com/uploads/avatars/user/1726/5178850_Liufeiii_1609642372.png',
-        link: 'https://gitee.com/liufeii/plugin-handle'
+        avatar: 'https://opengraph.githubassets.com/0/AeQiQi/plugin-handle',
+        link: 'https://github.com/AeQiQi/plugin-handle'
     },
     {
         name: 'crazy-thursday',
