@@ -96,7 +96,7 @@
         }
     },
     "scripts": {
-        "post-autoload-dump": "vendor/bin/captainhook install -f -s",
+        "post-autoload-dump": "[ $COMPOSER_DEV_MODE -eq 0 ] || vendor/bin/captainhook install -f -s",
         "analyse": "phpstan analyse --memory-limit 300M",
         "cs-fix": "PHP_CS_FIXER_FUTURE_MODE=1 php-cs-fixer fix",
         "test": "bin/phpunit-zm --no-coverage"
