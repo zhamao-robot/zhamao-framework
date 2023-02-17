@@ -19,10 +19,13 @@ jobs:
       - name: Setup PHP
         uses: sunxyw/workflows/setup-environment@main
         with:
-          php-version: 8.1
+          php-version: 8.0
           php-extensions: swoole, posix, json
           operating-system: ubuntu-latest
           use-cache: true
+
+      - name: Remove Dev Dependencies
+        run: composer install --no-dev
 
       - name: Build Phar
         run: ./zhamao build
