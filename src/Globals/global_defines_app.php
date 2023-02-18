@@ -51,8 +51,8 @@ const ZM_PLUGIN_TYPE_PHAR = 1;                  // Phar 类型的插件
 const ZM_PLUGIN_TYPE_SOURCE = 2;                // 源码类型的插件
 const ZM_PLUGIN_TYPE_COMPOSER = 3;              // Composer 依赖的插件
 
-const LOAD_MODE_VENDOR = 0; // 从 vendor 加载
-const LOAD_MODE_SRC = 1;    // 从 src 加载
+const LOAD_MODE_SRC = 0;    // 从 src 加载
+const LOAD_MODE_VENDOR = 1; // 从 vendor 加载
 
 /* 定义工作目录 */
 define('WORKING_DIR', getcwd());
@@ -70,12 +70,12 @@ if (DIRECTORY_SEPARATOR === '\\') {
     define('TMP_DIR', getcwd() . '/.zm-tmp');
 }
 
-/* 定义启动模式，这里指的是框架本身的源码目录是通过 composer 加入 vendor 加载的还是直接放到 src 目录加载的，前者为 1，后者为 0 */
-define('LOAD_MODE', is_dir(zm_dir(SOURCE_ROOT_DIR . '/src/ZM')) ? LOAD_MODE_VENDOR : LOAD_MODE_SRC);
+/* 定义启动模式，这里指的是框架本身的源码目录是通过 composer 加入 vendor 加载的还是直接放到 src 目录加载的 */
+define('LOAD_MODE', is_dir(zm_dir(SOURCE_ROOT_DIR . '/src/ZM')) ? LOAD_MODE_SRC : LOAD_MODE_VENDOR);
 
-/* 定义框架本身所处的根目录，此处如果 LOAD_MODE 为 1 的话，框架自身的根目录在 vendor/zhamao/framework 子目录下 */
+/* 定义框架本身所处的根目录，此处如果 LOAD_MODE 为 VENDOR 的话，框架自身的根目录在 vendor/zhamao/framework 子目录下 */
 if (Phar::running() !== '') {
-    define('FRAMEWORK_ROOT_DIR', zm_dir(LOAD_MODE == 1 ? (SOURCE_ROOT_DIR . '/vendor/zhamao/framework') : SOURCE_ROOT_DIR));
+    define('FRAMEWORK_ROOT_DIR', zm_dir(LOAD_MODE === LOAD_MODE_VENDOR ? (SOURCE_ROOT_DIR . '/vendor/zhamao/framework') : SOURCE_ROOT_DIR));
 } else {
     define('FRAMEWORK_ROOT_DIR', realpath(zm_dir(__DIR__ . '/../../')));
 }

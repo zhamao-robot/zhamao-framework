@@ -271,7 +271,7 @@ class Framework
         // 打印logger显示等级
         $properties['log_level'] = $this->argv['log-level'] ?? config('global.log_level') ?? 'info';
         // 打印框架版本
-        $properties['version'] = self::VERSION . (LOAD_MODE === 0 ? (' (build ' . ZM_VERSION_ID . ')') : '');
+        $properties['version'] = self::VERSION . (LOAD_MODE === LOAD_MODE_SRC ? (' (build ' . ZM_VERSION_ID . ')') : '');
         // 打印 PHP 版本
         $properties['php_version'] = PHP_VERSION;
         // 打印 master 进程的 pid
@@ -337,7 +337,7 @@ class Framework
                 $properties['redis[' . $name . ']'] = $redis['host'] . ':' . $redis['port'];
             }
         }
-        if (LOAD_MODE === 0) {
+        if (LOAD_MODE === LOAD_MODE_SRC) {
             logger()->info('框架正以源码模式启动');
         }
         logger()->debug('Starting framework with properties: ' . json_encode($properties, JSON_UNESCAPED_SLASHES));
