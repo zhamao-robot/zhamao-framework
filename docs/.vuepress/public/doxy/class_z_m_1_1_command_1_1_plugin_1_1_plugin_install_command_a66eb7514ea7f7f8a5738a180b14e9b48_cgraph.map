@@ -1,7 +1,4 @@
 <map id="handle" name="handle">
-<area shape="rect" id="node1" title=" " alt="" coords="5,63,65,88"/>
-<area shape="rect" id="node2" href="$global__functions_8php.html#a71de63d02514c7e74d68338f4424139f" title=" " alt="" coords="181,5,237,31"/>
-<area shape="rect" id="node3" href="$class_z_m_1_1_command_1_1_command.html#ab14503d56a09a2442ceab3808644ac55" title=" " alt="" coords="126,55,293,95"/>
-<area shape="rect" id="node5" href="$class_z_m_1_1_command_1_1_command.html#a68ef4d28b418f85103824ae8cda26fcc" title=" " alt="" coords="113,120,305,145"/>
-<area shape="rect" id="node4" href="$class_z_m_1_1_command_1_1_command.html#a0bdac9ff13b56ac6334f64e094a9073a" title=" " alt="" coords="353,85,520,125"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,5,65,31"/>
+<area shape="rect" id="node2" href="$global__functions_8php.html#a71de63d02514c7e74d68338f4424139f" title=" " alt="" coords="113,5,169,31"/>
 </map>
