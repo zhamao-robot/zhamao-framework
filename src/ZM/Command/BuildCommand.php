@@ -41,7 +41,8 @@ class BuildCommand extends Command
             $build_dir = WORKING_DIR . '/' . $build_dir;
         }
         $target = $build_dir . '/' . $target;
-        // 确认 Phar 文件可以写入
+
+        // 确认目标文件可写
         FileSystem::createDir($build_dir);
         FileSystem::ensureFileWritable($target);
 
@@ -52,7 +53,14 @@ class BuildCommand extends Command
             unlink($target);
         }
 
-        // TODO: 增加开发依赖的判定并提醒
+        // 检查是否安装了开发依赖
+        if ((LOAD_MODE === LOAD_MODE_SRC) && file_exists(SOURCE_ROOT_DIR . '/vendor/composer/installed.php')) {
+            $installed = require SOURCE_ROOT_DIR . '/vendor/composer/installed.php';
+            if ($installed['root']['dev']) {
+                $this->comment('检测到当前项目安装了开发依赖，这对于构建的 Phar 包来说是不必要的，建议在构建前执行 composer install --no-dev 以缩减包体积及加快构建速度');
+                $this->confirmOrExit('是否继续构建？');
+            }
+        }
 
         $this->info('正在构建 Phar 包');
 
