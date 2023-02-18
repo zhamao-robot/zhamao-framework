@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ZM\Command;
 
 use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -24,7 +25,7 @@ trait CommandInteractTrait
      * @param bool   $newline 是否在文本后换行
      * @see OutputInterface::write()
      */
-    protected function write(string $message, bool $newline = true): void
+    public function write(string $message, bool $newline = true): void
     {
         $this->output->write($message, $newline);
     }
@@ -35,7 +36,7 @@ trait CommandInteractTrait
      * @param string $message 要输出的文本
      * @param bool   $newline 是否在文本后换行
      */
-    protected function info(string $message, bool $newline = true): void
+    public function info(string $message, bool $newline = true): void
     {
         $this->write("<info>{$message}</info>", $newline);
     }
@@ -46,7 +47,7 @@ trait CommandInteractTrait
      * @param string $message 要输出的文本
      * @param bool   $newline 是否在文本后换行
      */
-    protected function error(string $message, bool $newline = true): void
+    public function error(string $message, bool $newline = true): void
     {
         $this->write("<error>{$message}</error>", $newline);
     }
@@ -57,7 +58,7 @@ trait CommandInteractTrait
      * @param string $message 要输出的文本
      * @param bool   $newline 是否在文本后换行
      */
-    protected function comment(string $message, bool $newline = true): void
+    public function comment(string $message, bool $newline = true): void
     {
         $this->write("<comment>{$message}</comment>", $newline);
     }
@@ -68,7 +69,7 @@ trait CommandInteractTrait
      * @param string $message 要输出的文本
      * @param bool   $newline 是否在文本后换行
      */
-    protected function question(string $message, bool $newline = true): void
+    public function question(string $message, bool $newline = true): void
     {
         $this->write("<question>{$message}</question>", $newline);
     }
@@ -79,7 +80,7 @@ trait CommandInteractTrait
      * @param string $message 要输出的文本
      * @param bool   $newline 是否在文本后换行
      */
-    protected function detail(string $message, bool $newline = true): void
+    public function detail(string $message, bool $newline = true): void
     {
         $this->write("<fg=gray>{$message}</>", $newline);
     }
@@ -92,7 +93,7 @@ trait CommandInteractTrait
      * @param string   $message  作为标题的文本
      * @param callable $callback 回调函数，接收一个参数，类型为 {@see ConsoleSectionOutput}
      */
-    protected function section(string $message, callable $callback): void
+    public function section(string $message, callable $callback): void
     {
         $output = $this->output;
         if (!$output instanceof ConsoleOutputInterface) {
@@ -114,7 +115,7 @@ trait CommandInteractTrait
      *
      * @param int $max 最大进度值，可以稍后再设置
      */
-    protected function progress(int $max = 0): ProgressBar
+    public function progress(int $max = 0): ProgressBar
     {
         $progress = new ProgressBar($this->output, $max);
         $progress->setBarCharacter('<fg=green>⚬</>');
@@ -133,10 +134,14 @@ trait CommandInteractTrait
      * @param  bool   $default 默认值
      * @return bool   用户是否确认
      */
-    protected function confirm(string $prompt, bool $default = true): bool
+    public function confirm(string $prompt, bool $default = true): bool
     {
+        /** @var QuestionHelper $helper */
         $helper = $this->getHelper('question');
-        $question = new ConfirmationQuestion($prompt, $default);
+
+        $affix = $default ? '[Y/n]' : '[y/N]';
+
+        $question = new ConfirmationQuestion("{$prompt} {$affix} ", $default);
         return $helper->ask($this->input, $this->output, $question);
     }
 
@@ -146,7 +151,7 @@ trait CommandInteractTrait
      * @param string $prompt  提示信息
      * @param bool   $default 默认值
      */
-    protected function confirmOrExit(string $prompt, bool $default = true): void
+    public function confirmOrExit(string $prompt, bool $default = true): void
     {
         if (!$this->confirm($prompt, $default)) {
             exit(self::SUCCESS);
