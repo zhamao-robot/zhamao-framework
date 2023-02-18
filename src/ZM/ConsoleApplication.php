@@ -9,6 +9,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\CommandLoader\FactoryCommandLoader;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use ZM\Command\Server\ServerStartCommand;
 use ZM\Exception\SingletonViolationException;
 use ZM\Store\FileSystem;
 
@@ -19,6 +20,15 @@ use ZM\Store\FileSystem;
  */
 final class ConsoleApplication extends Application
 {
+    protected array $bootstrappers = [
+        Bootstrap\LoadConfiguration::class,         // 加载配置文件
+        Bootstrap\LoadGlobalDefines::class,         // 加载框架级别的全局常量声明
+        Bootstrap\RegisterLogger::class,            // 加载 Logger
+        Bootstrap\HandleExceptions::class,          // 注册异常处理器
+        Bootstrap\RegisterEventProvider::class,     // 绑定框架的 EventProvider 到 libob 的 Driver 上
+        Bootstrap\SetInternalTimezone::class,       // 设置时区
+    ];
+
     private static ?ConsoleApplication $obj = null;
 
     public function __construct(string $name = 'zhamao-framework')
@@ -78,6 +88,11 @@ final class ConsoleApplication extends Application
      */
     public function run(InputInterface $input = null, OutputInterface $output = null): int
     {
+        $options = $input?->getOptions() ?? ServerStartCommand::exportOptionArray();
+        foreach ($this->bootstrappers as $bootstrapper) {
+            resolve($bootstrapper)->bootstrap($options);
+        }
+
         try {
             return parent::run($input, $output);
         } catch (\Exception $e) {

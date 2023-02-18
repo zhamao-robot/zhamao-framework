@@ -93,11 +93,6 @@ class Framework
      */
     public function init(): Framework
     {
-        // 顺序执行引导器
-        foreach ($this->bootstrappers as $bootstrapper) {
-            resolve($bootstrapper)->bootstrap($this->argv);
-        }
-
         // 初始化 @OnSetup 事件
         $this->initSetupAnnotations();
 
