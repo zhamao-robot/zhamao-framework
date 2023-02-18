@@ -34,6 +34,7 @@
     },
     "require-dev": {
         "captainhook/captainhook": "^5.10",
+        "captainhook/plugin-composer": "^5.3",
         "friendsofphp/php-cs-fixer": "^3.2 != 3.7.0",
         "jangregor/phpstan-prophecy": "^1.0",
         "jetbrains/phpstorm-attributes": "^1.0",
@@ -82,7 +83,8 @@
     ],
     "config": {
         "allow-plugins": {
-            "phpstan/extension-installer": true
+            "phpstan/extension-installer": true,
+            "captainhook/plugin-composer": true
         },
         "optimize-autoloader": true,
         "sort-packages": true
@@ -96,7 +98,6 @@
         }
     },
     "scripts": {
-        "post-autoload-dump": "vendor/bin/captainhook install -f -s",
         "analyse": "phpstan analyse --memory-limit 300M",
         "cs-fix": "PHP_CS_FIXER_FUTURE_MODE=1 php-cs-fixer fix",
         "test": "bin/phpunit-zm --no-coverage"

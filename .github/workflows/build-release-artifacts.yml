@@ -1,0 +1,71 @@
+name: Build Release Artifacts
+
+on:
+  release:
+    types:
+      - published
+  workflow_dispatch:
+
+jobs:
+  build-release-artifacts:
+    name: Build Release Artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.base_ref }}
+
+      - name: Setup PHP
+        uses: sunxyw/workflows/setup-environment@main
+        with:
+          php-version: 8.0
+          php-extensions: swoole, posix, json
+          operating-system: ubuntu-latest
+          use-cache: true
+
+      - name: Remove Dev Dependencies
+        run: composer install --no-dev
+
+      - name: Build Phar
+        run: ./zhamao build
+
+      - name: Get Latest Release Upload URL
+        id: get-latest-release
+        run: curl https://api.github.com/repos/${{ github.repository }}/releases/latest | jq -r '.upload_url' | sed 's/{?name,label}//g' > upload_url.txt
+
+      - name: Upload Phar
+        run: |
+          curl -X POST \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}"\
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          -H "Content-Type: application/octet-stream" \
+          $(cat upload_url.txt)/zm.phar \
+          --data-binary "@build/zm.phar"
+
+  update-changelog:
+    name: Update Changelog
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.base_ref }}
+
+      - name: Setup PHP
+        uses: sunxyw/workflows/setup-environment@main
+        with:
+          php-version: 8.1
+          php-extensions: swoole, posix, json
+          operating-system: ubuntu-latest
+          use-cache: true
+
+      - name: Update Changelog
+        run: ./zhamao generate:text update-log-md
+
+      - name: Commit Changelog
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: update changelog
+          branch: ${{ github.base_ref }}

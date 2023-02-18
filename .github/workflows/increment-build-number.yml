@@ -47,6 +47,16 @@ jobs:
           commit_message: update api docs
           branch: ${{ github.base_ref }}
 
+      - name: Update Class Aliases Docs
+        run: ./zhamao generate:text class-alias-md
+        if: ${{ github.event.pull_request.merged == true && contains(github.event.pull_request.changed_files, 'src/Globals/global_class_alias.php') }}
+
+      - name: Commit Class Aliases Docs
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: update class aliases docs
+          branch: ${{ github.base_ref }}
+
       - name: Increment build number
         id: increment-build-number
         run: |

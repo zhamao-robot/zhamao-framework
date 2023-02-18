@@ -42,6 +42,7 @@ class BuildCommand extends Command
         }
         $target = $build_dir . '/' . $target;
         // 确认 Phar 文件可以写入
+        FileSystem::createDir($build_dir);
         FileSystem::ensureFileWritable($target);
 
         $this->comment("目标文件：{$target}");
@@ -50,6 +51,8 @@ class BuildCommand extends Command
             $this->comment('目标文件已存在，正在删除...');
             unlink($target);
         }
+
+        // TODO: 增加开发依赖的判定并提醒
 
         $this->info('正在构建 Phar 包');
 
