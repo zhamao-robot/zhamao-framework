@@ -52,11 +52,18 @@ ob_event_provider()->addEventListener(WorkerStartEvent::getName(), function () {
     }
 }, 1);
 
+$options = ServerStartCommand::exportOptionArray();
+$options['driver'] = 'workerman';
+$options['worker-num'] = 1;
+$options['private-mode'] = true;
+
+// TODO: optimize this, maybe abstract the application (framework)
+$bootstrappers = new ReflectionProperty(\ZM\ConsoleApplication::class, 'bootstrappers');
+foreach ($bootstrappers->getDefaultValue() as $bootstrapper) {
+    resolve($bootstrapper)->bootstrap($options);
+}
+
 try {
-    $options = ServerStartCommand::exportOptionArray();
-    $options['driver'] = 'workerman';
-    $options['worker-num'] = 1;
-    $options['private-mode'] = true;
     (new Framework($options))->init()->start();
     exit($_swoole_atomic->get());
 } catch (Throwable $e) {

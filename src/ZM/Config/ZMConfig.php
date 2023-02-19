@@ -8,7 +8,6 @@ use OneBot\Config\Config;
 use OneBot\Config\Loader\LoaderInterface;
 use OneBot\Util\Singleton;
 use ZM\Exception\ConfigException;
-use ZM\Framework;
 
 class ZMConfig
 {
@@ -87,8 +86,8 @@ class ZMConfig
         // 初始化配置加载器
         $this->loader = new ($conf['loader'][0])(...$conf['loader'][1]);
 
-        // 调试模式下启用配置跟踪器
-        if (Framework::getInstance()->getArgv()['debug'] ?? false) {
+        // 启用配置跟踪器
+        if ($conf['trace'] ?? false) {
             $this->tracer = new ConfigTracer();
         } else {
             $this->tracer = null;
