@@ -37,6 +37,7 @@ class ServerStartCommand extends ServerCommand
             new InputOption('no-state-check', null, null, '关闭启动前框架运行状态检查'),
             new InputOption('private-mode', null, null, '启动时隐藏MOTD和敏感信息'),
             new InputOption('print-process-pid', null, null, '打印所有进程的PID'),
+            new InputOption('disable-plugins', null, InputOption::VALUE_REQUIRED, '要禁用的插件，如需多个，采用逗号分割名称'),
         ]);
         $this->setHelp('直接运行可以启动');
     }
