@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace ZM\Command\Plugin;
 
 use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
 use ZM\Bootstrap;
@@ -21,6 +19,9 @@ abstract class PluginCommand extends Command
         Bootstrap\LoadConfiguration::class,
         Bootstrap\LoadPlugins::class,
     ];
+
+    /** @var null|string 动态插件和 Phar 插件的加载目录 */
+    protected ?string $plugin_dir = null;
 
     /**
      * 插件名称合规验证器
@@ -48,6 +49,9 @@ abstract class PluginCommand extends Command
         }
         if (PluginManager::isPluginExists($answer)) {
             throw new \RuntimeException('名称为 ' . $answer . ' 的插件已存在，请换个名字');
+        }
+        if (is_dir(zm_dir($this->plugin_dir . '/' . $exp[1]))) {
+            throw new \RuntimeException('本插件名称的插件开发目录已经有相同名称，请先将同名插件的目录名修改，或修改本插件名称');
         }
         return $answer;
     }
@@ -126,10 +130,5 @@ abstract class PluginCommand extends Command
             ZM_PLUGIN_TYPE_COMPOSER => 'Composer 外部加载',
             default => '未知模式'
         };
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        return parent::execute($input, $output);
     }
 }
