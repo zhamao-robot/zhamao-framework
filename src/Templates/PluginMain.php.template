@@ -6,7 +6,7 @@ namespace {namespace};
 
 class {class}
 {
-    #[\BotCommand(match: '测试{name}')]
+    #[\BotCommand(match: '测试{basename}')]
     public function firstBotCommand(\BotContext $ctx): void
     {
         $ctx->reply('这是{name}插件的第一个命令！');

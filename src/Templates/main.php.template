@@ -5,9 +5,9 @@ declare(strict_types=1);
 $plugin = new ZMPlugin(__DIR__);
 
 /*
- * 发送 "测试{name}"，回复 "这是{name}插件的第一个命令！"
+ * 发送 "测试{basename}"，回复 "这是{basename}插件的第一个命令！"
  */
-$cmd1 = BotCommand::make('{name}', match: '测试{name}')->on(fn () => '这是{name}插件的第一个命令！');
+$cmd1 = BotCommand::make('{name}', match: '测试{basename}')->on(fn () => '这是{name}插件的第一个命令！');
 
 $plugin->addBotCommand($cmd1);
 
