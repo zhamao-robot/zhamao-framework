@@ -9,6 +9,7 @@ use ZM\Annotation\AnnotationMap;
 use ZM\Annotation\AnnotationParser;
 use ZM\Annotation\Framework\BindEvent;
 use ZM\Command\Command;
+use ZM\Exception\FileSystemException;
 use ZM\Exception\PluginException;
 use ZM\Store\FileSystem;
 use ZM\Store\PharHelper;
@@ -288,6 +289,7 @@ class PluginManager
      * 打包插件到 Phar
      *
      * @throws PluginException
+     * @throws FileSystemException
      */
     public static function packPlugin(string $plugin_name, string $build_dir, ?Command $command_context = null): string
     {

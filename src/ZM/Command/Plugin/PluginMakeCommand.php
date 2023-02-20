@@ -39,7 +39,7 @@ class PluginMakeCommand extends PluginCommand
         } elseif (FileSystem::isRelativePath($load_dir)) {
             $load_dir = SOURCE_ROOT_DIR . '/' . $load_dir;
         }
-        $plugin_dir = zm_dir($load_dir);
+        $this->plugin_dir = zm_dir($load_dir);
 
         // 询问插件名称
         if ($this->input->getArgument('name') === null) {
@@ -61,11 +61,11 @@ class PluginMakeCommand extends PluginCommand
             }
         }
 
-        $generator = new PluginGenerator($this->input->getArgument('name'), $plugin_dir);
+        $generator = new PluginGenerator($this->input->getArgument('name'), $this->plugin_dir);
         $generator->generate($this->input->getOptions());
 
         $this->info('已生成插件：' . $this->input->getArgument('name'));
-        $this->info('目录位置：' . zm_dir($plugin_dir . '/' . $this->input->getArgument('name')));
+        $this->info('目录位置：' . zm_dir($this->plugin_dir . '/' . $this->input->getArgument('name')));
         return self::SUCCESS;
     }
 }
