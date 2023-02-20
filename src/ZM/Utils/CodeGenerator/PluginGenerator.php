@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ZM\Utils\CodeGenerator;
 
+use ZM\Exception\FileSystemException;
 use ZM\Store\FileSystem;
 
 /**
@@ -19,7 +20,8 @@ class PluginGenerator
     /**
      * 开始生成
      *
-     * @param array $options 传入的命令行选项
+     * @param  array               $options 传入的命令行选项
+     * @throws FileSystemException
      */
     public function generate(array $options): void
     {
@@ -27,65 +29,64 @@ class PluginGenerator
         FileSystem::createDir($this->plugin_dir);
 
         // 创建插件目录
-        $plugin_base_dir = $this->plugin_dir . '/' . $this->name;
+        $name = explode('/', $this->name);
+        $basename = array_pop($name);
+        // 取最后一个，准没错
+        $plugin_base_dir = $this->plugin_dir . '/' . $basename;
+        // 最后一步：创建插件的根目录！！！
         FileSystem::createDir($plugin_base_dir);
 
-        // 这里开始写入 zmplugin.json
-        // 创建插件信息文件
-        $zmplugin['name'] = $this->name;
-        // 设置版本
-        if ($options['plugin-version'] !== null) {
-            $zmplugin['version'] = $options['plugin-version'];
-        }
-        // 设置作者
-        if ($options['author'] !== null) {
-            $zmplugin['author'] = $options['author'];
-        }
-        // 判断单文件还是 psr-4 类型
-        if ($options['type'] === 'file') {
-            // 设置入口文件为 main.php
-            $zmplugin['main'] = 'main.php';
-        }
-        // 到这里就可以写入文件了
-        file_put_contents(zm_dir($plugin_base_dir . '/zmplugin.json'), json_encode($zmplugin, JSON_PRETTY_PRINT));
+        // 从这里开始写入 composer.json
+        $composer = [
+            'name' => $this->name,
+            'description' => '炸毛框架生成的插件 ' . $this->name,
+            'extra' => [
+                'zm-plugin-version' => $options['plugin-version'] ?? '1.0.0',
+            ],
+        ];
 
-        // 接着写入 main.php
-        if ($options['type'] === 'file') {
-            $template = file_get_contents(zm_dir(FRAMEWORK_ROOT_DIR . '/src/Templates/main.php.template'));
-            $replace = ['{name}' => $this->name];
-            $main_php = str_replace(array_keys($replace), array_values($replace), $template);
-            file_put_contents(zm_dir($plugin_base_dir . '/main.php'), $main_php);
-        } else {
+        // 设置模板传入的参数列表
+        $replace_list = [
+            'name' => $this->name,
+            'basename' => $basename,
+        ];
+
+        if ($options['type'] === 'file') { // 设置入口文件
+            $composer['extra']['zm-plugin-main'] = 'main.php';
+            $file_contents = $this->replaceTemplate(
+                zm_dir(FRAMEWORK_ROOT_DIR . '/src/Templates/main.php.template'),
+                $replace_list
+            );
+            file_put_contents(zm_dir($plugin_base_dir . '/main.php'), $file_contents);
+        } elseif ($options['type'] === 'psr4') { // 设置 psr4
             // 如果是 psr4 就复杂一点，但也不麻烦
             // 先创建 src 目录
             FileSystem::createDir($plugin_base_dir . '/src');
-            // 再创建 src/PluginMain.php
-            $template = file_get_contents(zm_dir(FRAMEWORK_ROOT_DIR . '/src/Templates/PluginMain.php.template'));
-            $replace = [
-                '{name}' => $this->name,
-                '{namespace}' => $options['namespace'],
-                '{class}' => $this->convertClassName(),
-            ];
-            $main_php = str_replace(array_keys($replace), array_values($replace), $template);
-            file_put_contents(zm_dir($plugin_base_dir . '/src/' . $this->convertClassName() . '.php'), $main_php);
-            // 写入 composer.json
-            $composer_json = [
-                'autoload' => [
-                    'psr-4' => [
-                        $options['namespace'] . '\\' => 'src/',
-                    ],
+            $replace_list['namespace'] = $options['namespace'];
+            $replace_list['class'] = $this->convertClassName();
+            $file_contents = $this->replaceTemplate(
+                zm_dir(FRAMEWORK_ROOT_DIR . '/src/Templates/PluginMain.php.template'),
+                $replace_list
+            );
+            file_put_contents(zm_dir($plugin_base_dir . '/src/' . $this->convertClassName() . '.php'), $file_contents);
+            // 设置 autoload
+            $composer['autoload'] = [
+                'psr-4' => [
+                    $options['namespace'] . '\\' => 'src/',
                 ],
             ];
-            file_put_contents(zm_dir($plugin_base_dir . '/composer.json'), json_encode($composer_json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-            // TODO: 寻找 PHP 运行环境和 Composer 是否在当前目录的情况
-            chdir($plugin_base_dir);
-            $env = getenv('COMPOSER_EXECUTABLE');
-            if ($env === false) {
-                $env = 'composer';
-            }
-            passthru(PHP_BINARY . ' ' . escapeshellcmd($env) . ' dump-autoload');
-            chdir(WORKING_DIR);
         }
+
+        // 创建 composer.json 并更新
+        file_put_contents(zm_dir($plugin_base_dir . '/composer.json'), json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        // TODO: 寻找 PHP 运行环境和 Composer 是否在当前目录的情况
+        chdir($plugin_base_dir);
+        $env = getenv('COMPOSER_EXECUTABLE');
+        if ($env === false) {
+            $env = 'composer';
+        }
+        passthru(PHP_BINARY . ' ' . escapeshellcmd($env) . ' dump-autoload');
+        chdir(WORKING_DIR);
     }
 
     /**
@@ -93,8 +94,24 @@ class PluginGenerator
      */
     public function convertClassName(): string
     {
-        $name = $this->name;
+        $name = explode('/', $this->name);
+        $name = array_pop($name);
         $string = str_replace(['-', '_'], ' ', $name);
         return str_replace(' ', '', ucwords($string));
+    }
+
+    /**
+     * 替换模板参数
+     *
+     * @param string $zm_dir       路径
+     * @param array  $replace_list 替换词列表
+     */
+    private function replaceTemplate(string $zm_dir, array $replace_list): string
+    {
+        $template = file_get_contents($zm_dir);
+        foreach ($replace_list as $k => $v) {
+            $template = str_replace('{' . $k . '}', $v, $template);
+        }
+        return $template;
     }
 }
