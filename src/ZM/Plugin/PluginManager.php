@@ -18,6 +18,11 @@ class PluginManager
     /** @var array<string, PluginMeta> 插件信息列表 */
     private static array $plugins = [];
 
+    public static function getPlugins(): array
+    {
+        return self::$plugins;
+    }
+
     /**
      * 传入插件父目录，扫描插件目录下的所有插件并注册添加
      *
@@ -203,9 +208,16 @@ class PluginManager
      * @param  AnnotationParser $parser 传入注解解析器，用于将插件中的事件注解解析出来
      * @throws PluginException
      */
-    public static function enablePlugins(AnnotationParser $parser): void
+    public static function enablePlugins(AnnotationParser $parser, array $disable_list = []): void
     {
         foreach (self::$plugins as $name => $meta) {
+            if (in_array($name, $disable_list)) {
+                $meta->disablePlugin();
+            }
+            if (!$meta->isEnabled()) {
+                logger()->notice('插件 ' . $name . ' 已被禁用');
+                continue;
+            }
             // 除了内建插件外，输出 log 告知启动插件
             if ($meta->getPluginType() !== ZM_PLUGIN_TYPE_NATIVE) {
                 logger()->info('正在启用插件 ' . $name);

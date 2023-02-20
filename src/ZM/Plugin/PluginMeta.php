@@ -32,6 +32,8 @@ class PluginMeta implements \JsonSerializable
     /** @var array 元信息原文 */
     private array $metas;
 
+    private bool $enabled = true;
+
     private ?ZMPlugin $entity = null;
 
     /**
@@ -54,6 +56,21 @@ class PluginMeta implements \JsonSerializable
         $this->plugin_type = $plugin_type;
         // 设置插件根目录
         $this->root_dir = $root_dir;
+    }
+
+    public function enablePlugin(): void
+    {
+        $this->enabled = true;
+    }
+
+    public function disablePlugin(): void
+    {
+        $this->enabled = false;
+    }
+
+    public function isEnabled(): bool
+    {
+        return $this->enabled;
     }
 
     public function bindEntity(ZMPlugin $plugin): void
