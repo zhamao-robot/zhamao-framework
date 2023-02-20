@@ -88,6 +88,7 @@ final class ConsoleApplication extends Application
      */
     public function run(InputInterface $input = null, OutputInterface $output = null): int
     {
+        // 注册 bootstrap
         $options = $input?->getOptions() ?? ServerStartCommand::exportOptionArray();
         foreach ($this->bootstrappers as $bootstrapper) {
             resolve($bootstrapper)->bootstrap($options);
@@ -95,7 +96,7 @@ final class ConsoleApplication extends Application
 
         try {
             return parent::run($input, $output);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             echo zm_internal_errcode('E00005') . "{$e->getMessage()} at {$e->getFile()}({$e->getLine()})" . PHP_EOL;
             exit(1);
         }
