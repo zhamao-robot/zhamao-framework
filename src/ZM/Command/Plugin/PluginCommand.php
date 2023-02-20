@@ -97,11 +97,11 @@ abstract class PluginCommand extends Command
      * @param string   $question  问题
      * @param callable $validator 验证器
      */
-    protected function questionWithOption(string $name, string $question, callable $validator): void
+    protected function questionWithOption(string $name, string $question, callable $validator, string $default = null): void
     {
         /** @var QuestionHelper $helper */
         $helper = $this->getHelper('question');
-        $question = new Question('<question>' . $question . '</question>');
+        $question = new Question('<question>' . $question . '</question>', $default);
         $question->setValidator($validator);
         $this->input->setOption($name, $helper->ask($this->input, $this->output, $question));
     }

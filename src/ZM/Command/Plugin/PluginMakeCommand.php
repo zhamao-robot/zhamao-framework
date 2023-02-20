@@ -7,6 +7,7 @@ namespace ZM\Command\Plugin;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use ZM\Exception\FileSystemException;
 use ZM\Store\FileSystem;
 use ZM\Utils\CodeGenerator\PluginGenerator;
 
@@ -30,6 +31,7 @@ class PluginMakeCommand extends PluginCommand
 
     /**
      * {@inheritDoc}
+     * @throws FileSystemException
      */
     protected function handle(): int
     {
@@ -57,15 +59,16 @@ class PluginMakeCommand extends PluginCommand
         if ($this->input->getOption('type') === 'psr4') {
             // 询问命名空间
             if ($this->input->getOption('namespace') === null) {
-                $this->questionWithOption('namespace', '请输入插件命名空间：', [$this, 'validateNamespace']);
+                $default_namespace = explode('/', $this->input->getArgument('name'))[0];
+                $this->questionWithOption('namespace', '请输入插件命名空间，输入则使用自定义，回车默认使用 [' . $default_namespace . ']：', [$this, 'validateNamespace'], $default_namespace);
             }
         }
 
         $generator = new PluginGenerator($this->input->getArgument('name'), $this->plugin_dir);
-        $generator->generate($this->input->getOptions());
+        $dir = $generator->generate($this->input->getOptions());
 
         $this->info('已生成插件：' . $this->input->getArgument('name'));
-        $this->info('目录位置：' . zm_dir($this->plugin_dir . '/' . $this->input->getArgument('name')));
+        $this->info('目录位置：' . $dir);
         return self::SUCCESS;
     }
 }
