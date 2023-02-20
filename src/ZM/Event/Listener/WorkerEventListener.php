@@ -227,9 +227,14 @@ class WorkerEventListener
                     logger()->info('已加载 ' . $count . ' 个 Composer 插件');
                 }
             }
+            $disable_list = Framework::getInstance()->getArgv()['disable-plugins'];
+            if ($disable_list === null) {
+                $disable_list = '';
+            }
+            $exp = explode(',', $disable_list);
 
             // 启用并初始化插件
-            PluginManager::enablePlugins($parser);
+            PluginManager::enablePlugins($parser, $exp);
         }
 
         // 解析所有注册路径的文件，获取注解
