@@ -23,7 +23,7 @@ class PluginGenerator
      * @param  array               $options 传入的命令行选项
      * @throws FileSystemException
      */
-    public function generate(array $options): void
+    public function generate(array $options): string
     {
         // 先检查插件目录是否存在，不存在则创建
         FileSystem::createDir($this->plugin_dir);
@@ -87,6 +87,7 @@ class PluginGenerator
         }
         passthru(PHP_BINARY . ' ' . escapeshellcmd($env) . ' dump-autoload');
         chdir(WORKING_DIR);
+        return $plugin_base_dir;
     }
 
     /**
