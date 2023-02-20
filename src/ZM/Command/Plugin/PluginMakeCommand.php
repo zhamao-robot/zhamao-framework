@@ -5,11 +5,8 @@ declare(strict_types=1);
 namespace ZM\Command\Plugin;
 
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Question\ChoiceQuestion;
-use Symfony\Component\Console\Question\Question;
 use ZM\Store\FileSystem;
 use ZM\Utils\CodeGenerator\PluginGenerator;
 
@@ -43,65 +40,24 @@ class PluginMakeCommand extends PluginCommand
             $load_dir = SOURCE_ROOT_DIR . '/' . $load_dir;
         }
         $plugin_dir = zm_dir($load_dir);
-        /** @var QuestionHelper $helper */
-        $helper = $this->getHelper('question');
-
-        $other_plugins = is_dir($plugin_dir) ? FileSystem::scanDirFiles($plugin_dir, false, true, true) : [];
 
         // 询问插件名称
         if ($this->input->getArgument('name') === null) {
-            $question = new Question('<question>请输入插件名称：</question>');
-            $question->setValidator(function ($answer) use ($plugin_dir, $other_plugins) {
-                if (empty($answer)) {
-                    throw new \RuntimeException('插件名称不能为空');
-                }
-                if (is_numeric(mb_substr($answer, 0, 1))) {
-                    throw new \RuntimeException('插件名称不能以数字开头，且只能包含字母、数字、下划线、短横线');
-                }
-                if (!preg_match('/^[a-zA-Z0-9_-]+$/', $answer)) {
-                    throw new \RuntimeException('插件名称只能包含字母、数字、下划线、短横线');
-                }
-                if (is_dir($plugin_dir . '/' . strtolower($answer))) {
-                    throw new \RuntimeException('插件目录已存在，请换个名字');
-                }
-                foreach ($other_plugins as $dir_name) {
-                    $plugin_name = file_exists($plugin_dir . '/' . $dir_name . '/zmplugin.json') ? (json_decode(file_get_contents($plugin_dir . '/' . $dir_name . '/zmplugin.json'), true)['name'] ?? null) : null;
-                    if ($plugin_name !== null && $plugin_name === $answer) {
-                        throw new \RuntimeException('插件名称已存在，请换个名字');
-                    }
-                }
-                return $answer;
-            });
-            $this->input->setArgument('name', $helper->ask($this->input, $this->output, $question));
+            $this->questionWithArgument('name', '请输入插件名称（插件名称格式为"所有者/插件名"，例如"foobar/demo-plugin"）', [$this, 'validatePluginName']);
         }
 
         // 询问插件类型
         if ($this->input->getOption('type') === null) {
-            $question = new ChoiceQuestion(
-                '<question>请输入要生成的插件结构类型</question>',
-                ['file' => 'file 类型为单文件，方便写简单功能', 'psr4' => 'psr4 类型为目录，按照 psr-4 结构生成，同时将生成 composer.json 用来支持自动加载']
-            );
-            $this->input->setOption('type', $helper->ask($this->input, $this->output, $question));
+            $this->choiceWithOption('type', '请输入要生成的插件结构类型', [
+                'file' => 'file 类型为单文件，方便写简单功能',
+                'psr4' => 'psr4 类型为目录，按照 psr-4 结构生成，同时将生成 composer.json 用来支持自动加载（推荐）',
+            ]);
         }
 
         if ($this->input->getOption('type') === 'psr4') {
             // 询问命名空间
             if ($this->input->getOption('namespace') === null) {
-                $question = new Question('<question>请输入插件命名空间：</question>');
-                $question->setValidator(function ($answer) {
-                    if (empty($answer)) {
-                        throw new \RuntimeException('插件命名空间不能为空');
-                    }
-                    if (is_numeric(mb_substr($answer, 0, 1))) {
-                        throw new \RuntimeException('插件命名空间不能以数字开头，且只能包含字母、数字、反斜线');
-                    }
-                    // 只能包含字母、数字和反斜线
-                    if (!preg_match('/^[a-zA-Z0-9\\\\]+$/', $answer)) {
-                        throw new \RuntimeException('插件命名空间只能包含字母、数字、反斜线');
-                    }
-                    return $answer;
-                });
-                $this->input->setOption('namespace', $helper->ask($this->input, $this->output, $question));
+                $this->questionWithOption('namespace', '请输入插件命名空间：', [$this, 'validateNamespace']);
             }
         }
 
