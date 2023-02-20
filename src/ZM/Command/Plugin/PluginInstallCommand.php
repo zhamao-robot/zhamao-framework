@@ -30,7 +30,7 @@ class PluginInstallCommand extends PluginCommand
     {
         $addr = $this->input->getArgument('address');
         $name = ob_uuidgen();
-        $plugin_dir = FileSystem::isRelativePath(config('global.plugin.load_dir', 'plugins')) ? (WORKING_DIR . '/' . config('global.plugin.load_dir', 'plugins')) : config('global.plugin.load_dir', 'plugins');
+        $this->plugin_dir = FileSystem::isRelativePath(config('global.plugin.load_dir', 'plugins')) ? (WORKING_DIR . '/' . config('global.plugin.load_dir', 'plugins')) : config('global.plugin.load_dir', 'plugins');
         // 先通过 GitHub API 获取看看存不存在 zmplugin.json
         // 解析 git https 路径中的仓库所有者和仓库名
         $git_url = parse_url($addr);
@@ -65,36 +65,36 @@ class PluginInstallCommand extends PluginCommand
         }
         $this->info('正在从 ' . $addr . ' 克隆插件仓库');
         try {
-            FileSystem::createDir($plugin_dir);
+            FileSystem::createDir($this->plugin_dir);
         } catch (FileSystemException $exception) {
-            $this->error("无法创建插件目录 {$plugin_dir}：{$exception->getMessage()}");
+            $this->error("无法创建插件目录 {$this->plugin_dir}：{$exception->getMessage()}");
             return static::FAILURE;
         }
-        passthru('cd ' . escapeshellarg($plugin_dir) . ' && git clone --depth=1 ' . escapeshellarg($addr) . ' ' . $name, $code);
+        passthru('cd ' . escapeshellarg($this->plugin_dir) . ' && git clone --depth=1 ' . escapeshellarg($addr) . ' ' . $name, $code);
         if ($code !== 0) {
             $this->error('无法从指定 Git 地址拉取项目，请检查地址名是否正确');
             return static::FAILURE;
         }
-        if (!file_exists($plugin_dir . '/' . $name . '/zmplugin.json')) {
+        if (!file_exists($this->plugin_dir . '/' . $name . '/zmplugin.json')) {
             $this->error('项目不存在 zmplugin.json 插件元信息，无法安装，请手动删除目录 ' . $name);
             // TODO: 使用 rmdir 和 unlink 删除 git 目录
             return static::FAILURE;
         }
         $this->output->writeln('正在检查元信息完整性');
-        $getname = json_decode(file_get_contents($plugin_dir . '/' . $name . '/zmplugin.json'), true)['name'] ?? null;
+        $getname = json_decode(file_get_contents($this->plugin_dir . '/' . $name . '/zmplugin.json'), true)['name'] ?? null;
         if ($getname === null) {
             $this->error('无法获取元信息 zmplugin.json');
             return static::FAILURE;
         }
-        $code = rename($plugin_dir . '/' . $name, $plugin_dir . '/' . $getname);
+        $code = rename($this->plugin_dir . '/' . $name, $this->plugin_dir . '/' . $getname);
         if ($code === false) {
             $this->error('无法重命名文件夹 ' . $name);
             return static::FAILURE;
         }
-        if (file_exists($plugin_dir . '/' . $getname . '/composer.json')) {
+        if (file_exists($this->plugin_dir . '/' . $getname . '/composer.json')) {
             $this->info('插件存在 composer.json，正在安装 composer 相关依赖（需要系统环境变量中包含 composer 路径）');
             $cwd = getcwd();
-            chdir($plugin_dir . '/' . $getname);
+            chdir($this->plugin_dir . '/' . $getname);
             // 使用内建 Composer
             if (file_exists(WORKING_DIR . '/runtime/composer.phar')) {
                 $this->info('使用内建 Composer');
