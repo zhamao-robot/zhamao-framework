@@ -123,7 +123,8 @@ abstract class PluginCommand extends Command
             ZM_PLUGIN_TYPE_NATIVE => '内部',
             ZM_PLUGIN_TYPE_PHAR => 'Phar',
             ZM_PLUGIN_TYPE_SOURCE => '源码',
-            ZM_PLUGIN_TYPE_COMPOSER => 'Composer 外部加载'
+            ZM_PLUGIN_TYPE_COMPOSER => 'Composer 外部加载',
+            default => '未知模式'
         };
     }
 
