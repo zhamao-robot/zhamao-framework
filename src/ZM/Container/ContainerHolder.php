@@ -34,6 +34,8 @@ class ContainerHolder
 
     private static function buildContainer(): Container
     {
+        self::loadConfig();
+
         $builder = new ContainerBuilder();
         $builder->addDefinitions(
             new AliasDefinitionSource(),
@@ -61,6 +63,9 @@ class ContainerHolder
 
     private static function loadConfig(): void
     {
+        if (self::$config) {
+            return;
+        }
         self::$config = require Kernel::getInstance()->getConfigDir() . '/container.php';
     }
 }
