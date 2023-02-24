@@ -13,13 +13,13 @@ class Kernel
 
     private array $bootstrappers = [];
 
-    private string $config_dir;
+    private string $config_dir = SOURCE_ROOT_DIR . '/config';
 
-    private string $environment;
+    private string $environment = 'development';
 
     private bool $debug_mode = false;
 
-    private string $log_level;
+    private string $log_level = 'info';
 
     private bool $test_mode = false;
 
