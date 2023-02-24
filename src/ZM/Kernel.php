@@ -17,9 +17,11 @@ class Kernel
 
     private string $environment;
 
-    private bool $debug_mode;
+    private bool $debug_mode = false;
 
     private string $log_level;
+
+    private bool $test_mode = false;
 
     private function __construct()
     {
@@ -106,7 +108,12 @@ class Kernel
 
     public function runningUnitTests(): bool
     {
-        return $this->environment('testing');
+        return $this->test_mode;
+    }
+
+    public function setTestMode(bool $test_mode): void
+    {
+        $this->test_mode = $test_mode;
     }
 
     public function registerBootstrappers(array $bootstrappers): void
