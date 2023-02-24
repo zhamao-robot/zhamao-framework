@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace ZM\Bootstrap;
 
-class LoadGlobalDefines
+use ZM\Kernel;
+
+class LoadGlobalDefines implements Bootstrapper
 {
-    public function bootstrap(array $config): void
+    public function bootstrap(Kernel $kernel): void
     {
         require FRAMEWORK_ROOT_DIR . '/src/Globals/global_defines_framework.php';
     }

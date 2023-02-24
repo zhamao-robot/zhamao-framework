@@ -6,10 +6,11 @@ namespace ZM\Bootstrap;
 
 use OneBot\Exception\ExceptionHandler;
 use ZM\Exception\Handler;
+use ZM\Kernel;
 
-class HandleExceptions
+class HandleExceptions implements Bootstrapper
 {
-    public function bootstrap(array $config): void
+    public function bootstrap(Kernel $kernel): void
     {
         // 注册全局错误处理器
         set_error_handler(function ($error_no, $error_msg, $error_file, $error_line) {

@@ -21,7 +21,6 @@ use OneBot\Driver\Workerman\Worker;
 use OneBot\Driver\Workerman\WorkermanDriver;
 use OneBot\Util\Singleton;
 use ZM\Command\Server\ServerStartCommand;
-use ZM\Config\ZMConfig;
 use ZM\Container\ContainerBindingListener;
 use ZM\Event\Listener\HttpEventListener;
 use ZM\Event\Listener\ManagerEventListener;
@@ -260,7 +259,7 @@ class Framework
         // 打印工作目录
         $properties['working_dir'] = WORKING_DIR;
         // 打印环境信息
-        $properties['environment'] = ZMConfig::getInstance()->getEnvironment();
+        $properties['environment'] = Kernel::getInstance()->environment();
         // 打印驱动
         $properties['driver'] = config('global.driver');
         // 打印logger显示等级

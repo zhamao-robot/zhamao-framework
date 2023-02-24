@@ -7,9 +7,11 @@ namespace ZM;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\CommandLoader\FactoryCommandLoader;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use ZM\Command\Server\ServerStartCommand;
+use Symfony\Component\Console\ConsoleEvents;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Event\ConsoleErrorEvent;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use ZM\Exception\SingletonViolationException;
 use ZM\Store\FileSystem;
 
@@ -20,15 +22,6 @@ use ZM\Store\FileSystem;
  */
 final class ConsoleApplication extends Application
 {
-    protected array $bootstrappers = [
-        Bootstrap\LoadConfiguration::class,         // 加载配置文件
-        Bootstrap\LoadGlobalDefines::class,         // 加载框架级别的全局常量声明
-        Bootstrap\RegisterLogger::class,            // 加载 Logger
-        Bootstrap\HandleExceptions::class,          // 注册异常处理器
-        Bootstrap\RegisterEventProvider::class,     // 绑定框架的 EventProvider 到 libob 的 Driver 上
-        Bootstrap\SetInternalTimezone::class,       // 设置时区
-    ];
-
     private static ?ConsoleApplication $obj = null;
 
     public function __construct(string $name = 'zhamao-framework')
@@ -37,6 +30,67 @@ final class ConsoleApplication extends Application
             throw new SingletonViolationException(self::class);
         }
 
+        // 初始化 Composer 变量
+        if (file_exists(WORKING_DIR . '/runtime/composer.phar')) {
+            echo '* Using native composer' . PHP_EOL;
+            putenv('COMPOSER_EXECUTABLE=' . WORKING_DIR . '/runtime/composer.phar');
+        }
+
+        $this->registerCommandLoader();
+
+        // 执行父级初始化
+        parent::__construct($name, ZM_VERSION);
+
+        $this->registerGlobalOptions();
+
+        // 设置命令事件分发器
+        $dispatcher = new EventDispatcher();
+        $this->setDispatcher($dispatcher);
+
+        // 注册命令执行前监听器
+        $dispatcher->addListener(ConsoleEvents::COMMAND, function (ConsoleCommandEvent $event) {
+            $input = $event->getInput();
+
+            // 初始化内核
+            /** @var Kernel $kernel */
+            $kernel = Kernel::getInstance();
+            $kernel->setConfigDir($input->getOption('config-dir'));
+            $kernel->setEnvironment($input->getOption('env'));
+            $kernel->setDebugMode($input->getOption('debug'));
+            $kernel->setLogLevel($input->getOption('log-level'));
+            $kernel->bootstrap();
+        });
+
+        // 注册命令执行错误监听器
+        $dispatcher->addListener(ConsoleEvents::ERROR, function (ConsoleErrorEvent $event) {
+            $e = $event->getError();
+            // 输出错误信息
+            echo zm_internal_errcode('E00005') . "{$e->getMessage()} at {$e->getFile()}({$e->getLine()})" . PHP_EOL;
+            exit(1);
+        });
+
+        // 设置单例，阻止后续实例化
+        self::$obj = $this;
+    }
+
+    /**
+     * 注册全局选项，应用到所有命令
+     */
+    public function registerGlobalOptions(): void
+    {
+        $this->getDefinition()->addOptions([
+            new InputOption('debug', 'd', InputOption::VALUE_NONE, '启用调试模式'),
+            new InputOption('env', 'e', InputOption::VALUE_REQUIRED, '指定运行环境', 'development'),
+            new InputOption('config-dir', 'c', InputOption::VALUE_REQUIRED, '指定配置文件目录', SOURCE_ROOT_DIR . '/config'),
+            new InputOption('log-level', 'l', InputOption::VALUE_REQUIRED, '指定日志等级', 'info'),
+        ]);
+    }
+
+    /**
+     * 注册命令加载器
+     */
+    private function registerCommandLoader(): void
+    {
         // 初始化命令
         $command_classes = [];
         // 先加载框架内置命令
@@ -51,11 +105,7 @@ final class ConsoleApplication extends Application
                 FileSystem::getClassesPsr4(SOURCE_ROOT_DIR . '/src/Command', 'Command')
             );
         }
-        // 初始化 Composer 变量
-        if (file_exists(WORKING_DIR . '/runtime/composer.phar')) {
-            echo '* Using native composer' . PHP_EOL;
-            putenv('COMPOSER_EXECUTABLE=' . WORKING_DIR . '/runtime/composer.phar');
-        }
+        // TODO: 加载插件命令，可以考虑自定义 CommandLoader
         $commands = [];
         foreach ($command_classes as $command_class) {
             try {
@@ -78,27 +128,5 @@ final class ConsoleApplication extends Application
         // 命令工厂，用于延迟加载命令
         $command_loader = new FactoryCommandLoader($commands);
         $this->setCommandLoader($command_loader);
-
-        self::$obj = $this; // 用于标记已经初始化完成
-        parent::__construct($name, ZM_VERSION);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function run(InputInterface $input = null, OutputInterface $output = null): int
-    {
-        // 注册 bootstrap
-        $options = $input?->getOptions() ?? ServerStartCommand::exportOptionArray();
-        foreach ($this->bootstrappers as $bootstrapper) {
-            resolve($bootstrapper)->bootstrap($options);
-        }
-
-        try {
-            return parent::run($input, $output);
-        } catch (\Throwable $e) {
-            echo zm_internal_errcode('E00005') . "{$e->getMessage()} at {$e->getFile()}({$e->getLine()})" . PHP_EOL;
-            exit(1);
-        }
     }
 }

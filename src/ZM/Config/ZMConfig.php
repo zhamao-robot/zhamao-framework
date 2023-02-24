@@ -8,6 +8,7 @@ use OneBot\Config\Config;
 use OneBot\Config\Loader\LoaderInterface;
 use OneBot\Util\Singleton;
 use ZM\Exception\ConfigException;
+use ZM\Kernel;
 
 class ZMConfig
 {
@@ -43,11 +44,6 @@ class ZMConfig
     private array $config_paths;
 
     /**
-     * @var string 当前环境
-     */
-    private string $environment;
-
-    /**
      * @var Config 内部配置容器
      */
     private Config $holder;
@@ -66,17 +62,14 @@ class ZMConfig
     /**
      * 构造配置实例
      *
-     * @param string $environment 环境
-     *
      * @throws ConfigException 配置文件加载出错
      */
-    public function __construct(string $environment = 'uninitiated', array $init_config = null)
+    public function __construct(array $init_config = null)
     {
-        $conf = $init_config ?: $this->loadInitConfig();
+        // 合并初始化配置，构造传入优先
+        $conf = array_merge_recursive($this->loadInitConfig(), $init_config ?? []);
         $this->file_extensions = $conf['source']['extensions'];
         $this->config_paths = $conf['source']['paths'];
-
-        $this->environment = self::$environment_alias[$environment] ?? $environment;
 
         // 初始化配置容器
         $this->holder = new Config(
@@ -93,9 +86,7 @@ class ZMConfig
             $this->tracer = null;
         }
 
-        if ($environment !== 'uninitiated') {
-            $this->loadFiles();
-        }
+        $this->loadFiles();
     }
 
     /**
@@ -208,32 +199,6 @@ class ZMConfig
     }
 
     /**
-     * 获取当前环境
-     *
-     * @return string 当前环境
-     */
-    public function getEnvironment(): string
-    {
-        return $this->environment;
-    }
-
-    /**
-     * 设置当前环境
-     *
-     * 变更环境后，将会自动调用 `reload` 方法重载配置
-     *
-     * @param string $environment 目标环境
-     */
-    public function setEnvironment(string $environment): void
-    {
-        $target = self::$environment_alias[$environment] ?? $environment;
-        if ($this->environment !== $target) {
-            $this->environment = $target;
-            $this->reload();
-        }
-    }
-
-    /**
      * 重载配置文件
      * 运行期间新增的配置文件不会被加载哟~
      *
@@ -337,7 +302,7 @@ class ZMConfig
         }
         if ($type === 'environment') {
             $name_and_env = explode('.', $name);
-            if ($name_and_env[1] === $this->environment) {
+            if (Kernel::getInstance()->environment($name_and_env[1])) {
                 return true;
             }
         }

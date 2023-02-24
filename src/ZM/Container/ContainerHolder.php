@@ -8,11 +8,14 @@ use DI;
 use DI\Container;
 use DI\ContainerBuilder;
 use OneBot\Driver\Coroutine\Adaptive;
+use ZM\Kernel;
 
 class ContainerHolder
 {
     /** @var Container[] */
     private static array $container = [];
+
+    private static array $config = [];
 
     public static function getEventContainer(): Container
     {
@@ -34,13 +37,13 @@ class ContainerHolder
         $builder = new ContainerBuilder();
         $builder->addDefinitions(
             new AliasDefinitionSource(),
-            new DI\Definition\Source\DefinitionArray(config('container.definitions', [])),
+            new DI\Definition\Source\DefinitionArray(self::$config['definitions'] ?? []),
         );
         $builder->useAutowiring(true);
         $builder->useAttributes(true);
 
         // 容器缓存
-        $enable_cache = config('container.cache.enable', false);
+        $enable_cache = self::$config['cache']['enable'] ?? false;
         if (is_callable($enable_cache)) {
             $enable_cache = $enable_cache();
         }
@@ -49,10 +52,15 @@ class ContainerHolder
             if (!extension_loaded('apcu')) {
                 logger()->warning('APCu 扩展未加载，容器缓存将不可用');
             } else {
-                $builder->enableDefinitionCache(config('container.cache.namespace', ''));
+                $builder->enableDefinitionCache(self::$config['cache']['namespace'] ?? '');
             }
         }
 
         return $builder->build();
+    }
+
+    private static function loadConfig(): void
+    {
+        self::$config = require Kernel::getInstance()->getConfigDir() . '/container.php';
     }
 }
