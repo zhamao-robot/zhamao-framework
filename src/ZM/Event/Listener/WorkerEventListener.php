@@ -199,7 +199,7 @@ class WorkerEventListener
                 'command-manual' => new CommandManualPlugin($parser),
                 default => throw new PluginException('Unknown native plugin: ' . $name),
             };
-            $meta = new PluginMeta(['name' => $name], ZM_PLUGIN_TYPE_NATIVE);
+            $meta = new PluginMeta(name: $name, plugin_type: ZM_PLUGIN_TYPE_NATIVE);
             $meta->bindEntity($plugin);
             PluginManager::addPlugin($meta);
         }
