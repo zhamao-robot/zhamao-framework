@@ -273,6 +273,11 @@ class BotContext implements ContextInterface
         if (!$result instanceof OneBotEvent || $result->type !== 'message') {
             throw new OneBot12Exception('Internal error for resuming prompt: unknown type ' . gettype($result));
         }
+        // 更新容器内的事件绑定对象
+        if (($option & ZM_PROMPT_UPDATE_EVENT) === ZM_PROMPT_UPDATE_EVENT) {
+            container()->set(OneBotEvent::class, $result);
+            container()->set('bot.event', $result);
+        }
         // 是否为 string 回复
         if (($option & ZM_PROMPT_RETURN_STRING) === ZM_PROMPT_RETURN_STRING) {
             return $result->getMessageString();
