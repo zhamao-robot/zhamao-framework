@@ -20,41 +20,22 @@ class PluginMeta implements \JsonSerializable
     /** @var string 插件描述 */
     private string $description;
 
-    /** @var array 插件的依赖列表 */
-    private array $dependencies;
-
     /** @var null|string 插件的根目录 */
     private ?string $root_dir;
 
     /** @var int 插件类型 */
     private int $plugin_type;
 
-    /** @var array 元信息原文 */
-    private array $metas;
-
     private bool $enabled = true;
 
     private ?ZMPlugin $entity = null;
 
-    /**
-     * @param array       $meta        元信息数组格式
-     * @param int         $plugin_type 插件类型
-     * @param null|string $root_dir    插件根目录
-     */
-    public function __construct(array $meta, int $plugin_type = ZM_PLUGIN_TYPE_NATIVE, ?string $root_dir = null)
+    public function __construct(string $name, string $version = '1.0-dev', string $description = '', int $plugin_type = ZM_PLUGIN_TYPE_NATIVE, ?string $root_dir = null)
     {
-        // 设置名称
-        $this->name = $meta['name'] ?? '<anonymous>';
-        // 设置版本
-        $this->version = $meta['version'] ?? '1.0-dev';
-        // 设置描述
-        $this->description = $meta['description'] ?? '';
-        // 设置依赖
-        $this->dependencies = $meta['dependencies'] ?? [];
-        $this->metas = $meta;
-        // 设置插件根目录
+        $this->name = $name;
+        $this->version = $version;
+        $this->description = $description;
         $this->plugin_type = $plugin_type;
-        // 设置插件根目录
         $this->root_dir = $root_dir;
     }
 
@@ -148,11 +129,6 @@ class PluginMeta implements \JsonSerializable
         return $this->description;
     }
 
-    public function getDependencies(): array
-    {
-        return $this->dependencies;
-    }
-
     public function getRootDir(): string
     {
         return $this->root_dir;
@@ -174,13 +150,7 @@ class PluginMeta implements \JsonSerializable
             'name' => $this->name,
             'version' => $this->version,
             'description' => $this->description,
-            'dependencies' => $this->dependencies,
         ];
-    }
-
-    public function getMetas(): array
-    {
-        return $this->metas;
     }
 
     public function getEntity(): ?ZMPlugin
