@@ -125,9 +125,9 @@ abstract class PluginCommand extends Command
     {
         return match ($type) {
             ZM_PLUGIN_TYPE_NATIVE => '内部',
-            ZM_PLUGIN_TYPE_PHAR => 'Phar',
-            ZM_PLUGIN_TYPE_SOURCE => '源码',
-            ZM_PLUGIN_TYPE_COMPOSER => 'Composer 外部加载',
+            ZM_PLUGIN_TYPE_PHAR => '<comment>Phar</comment>',
+            ZM_PLUGIN_TYPE_SOURCE => '<fg=gray>源码</>',
+            ZM_PLUGIN_TYPE_COMPOSER => '<info>Composer</info>',
             default => '未知模式'
         };
     }

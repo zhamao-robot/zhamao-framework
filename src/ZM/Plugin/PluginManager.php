@@ -25,7 +25,7 @@ class PluginManager
     }
 
     /**
-     * 传入插件父目录，扫描插件目录下的所有插件并注册添加
+     * 传入插件父目录，扫描插件目录下的所有插件并注册添加（开发插件）
      *
      * @param  string          $dir 插件目录
      * @return int             返回添加插件的数量
@@ -54,21 +54,31 @@ class PluginManager
             }
 
             // 先看有没有 zmplugin.json，没有则不是正常的插件，发个 notice 然后跳过
-            $meta_file = $item . '/zmplugin.json';
+            $meta_file = $item . '/composer.json';
             if (!is_file($meta_file)) {
-                logger()->notice('插件目录 {dir} 没有插件元信息（zmplugin.json），跳过扫描。', ['dir' => $item]);
+                logger()->notice('插件目录 {dir} 没有插件元信息（composer.json），跳过扫描。', ['dir' => $item]);
                 continue;
             }
 
             // 检验元信息是否合法，不合法发个 notice 然后跳过
             $json_meta = json_decode(file_get_contents($meta_file), true);
             if (!is_array($json_meta)) {
-                logger()->notice('插件目录 {dir} 的插件元信息（zmplugin.json）不是有效的 JSON，跳过扫描。', ['dir' => $item]);
+                logger()->notice('插件目录 {dir} 的插件元信息（composer.json）不是有效的 JSON，跳过扫描。', ['dir' => $item]);
+                continue;
+            }
+            if (!isset($json_meta['extra']['zm-plugin-version'], $json_meta['name'])) {
+                logger()->notice('插件目录 {dir} 的插件元信息未提供版本和名称，不是有效的插件，跳过扫描。', ['dir' => $item]);
                 continue;
             }
 
             // 构造一个元信息对象
-            $meta = new PluginMeta($json_meta, ZM_PLUGIN_TYPE_SOURCE, $item);
+            $meta = new PluginMeta(
+                name: $json_meta['name'],
+                version: $json_meta['extra']['zm-plugin-version'],
+                description: $json_meta['description'] ?? '',
+                plugin_type: ZM_PLUGIN_TYPE_SOURCE,
+                root_dir: $item
+            );
             if ($meta->getEntryFile() === null && $meta->getAutoloadFile() === null) {
                 logger()->notice('插件 ' . $item . ' 不存在入口文件，也没有自动加载文件和内建 Composer，跳过加载');
                 continue;
@@ -93,18 +103,29 @@ class PluginManager
             // 加载这个 Phar 文件
             $phar = require $phar_path;
             // 读取元信息
-            $plugin_file_path = zm_dir('phar://' . $phar_path . '/zmplugin.json');
+            $plugin_file_path = zm_dir('phar://' . $phar_path . '/composer.json');
             if (!file_exists($plugin_file_path)) {
-                throw new PluginException('插件元信息 zmplugin.json 文件不存在');
+                throw new PluginException('插件元信息 composer.json 文件不存在');
             }
             // 解析元信息的 JSON
-            $meta_json = json_decode(file_get_contents($plugin_file_path), true);
+            $json_meta = json_decode(file_get_contents($plugin_file_path), true);
             // 失败抛出异常
-            if (!is_array($meta_json)) {
+            if (!is_array($json_meta)) {
                 throw new PluginException('插件信息文件解析失败');
             }
+            // 解析 name 和版本失败
+            if (!isset($json_meta['extra']['zm-plugin-version'], $json_meta['name'])) {
+                throw new PluginException('插件文件 ' . $phar_path . ' 的插件元信息未提供版本和名称，不是有效的插件');
+            }
             // $phar 这时应该是一个 ZMPlugin 对象，写入元信息
-            $meta = new PluginMeta($meta_json, ZM_PLUGIN_TYPE_PHAR, zm_dir('phar://' . $phar_path));
+            // 构造一个元信息对象
+            $meta = new PluginMeta(
+                name: $json_meta['name'],
+                version: $json_meta['extra']['zm-plugin-version'],
+                description: $json_meta['description'] ?? '',
+                plugin_type: ZM_PLUGIN_TYPE_PHAR,
+                root_dir: zm_dir('phar://' . $phar_path)
+            );
             // 如果已经返回了一个插件对象，那么直接塞进去实体
             if ($phar instanceof ZMPlugin) {
                 $meta->bindEntity($phar);
@@ -144,7 +165,7 @@ class PluginManager
         $cnt = 0;
         foreach ($json['packages'] as $item) {
             $root_dir = $vendor_dir . '/' . $item['name'];
-            $meta_file = zm_dir($root_dir . '/zmplugin.json');
+            $meta_file = zm_dir($root_dir . '/composer.json');
             if (!file_exists($meta_file)) {
                 continue;
             }
@@ -152,12 +173,22 @@ class PluginManager
             // 检验元信息是否合法，不合法发个 notice 然后跳过
             $json_meta = json_decode(file_get_contents($meta_file), true);
             if (!is_array($json_meta)) {
-                logger()->notice('插件目录 {dir} 的插件元信息（zmplugin.json）不是有效的 JSON，跳过扫描。', ['dir' => $item]);
+                logger()->notice('插件目录 {dir} 的插件元信息（composer.json）不是有效的 JSON，跳过扫描。', ['dir' => $item]);
+                continue;
+            }
+            // 解析 name 和版本失败
+            if (!isset($json_meta['extra']['zm-plugin-version'], $json_meta['name'])) {
                 continue;
             }
 
             // 构造一个元信息对象
-            $meta = new PluginMeta($json_meta, ZM_PLUGIN_TYPE_COMPOSER, zm_dir($root_dir));
+            $meta = new PluginMeta(
+                name: $json_meta['name'],
+                version: $json_meta['extra']['zm-plugin-version'],
+                description: $json_meta['description'] ?? '',
+                plugin_type: ZM_PLUGIN_TYPE_COMPOSER,
+                root_dir: $root_dir
+            );
             if ($meta->getEntryFile() === null && $meta->getAutoloadFile() === null) {
                 logger()->notice('插件 ' . $item . ' 不存在入口文件，也没有自动加载文件和内建 Composer，跳过加载');
                 continue;
@@ -223,6 +254,7 @@ class PluginManager
             if ($meta->getPluginType() !== ZM_PLUGIN_TYPE_NATIVE) {
                 logger()->info('正在启用插件 ' . $name);
             }
+            /* 插件从 zmplugin.json 改为 composer 了，所以不需要自己判断依赖
             // 先判断依赖关系，如果声明了依赖，但依赖不合规则报错崩溃
             foreach ($meta->getDependencies() as $dep_name => $dep_version) {
                 // 缺少依赖的插件，不行
@@ -233,7 +265,7 @@ class PluginManager
                 if (VersionComparator::compareVersionRange(self::$plugins[$dep_name]->getVersion(), $dep_version) === false) {
                     throw new PluginException('插件 ' . $name . ' 依赖插件 ' . $dep_name . '，但是这个插件的版本不符合要求');
                 }
-            }
+            }*/
             // 如果插件为单文件形式，且设置了 pluginLoad 事件，那就调用
             $meta->getEntity()?->emitPluginLoad($parser);
             if (($entity = $meta->getEntity()) instanceof ZMPlugin) {
