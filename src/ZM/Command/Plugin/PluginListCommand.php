@@ -32,6 +32,7 @@ class PluginListCommand extends PluginCommand
         }
         $table = new Table($this->output);
         $table->setColumnMaxWidth(2, 27);
+        $table->setHeaderTitle('插件列表');
         $table->setHeaders(['名称', '版本', '简介', '类型']);
         foreach ($all as $k => $v) {
             $table->addRow([$k, $v->getVersion(), $v->getDescription(), $this->getTypeDisplayName($v->getPluginType())]);
