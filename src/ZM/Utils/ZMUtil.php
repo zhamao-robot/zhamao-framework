@@ -16,4 +16,15 @@ class ZMUtil
     {
         return json_decode(file_get_contents(($path ?? SOURCE_ROOT_DIR) . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
     }
+
+    /**
+     * 写入 composer.json
+     *
+     * @param null|string $path    路径
+     * @param array       $content 内容数组
+     */
+    public static function putComposerMetadata(?string $path = null, array $content = []): false|int
+    {
+        return file_put_contents(($path ?? SOURCE_ROOT_DIR) . '/composer.json', json_encode($content, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
 }
