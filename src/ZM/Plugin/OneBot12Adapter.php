@@ -219,11 +219,10 @@ class OneBot12Adapter extends ZMPlugin
     /**
      * [CALLBACK] 处理需要等待回复的 bot()->prompt() 会话消息
      *
-     * @param  BotContext         $ctx   机器人上下文
      * @param  OneBotEvent        $event 当前事件对象
      * @throws InterruptException
      */
-    public function handleContextPrompt(BotContext $ctx, OneBotEvent $event)
+    public function handleContextPrompt(OneBotEvent $event)
     {
         // 必须支持协程才能用
         if (($co = Adaptive::getCoroutine()) === null) {
