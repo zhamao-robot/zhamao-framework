@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ZM\Command;
 
+use Psr\Log\LogLevel;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
@@ -19,6 +20,119 @@ use ZM\Exception\ZMException;
 trait CommandInteractTrait
 {
     /**
+     * System is unusable.
+     *
+     * @param string  $message
+     * @param mixed[] $context
+     */
+    public function emergency($message, array $context = [])
+    {
+        $this->log(LogLevel::EMERGENCY, $message, $context);
+    }
+
+    /**
+     * Action must be taken immediately.
+     *
+     * Example: Entire website down, database unavailable, etc. This should
+     * trigger the SMS alerts and wake you up.
+     *
+     * @param string  $message
+     * @param mixed[] $context
+     */
+    public function alert($message, array $context = [])
+    {
+        $this->log(LogLevel::ALERT, $message, $context);
+    }
+
+    /**
+     * Critical conditions.
+     *
+     * Example: Application component unavailable, unexpected exception.
+     *
+     * @param string  $message
+     * @param mixed[] $context
+     */
+    public function critical($message, array $context = [])
+    {
+        $this->log(LogLevel::CRITICAL, $message, $context);
+    }
+
+    /**
+     * Runtime errors that do not require immediate action but should typically
+     * be logged and monitored.
+     *
+     * @param string  $message
+     * @param mixed[] $context
+     */
+    public function error($message, array $context = [])
+    {
+        $this->log(LogLevel::ERROR, $message, $context);
+    }
+
+    /**
+     * Exceptional occurrences that are not errors.
+     *
+     * Example: Use of deprecated APIs, poor use of an API, undesirable things
+     * that are not necessarily wrong.
+     *
+     * @param string  $message
+     * @param mixed[] $context
+     */
+    public function warning($message, array $context = [])
+    {
+        $this->log(LogLevel::WARNING, $message, $context);
+    }
+
+    /**
+     * Normal but significant events.
+     *
+     * @param string  $message
+     * @param mixed[] $context
+     */
+    public function notice($message, array $context = [])
+    {
+        $this->log(LogLevel::NOTICE, $message, $context);
+    }
+
+    /**
+     * Interesting events.
+     *
+     * Example: User logs in, SQL logs.
+     *
+     * @param string $message
+     */
+    public function info($message, array $context = [])
+    {
+        $this->log(LogLevel::INFO, $message, $context);
+    }
+
+    /**
+     * Detailed debug information.
+     *
+     * @param string $message
+     */
+    public function debug($message, array $context = [])
+    {
+        $this->log(LogLevel::DEBUG, $message, $context);
+    }
+
+    public function log($level, $message, array $context = [])
+    {
+        $msg = match ($level) {
+            'info' => "<info>{$message}</info>",
+            'debug' => $this->input->getOption('verbose') ? "<fg=gray>{$message}</>" : '',
+            'notice' => "<fg=cyan>{$message}</>",
+            'warning' => "<comment>{$message}</comment>",
+            'error', 'critical', 'alert', 'emergency' => "<error>{$message}</error>",
+            default => '',
+        };
+        $msg = $this->interpolate($msg, $context);
+        if ($msg !== '') {
+            $this->output->write($msg, true);
+        }
+    }
+
+    /**
      * 输出一段文本，默认样式
      *
      * @param string $message 要输出的文本
@@ -28,28 +142,6 @@ trait CommandInteractTrait
     public function write(string $message, bool $newline = true): void
     {
         $this->output->write($message, $newline);
-    }
-
-    /**
-     * 输出文本，一般用于提示信息
-     *
-     * @param string $message 要输出的文本
-     * @param bool   $newline 是否在文本后换行
-     */
-    public function info(string $message, bool $newline = true): void
-    {
-        $this->write("<info>{$message}</info>", $newline);
-    }
-
-    /**
-     * 输出文本，一般用于错误信息
-     *
-     * @param string $message 要输出的文本
-     * @param bool   $newline 是否在文本后换行
-     */
-    public function error(string $message, bool $newline = true): void
-    {
-        $this->write("<error>{$message}</error>", $newline);
     }
 
     /**
@@ -155,6 +247,47 @@ trait CommandInteractTrait
     {
         if (!$this->confirm($prompt, $default)) {
             exit(self::SUCCESS);
+        }
+    }
+
+    private function interpolate(string $message, array $context = []): string
+    {
+        $replace = [];
+        foreach ($context as $key => $value) {
+            $replace['{' . $key . '}'] = $this->stringify($value);
+        }
+
+        return strtr($message, $replace);
+    }
+
+    private function stringify($item): string
+    {
+        switch (true) {
+            case is_callable($item):
+                if (is_array($item)) {
+                    if (is_object($item[0])) {
+                        return get_class($item[0]) . '@' . $item[1];
+                    }
+                    return $item[0] . '::' . $item[1];
+                }
+                return 'closure';
+            case is_string($item):
+                return $item;
+            case is_array($item):
+                return 'array' . (extension_loaded('json') ? json_encode($item, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_LINE_TERMINATORS) : '');
+            case is_object($item):
+                return get_class($item);
+            case is_resource($item):
+                return 'resource(' . get_resource_type($item) . ')';
+            case is_null($item):
+                return 'null';
+            case is_bool($item):
+                return $item ? 'true' : 'false';
+            case is_float($item):
+            case is_int($item):
+                return (string) $item;
+            default:
+                return 'unknown';
         }
     }
 }
