@@ -14,5 +14,6 @@ class LoadPlugins
         $plugin_dir = config('global.plugin.load_dir', SOURCE_ROOT_DIR . '/plugins');
         // 模拟加载一遍插件
         PluginManager::addPluginsFromDir($plugin_dir);
+        PluginManager::addPluginsFromComposer();
     }
 }
