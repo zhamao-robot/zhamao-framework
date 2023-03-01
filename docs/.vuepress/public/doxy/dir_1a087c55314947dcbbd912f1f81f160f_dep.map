@@ -1,6 +1,7 @@
 <map id="src/ZM/Plugin" name="src/ZM/Plugin">
-<area shape="rect" id="node2" href="dir_b04f5c6e20ae447d34a415ef2026b1b0.html" title="CommandManual" alt="" coords="117,63,240,88"/>
-<area shape="rect" id="node3" href="dir_b44262b9228cbb5b7014731b35e08080.html" title="Traits" alt="" coords="38,63,93,88"/>
-<area shape="rect" id="clust2" href="dir_1a087c55314947dcbbd912f1f81f160f.html" alt="" coords="27,52,333,99"/>
-<area shape="rect" id="clust1" href="dir_14547c19cd47bd2555adf353e72448ce.html" title="ZM" alt="" coords="16,16,344,109"/>
+<area shape="rect" id="node2" href="dir_b04f5c6e20ae447d34a415ef2026b1b0.html" title="CommandManual" alt="" coords="212,63,335,88"/>
+<area shape="rect" id="node3" href="dir_1fcb1389e4ff08b56c2f544f13235c57.html" title="Strategy" alt="" coords="117,63,187,88"/>
+<area shape="rect" id="node4" href="dir_b44262b9228cbb5b7014731b35e08080.html" title="Traits" alt="" coords="38,63,93,88"/>
+<area shape="rect" id="clust2" href="dir_1a087c55314947dcbbd912f1f81f160f.html" alt="" coords="27,52,428,99"/>
+<area shape="rect" id="clust1" href="dir_14547c19cd47bd2555adf353e72448ce.html" title="ZM" alt="" coords="16,16,439,109"/>
 </map>

@@ -1,5 +1,8 @@
 var class_z_m_1_1_command_1_1_plugin_1_1_plugin_command =
 [
-    [ "execute", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_command.html#ab31c72b72ddaf7116db5d84c055d3c0b", null ],
-    [ "$bootstrappers", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_command.html#a204c8c9af4afd3a0254d46aaf263e1b1", null ]
+    [ "getTypeDisplayName", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_command.html#a457cd28cbb2f99799325df724e334b33", null ],
+    [ "validateNamespace", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_command.html#a4b1dc13ccc94287f518074af17f92101", null ],
+    [ "validatePluginName", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_command.html#ad98a1adc0a972cf6d0827e56a3f84c60", null ],
+    [ "$bootstrappers", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_command.html#a204c8c9af4afd3a0254d46aaf263e1b1", null ],
+    [ "$plugin_dir", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_command.html#a792ab9ef8f9dc62c48165981915897c1", null ]
 ];

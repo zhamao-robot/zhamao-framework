@@ -1,8 +1,9 @@
 <map id="PluginPackCommand" name="PluginPackCommand">
-<area shape="rect" id="node1" title=" " alt="" coords="89,243,235,268"/>
-<area shape="rect" id="node2" href="$class_z_m_1_1_command_1_1_plugin_1_1_plugin_command.html" title=" " alt="" coords="103,168,221,193"/>
-<area shape="rect" id="node3" href="$class_z_m_1_1_command_1_1_command.html" title=" " alt="" coords="121,93,203,119"/>
+<area shape="rect" id="node1" title=" " alt="" coords="159,243,306,268"/>
+<area shape="rect" id="node2" href="$class_z_m_1_1_command_1_1_plugin_1_1_plugin_command.html" title=" " alt="" coords="174,168,291,193"/>
+<area shape="rect" id="node3" href="$class_z_m_1_1_command_1_1_command.html" title=" " alt="" coords="192,93,273,119"/>
 <area shape="rect" id="node4" title=" " alt="" coords="5,5,87,31"/>
-<area shape="rect" id="node5" title=" " alt="" coords="111,5,213,31"/>
-<area shape="rect" id="node6" title=" " alt="" coords="238,5,350,31"/>
+<area shape="rect" id="node5" title=" " alt="" coords="111,5,224,31"/>
+<area shape="rect" id="node6" title=" " alt="" coords="248,5,351,31"/>
+<area shape="rect" id="node7" title=" " alt="" coords="375,5,487,31"/>
 </map>

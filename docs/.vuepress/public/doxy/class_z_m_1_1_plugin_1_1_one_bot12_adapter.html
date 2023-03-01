@@ -27,7 +27,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Zhamao Framework<span id="projectnumber">&#160;3.0.3</span>
+   <div id="projectname">Zhamao Framework<span id="projectnumber">&#160;3.1.0</span>
    </div>
    <div id="projectbrief">A high-performance chatbot + web framework</div>
   </td>
@@ -117,8 +117,8 @@ Public 成员函数</h2></td></tr>
 <tr class="separator:ac2873c40465712dc7b90cb32d8be0327"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a07dc89a22bfa31bdfe64435de3d244b3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_plugin_1_1_one_bot12_adapter.html#a07dc89a22bfa31bdfe64435de3d244b3">parseBotCommand</a> (<a class="el" href="class_z_m_1_1_annotation_1_1_one_bot_1_1_bot_command.html">BotCommand</a> $command, ?array $same_method_annotations=null)</td></tr>
 <tr class="separator:a07dc89a22bfa31bdfe64435de3d244b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a564415b04e655cd80cec10f806e21c2a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_plugin_1_1_one_bot12_adapter.html#a564415b04e655cd80cec10f806e21c2a">handleContextPrompt</a> (<a class="el" href="class_z_m_1_1_context_1_1_bot_context.html">BotContext</a> $ctx, OneBotEvent $event)</td></tr>
-<tr class="separator:a564415b04e655cd80cec10f806e21c2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a64f4c7724db0ab90759e47085ea85fbb"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_plugin_1_1_one_bot12_adapter.html#a64f4c7724db0ab90759e47085ea85fbb">handleContextPrompt</a> (OneBotEvent $event)</td></tr>
+<tr class="separator:a64f4c7724db0ab90759e47085ea85fbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a47a16077a88d8bf91bfb776c3ced3fbf"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_plugin_1_1_one_bot12_adapter.html#a47a16077a88d8bf91bfb776c3ced3fbf">handleUnknownWSReverseInput</a> (WebSocketOpenEvent $event)</td></tr>
 <tr class="separator:a47a16077a88d8bf91bfb776c3ced3fbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a10ebdd5d22239391c9f23325ea8d2211"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_plugin_1_1_one_bot12_adapter.html#a10ebdd5d22239391c9f23325ea8d2211">handleWSReverseOpen</a> (WebSocketOpenEvent $event)</td></tr>
@@ -208,8 +208,8 @@ Public 成员函数</h2></td></tr>
 
 </div>
 </div>
-<a id="a564415b04e655cd80cec10f806e21c2a" name="a564415b04e655cd80cec10f806e21c2a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a564415b04e655cd80cec10f806e21c2a">&#9670;&#160;</a></span>handleContextPrompt()</h2>
+<a id="a64f4c7724db0ab90759e47085ea85fbb" name="a64f4c7724db0ab90759e47085ea85fbb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a64f4c7724db0ab90759e47085ea85fbb">&#9670;&#160;</a></span>handleContextPrompt()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -217,26 +217,15 @@ Public 成员函数</h2></td></tr>
         <tr>
           <td class="memname">handleContextPrompt </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_z_m_1_1_context_1_1_bot_context.html">BotContext</a>&#160;</td>
-          <td class="paramname"><em>$ctx</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
           <td class="paramtype">OneBotEvent&#160;</td>
-          <td class="paramname"><em>$event</em>&#160;</td>
-        </tr>
-        <tr>
+          <td class="paramname"><em>$event</em></td><td>)</td>
           <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 <p >[CALLBACK] 处理需要等待回复的 <a class="el" href="global__functions_8php.html#af9e36b31fab375707e181526bd590d61">bot()</a>-&gt;prompt() 会话消息</p>
 <dl class="params"><dt>参数</dt><dd>
   <table class="params">
-    <tr><td class="paramtype">BotContext</td><td class="paramname">$ctx</td><td>机器人上下文 </td></tr>
     <tr><td class="paramtype">OneBotEvent</td><td class="paramname">$event</td><td>当前事件对象 </td></tr>
   </table>
   </dd>

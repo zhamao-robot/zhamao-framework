@@ -8,5 +8,6 @@ var searchData=
   ['post_5',['post',['../class_z_m_1_1_utils_1_1_z_m_request.html#a1e632b807e0102f7eb1d8905efbf8b01',1,'ZM::Utils::ZMRequest']]],
   ['prepare_6',['prepare',['../class_z_m_1_1_store_1_1_database_1_1_d_b_connection.html#ab62fe348997905e95319ac84b3d304f7',1,'ZM::Store::Database::DBConnection']]],
   ['process_7',['process',['../class_z_m_1_1_middleware_1_1_middleware_handler.html#a560b0a9a500384b52d40be0101fe5ae9',1,'ZM::Middleware::MiddlewareHandler']]],
-  ['promptstring_8',['promptString',['../class_z_m_1_1_context_1_1_bot_context.html#a658777d23d340b09fe9af94c5f9d1591',1,'ZM::Context::BotContext']]]
+  ['promptstring_8',['promptString',['../class_z_m_1_1_context_1_1_bot_context.html#a658777d23d340b09fe9af94c5f9d1591',1,'ZM::Context::BotContext']]],
+  ['putcomposermetadata_9',['putComposerMetadata',['../class_z_m_1_1_utils_1_1_z_m_util.html#a9850d3a97583a42f7ed18f89ca84f1c4',1,'ZM::Utils::ZMUtil']]]
 ];

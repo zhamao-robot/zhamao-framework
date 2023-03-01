@@ -14,6 +14,7 @@ var hierarchy =
         [ "InitCommand", "class_z_m_1_1_command_1_1_init_command.html", null ],
         [ "PluginCommand", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_command.html", [
           [ "PluginInstallCommand", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_install_command.html", null ],
+          [ "PluginListCommand", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_list_command.html", null ],
           [ "PluginMakeCommand", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_make_command.html", null ],
           [ "PluginPackCommand", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_pack_command.html", null ]
         ] ],
@@ -123,6 +124,10 @@ var hierarchy =
       [ "TimerMiddleware", "class_z_m_1_1_middleware_1_1_timer_middleware.html", null ]
     ] ],
     [ "PluginGenerator", "class_z_m_1_1_utils_1_1_code_generator_1_1_plugin_generator.html", null ],
+    [ "PluginInstallStrategy", "class_z_m_1_1_plugin_1_1_strategy_1_1_plugin_install_strategy.html", [
+      [ "ComposerStrategy", "class_z_m_1_1_plugin_1_1_strategy_1_1_composer_strategy.html", null ],
+      [ "GitStrategy", "class_z_m_1_1_plugin_1_1_strategy_1_1_git_strategy.html", null ]
+    ] ],
     [ "ProcessStateManager", "class_z_m_1_1_process_1_1_process_state_manager.html", null ],
     [ "Redis", null, [
       [ "ZMRedis", "class_z_m_1_1_store_1_1_k_v_1_1_redis_1_1_z_m_redis.html", null ]
@@ -180,6 +185,9 @@ var hierarchy =
     ] ],
     [ "ExceptionHandler", null, [
       [ "Handler", "class_z_m_1_1_exception_1_1_handler.html", null ]
+    ] ],
+    [ "LoggerInterface", null, [
+      [ "Command", "class_z_m_1_1_command_1_1_command.html", null ]
     ] ],
     [ "QueryBuilder", null, [
       [ "DBQueryBuilder", "class_z_m_1_1_store_1_1_database_1_1_d_b_query_builder.html", null ]

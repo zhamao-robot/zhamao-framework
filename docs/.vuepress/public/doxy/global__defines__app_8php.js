@@ -33,6 +33,7 @@ var global__defines__app_8php =
     [ "ZM_PROMPT_TIMEOUT_MENTION_USER", "global__defines__app_8php.html#ac11227636c25e035b9f7f4ea3c8401d4", null ],
     [ "ZM_PROMPT_TIMEOUT_QUOTE_SELF", "global__defines__app_8php.html#a54474f46d1ce9acdaed0051bba89ffc4", null ],
     [ "ZM_PROMPT_TIMEOUT_QUOTE_USER", "global__defines__app_8php.html#af15159e7cbf0bcade802b122f37da5ec", null ],
+    [ "ZM_PROMPT_UPDATE_EVENT", "global__defines__app_8php.html#a64ddd33b0e86c71f0bf09c2b2752eccc", null ],
     [ "ZM_REPLY_MENTION", "global__defines__app_8php.html#a1f7bd423a8db5f2772478b9a64eeeca7", null ],
     [ "ZM_REPLY_NONE", "global__defines__app_8php.html#a6799bc056e2c6ee166accb04ab44eb47", null ],
     [ "ZM_REPLY_QUOTE", "global__defines__app_8php.html#af616dca4ea6151351ae9a257d20fe468", null ],

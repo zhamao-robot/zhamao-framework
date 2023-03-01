@@ -1,6 +1,7 @@
 var namespace_z_m_1_1_plugin =
 [
     [ "CommandManual", "namespace_z_m_1_1_plugin_1_1_command_manual.html", "namespace_z_m_1_1_plugin_1_1_command_manual" ],
+    [ "Strategy", "namespace_z_m_1_1_plugin_1_1_strategy.html", "namespace_z_m_1_1_plugin_1_1_strategy" ],
     [ "Traits", "namespace_z_m_1_1_plugin_1_1_traits.html", [
       [ "addBotCommand", "namespace_z_m_1_1_plugin_1_1_traits.html#a2a7453aa099c39db14e3c084f3fc98dd", null ],
       [ "addBotEvent", "namespace_z_m_1_1_plugin_1_1_traits.html#a1ff465e537000a7d4d01966d22f1abb7", null ],

@@ -61,6 +61,7 @@ var annotated_dup =
         [ "Plugin", "namespace_z_m_1_1_command_1_1_plugin.html", [
           [ "PluginCommand", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_command.html", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_command" ],
           [ "PluginInstallCommand", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_install_command.html", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_install_command" ],
+          [ "PluginListCommand", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_list_command.html", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_list_command" ],
           [ "PluginMakeCommand", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_make_command.html", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_make_command" ],
           [ "PluginPackCommand", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_pack_command.html", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_pack_command" ]
         ] ],
@@ -135,6 +136,11 @@ var annotated_dup =
         [ "CommandManual", "namespace_z_m_1_1_plugin_1_1_command_manual.html", [
           [ "CommandManualPlugin", "class_z_m_1_1_plugin_1_1_command_manual_1_1_command_manual_plugin.html", "class_z_m_1_1_plugin_1_1_command_manual_1_1_command_manual_plugin" ],
           [ "StaticManualFactory", "class_z_m_1_1_plugin_1_1_command_manual_1_1_static_manual_factory.html", "class_z_m_1_1_plugin_1_1_command_manual_1_1_static_manual_factory" ]
+        ] ],
+        [ "Strategy", "namespace_z_m_1_1_plugin_1_1_strategy.html", [
+          [ "ComposerStrategy", "class_z_m_1_1_plugin_1_1_strategy_1_1_composer_strategy.html", "class_z_m_1_1_plugin_1_1_strategy_1_1_composer_strategy" ],
+          [ "GitStrategy", "class_z_m_1_1_plugin_1_1_strategy_1_1_git_strategy.html", "class_z_m_1_1_plugin_1_1_strategy_1_1_git_strategy" ],
+          [ "PluginInstallStrategy", "class_z_m_1_1_plugin_1_1_strategy_1_1_plugin_install_strategy.html", "class_z_m_1_1_plugin_1_1_strategy_1_1_plugin_install_strategy" ]
         ] ],
         [ "OneBot12Adapter", "class_z_m_1_1_plugin_1_1_one_bot12_adapter.html", "class_z_m_1_1_plugin_1_1_one_bot12_adapter" ],
         [ "PluginMeta", "class_z_m_1_1_plugin_1_1_plugin_meta.html", "class_z_m_1_1_plugin_1_1_plugin_meta" ],
