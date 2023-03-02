@@ -5,7 +5,13 @@ declare(strict_types=1);
 use OneBot\Exception\ExceptionHandler;
 
 // CLI Application 入口文件，先引入 Composer 组件
-require_once((!is_dir(__DIR__ . '/../vendor')) ? getcwd() : (__DIR__ . '/..')) . '/vendor/autoload.php';
+if (file_exists(dirname(__DIR__) . '/vendor/autoload.php')) {
+    // Current: src
+    require_once dirname(__DIR__) . '/vendor/autoload.php';
+} else {
+    // Current: vendor/zhamao/framework/src
+    require_once dirname(__DIR__, 3) . '/autoload.php';
+}
 
 // 适配 Windows 的 conhost 中文显示，因为使用 micro 打包框架运行的时候在 Windows 运行中文部分会变成乱码
 if (DIRECTORY_SEPARATOR === '\\') {
