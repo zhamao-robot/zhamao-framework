@@ -188,7 +188,10 @@ class LightCache
             $data_type = '';
         } elseif (is_int($value)) {
             $data_type = 'int';
-        } else {
+        } elseif (is_bool($value)) {
+            $data_type = 'bool';
+            $value = json_encode($value);
+        }  else {
             throw new LightCacheException('E00048', 'Only can set string, array and int');
         }
         try {
