@@ -32,12 +32,12 @@ class MiddlewareHandler
      */
     protected array $callable_stack = [];
 
-    public function registerBefore(string $name, callable $callback)
+    public function registerBefore(string $name, callable $callback): void
     {
         $this->middlewares[$name]['before'] = $callback;
     }
 
-    public function registerAfter(string $name, callable $callback)
+    public function registerAfter(string $name, callable $callback): void
     {
         if (
             is_array($callback)                                     // 如果是数组类型callback
@@ -53,7 +53,7 @@ class MiddlewareHandler
         $this->middlewares[$name]['after'] = $callback;
     }
 
-    public function registerException(string $name, string $exception_class, callable $callback)
+    public function registerException(string $name, string $exception_class, callable $callback): void
     {
         $this->middlewares[$name]['exception'][$exception_class] = $callback;
     }
@@ -61,7 +61,7 @@ class MiddlewareHandler
     /**
      * @throws InvalidArgumentException
      */
-    public function bindMiddleware(callable $callback, string $name, array $args = [])
+    public function bindMiddleware(callable $callback, string $name, array $args = []): void
     {
         $stack_id = $this->getStackId($callback);
         // TODO: 对中间件是否存在进行检查
@@ -72,7 +72,7 @@ class MiddlewareHandler
         $this->reg_map[$stack_id][] = [$name, $args];
     }
 
-    public function getPipeClosure(callable $callback, $stack_id, ?AnnotationBase $annotation = null)
+    public function getPipeClosure(callable $callback, $stack_id, ?AnnotationBase $annotation = null): \Closure
     {
         $pipe_func = function (array $mid_list, ...$args) use ($callback, $stack_id, $annotation, &$pipe_func) {
             $return = true;
@@ -184,7 +184,7 @@ class MiddlewareHandler
      *
      * @return false|mixed
      */
-    public function getCurrentCallable()
+    public function getCurrentCallable(): mixed
     {
         return end($this->callable_stack);
     }
