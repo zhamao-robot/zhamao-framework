@@ -17,7 +17,6 @@ class WebSocketFilter implements MiddlewareInterface, PipelineInterface
 
     public function handle(callable $callback, ...$params)
     {
-        logger()->alert('正在走 Filter');
         if (!$this->annotation instanceof BindEvent) {
             return null;
         }
