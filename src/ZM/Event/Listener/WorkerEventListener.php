@@ -17,7 +17,7 @@ use ZM\Exception\PluginException;
 use ZM\Exception\ZMKnownException;
 use ZM\Framework;
 use ZM\Plugin\CommandManual\CommandManualPlugin;
-use ZM\Plugin\OneBot12Adapter;
+use ZM\Plugin\OneBot\OneBot12Adapter;
 use ZM\Plugin\PluginManager;
 use ZM\Plugin\PluginMeta;
 use ZM\Process\ProcessStateManager;
@@ -116,6 +116,7 @@ class WorkerEventListener
         // 回显 debug 日志：进程占用的内存
         $memory_total = memory_get_usage() / 1024 / 1024;
         logger()->debug('Worker process used ' . round($memory_total, 3) . ' MB');
+        logger()->info('已初始化完成');
     }
 
     public function onWorkerStart1(): void
@@ -152,10 +153,6 @@ class WorkerEventListener
 
         if (DIRECTORY_SEPARATOR !== '\\') {
             ProcessStateManager::removeProcessState(ProcessStateManager::isTaskWorker() ? ZM_PROCESS_TASKWORKER : ZM_PROCESS_WORKER, ProcessManager::getProcessId());
-        }
-        // 清空 MySQL 的连接池
-        foreach (DBPool::getAllPools() as $name => $pool) {
-            DBPool::destroyPool($name);
         }
     }
 
