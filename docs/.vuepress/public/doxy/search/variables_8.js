@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['routetrait_0',['RouteTrait',['../namespace_z_m_1_1_plugin_1_1_traits.html#a137922a82f833ad67494c152d0fcc7d0',1,'ZM::Plugin::Traits']]]
+  ['pluginloadtrait_0',['PluginLoadTrait',['../namespace_z_m_1_1_plugin_1_1_traits.html#acce770cb6ab511ad71da8794ba33f3df',1,'ZM::Plugin::Traits']]],
+  ['pluginpacktrait_1',['PluginPackTrait',['../namespace_z_m_1_1_plugin_1_1_traits.html#a5142deee75df3b69f916595d7a4759f6',1,'ZM::Plugin::Traits']]]
 ];
