@@ -63,8 +63,8 @@ class TextGenerateCommand extends Command
 LINE;
         file_put_contents(
             SOURCE_ROOT_DIR . '/docs/components/common/class-alias.md',
-            $obj . "\n" . '| ' . str_pad('全类名', $full_maxlen) . ' | ' . str_pad('别名', $short_maxlen) . ' |' .
-            "\n" . '| ' . str_pad('', $full_maxlen, '-') . ' | ' . str_pad('', $short_maxlen, '-') . ' |' .
+            $obj . "\n" . '| ' . str_pad('全类名      ', $full_maxlen + 6) . ' | ' . str_pad('别名    ', $short_maxlen + 4) . ' |' .
+            "\n" . '|-' . str_pad('', $full_maxlen, '-') . '-|-' . str_pad('', $short_maxlen, '-') . '-|' .
             "\n" . implode("\n", array_map(fn ($v) => '| ' . str_pad('`' . $v[0] . '`', $full_maxlen) . ' | ' . str_pad('`' . $v[1] . '`', $short_maxlen) . ' |', $line)) . "\n"
         );
         $this->write('成功');
