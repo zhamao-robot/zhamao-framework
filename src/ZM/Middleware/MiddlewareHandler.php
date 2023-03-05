@@ -60,7 +60,7 @@ class MiddlewareHandler
     /**
      * @throws InvalidArgumentException
      */
-    public function bindMiddleware(callable $callback, string $name, array $params = [])
+    public function bindMiddleware(callable $callback, string $name, array $args = [])
     {
         $stack_id = $this->getStackId($callback);
         // TODO: 对中间件是否存在进行检查
@@ -68,7 +68,7 @@ class MiddlewareHandler
             $obj = resolve($name);
         }
 
-        $this->reg_map[$stack_id][] = [$name, $params];
+        $this->reg_map[$stack_id][] = [$name, $args];
     }
 
     public function getPipeClosure(callable $callback, $stack_id)
@@ -80,7 +80,11 @@ class MiddlewareHandler
                     $this->stack[$stack_id][] = $item;
                     // 如果是 pipeline 形式的中间件，则使用闭包回去
                     if (class_exists($item[0]) && is_a($item[0], PipelineInterface::class, true)) {
-                        return resolve($item[0])->handle(function (...$args) use ($mid_list, &$pipe_func) {
+                        $resolve = resolve($item[0]);
+                        if (method_exists($resolve, 'setArgs')) {
+                            $resolve->setArgs($item[1]);
+                        }
+                        return $resolve->handle(function (...$args) use ($mid_list, &$pipe_func) {
                             return $pipe_func($mid_list, ...$args);
                         }, ...$args);
                     } elseif (isset($this->middlewares[$item[0]]['before'])) {

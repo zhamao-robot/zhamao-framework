@@ -60,7 +60,7 @@ class AnnotationParser
         // 如果需要，添加内置的注解解析器
         if ($with_internal_parsers) {
             $this->special_parsers = [
-                Middleware::class => [function (Middleware $middleware) { \middleware()->bindMiddleware([resolve($middleware->class), $middleware->method], $middleware->name, $middleware->params); }],
+                Middleware::class => [function (Middleware $middleware) { \middleware()->bindMiddleware([resolve($middleware->class), $middleware->method], $middleware->name, $middleware->args); }],
                 Route::class => [[$this, 'addRouteAnnotation']],
                 Closed::class => [fn () => false],
                 Cron::class => [[resolve(Schedule::class), 'addSchedule']],
