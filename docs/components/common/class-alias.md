@@ -29,6 +29,8 @@
 | `\ZM\Annotation\OneBot\CommandArgument`                | `CommandArgument`       |
 | `\ZM\Annotation\OneBot\CommandHelp`                    | `CommandHelp`           |
 | `\ZM\Annotation\Closed`                                | `Closed`                |
+| `\ZM\Middleware\MiddlewareArgTrait`                    | `MiddlewareArgTrait`    |
+| `\ZM\Middleware\Pipeline`                              | `Pipeline`              |
 | `\ZM\Plugin\ZMPlugin`                                  | `ZMPlugin`              |
 | `\ZM\Context\BotContext`                               | `BotContext`            |
 | `\ZM\Utils\ZMRequest`                                  | `ZMRequest`             |
