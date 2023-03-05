@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ZM\Middleware;
 
 use OneBot\Util\Singleton;
+use ZM\Annotation\AnnotationBase;
 use ZM\Exception\InvalidArgumentException;
 
 class MiddlewareHandler
@@ -71,9 +72,9 @@ class MiddlewareHandler
         $this->reg_map[$stack_id][] = [$name, $args];
     }
 
-    public function getPipeClosure(callable $callback, $stack_id)
+    public function getPipeClosure(callable $callback, $stack_id, ?AnnotationBase $annotation = null)
     {
-        $pipe_func = function (array $mid_list, ...$args) use ($callback, $stack_id, &$pipe_func) {
+        $pipe_func = function (array $mid_list, ...$args) use ($callback, $stack_id, $annotation, &$pipe_func) {
             $return = true;
             try {
                 while (($item = array_shift($mid_list)) !== null) {
@@ -81,6 +82,9 @@ class MiddlewareHandler
                     // 如果是 pipeline 形式的中间件，则使用闭包回去
                     if (class_exists($item[0]) && is_a($item[0], PipelineInterface::class, true)) {
                         $resolve = resolve($item[0]);
+                        if (method_exists($resolve, 'setAnnotation') && $annotation !== null) {
+                            $resolve->setAnnotation($annotation);
+                        }
                         if (method_exists($resolve, 'setArgs')) {
                             $resolve->setArgs($item[1]);
                         }
@@ -152,6 +156,23 @@ class MiddlewareHandler
         try {
             $mid_list = ($this->reg_map[$stack_id] ?? []);
             $final_result = ($this->getPipeClosure($callback, $stack_id))($mid_list, ...$args);
+        } finally {
+            array_pop($this->callable_stack);
+        }
+        return $final_result ?? null;
+    }
+
+    public function processWithAnnotation(AnnotationBase $v, callable $callback, ...$args)
+    {
+        $stack_id = $this->getStackId($callback);
+        unset($this->stack[$stack_id]);
+
+        $this->callable_stack[] = $callback;
+
+        // 遍历执行before并压栈，并在遇到返回false后停止
+        try {
+            $mid_list = ($this->reg_map[$stack_id] ?? []);
+            $final_result = ($this->getPipeClosure($callback, $stack_id, $v))($mid_list, ...$args);
         } finally {
             array_pop($this->callable_stack);
         }

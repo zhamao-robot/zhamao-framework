@@ -131,7 +131,7 @@ class AnnotationHandler
             return false;
         }
         try {
-            $this->return_val = middleware()->process($callback, ...$args);
+            $this->return_val = middleware()->processWithAnnotation($v, $callback, ...$args);
             // 执行完毕后检查状态，如果状态是规则判断或中间件before不通过，则重置状态后继续执行别的注解函数
             if ($this->status == self::STATUS_BEFORE_FAILED || $this->status == self::STATUS_RULE_FAILED) {
                 $this->status = self::STATUS_NORMAL;

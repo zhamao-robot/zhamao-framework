@@ -317,7 +317,7 @@ class OneBot12Adapter extends ZMPlugin
             logger()->info('检测到 OneBot 12 反向 WS 连接，正在进行认证...');
             // 是 OneBot 12 标准的，准许接入，进行鉴权
             $request = $event->getRequest();
-            $info = ['impl' => $line[1] ?? 'unknown'];
+            $info = ['impl' => $line[1] ?? 'unknown', 'onebot-version' => '12'];
             if (($stored_token = $event->getSocketConfig()['access_token'] ?? '') !== '') {
                 // 测试 Header
                 $token = $request->getHeaderLine('Authorization');

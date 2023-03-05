@@ -53,7 +53,7 @@ class PluginInstallCommand extends PluginCommand
                 return static::FAILURE;
             }
         } catch (\Throwable $e) {
-            $this->error('niu: ' . $e->getMessage());
+            $this->error('插件安装失败: ' . $e->getMessage());
             $this->error($e->getTraceAsString());
             return static::FAILURE;
         }
