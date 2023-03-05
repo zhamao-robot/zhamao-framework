@@ -4,7 +4,7 @@ var searchData=
   ['addbotevent_1',['addBotEvent',['../namespace_z_m_1_1_plugin_1_1_traits.html#a1ff465e537000a7d4d01966d22f1abb7',1,'ZM::Plugin::Traits']]],
   ['addconfigpath_2',['addConfigPath',['../class_z_m_1_1_config_1_1_z_m_config.html#a884772e2673674ac3b1de2fbcd602538',1,'ZM::Config::ZMConfig']]],
   ['addconnection_3',['addConnection',['../class_z_m_1_1_utils_1_1_connection_util.html#a3fec99f357943ab8e2737e31f5d10c3d',1,'ZM::Utils::ConnectionUtil']]],
-  ['addcontextprompt_4',['addContextPrompt',['../class_z_m_1_1_plugin_1_1_one_bot12_adapter.html#a37f2da40fca1f7db80af4a000440be8c',1,'ZM::Plugin::OneBot12Adapter']]],
+  ['addcontextprompt_4',['addContextPrompt',['../class_z_m_1_1_plugin_1_1_one_bot_1_1_one_bot12_adapter.html#a37f2da40fca1f7db80af4a000440be8c',1,'ZM::Plugin::OneBot::OneBot12Adapter']]],
   ['addcron_5',['addCron',['../namespace_z_m_1_1_plugin_1_1_traits.html#a1900c40593a4cc506bc328da992129e1',1,'ZM::Plugin::Traits']]],
   ['addevent_6',['addEvent',['../namespace_z_m_1_1_plugin_1_1_traits.html#a17a9cd93208eb3a3d75e5faded3bc202',1,'ZM::Plugin::Traits']]],
   ['addeventlistener_7',['addEventListener',['../class_z_m_1_1_event_1_1_event_provider.html#ac70a16381d41713c8dea7deb533de267',1,'ZM::Event::EventProvider']]],

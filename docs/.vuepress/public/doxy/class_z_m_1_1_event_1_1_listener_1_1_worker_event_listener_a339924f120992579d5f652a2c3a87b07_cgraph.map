@@ -1,7 +1,5 @@
 <map id="onWorkerStop999" name="onWorkerStop999">
-<area shape="rect" id="node1" title=" " alt="" coords="5,95,131,120"/>
-<area shape="rect" id="node2" href="$global__functions_8php.html#a71de63d02514c7e74d68338f4424139f" title=" " alt="" coords="242,5,298,31"/>
-<area shape="rect" id="node3" href="$class_z_m_1_1_store_1_1_database_1_1_d_b_pool.html#abeafe92a8e01fa3343da7cbd88ae4942" title=" " alt="" coords="179,55,361,95"/>
-<area shape="rect" id="node4" href="$class_z_m_1_1_store_1_1_database_1_1_d_b_pool.html#aa42d01b0fa5917a3f68facf1eaec3195" title=" " alt="" coords="179,119,361,159"/>
-<area shape="rect" id="node5" href="$global__functions_8php.html#a97e3b3adabf67bc7d3650ed14214ddaa" title=" " alt="" coords="241,184,299,209"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,31,131,56"/>
+<area shape="rect" id="node2" href="$global__functions_8php.html#a71de63d02514c7e74d68338f4424139f" title=" " alt="" coords="179,5,235,31"/>
+<area shape="rect" id="node3" href="$global__functions_8php.html#a97e3b3adabf67bc7d3650ed14214ddaa" title=" " alt="" coords="179,55,236,80"/>
 </map>

@@ -3,6 +3,8 @@ var hierarchy =
     [ "AnnotationHandler", "class_z_m_1_1_annotation_1_1_annotation_handler.html", null ],
     [ "AnnotationMap", "class_z_m_1_1_annotation_1_1_annotation_map.html", null ],
     [ "AnnotationParser", "class_z_m_1_1_annotation_1_1_annotation_parser.html", null ],
+    [ "BotConnectContext", "class_z_m_1_1_context_1_1_bot_connect_context.html", null ],
+    [ "BotMap", "class_z_m_1_1_plugin_1_1_one_bot_1_1_bot_map.html", null ],
     [ "CatCode", "class_z_m_1_1_utils_1_1_cat_code.html", null ],
     [ "Command", null, [
       [ "Command", "class_z_m_1_1_command_1_1_command.html", [
@@ -152,7 +154,7 @@ var hierarchy =
     [ "ZMConfig", "class_z_m_1_1_config_1_1_z_m_config.html", null ],
     [ "ZMPlugin", "class_z_m_1_1_plugin_1_1_z_m_plugin.html", [
       [ "CommandManualPlugin", "class_z_m_1_1_plugin_1_1_command_manual_1_1_command_manual_plugin.html", null ],
-      [ "OneBot12Adapter", "class_z_m_1_1_plugin_1_1_one_bot12_adapter.html", null ],
+      [ "OneBot12Adapter", "class_z_m_1_1_plugin_1_1_one_bot_1_1_one_bot12_adapter.html", null ],
       [ "ZMApplication", "class_z_m_1_1_z_m_application.html", null ]
     ] ],
     [ "ZMRequest", "class_z_m_1_1_utils_1_1_z_m_request.html", null ],

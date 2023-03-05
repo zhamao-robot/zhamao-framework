@@ -1,6 +1,7 @@
 var namespace_z_m_1_1_plugin =
 [
     [ "CommandManual", "namespace_z_m_1_1_plugin_1_1_command_manual.html", "namespace_z_m_1_1_plugin_1_1_command_manual" ],
+    [ "OneBot", "namespace_z_m_1_1_plugin_1_1_one_bot.html", "namespace_z_m_1_1_plugin_1_1_one_bot" ],
     [ "Strategy", "namespace_z_m_1_1_plugin_1_1_strategy.html", "namespace_z_m_1_1_plugin_1_1_strategy" ],
     [ "Traits", "namespace_z_m_1_1_plugin_1_1_traits.html", [
       [ "addBotCommand", "namespace_z_m_1_1_plugin_1_1_traits.html#a2a7453aa099c39db14e3c084f3fc98dd", null ],
@@ -37,7 +38,6 @@ var namespace_z_m_1_1_plugin =
       [ "RouteTrait", "namespace_z_m_1_1_plugin_1_1_traits.html#a137922a82f833ad67494c152d0fcc7d0", null ],
       [ "TickTrait", "namespace_z_m_1_1_plugin_1_1_traits.html#a36dd348cb10a14202d9602701e2d480e", null ]
     ] ],
-    [ "OneBot12Adapter", "class_z_m_1_1_plugin_1_1_one_bot12_adapter.html", "class_z_m_1_1_plugin_1_1_one_bot12_adapter" ],
     [ "PluginMeta", "class_z_m_1_1_plugin_1_1_plugin_meta.html", "class_z_m_1_1_plugin_1_1_plugin_meta" ],
     [ "ZMPlugin", "class_z_m_1_1_plugin_1_1_z_m_plugin.html", null ]
 ];

@@ -20,7 +20,7 @@ var searchData=
   ['listener_17',['Listener',['../namespace_z_m_1_1_event_1_1_listener.html',1,'ZM::Event']]],
   ['lock_18',['Lock',['../namespace_z_m_1_1_store_1_1_lock.html',1,'ZM::Store']]],
   ['middleware_19',['Middleware',['../namespace_z_m_1_1_annotation_1_1_middleware.html',1,'ZM\Annotation\Middleware'],['../namespace_z_m_1_1_middleware.html',1,'ZM\Middleware']]],
-  ['onebot_20',['OneBot',['../namespace_z_m_1_1_annotation_1_1_one_bot.html',1,'ZM::Annotation']]],
+  ['onebot_20',['OneBot',['../namespace_z_m_1_1_annotation_1_1_one_bot.html',1,'ZM\Annotation\OneBot'],['../namespace_z_m_1_1_plugin_1_1_one_bot.html',1,'ZM\Plugin\OneBot']]],
   ['plugin_21',['Plugin',['../namespace_z_m_1_1_command_1_1_plugin.html',1,'ZM\Command\Plugin'],['../namespace_z_m_1_1_plugin.html',1,'ZM\Plugin']]],
   ['process_22',['Process',['../namespace_z_m_1_1_process.html',1,'ZM']]],
   ['redis_23',['Redis',['../namespace_z_m_1_1_store_1_1_k_v_1_1_redis.html',1,'ZM::Store::KV']]],

@@ -1,6 +1,7 @@
 var global__functions_8php =
 [
-    [ "bot", "global__functions_8php.html#af9e36b31fab375707e181526bd590d61", null ],
+    [ "bot", "global__functions_8php.html#ad36f3e85e1dffc28a10a95382aaac608", null ],
+    [ "bot_connect", "global__functions_8php.html#a76f57c411996a730c3759fa1b5e23dc5", null ],
     [ "config", "global__functions_8php.html#a71de63d02514c7e74d68338f4424139f", null ],
     [ "container", "global__functions_8php.html#aeacc0140de439ebab9a5466c45d38191", null ],
     [ "coroutine", "global__functions_8php.html#aea4203b9b3d3a0cecaad1479e2978e16", null ],
@@ -16,6 +17,7 @@ var global__functions_8php =
     [ "resolve", "global__functions_8php.html#a72209840841640a3706f6393aa3bc0bc", null ],
     [ "segment", "global__functions_8php.html#aab951b3aba3cafdec6df825656344148", null ],
     [ "sql_builder", "global__functions_8php.html#a5e5e46262ccc376a933859820eaee89f", null ],
+    [ "ws_socket", "global__functions_8php.html#a3117291dc19c3820da1c3bbf65327e9d", null ],
     [ "zm_dir", "global__functions_8php.html#a5ffdd3528ee418f5b556be8335641705", null ],
     [ "zm_exec", "global__functions_8php.html#a49a9c9fabfe3e76c1535ea0a42407b15", null ],
     [ "zm_http_response", "global__functions_8php.html#ae77ae8234f42c23b690431e8313b8c69", null ],

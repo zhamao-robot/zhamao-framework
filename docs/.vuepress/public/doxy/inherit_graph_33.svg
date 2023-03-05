@@ -11,9 +11,9 @@
 <!-- Node0 -->
 <g id="node1" class="node">
 <title>Node0</title>
-<g id="a_node1"><a xlink:href="class_z_m_1_1_event_1_1_listener_1_1_http_event_listener.html" target="_top" xlink:title=" ">
+<g id="a_node1"><a xlink:href="class_z_m_1_1_bootstrap_1_1_handle_exceptions.html" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="#666666" points="95,-19 0,-19 0,0 95,0 95,-19"/>
-<text text-anchor="middle" x="47.5" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">HttpEventListener</text>
+<text text-anchor="middle" x="47.5" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">HandleExceptions</text>
 </a>
 </g>
 </g>

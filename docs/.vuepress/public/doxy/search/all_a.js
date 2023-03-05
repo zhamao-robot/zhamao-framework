@@ -20,7 +20,7 @@ var searchData=
   ['invalidargumentexception_2ephp_17',['InvalidArgumentException.php',['../_invalid_argument_exception_8php.html',1,'']]],
   ['is_5fassoc_5farray_18',['is_assoc_array',['../global__functions_8php.html#a872aa6d894a402d6faa4dbac803dd523',1,'global_functions.php']]],
   ['isautocommit_19',['isAutoCommit',['../class_z_m_1_1_store_1_1_database_1_1_d_b_wrapper.html#ac450e1c7aa682b1df444e7a2698e5cd7',1,'ZM::Store::Database::DBWrapper']]],
-  ['iscontextpromptexists_20',['isContextPromptExists',['../class_z_m_1_1_plugin_1_1_one_bot12_adapter.html#af077b71152d6ce243a398238a0bd143e',1,'ZM::Plugin::OneBot12Adapter']]],
+  ['iscontextpromptexists_20',['isContextPromptExists',['../class_z_m_1_1_plugin_1_1_one_bot_1_1_one_bot12_adapter.html#af077b71152d6ce243a398238a0bd143e',1,'ZM::Plugin::OneBot::OneBot12Adapter']]],
   ['isenabled_21',['isEnabled',['../class_z_m_1_1_plugin_1_1_plugin_meta.html#ad734dc60b64a242fe183e0c23b192790',1,'ZM::Plugin::PluginMeta']]],
   ['isingroup_22',['isInGroup',['../class_z_m_1_1_annotation_1_1_annotation_base.html#ac159870e22c4ebf2906db203bfd3cd1f',1,'ZM::Annotation::AnnotationBase']]],
   ['ismultiworkers_23',['isMultiWorkers',['../class_z_m_1_1_process_1_1_process_state_manager.html#af94dd63424fb58c22eeb8f380ab8f2e9',1,'ZM::Process::ProcessStateManager']]],

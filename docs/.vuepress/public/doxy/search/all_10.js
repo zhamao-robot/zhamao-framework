@@ -2,7 +2,7 @@ var searchData=
 [
   ['on_0',['on',['../class_z_m_1_1_annotation_1_1_annotation_base.html#a730374ff22a1666ccffadb007551aa7c',1,'ZM::Annotation::AnnotationBase']]],
   ['onbotaction_1',['onBotAction',['../namespace_z_m_1_1_plugin_1_1_traits.html#a084d3c0af903855c5295e8858d2f2512',1,'ZM::Plugin::Traits']]],
-  ['onebot12adapter_2',['OneBot12Adapter',['../class_z_m_1_1_plugin_1_1_one_bot12_adapter.html',1,'ZM::Plugin']]],
+  ['onebot12adapter_2',['OneBot12Adapter',['../class_z_m_1_1_plugin_1_1_one_bot_1_1_one_bot12_adapter.html',1,'ZM::Plugin::OneBot']]],
   ['onebot12adapter_2ephp_3',['OneBot12Adapter.php',['../_one_bot12_adapter_8php.html',1,'']]],
   ['onebot12exception_4',['OneBot12Exception',['../class_z_m_1_1_exception_1_1_one_bot12_exception.html',1,'ZM::Exception']]],
   ['onebot12exception_2ephp_5',['OneBot12Exception.php',['../_one_bot12_exception_8php.html',1,'']]],

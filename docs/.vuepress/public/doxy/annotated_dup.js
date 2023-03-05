@@ -92,6 +92,7 @@ var annotated_dup =
         [ "ContainerRegistrant", "class_z_m_1_1_container_1_1_container_registrant.html", null ]
       ] ],
       [ "Context", "namespace_z_m_1_1_context.html", [
+        [ "BotConnectContext", "class_z_m_1_1_context_1_1_bot_connect_context.html", "class_z_m_1_1_context_1_1_bot_connect_context" ],
         [ "BotContext", "class_z_m_1_1_context_1_1_bot_context.html", "class_z_m_1_1_context_1_1_bot_context" ],
         [ "ContextInterface", "interface_z_m_1_1_context_1_1_context_interface.html", null ]
       ] ],
@@ -137,12 +138,15 @@ var annotated_dup =
           [ "CommandManualPlugin", "class_z_m_1_1_plugin_1_1_command_manual_1_1_command_manual_plugin.html", "class_z_m_1_1_plugin_1_1_command_manual_1_1_command_manual_plugin" ],
           [ "StaticManualFactory", "class_z_m_1_1_plugin_1_1_command_manual_1_1_static_manual_factory.html", "class_z_m_1_1_plugin_1_1_command_manual_1_1_static_manual_factory" ]
         ] ],
+        [ "OneBot", "namespace_z_m_1_1_plugin_1_1_one_bot.html", [
+          [ "BotMap", "class_z_m_1_1_plugin_1_1_one_bot_1_1_bot_map.html", null ],
+          [ "OneBot12Adapter", "class_z_m_1_1_plugin_1_1_one_bot_1_1_one_bot12_adapter.html", "class_z_m_1_1_plugin_1_1_one_bot_1_1_one_bot12_adapter" ]
+        ] ],
         [ "Strategy", "namespace_z_m_1_1_plugin_1_1_strategy.html", [
           [ "ComposerStrategy", "class_z_m_1_1_plugin_1_1_strategy_1_1_composer_strategy.html", "class_z_m_1_1_plugin_1_1_strategy_1_1_composer_strategy" ],
           [ "GitStrategy", "class_z_m_1_1_plugin_1_1_strategy_1_1_git_strategy.html", "class_z_m_1_1_plugin_1_1_strategy_1_1_git_strategy" ],
           [ "PluginInstallStrategy", "class_z_m_1_1_plugin_1_1_strategy_1_1_plugin_install_strategy.html", "class_z_m_1_1_plugin_1_1_strategy_1_1_plugin_install_strategy" ]
         ] ],
-        [ "OneBot12Adapter", "class_z_m_1_1_plugin_1_1_one_bot12_adapter.html", "class_z_m_1_1_plugin_1_1_one_bot12_adapter" ],
         [ "PluginMeta", "class_z_m_1_1_plugin_1_1_plugin_meta.html", "class_z_m_1_1_plugin_1_1_plugin_meta" ],
         [ "ZMPlugin", "class_z_m_1_1_plugin_1_1_z_m_plugin.html", null ]
       ] ],

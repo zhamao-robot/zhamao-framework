@@ -6,9 +6,11 @@ var searchData=
   ['botactiontrait_2ephp_3',['BotActionTrait.php',['../_context_2_trait_2_bot_action_trait_8php.html',1,'(全局命名空间)'],['../_plugin_2_traits_2_bot_action_trait_8php.html',1,'(全局命名空间)']]],
   ['botcommand_2ephp_4',['BotCommand.php',['../_bot_command_8php.html',1,'']]],
   ['botcommandtrait_2ephp_5',['BotCommandTrait.php',['../_bot_command_trait_8php.html',1,'']]],
-  ['botcontext_2ephp_6',['BotContext.php',['../_bot_context_8php.html',1,'']]],
-  ['botcraftcommand_2ephp_7',['BotCraftCommand.php',['../_bot_craft_command_8php.html',1,'']]],
-  ['botevent_2ephp_8',['BotEvent.php',['../_bot_event_8php.html',1,'']]],
-  ['boteventtrait_2ephp_9',['BotEventTrait.php',['../_bot_event_trait_8php.html',1,'']]],
-  ['buildcommand_2ephp_10',['BuildCommand.php',['../_build_command_8php.html',1,'']]]
+  ['botconnectcontext_2ephp_6',['BotConnectContext.php',['../_bot_connect_context_8php.html',1,'']]],
+  ['botcontext_2ephp_7',['BotContext.php',['../_bot_context_8php.html',1,'']]],
+  ['botcraftcommand_2ephp_8',['BotCraftCommand.php',['../_bot_craft_command_8php.html',1,'']]],
+  ['botevent_2ephp_9',['BotEvent.php',['../_bot_event_8php.html',1,'']]],
+  ['boteventtrait_2ephp_10',['BotEventTrait.php',['../_bot_event_trait_8php.html',1,'']]],
+  ['botmap_2ephp_11',['BotMap.php',['../_bot_map_8php.html',1,'']]],
+  ['buildcommand_2ephp_12',['BuildCommand.php',['../_build_command_8php.html',1,'']]]
 ];
