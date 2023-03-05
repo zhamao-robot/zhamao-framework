@@ -104,6 +104,7 @@ module.exports = {
                         'store/file-system',
                         'store/cache',
                         'store/redis',
+                        'store/mysql',
                     ]
                 },
                 {
