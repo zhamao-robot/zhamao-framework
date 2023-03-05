@@ -6,6 +6,7 @@ use Choir\Http\HttpFactory;
 use OneBot\Driver\Coroutine\Adaptive;
 use OneBot\Driver\Coroutine\CoroutineInterface;
 use OneBot\Driver\Process\ExecutionResult;
+use OneBot\Driver\Socket\WSServerSocketBase;
 use OneBot\V12\Object\MessageSegment;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
@@ -13,8 +14,10 @@ use Psr\SimpleCache\CacheInterface;
 use ZM\Config\Environment;
 use ZM\Config\ZMConfig;
 use ZM\Container\ContainerHolder;
+use ZM\Framework;
 use ZM\Logger\ConsoleLogger;
 use ZM\Middleware\MiddlewareHandler;
+use ZM\Plugin\OneBot\BotMap;
 use ZM\Schedule\Timer;
 use ZM\Store\Database\DBException;
 use ZM\Store\Database\DBQueryBuilder;
@@ -326,4 +329,19 @@ function env(string $key, mixed $default = null): mixed
 function zm_http_response(int $status_code = 200, ?string $reason = null, array $headers = [], mixed $body = null, string $protocol = '1.1'): ResponseInterface
 {
     return HttpFactory::createResponse($status_code, $reason, $headers, $body, $protocol);
+}
+
+/**
+ * 【助手函数】获取驱动的 WebSocket 服务器对应 Socket 操作对象
+ *
+ * @param  int       $flag 对应的 Server 端口标记
+ * @throws Exception
+ */
+function ws_socket(int $flag = 1): WSServerSocketBase
+{
+    $a = Framework::getInstance()->getDriver()->getWSServerSocketByFlag($flag);
+    if ($a === null) {
+        throw new Exception('找不到目标的 server socket，请检查 flag 值');
+    }
+    return $a;
 }
