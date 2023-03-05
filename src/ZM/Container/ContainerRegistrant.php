@@ -27,6 +27,9 @@ class ContainerRegistrant
             'bot.event' => DI\get(OneBotEvent::class),
         ]);
 
+        // 不用依赖注入可能会更好一点，而且方便其他开发者排查问题（因为挺多开发者在非机器人事件里面用 bot() 的，会让依赖注入报错，而且他们自己也看不懂
+        // 而且我想让 BotContext 对象成为无状态无数据的对象，一切东西都从 container 和 BotMap 获取，它就是用作调用方法而已
+        /*
         if (isset($event->self['platform'])) {
             self::addServices([
                 BotContext::class => DI\autowire($bot_context)->constructor(
@@ -35,6 +38,7 @@ class ContainerRegistrant
                 ),
             ]);
         }
+        */
     }
 
     /**

@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace ZM\Plugin;
+namespace ZM\Plugin\OneBot;
 
 use Choir\Http\HttpFactory;
 use OneBot\Driver\Coroutine\Adaptive;
 use OneBot\Driver\Event\StopException;
+use OneBot\Driver\Event\WebSocket\WebSocketCloseEvent;
 use OneBot\Driver\Event\WebSocket\WebSocketMessageEvent;
 use OneBot\Driver\Event\WebSocket\WebSocketOpenEvent;
 use OneBot\V12\Exception\OneBotException;
@@ -28,6 +29,7 @@ use ZM\Context\BotContext;
 use ZM\Exception\InterruptException;
 use ZM\Exception\OneBot12Exception;
 use ZM\Exception\WaitTimeoutException;
+use ZM\Plugin\ZMPlugin;
 use ZM\Utils\ConnectionUtil;
 use ZM\Utils\MessageUtil;
 
@@ -49,19 +51,20 @@ class OneBot12Adapter extends ZMPlugin
      */
     private static array $context_prompt_queue = [];
 
-    public function __construct(string $submodule = '', ?AnnotationParser $parser = null)
+    public function __construct(string $submodule = 'onebot12', ?AnnotationParser $parser = null)
     {
         switch ($submodule) {
-            case '':
             case 'onebot12':
                 // 处理所有 OneBot 12 的反向 WS 握手事件
                 $this->addEvent(WebSocketOpenEvent::class, [$this, 'handleWSReverseOpen']);
                 $this->addEvent(WebSocketMessageEvent::class, [$this, 'handleWSReverseMessage']);
+                $this->addEvent(WebSocketCloseEvent::class, [$this, 'handleWSReverseClose']);
                 // 在 BotEvent 内处理 BotCommand
                 $this->addBotEvent(BotEvent::make(type: 'message', level: 15)->on([$this, 'handleBotCommand']));
                 // 在 BotEvent 内处理需要等待回复的 CommandArgument
                 $this->addBotEvent(BotEvent::make(type: 'message', level: 49)->on([$this, 'handleCommandArgument']));
                 $this->addBotEvent(BotEvent::make(type: 'message', level: 50)->on([$this, 'handleContextPrompt']));
+                $this->addBotEvent(BotEvent::make(type: 'meta', detail_type: 'status_update', level: 50)->on([$this, 'handleStatusUpdate']));
                 // 处理和声明所有 BotCommand 下的 CommandArgument
                 $parser->addSpecialParser(BotCommand::class, [$this, 'parseBotCommand']);
                 // 不需要给列表写入 CommandArgument
@@ -163,6 +166,44 @@ class OneBot12Adapter extends ZMPlugin
         $ctx->setParams($arguments);
         // 调用方法
         $this->callBotCommand($ctx, $command);
+    }
+
+    /**
+     * [CALLBACK] 处理 status_update 事件，更新 BotMap
+     *
+     * @param OneBotEvent $event 机器人事件
+     */
+    public function handleStatusUpdate(OneBotEvent $event, WebSocketMessageEvent $message_event): void
+    {
+        $status = $event->get('status');
+        $old = BotMap::getBotFds();
+        if (($status['good'] ?? false) === true) {
+            foreach (($status['bots'] ?? []) as $bot) {
+                BotMap::registerBotWithFd(
+                    bot_id: $bot['self']['user_id'],
+                    platform: $bot['self']['platform'],
+                    status: $bot['good'] ?? false,
+                    fd: $message_event->getFd(),
+                    flag: $message_event->getSocketFlag()
+                );
+                if (isset($old[$bot['self']['platform']][$bot['self']['user_id']])) {
+                    unset($old[$bot['self']['platform']][$bot['self']['user_id']]);
+                }
+                logger()->error("[{$bot['self']['platform']}.{$bot['self']['user_id']}] 已接入，状态：" . (($bot['good'] ?? false) ? 'OK' : 'Not OK'));
+            }
+        } else {
+            logger()->debug('该实现状态目前不是正常的，不处理 bots 列表');
+            $old = [];
+        }
+        foreach ($old as $platform => $bot_ids) {
+            if (empty($bot_ids)) {
+                continue;
+            }
+            foreach ($bot_ids as $id => $flag_fd) {
+                logger()->debug("[{$platform}.{$id}] 已断开！");
+                BotMap::unregisterBot($id, $platform);
+            }
+        }
     }
 
     /**
@@ -339,6 +380,14 @@ class OneBot12Adapter extends ZMPlugin
 
             // 绑定容器
             ContainerRegistrant::registerOBEventServices($obj);
+            if ($obj->getSelf() !== null) {
+                $bot_id = $obj->self['user_id'];
+                $platform = $obj->self['platform'];
+                if (BotMap::getBotFd($bot_id, $platform) === null) {
+                    BotMap::registerBotWithFd($bot_id, $platform, true, $event->getFd(), $event->getSocketFlag());
+                }
+                container()->set(BotContext::class, bot($obj->self['user_id'], $obj->self['platform']));
+            }
 
             // 调用 BotEvent 事件
             $handler = new AnnotationHandler(BotEvent::class);
@@ -385,6 +434,17 @@ class OneBot12Adapter extends ZMPlugin
             // 如果有协程，并且该 echo 记录在案的话，就恢复协程
             BotContext::tryResume($resp);
         }
+    }
+
+    public function handleWSReverseClose(WebSocketCloseEvent $event)
+    {
+        // 忽略非 OneBot 12 的消息
+        $impl = ConnectionUtil::getConnection($event->getFd())['impl'] ?? null;
+        if ($impl === null) {
+            return;
+        }
+        // 在关闭连接的时候
+        BotMap::unregisterBotByFd($event->getSocketFlag(), $event->getFd());
     }
 
     /**
