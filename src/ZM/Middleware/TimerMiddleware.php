@@ -6,6 +6,8 @@ namespace ZM\Middleware;
 
 class TimerMiddleware implements MiddlewareInterface, PipelineInterface
 {
+    use MiddlewareArgTrait;
+
     public function handle(callable $callback, ...$params)
     {
         $starttime = microtime(true);
