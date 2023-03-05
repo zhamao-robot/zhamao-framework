@@ -1,7 +1,7 @@
 var searchData=
 [
   ['parse_0',['parse',['../class_z_m_1_1_annotation_1_1_annotation_parser.html#a38d99acc70a1d8fd8f94455743b2d237',1,'ZM::Annotation::AnnotationParser']]],
-  ['parsebotcommand_1',['parseBotCommand',['../class_z_m_1_1_plugin_1_1_one_bot_1_1_one_bot12_adapter.html#a07dc89a22bfa31bdfe64435de3d244b3',1,'ZM\Plugin\OneBot\OneBot12Adapter\parseBotCommand()'],['../class_z_m_1_1_plugin_1_1_command_manual_1_1_command_manual_plugin.html#adacd3128f887d89f95ea589f04bc3f5e',1,'ZM\Plugin\CommandManual\CommandManualPlugin\parseBotCommand()']]],
+  ['parsebotcommand_1',['parseBotCommand',['../class_z_m_1_1_plugin_1_1_command_manual_1_1_command_manual_plugin.html#adacd3128f887d89f95ea589f04bc3f5e',1,'ZM\Plugin\CommandManual\CommandManualPlugin\parseBotCommand()'],['../class_z_m_1_1_plugin_1_1_one_bot_1_1_one_bot12_adapter.html#a07dc89a22bfa31bdfe64435de3d244b3',1,'ZM\Plugin\OneBot\OneBot12Adapter\parseBotCommand()']]],
   ['parsespecial_2',['parseSpecial',['../class_z_m_1_1_annotation_1_1_annotation_parser.html#a775eafdccac18876952bca9ab91bcf96',1,'ZM::Annotation::AnnotationParser']]],
   ['parseuri_3',['parseUri',['../class_z_m_1_1_utils_1_1_http_util.html#a231e8ae45d807340170a575ae0e50dc5',1,'ZM::Utils::HttpUtil']]],
   ['pgsqldriver_4',['PgSQLDriver',['../class_z_m_1_1_store_1_1_database_1_1_pg_s_q_l_driver.html',1,'ZM::Store::Database']]],
@@ -41,8 +41,9 @@ var searchData=
   ['process_38',['process',['../class_z_m_1_1_middleware_1_1_middleware_handler.html#a560b0a9a500384b52d40be0101fe5ae9',1,'ZM::Middleware::MiddlewareHandler']]],
   ['processstatemanager_39',['ProcessStateManager',['../class_z_m_1_1_process_1_1_process_state_manager.html',1,'ZM::Process']]],
   ['processstatemanager_2ephp_40',['ProcessStateManager.php',['../_process_state_manager_8php.html',1,'']]],
-  ['promptstring_41',['promptString',['../class_z_m_1_1_context_1_1_bot_context.html#a658777d23d340b09fe9af94c5f9d1591',1,'ZM::Context::BotContext']]],
-  ['proxyservercommand_42',['ProxyServerCommand',['../class_z_m_1_1_command_1_1_proxy_server_command.html',1,'ZM::Command']]],
-  ['proxyservercommand_2ephp_43',['ProxyServerCommand.php',['../_proxy_server_command_8php.html',1,'']]],
-  ['putcomposermetadata_44',['putComposerMetadata',['../class_z_m_1_1_utils_1_1_z_m_util.html#a9850d3a97583a42f7ed18f89ca84f1c4',1,'ZM::Utils::ZMUtil']]]
+  ['processwithannotation_41',['processWithAnnotation',['../class_z_m_1_1_middleware_1_1_middleware_handler.html#a611155cfe5f7aa7aa7d824a1311b2ac6',1,'ZM::Middleware::MiddlewareHandler']]],
+  ['promptstring_42',['promptString',['../class_z_m_1_1_context_1_1_bot_context.html#a658777d23d340b09fe9af94c5f9d1591',1,'ZM::Context::BotContext']]],
+  ['proxyservercommand_43',['ProxyServerCommand',['../class_z_m_1_1_command_1_1_proxy_server_command.html',1,'ZM::Command']]],
+  ['proxyservercommand_2ephp_44',['ProxyServerCommand.php',['../_proxy_server_command_8php.html',1,'']]],
+  ['putcomposermetadata_45',['putComposerMetadata',['../class_z_m_1_1_utils_1_1_z_m_util.html#a9850d3a97583a42f7ed18f89ca84f1c4',1,'ZM::Utils::ZMUtil']]]
 ];

@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['version_0',['VERSION',['../class_z_m_1_1_framework.html#af71005841ce53adac00581ab0ba24c1f',1,'ZM::Framework']]],
-  ['version_5fid_1',['VERSION_ID',['../class_z_m_1_1_framework.html#a835ac83b0f0a2c196532f370dc585aa0',1,'ZM::Framework']]]
+  ['unsupported_5ffile_5ftype_0',['UNSUPPORTED_FILE_TYPE',['../class_z_m_1_1_exception_1_1_config_exception.html#a7f55a7dd8e350ad420d05a38fcda32ac',1,'ZM::Exception::ConfigException']]]
 ];

@@ -5,7 +5,7 @@ var indexSectionsWithContent =
   2: "mz",
   3: "abcdefghiklmnoprstwz",
   4: "_abcdefghijklmnopqrstuvwz",
-  5: "$bcefilmprstuvwz",
+  5: "$bcefilmnprstuvwz",
   6: "弃"
 };
 

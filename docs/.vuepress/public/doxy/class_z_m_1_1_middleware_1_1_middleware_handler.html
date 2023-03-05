@@ -109,10 +109,12 @@ Public 成员函数</h2></td></tr>
 <tr class="separator:a95f9026736b6521a00f7795459961b15"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5a165e9c929b2f795b8d395c59ac1a2c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_middleware_1_1_middleware_handler.html#a5a165e9c929b2f795b8d395c59ac1a2c">bindMiddleware</a> (callable $callback, string $name, array $args=[])</td></tr>
 <tr class="separator:a5a165e9c929b2f795b8d395c59ac1a2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4520f2dcd5b20532ce0478de53fd6777"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_middleware_1_1_middleware_handler.html#a4520f2dcd5b20532ce0478de53fd6777">getPipeClosure</a> (callable $callback, $stack_id)</td></tr>
-<tr class="separator:a4520f2dcd5b20532ce0478de53fd6777"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8c2bea1e9aca3f23776ab1ff2c386cd9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_middleware_1_1_middleware_handler.html#a8c2bea1e9aca3f23776ab1ff2c386cd9">getPipeClosure</a> (callable $callback, $stack_id, ?<a class="el" href="class_z_m_1_1_annotation_1_1_annotation_base.html">AnnotationBase</a> $annotation=null)</td></tr>
+<tr class="separator:a8c2bea1e9aca3f23776ab1ff2c386cd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a560b0a9a500384b52d40be0101fe5ae9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_middleware_1_1_middleware_handler.html#a560b0a9a500384b52d40be0101fe5ae9">process</a> (callable $callback,... $args)</td></tr>
 <tr class="separator:a560b0a9a500384b52d40be0101fe5ae9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a611155cfe5f7aa7aa7d824a1311b2ac6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_middleware_1_1_middleware_handler.html#a611155cfe5f7aa7aa7d824a1311b2ac6">processWithAnnotation</a> (<a class="el" href="class_z_m_1_1_annotation_1_1_annotation_base.html">AnnotationBase</a> $v, callable $callback,... $args)</td></tr>
+<tr class="separator:a611155cfe5f7aa7aa7d824a1311b2ac6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a65508775baadff3ce7228e66962e5292"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_middleware_1_1_middleware_handler.html#a65508775baadff3ce7228e66962e5292">getCurrentCallable</a> ()</td></tr>
 <tr class="separator:a65508775baadff3ce7228e66962e5292"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1dc0bc9891821ea0293b7db757756045"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_middleware_1_1_middleware_handler.html#a1dc0bc9891821ea0293b7db757756045">getStackId</a> (callable $callback)</td></tr>
@@ -195,8 +197,8 @@ Protected 属性</h2></td></tr>
 
 </div>
 </div>
-<a id="a4520f2dcd5b20532ce0478de53fd6777" name="a4520f2dcd5b20532ce0478de53fd6777"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4520f2dcd5b20532ce0478de53fd6777">&#9670;&#160;</a></span>getPipeClosure()</h2>
+<a id="a8c2bea1e9aca3f23776ab1ff2c386cd9" name="a8c2bea1e9aca3f23776ab1ff2c386cd9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8c2bea1e9aca3f23776ab1ff2c386cd9">&#9670;&#160;</a></span>getPipeClosure()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -211,7 +213,13 @@ Protected 属性</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>$stack_id</em>&#160;</td>
+          <td class="paramname"><em>$stack_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">?<a class="el" href="class_z_m_1_1_annotation_1_1_annotation_base.html">AnnotationBase</a>&#160;</td>
+          <td class="paramname"><em>$annotation</em> = <code>null</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -223,7 +231,7 @@ Protected 属性</h2></td></tr>
 <div class="dynheader">
 函数调用图:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="class_z_m_1_1_middleware_1_1_middleware_handler_a4520f2dcd5b20532ce0478de53fd6777_cgraph.svg" width="356" height="62"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="class_z_m_1_1_middleware_1_1_middleware_handler_a8c2bea1e9aca3f23776ab1ff2c386cd9_cgraph.svg" width="356" height="62"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 
@@ -296,6 +304,46 @@ Protected 属性</h2></td></tr>
 函数调用图:</div>
 <div class="dyncontent">
 <div class="center"><iframe scrolling="no" frameborder="0" src="class_z_m_1_1_middleware_1_1_middleware_handler_a560b0a9a500384b52d40be0101fe5ae9_cgraph.svg" width="472" height="86"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+</div>
+
+</div>
+</div>
+<a id="a611155cfe5f7aa7aa7d824a1311b2ac6" name="a611155cfe5f7aa7aa7d824a1311b2ac6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a611155cfe5f7aa7aa7d824a1311b2ac6">&#9670;&#160;</a></span>processWithAnnotation()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">processWithAnnotation </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="class_z_m_1_1_annotation_1_1_annotation_base.html">AnnotationBase</a>&#160;</td>
+          <td class="paramname"><em>$v</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">callable&#160;</td>
+          <td class="paramname"><em>$callback</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>$args</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="class_z_m_1_1_middleware_1_1_middleware_handler_a611155cfe5f7aa7aa7d824a1311b2ac6_cgraph.svg" width="560" height="86"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 

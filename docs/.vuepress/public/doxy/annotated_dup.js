@@ -131,7 +131,8 @@ var annotated_dup =
         [ "MiddlewareInterface", "interface_z_m_1_1_middleware_1_1_middleware_interface.html", null ],
         [ "Pipeline", "class_z_m_1_1_middleware_1_1_pipeline.html", "class_z_m_1_1_middleware_1_1_pipeline" ],
         [ "PipelineInterface", "interface_z_m_1_1_middleware_1_1_pipeline_interface.html", "interface_z_m_1_1_middleware_1_1_pipeline_interface" ],
-        [ "TimerMiddleware", "class_z_m_1_1_middleware_1_1_timer_middleware.html", "class_z_m_1_1_middleware_1_1_timer_middleware" ]
+        [ "TimerMiddleware", "class_z_m_1_1_middleware_1_1_timer_middleware.html", "class_z_m_1_1_middleware_1_1_timer_middleware" ],
+        [ "WebSocketFilter", "class_z_m_1_1_middleware_1_1_web_socket_filter.html", "class_z_m_1_1_middleware_1_1_web_socket_filter" ]
       ] ],
       [ "Plugin", "namespace_z_m_1_1_plugin.html", [
         [ "CommandManual", "namespace_z_m_1_1_plugin_1_1_command_manual.html", [

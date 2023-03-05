@@ -1,4 +1,5 @@
 <map id="PipelineInterface" name="PipelineInterface">
-<area shape="rect" id="node1" title=" " alt="" coords="7,5,125,31"/>
+<area shape="rect" id="node1" title=" " alt="" coords="79,5,197,31"/>
 <area shape="rect" id="node2" href="$class_z_m_1_1_middleware_1_1_timer_middleware.html" title=" " alt="" coords="5,79,127,104"/>
+<area shape="rect" id="node3" href="$class_z_m_1_1_middleware_1_1_web_socket_filter.html" title=" " alt="" coords="151,79,269,104"/>
 </map>

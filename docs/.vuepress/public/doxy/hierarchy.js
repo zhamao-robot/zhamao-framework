@@ -115,7 +115,8 @@ var hierarchy =
     [ "MessageUtil", "class_z_m_1_1_utils_1_1_message_util.html", null ],
     [ "MiddlewareHandler", "class_z_m_1_1_middleware_1_1_middleware_handler.html", null ],
     [ "MiddlewareInterface", "interface_z_m_1_1_middleware_1_1_middleware_interface.html", [
-      [ "TimerMiddleware", "class_z_m_1_1_middleware_1_1_timer_middleware.html", null ]
+      [ "TimerMiddleware", "class_z_m_1_1_middleware_1_1_timer_middleware.html", null ],
+      [ "WebSocketFilter", "class_z_m_1_1_middleware_1_1_web_socket_filter.html", null ]
     ] ],
     [ "MockAtomic", "class_z_m_1_1_store_1_1_mock_atomic.html", null ],
     [ "OneBot12FileDownloader", "class_z_m_1_1_utils_1_1_one_bot12_file_downloader.html", null ],
@@ -123,7 +124,8 @@ var hierarchy =
     [ "PharHelper", "class_z_m_1_1_store_1_1_phar_helper.html", null ],
     [ "Pipeline", "class_z_m_1_1_middleware_1_1_pipeline.html", null ],
     [ "PipelineInterface", "interface_z_m_1_1_middleware_1_1_pipeline_interface.html", [
-      [ "TimerMiddleware", "class_z_m_1_1_middleware_1_1_timer_middleware.html", null ]
+      [ "TimerMiddleware", "class_z_m_1_1_middleware_1_1_timer_middleware.html", null ],
+      [ "WebSocketFilter", "class_z_m_1_1_middleware_1_1_web_socket_filter.html", null ]
     ] ],
     [ "PluginGenerator", "class_z_m_1_1_utils_1_1_code_generator_1_1_plugin_generator.html", null ],
     [ "PluginInstallStrategy", "class_z_m_1_1_plugin_1_1_strategy_1_1_plugin_install_strategy.html", [
