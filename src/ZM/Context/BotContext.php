@@ -7,15 +7,13 @@ namespace ZM\Context;
 use DI\DependencyException;
 use DI\NotFoundException;
 use OneBot\Driver\Coroutine\Adaptive;
-use OneBot\Driver\Event\Http\HttpRequestEvent;
-use OneBot\Driver\Event\WebSocket\WebSocketMessageEvent;
 use OneBot\V12\Object\ActionResponse;
 use OneBot\V12\Object\MessageSegment;
 use OneBot\V12\Object\OneBotEvent;
 use ZM\Context\Trait\BotActionTrait;
 use ZM\Exception\OneBot12Exception;
 use ZM\Exception\WaitTimeoutException;
-use ZM\Plugin\OneBot12Adapter;
+use ZM\Plugin\OneBot\OneBot12Adapter;
 use ZM\Schedule\Timer;
 use ZM\Utils\MessageUtil;
 
@@ -26,7 +24,7 @@ class BotContext implements ContextInterface
     /** @var array<string, array<string, BotContext>> 记录机器人的上下文列表 */
     private static array $bots = [];
 
-    /** @var string[] 记录当前上下文绑定的机器人 */
+    /** @var null|string[] 记录当前上下文绑定的机器人 */
     private array $self;
 
     /** @var array 如果是 BotCommand 匹配的上下文，这里会存放匹配到的参数 */
@@ -35,11 +33,9 @@ class BotContext implements ContextInterface
     /** @var bool 用于标记当前上下文会话是否已经调用过 reply() 方法 */
     private bool $replied = false;
 
-    public function __construct(string $bot_id, string $platform, null|WebSocketMessageEvent|HttpRequestEvent $event = null)
+    public function __construct(string $bot_id, string $platform)
     {
         $this->self = ['user_id' => $bot_id, 'platform' => $platform];
-        self::$bots[$bot_id][$platform] = $this;
-        $this->base_event = $event;
     }
 
     /**

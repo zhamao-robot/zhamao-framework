@@ -279,12 +279,14 @@ function config(array|string $key = null, mixed $default = null)
     return $config->get($key, $default);
 }
 
-function bot(): ZM\Context\BotContext
+function bot(string $bot_id = '', string $platform = ''): ZM\Context\BotContext
 {
-    if (container()->has(ZM\Context\BotContext::class)) {
-        return container()->get(ZM\Context\BotContext::class);
-    }
-    return new \ZM\Context\BotContext('', '');
+    return BotMap::getBotContext($bot_id, $platform);
+}
+
+function bot_connect(int $flag, int $fd)
+{
+    return BotMap::getConnectContext($flag, $fd);
 }
 
 /**
@@ -297,7 +299,7 @@ function kv(string $name = ''): Psr\SimpleCache\CacheInterface
 {
     global $kv_class;
     if (!$kv_class) {
-        $kv_class = config('global.kv.use', \LightCache::class);
+        $kv_class = config('global.kv.use', LightCache::class);
     }
     /* @phpstan-ignore-next-line */
     return is_a($kv_class, KVInterface::class, true) ? $kv_class::open($name) : new $kv_class($name);
