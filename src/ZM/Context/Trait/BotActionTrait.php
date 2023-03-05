@@ -40,7 +40,7 @@ trait BotActionTrait
         $message = MessageUtil::convertToArr($message);
         $params['message'] = $message;
         $params['detail_type'] = $detail_type;
-        return $this->sendAction(Utils::camelToSeparator(__FUNCTION__), $params, $this->getSelf());
+        return $this->sendAction(Utils::camelToSeparator(__FUNCTION__), $params, $this->self);
     }
 
     /**

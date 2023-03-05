@@ -25,7 +25,7 @@ class BotContext implements ContextInterface
     private static array $bots = [];
 
     /** @var null|string[] 记录当前上下文绑定的机器人 */
-    private array $self;
+    private ?array $self;
 
     /** @var array 如果是 BotCommand 匹配的上下文，这里会存放匹配到的参数 */
     private array $params = [];
