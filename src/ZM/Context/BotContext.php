@@ -30,9 +30,6 @@ class BotContext implements ContextInterface
     /** @var array 如果是 BotCommand 匹配的上下文，这里会存放匹配到的参数 */
     private array $params = [];
 
-    /** @var bool 用于标记当前上下文会话是否已经调用过 reply() 方法 */
-    private bool $replied = false;
-
     public function __construct(string $bot_id, string $platform)
     {
         $this->self = ['user_id' => $bot_id, 'platform' => $platform];
@@ -69,7 +66,7 @@ class BotContext implements ContextInterface
                 throw new OneBot12Exception('bot()->reply() can only be used in message event.');
             }
             $msg = (is_string($message) ? [new MessageSegment('text', ['text' => $message])] : ($message instanceof MessageSegment ? [$message] : $message));
-            $this->replied = true;
+            container()->set('replied', true);
             // 判断规则
             $this->matchReplyMode($reply_mode, $msg, $event);
             return $this->sendMessage($msg, $event->detail_type, $event->jsonSerialize());
@@ -148,7 +145,15 @@ class BotContext implements ContextInterface
      */
     public function hasReplied(): bool
     {
-        return $this->replied;
+        return container()->has('replied') && container()->get('replied') === true;
+    }
+
+    /**
+     * 重置当前上下文为没有被回复过
+     */
+    public function flushReply(): void
+    {
+        container()->set('replied', false);
     }
 
     /**
