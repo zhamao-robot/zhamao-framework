@@ -228,8 +228,8 @@ class OneBot12Adapter extends ZMPlugin
             }
             $matched = match ($old_event->detail_type) {
                 'private' => $new_event->getUserId() === $old_event->getUserId(),
-                'group' => $new_event->getGroupId() === $old_event->getGroupId(),
-                'guild' => $new_event->getGuildId() === $old_event->getGuildId() && $new_event->getChannelId() === $old_event->getChannelId(),
+                'group' => $new_event->getGroupId() === $old_event->getGroupId() && $new_event->getUserId() === $old_event->getUserId(),
+                'guild' => $new_event->getGuildId() === $old_event->getGuildId() && $new_event->getChannelId() === $old_event->getChannelId() && $new_event->getUserId() === $old_event->getUserId(),
                 default => false,
             };
             if (!$matched) {
