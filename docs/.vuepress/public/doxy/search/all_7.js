@@ -20,8 +20,9 @@ var searchData=
   ['filesystemexception_2ephp_17',['FileSystemException.php',['../_file_system_exception_8php.html',1,'']]],
   ['filterpack_18',['filterPack',['../namespace_z_m_1_1_plugin_1_1_traits.html#af0ac37d8568c12cc24ee9c167180d63c',1,'ZM::Plugin::Traits']]],
   ['fixtypename_19',['fixTypeName',['../class_z_m_1_1_annotation_1_1_one_bot_1_1_command_argument.html#a0948c9d8b33ec17f5603ed82f9e823fe',1,'ZM::Annotation::OneBot::CommandArgument']]],
-  ['framework_20',['Framework',['../class_z_m_1_1_framework.html',1,'ZM']]],
-  ['framework_2ephp_21',['Framework.php',['../_framework_8php.html',1,'']]],
-  ['free_22',['free',['../class_z_m_1_1_store_1_1_database_1_1_d_b_statement_wrapper.html#a5ad8044ee4b8a2c8bdb8b5c3dc786424',1,'ZM::Store::Database::DBStatementWrapper']]],
-  ['fromsegment_23',['fromSegment',['../class_z_m_1_1_utils_1_1_cat_code.html#a7d83bf875cb983ae021208e8b09324a1',1,'ZM::Utils::CatCode']]]
+  ['flushreply_20',['flushReply',['../class_z_m_1_1_context_1_1_bot_context.html#aded5513660599474b24289f159454e19',1,'ZM::Context::BotContext']]],
+  ['framework_21',['Framework',['../class_z_m_1_1_framework.html',1,'ZM']]],
+  ['framework_2ephp_22',['Framework.php',['../_framework_8php.html',1,'']]],
+  ['free_23',['free',['../class_z_m_1_1_store_1_1_database_1_1_d_b_statement_wrapper.html#a5ad8044ee4b8a2c8bdb8b5c3dc786424',1,'ZM::Store::Database::DBStatementWrapper']]],
+  ['fromsegment_24',['fromSegment',['../class_z_m_1_1_utils_1_1_cat_code.html#a7d83bf875cb983ae021208e8b09324a1',1,'ZM::Utils::CatCode']]]
 ];

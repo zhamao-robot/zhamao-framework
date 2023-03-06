@@ -60,10 +60,10 @@ var NAVTREEINDEX =
 "_alias_definition_source_8php.html",
 "class_z_m_1_1_annotation_1_1_annotation_parser.html",
 "class_z_m_1_1_command_1_1_server_1_1_server_start_command.html#ab31c72b72ddaf7116db5d84c055d3c0b",
-"class_z_m_1_1_framework.html#ae8f8f8fa3f35aac8f365d9ee4c4c943f",
-"class_z_m_1_1_store_1_1_database_1_1_d_b_statement_wrapper.html#a5576c1c95c47cff0852d8d9451c5df6d",
-"deprecated.html",
-"namespace_z_m_1_1_plugin_1_1_traits.html#a5142deee75df3b69f916595d7a4759f6"
+"class_z_m_1_1_framework.html#ad9a8952bc741b5305f6af9f1881519de",
+"class_z_m_1_1_store_1_1_database_1_1_d_b_statement_wrapper.html#a47c5efffd190648c764c7eb9ab92260e",
+"class_z_m_1_1_z_m_application.html#afc7ff28f6c2a0264e9961d0c8241d917",
+"namespace_z_m_1_1_plugin_1_1_traits.html#a3bd80caa7b9a00734baaed72bd486988"
 ];
 
 var SYNCONMSG = '点击 关闭 面板同步';
