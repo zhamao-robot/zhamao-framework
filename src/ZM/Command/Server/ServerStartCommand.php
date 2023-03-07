@@ -74,7 +74,7 @@ class ServerStartCommand extends ServerCommand
         }
 
         // 框架启动的入口
-        (new Framework($input->getOptions()))->init()->start();
+        Framework::getInstance()->init($input->getOptions())->start();
         return 0;
     }
 }

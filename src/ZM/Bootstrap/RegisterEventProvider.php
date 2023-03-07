@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace ZM\Bootstrap;
 
 use ZM\Event\EventProvider;
-use ZM\Kernel;
+use ZM\HasRuntimeInfo;
 
 class RegisterEventProvider implements Bootstrapper
 {
-    public function bootstrap(Kernel $kernel): void
+    public function bootstrap(HasRuntimeInfo $runtime_info): void
     {
         global $ob_event_provider;
         $ob_event_provider = EventProvider::getInstance();

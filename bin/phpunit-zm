@@ -57,14 +57,12 @@ $options['driver'] = 'workerman';
 $options['worker-num'] = 1;
 $options['private-mode'] = true;
 
-$kernel = \ZM\Kernel::getInstance();
-$kernel->setEnvironment('development');
-$kernel->setTestMode(true);
-$kernel->setConfigDir(dirname(__DIR__) . '/config');
-$kernel->bootstrap();
-
 try {
-    (new Framework($options))->init()->start();
+    $framework = (new Framework($options));
+    $framework->setEnvironment('development');
+    $framework->setConfigDir(dirname(__DIR__) . '/config');
+    $framework->bootstrap();
+    $framework->init()->start();
     exit($_swoole_atomic->get());
 } catch (Throwable $e) {
     echo $e->getMessage() . PHP_EOL;

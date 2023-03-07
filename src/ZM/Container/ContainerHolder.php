@@ -8,7 +8,7 @@ use DI;
 use DI\Container;
 use DI\ContainerBuilder;
 use OneBot\Driver\Coroutine\Adaptive;
-use ZM\Kernel;
+use ZM\Framework;
 
 class ContainerHolder
 {
@@ -66,6 +66,6 @@ class ContainerHolder
         if (self::$config) {
             return;
         }
-        self::$config = require Kernel::getInstance()->getConfigDir() . '/container.php';
+        self::$config = require Framework::getInstance()->getConfigDir() . '/container.php';
     }
 }

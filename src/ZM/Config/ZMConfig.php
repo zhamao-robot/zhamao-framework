@@ -8,7 +8,7 @@ use OneBot\Config\Config;
 use OneBot\Config\Loader\LoaderInterface;
 use OneBot\Util\Singleton;
 use ZM\Exception\ConfigException;
-use ZM\Kernel;
+use ZM\Framework;
 
 class ZMConfig
 {
@@ -302,7 +302,7 @@ class ZMConfig
         }
         if ($type === 'environment') {
             $name_and_env = explode('.', $name);
-            if (Kernel::getInstance()->environment($name_and_env[1])) {
+            if (Framework::getInstance()->environment($name_and_env[1])) {
                 return true;
             }
         }

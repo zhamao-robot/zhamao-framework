@@ -28,6 +28,6 @@
         </report>
     </coverage>
     <php>
-        <env name="APP_ENV" value="testing"/>
+        <env name="PHPUNIT_RUNNING" value="1"/>
     </php>
 </phpunit>

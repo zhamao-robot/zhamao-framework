@@ -8,11 +8,11 @@ use Dotenv\Dotenv;
 use ZM\Config\Environment;
 use ZM\Config\EnvironmentInterface;
 use ZM\Config\ZMConfig;
-use ZM\Kernel;
+use ZM\HasRuntimeInfo;
 
 class LoadConfiguration implements Bootstrapper
 {
-    public function bootstrap(Kernel $kernel): void
+    public function bootstrap(HasRuntimeInfo $runtime_info): void
     {
         // TODO: 重新思考容器绑定的加载方式，从而在此处使用 interface
         $env = resolve(Environment::class);
@@ -20,7 +20,7 @@ class LoadConfiguration implements Bootstrapper
 
         new ZMConfig([
             'source' => [
-                'paths' => [$kernel->getConfigDir()],
+                'paths' => [$runtime_info->getConfigDir()],
             ],
         ]);
     }

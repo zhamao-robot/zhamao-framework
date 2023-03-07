@@ -52,8 +52,8 @@ final class ConsoleApplication extends Application
             $input = $event->getInput();
 
             // 初始化内核
-            /** @var Kernel $kernel */
-            $kernel = Kernel::getInstance();
+            /** @var Framework $kernel */
+            $kernel = Framework::getInstance();
             $kernel->setConfigDir($input->getOption('config-dir'));
             $kernel->setEnvironment($input->getOption('env'));
             $kernel->setDebugMode($input->getOption('debug'));

@@ -53,6 +53,6 @@ class ZMApplication extends ZMPlugin
         $meta = new PluginMeta(name: 'native', plugin_type: ZM_PLUGIN_TYPE_NATIVE);
         $meta->bindEntity($this);
         PluginManager::addPlugin($meta);
-        (new Framework($this->args))->init()->start();
+        Framework::getInstance()->init($this->args)->start();
     }
 }
