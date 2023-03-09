@@ -11,9 +11,9 @@
 <!-- Node0 -->
 <g id="node1" class="node">
 <title>Node0</title>
-<g id="a_node1"><a xlink:href="class_z_m_1_1_bootstrap_1_1_set_internal_timezone.html" target="_top" xlink:title=" ">
+<g id="a_node1"><a xlink:href="class_z_m_1_1_plugin_1_1_command_manual_1_1_static_manual_factory.html" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="#666666" points="106,-19 0,-19 0,0 106,0 106,-19"/>
-<text text-anchor="middle" x="53" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">SetInternalTimezone</text>
+<text text-anchor="middle" x="53" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">StaticManualFactory</text>
 </a>
 </g>
 </g>

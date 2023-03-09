@@ -1,6 +1,3 @@
 <map id="类继承关系图" name="类继承关系图">
-<area shape="rect" id="node1" href="$interface_z_m_1_1_middleware_1_1_middleware_interface.html" title=" " alt="" coords="5,5,144,31"/>
-<area shape="rect" id="node2" href="$class_z_m_1_1_middleware_1_1_timer_middleware.html" title=" " alt="" coords="192,5,313,31"/>
-<area shape="rect" id="node3" href="$class_z_m_1_1_middleware_1_1_web_socket_filter.html" title=" " alt="" coords="193,55,312,80"/>
-<area shape="rect" id="node4" href="$interface_z_m_1_1_middleware_1_1_pipeline_interface.html" title=" " alt="" coords="15,55,134,80"/>
+<area shape="rect" id="node1" href="$class_z_m_1_1_utils_1_1_one_bot12_file_uploader.html" title=" " alt="" coords="5,5,159,31"/>
 </map>

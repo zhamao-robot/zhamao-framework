@@ -8,5 +8,6 @@ var searchData=
   ['registerlogger_5',['RegisterLogger',['../class_z_m_1_1_bootstrap_1_1_register_logger.html',1,'ZM::Bootstrap']]],
   ['replcommand_6',['ReplCommand',['../class_z_m_1_1_command_1_1_repl_command.html',1,'ZM::Command']]],
   ['route_7',['Route',['../class_z_m_1_1_annotation_1_1_http_1_1_route.html',1,'ZM::Annotation::Http']]],
-  ['rule_8',['Rule',['../interface_z_m_1_1_annotation_1_1_interfaces_1_1_rule.html',1,'ZM::Annotation::Interfaces']]]
+  ['rule_8',['Rule',['../interface_z_m_1_1_annotation_1_1_interfaces_1_1_rule.html',1,'ZM::Annotation::Interfaces']]],
+  ['runtimepreferences_9',['RuntimePreferences',['../class_z_m_1_1_config_1_1_runtime_preferences.html',1,'ZM::Config']]]
 ];

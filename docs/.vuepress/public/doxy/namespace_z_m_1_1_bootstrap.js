@@ -1,5 +1,6 @@
 var namespace_z_m_1_1_bootstrap =
 [
+    [ "Bootstrapper", "interface_z_m_1_1_bootstrap_1_1_bootstrapper.html", "interface_z_m_1_1_bootstrap_1_1_bootstrapper" ],
     [ "HandleExceptions", "class_z_m_1_1_bootstrap_1_1_handle_exceptions.html", "class_z_m_1_1_bootstrap_1_1_handle_exceptions" ],
     [ "LoadConfiguration", "class_z_m_1_1_bootstrap_1_1_load_configuration.html", "class_z_m_1_1_bootstrap_1_1_load_configuration" ],
     [ "LoadGlobalDefines", "class_z_m_1_1_bootstrap_1_1_load_global_defines.html", "class_z_m_1_1_bootstrap_1_1_load_global_defines" ],

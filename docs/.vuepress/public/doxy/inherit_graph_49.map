@@ -1,3 +1,5 @@
 <map id="类继承关系图" name="类继承关系图">
-<area shape="rect" id="node1" href="$class_z_m_1_1_store_1_1_phar_helper.html" title=" " alt="" coords="5,5,92,31"/>
+<area shape="rect" id="node1" href="$class_z_m_1_1_plugin_1_1_strategy_1_1_plugin_install_strategy.html" title=" " alt="" coords="5,31,147,56"/>
+<area shape="rect" id="node2" href="$class_z_m_1_1_plugin_1_1_strategy_1_1_composer_strategy.html" title=" " alt="" coords="195,5,324,31"/>
+<area shape="rect" id="node3" href="$class_z_m_1_1_plugin_1_1_strategy_1_1_git_strategy.html" title=" " alt="" coords="216,55,303,80"/>
 </map>

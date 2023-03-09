@@ -42,6 +42,7 @@ var annotated_dup =
         [ "Closed", "class_z_m_1_1_annotation_1_1_closed.html", null ]
       ] ],
       [ "Bootstrap", "namespace_z_m_1_1_bootstrap.html", [
+        [ "Bootstrapper", "interface_z_m_1_1_bootstrap_1_1_bootstrapper.html", "interface_z_m_1_1_bootstrap_1_1_bootstrapper" ],
         [ "HandleExceptions", "class_z_m_1_1_bootstrap_1_1_handle_exceptions.html", "class_z_m_1_1_bootstrap_1_1_handle_exceptions" ],
         [ "LoadConfiguration", "class_z_m_1_1_bootstrap_1_1_load_configuration.html", "class_z_m_1_1_bootstrap_1_1_load_configuration" ],
         [ "LoadGlobalDefines", "class_z_m_1_1_bootstrap_1_1_load_global_defines.html", "class_z_m_1_1_bootstrap_1_1_load_global_defines" ],
@@ -83,6 +84,7 @@ var annotated_dup =
         [ "ConfigTracer", "class_z_m_1_1_config_1_1_config_tracer.html", "class_z_m_1_1_config_1_1_config_tracer" ],
         [ "Environment", "class_z_m_1_1_config_1_1_environment.html", "class_z_m_1_1_config_1_1_environment" ],
         [ "EnvironmentInterface", "interface_z_m_1_1_config_1_1_environment_interface.html", "interface_z_m_1_1_config_1_1_environment_interface" ],
+        [ "RuntimePreferences", "class_z_m_1_1_config_1_1_runtime_preferences.html", "class_z_m_1_1_config_1_1_runtime_preferences" ],
         [ "ZMConfig", "class_z_m_1_1_config_1_1_z_m_config.html", "class_z_m_1_1_config_1_1_z_m_config" ]
       ] ],
       [ "Container", "namespace_z_m_1_1_container.html", [

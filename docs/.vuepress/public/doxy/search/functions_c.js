@@ -7,7 +7,5 @@ var searchData=
   ['loadconfigfailed_4',['loadConfigFailed',['../class_z_m_1_1_exception_1_1_config_exception.html#a47d8473922008fe9481aa7252739c116',1,'ZM::Exception::ConfigException']]],
   ['loadfiles_5',['loadFiles',['../class_z_m_1_1_config_1_1_z_m_config.html#a3ebd7435a2c8d19720a6328048a029e6',1,'ZM::Config::ZMConfig']]],
   ['lock_6',['lock',['../class_z_m_1_1_store_1_1_lock_1_1_file_lock.html#afd4c91c41adf87d78e20c7f17e3862bc',1,'ZM::Store::Lock::FileLock']]],
-  ['logger_7',['logger',['../global__functions_8php.html#a97e3b3adabf67bc7d3650ed14214ddaa',1,'global_functions.php']]],
-  ['logtime_8',['logTime',['../class_module_1_1_example_1_1_hello123.html#aa69e80cb614ab65dac73c9112a0d5444',1,'Module::Example::Hello123']]],
-  ['logtime2_9',['logTime2',['../class_module_1_1_example_1_1_hello123.html#a63074cad03166463e7387e4bf3b0c778',1,'Module::Example::Hello123']]]
+  ['logger_7',['logger',['../global__functions_8php.html#a97e3b3adabf67bc7d3650ed14214ddaa',1,'global_functions.php']]]
 ];
