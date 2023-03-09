@@ -58,9 +58,10 @@ $options['worker-num'] = 1;
 $options['private-mode'] = true;
 
 try {
-    $framework = (new Framework($options));
-    $framework->setEnvironment('development');
-    $framework->setConfigDir(dirname(__DIR__) . '/config');
+    $framework = new Framework();
+    $framework->runtime_preferences = $framework->runtime_preferences
+        ->withConfigDir(dirname(__DIR__) . '/config')
+        ->withEnvironment('development');
     $framework->bootstrap();
     $framework->init()->start();
     exit($_swoole_atomic->get());

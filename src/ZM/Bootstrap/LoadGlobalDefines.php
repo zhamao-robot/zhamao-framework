@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace ZM\Bootstrap;
 
-use ZM\HasRuntimeInfo;
+use ZM\Config\RuntimePreferences;
 
 class LoadGlobalDefines implements Bootstrapper
 {
-    public function bootstrap(HasRuntimeInfo $runtime_info): void
+    public function bootstrap(RuntimePreferences $preferences): void
     {
         require FRAMEWORK_ROOT_DIR . '/src/Globals/global_defines_framework.php';
     }

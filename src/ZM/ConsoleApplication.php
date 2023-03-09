@@ -54,10 +54,11 @@ final class ConsoleApplication extends Application
             // 初始化内核
             /** @var Framework $kernel */
             $kernel = Framework::getInstance();
-            $kernel->setConfigDir($input->getOption('config-dir'));
-            $kernel->setEnvironment($input->getOption('env'));
-            $kernel->setDebugMode($input->getOption('debug'));
-            $kernel->setLogLevel($input->getOption('log-level'));
+            $kernel->runtime_preferences = $kernel->runtime_preferences
+                ->withConfigDir($input->getOption('config-dir'))
+                ->withEnvironment($input->getOption('env'))
+                ->enableDebugMode($input->getOption('debug'))
+                ->withLogLevel($input->getOption('log-level'));
             $kernel->bootstrap();
         });
 

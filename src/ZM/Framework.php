@@ -22,6 +22,7 @@ use OneBot\Driver\Workerman\WorkermanDriver;
 use OneBot\Util\Singleton;
 use ZM\Bootstrap\Bootstrapper;
 use ZM\Command\Server\ServerStartCommand;
+use ZM\Config\RuntimePreferences;
 use ZM\Container\ContainerBindingListener;
 use ZM\Event\Listener\HttpEventListener;
 use ZM\Event\Listener\ManagerEventListener;
@@ -38,8 +39,10 @@ use ZM\Utils\EasterEgg;
 /**
  * 框架入口类
  * @since 3.0
+ *
+ * @method static Framework getInstance()
  */
-class Framework implements HasRuntimeInfo
+class Framework
 {
     use Singleton;
 
@@ -48,6 +51,11 @@ class Framework implements HasRuntimeInfo
 
     /** @var string 版本名称 */
     public const VERSION = '3.1.1';
+
+    /**
+     * @var RuntimePreferences 运行时偏好（环境信息&参数）
+     */
+    public RuntimePreferences $runtime_preferences;
 
     /** @var array 传入的参数 */
     protected array $argv;
@@ -68,14 +76,6 @@ class Framework implements HasRuntimeInfo
         Bootstrap\SetInternalTimezone::class,       // 设置时区
     ];
 
-    protected string $environment = 'development';
-
-    protected bool $debug_mode = false;
-
-    protected string $log_level = 'info';
-
-    protected string $config_dir = SOURCE_ROOT_DIR . '/config';
-
     /**
      * 框架初始化文件
      * @throws \Exception
@@ -87,6 +87,8 @@ class Framework implements HasRuntimeInfo
             throw new SingletonViolationException(self::class);
         }
         self::$instance = $this;
+
+        $this->runtime_preferences = new RuntimePreferences();
     }
 
     /**
@@ -264,67 +266,8 @@ class Framework implements HasRuntimeInfo
     {
         foreach ($this->bootstrappers as $bootstrapper) {
             /* @var Bootstrapper $bootstrapper */
-            (new $bootstrapper())->bootstrap($this);
+            (new $bootstrapper())->bootstrap($this->runtime_preferences);
         }
-    }
-
-    public function environment(...$environments): string|bool
-    {
-        if (empty($environments)) {
-            return $this->environment;
-        }
-
-        return in_array($this->environment, $environments, true);
-    }
-
-    public function setEnvironment(string $environment): void
-    {
-        $this->environment = $environment;
-    }
-
-    public function isDebugMode(): bool
-    {
-        return $this->debug_mode;
-    }
-
-    public function setDebugMode(bool $debug_mode): void
-    {
-        $this->debug_mode = $debug_mode;
-    }
-
-    public function getLogLevel(): string
-    {
-        return $this->isDebugMode() ? 'debug' : $this->log_level;
-    }
-
-    public function setLogLevel(string $log_level): void
-    {
-        $this->log_level = $log_level;
-    }
-
-    public function getConfigDir(): string
-    {
-        return $this->config_dir;
-    }
-
-    public function setConfigDir(string $config_dir): void
-    {
-        $this->config_dir = $config_dir;
-    }
-
-    public function runningInInteractiveTerminal(): bool
-    {
-        if (function_exists('posix_isatty')) {
-            return posix_isatty(STDIN) && posix_isatty(STDOUT);
-        }
-
-        // fallback to stream_isatty() if posix_isatty() is not available (e.g. on Windows)
-        return function_exists('stream_isatty') && stream_isatty(STDIN) && stream_isatty(STDOUT);
-    }
-
-    public function runningUnitTests(): bool
-    {
-        return defined('PHPUNIT_RUNNING') && constant('PHPUNIT_RUNNING');
     }
 
     /**
@@ -336,7 +279,7 @@ class Framework implements HasRuntimeInfo
         // 打印工作目录
         $properties['working_dir'] = WORKING_DIR;
         // 打印环境信息
-        $properties['environment'] = $this->environment();
+        $properties['environment'] = $this->runtime_preferences->environment();
         // 打印驱动
         $properties['driver'] = config('global.driver');
         // 打印logger显示等级

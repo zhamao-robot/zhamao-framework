@@ -302,7 +302,7 @@ class ZMConfig
         }
         if ($type === 'environment') {
             $name_and_env = explode('.', $name);
-            if (Framework::getInstance()->environment($name_and_env[1])) {
+            if (Framework::getInstance()->runtime_preferences->environment($name_and_env[1])) {
                 return true;
             }
         }

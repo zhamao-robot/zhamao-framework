@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace ZM\Bootstrap;
 
 use OneBot\Exception\ExceptionHandler;
+use ZM\Config\RuntimePreferences;
 use ZM\Exception\Handler;
-use ZM\HasRuntimeInfo;
 
 class HandleExceptions implements Bootstrapper
 {
-    public function bootstrap(HasRuntimeInfo $runtime_info): void
+    public function bootstrap(RuntimePreferences $preferences): void
     {
         // 注册全局错误处理器
         set_error_handler(function ($error_no, $error_msg, $error_file, $error_line) {

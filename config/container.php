@@ -39,7 +39,7 @@ return [
     // 详细介绍请参阅：https://php-di.org/doc/performances.html#caching
     'cache' => [
         // 是否启用缓存，支持 bool、callable
-        'enable' => fn () => Framework::getInstance()->environment('production'),
+        'enable' => fn () => Framework::getInstance()->runtime_preferences->environment('production'),
         'namespace' => 'zm',
     ],
 ];

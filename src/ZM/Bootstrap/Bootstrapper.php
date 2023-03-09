@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace ZM\Bootstrap;
 
-use ZM\HasRuntimeInfo;
+use ZM\Config\RuntimePreferences;
 
 interface Bootstrapper
 {
-    public function bootstrap(HasRuntimeInfo $runtime_info): void;
+    public function bootstrap(RuntimePreferences $preferences): void;
 }

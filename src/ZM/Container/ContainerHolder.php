@@ -66,6 +66,6 @@ class ContainerHolder
         if (self::$config) {
             return;
         }
-        self::$config = require Framework::getInstance()->getConfigDir() . '/container.php';
+        self::$config = require Framework::getInstance()->runtime_preferences->getConfigDir() . '/container.php';
     }
 }

@@ -33,11 +33,6 @@ abstract class Command extends \Symfony\Component\Console\Command\Command implem
         $this->input = $input;
         $this->output = $output;
         if ($this->shouldExecute()) {
-            if (property_exists($this, 'bootstrappers')) {
-                foreach ($this->bootstrappers as $bootstrapper) {
-                    (new $bootstrapper())->bootstrap($this->input->getOptions());
-                }
-            }
             try {
                 return $this->handle();
             } catch (\Throwable $e) {
