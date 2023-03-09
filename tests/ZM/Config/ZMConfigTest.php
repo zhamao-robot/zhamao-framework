@@ -58,7 +58,7 @@ class ZMConfigTest extends TestCase
         try {
             $init_conf = require SOURCE_ROOT_DIR . '/config/config.php';
             $init_conf['source']['paths'] = [$this->vfs->url()];
-            $config = new ZMConfig('development', $init_conf);
+            $config = new ZMConfig($init_conf);
         } catch (ConfigException $e) {
             $this->fail($e->getMessage());
         }

@@ -7,8 +7,8 @@ use OneBot\Driver\Process\ProcessManager;
 use Psr\Log\LoggerInterface;
 use ZM\Config\Environment;
 use ZM\Config\EnvironmentInterface;
-use ZM\Config\ZMConfig;
 use ZM\Framework;
+use ZM\HasRuntimeInfo;
 
 /*
  * 这里是容器的配置文件，你可以在这里配置容器的绑定和其他一些参数。
@@ -28,6 +28,8 @@ return [
         Driver::class => fn () => Framework::getInstance()->getDriver(),
         LoggerInterface::class => fn () => logger(),
         EnvironmentInterface::class => Environment::class,
+
+        HasRuntimeInfo::class => Framework::class,
     ],
 
     // 容器的缓存配置，默认情况下，只有在生产环境下才会启用缓存
@@ -37,7 +39,7 @@ return [
     // 详细介绍请参阅：https://php-di.org/doc/performances.html#caching
     'cache' => [
         // 是否启用缓存，支持 bool、callable
-        'enable' => fn () => ZMConfig::getInstance()->getEnvironment() === 'production',
+        'enable' => fn () => Framework::getInstance()->runtime_preferences->environment('production'),
         'namespace' => 'zm',
     ],
 ];

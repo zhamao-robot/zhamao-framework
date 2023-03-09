@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ZM\Command\Server;
 
 use OneBot\Driver\Process\ProcessManager;
+use OneBot\Driver\Workerman\Worker;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -26,13 +27,10 @@ class ServerStartCommand extends ServerCommand
     protected function configure()
     {
         $this->setDefinition([
-            new InputOption('config-dir', null, InputOption::VALUE_REQUIRED, '指定其他配置文件目录'),
             new InputOption('driver', null, InputOption::VALUE_REQUIRED, '指定驱动类型'),
-            new InputOption('log-level', null, InputOption::VALUE_REQUIRED, '调整消息等级到debug (log-level=4)'),
             new InputOption('daemon', null, null, '以守护进程的方式运行框架'),
             new InputOption('worker-num', null, InputOption::VALUE_REQUIRED, '启动框架时运行的 Worker 进程数量'),
             new InputOption('watch', null, null, '监听 plugins/ 目录下各个插件的文件变化并热更新（还不能用）'),
-            new InputOption('env', null, InputOption::VALUE_REQUIRED, '设置环境类型 (production, development, staging)'),
             new InputOption('disable-safe-exit', null, null, '关闭安全退出（关闭后按CtrlC时直接杀死进程）'),
             new InputOption('no-state-check', null, null, '关闭启动前框架运行状态检查'),
             new InputOption('private-mode', null, null, '启动时隐藏MOTD和敏感信息'),
@@ -60,8 +58,23 @@ class ServerStartCommand extends ServerCommand
                 }
             }
         }
+
+        if ($input->getOption('driver')) {
+            config(['global.driver' => $input->getOption('driver')]);
+        }
+
+        if ($input->getOption('worker-num')) {
+            config(['global.swoole_options.swoole_set.worker_num' => (int) $input->getOption('worker-num')]);
+            config(['global.workerman_options.workerman_worker_num' => (int) $input->getOption('worker-num')]);
+        }
+
+        if ($input->getOption('daemon')) {
+            config(['global.swoole_options.swoole_set.daemonize' => 1]);
+            Worker::$daemonize = true;
+        }
+
         // 框架启动的入口
-        (new Framework($input->getOptions()))->init()->start();
+        Framework::getInstance()->init($input->getOptions())->start();
         return 0;
     }
 }

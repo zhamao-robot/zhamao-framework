@@ -20,8 +20,9 @@ use OneBot\Driver\Swoole\SwooleDriver;
 use OneBot\Driver\Workerman\Worker;
 use OneBot\Driver\Workerman\WorkermanDriver;
 use OneBot\Util\Singleton;
+use ZM\Bootstrap\Bootstrapper;
 use ZM\Command\Server\ServerStartCommand;
-use ZM\Config\ZMConfig;
+use ZM\Config\RuntimePreferences;
 use ZM\Container\ContainerBindingListener;
 use ZM\Event\Listener\HttpEventListener;
 use ZM\Event\Listener\ManagerEventListener;
@@ -38,6 +39,8 @@ use ZM\Utils\EasterEgg;
 /**
  * 框架入口类
  * @since 3.0
+ *
+ * @method static Framework getInstance()
  */
 class Framework
 {
@@ -48,6 +51,11 @@ class Framework
 
     /** @var string 版本名称 */
     public const VERSION = '3.1.1';
+
+    /**
+     * @var RuntimePreferences 运行时偏好（环境信息&参数）
+     */
+    public RuntimePreferences $runtime_preferences;
 
     /** @var array 传入的参数 */
     protected array $argv;
@@ -70,11 +78,9 @@ class Framework
 
     /**
      * 框架初始化文件
-     *
-     * @param  array<string, null|bool|string> $argv 传入的参数（见 ServerStartCommand）
      * @throws \Exception
      */
-    public function __construct(array $argv = [])
+    public function __construct()
     {
         // 单例化整个Framework类
         if (self::$instance !== null) {
@@ -82,17 +88,22 @@ class Framework
         }
         self::$instance = $this;
 
-        // 初始化必需的args参数，如果没有传入的话，使用默认值
-        $this->argv = empty($argv) ? ServerStartCommand::exportOptionArray() : $argv;
+        $this->runtime_preferences = new RuntimePreferences();
     }
 
     /**
      * 初始化框架
      *
+     * @param array<string, null|bool|string> $argv 传入的参数（见 ServerStartCommand）
+     *
      * @throws \Exception
      */
-    public function init(): Framework
+    public function init(array $argv = []): Framework
     {
+        // TODO: discard argv
+        // 初始化必需的args参数，如果没有传入的话，使用默认值
+        $this->argv = empty($argv) ? ServerStartCommand::exportOptionArray() : $argv;
+
         // 初始化 @OnSetup 事件
         $this->initSetupAnnotations();
 
@@ -251,6 +262,14 @@ class Framework
         }
     }
 
+    public function bootstrap(): void
+    {
+        foreach ($this->bootstrappers as $bootstrapper) {
+            /* @var Bootstrapper $bootstrapper */
+            (new $bootstrapper())->bootstrap($this->runtime_preferences);
+        }
+    }
+
     /**
      * 打印属性表格
      */
@@ -260,7 +279,7 @@ class Framework
         // 打印工作目录
         $properties['working_dir'] = WORKING_DIR;
         // 打印环境信息
-        $properties['environment'] = ZMConfig::getInstance()->getEnvironment();
+        $properties['environment'] = $this->runtime_preferences->environment();
         // 打印驱动
         $properties['driver'] = config('global.driver');
         // 打印logger显示等级

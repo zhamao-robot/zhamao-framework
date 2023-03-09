@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace ZM\Bootstrap;
 
+use ZM\Config\RuntimePreferences;
 use ZM\Event\EventProvider;
 
-class RegisterEventProvider
+class RegisterEventProvider implements Bootstrapper
 {
-    public function bootstrap(array $config): void
+    public function bootstrap(RuntimePreferences $preferences): void
     {
         global $ob_event_provider;
         $ob_event_provider = EventProvider::getInstance();
