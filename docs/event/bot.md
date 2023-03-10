@@ -24,18 +24,43 @@ BotAction 注解将在 OneBot 12 标准的动作发送前会触发，体现在�
 #[BotAction()]
 public function onBotAction(\OneBot\V12\Object\Action $action)
 {
+    logger()->info('机器人执行了动作：' . $action->action);
+}
+```
 
+举例二，你可以通过设置 BotAction 注解的限定参数来限定捕获触发的动作事件：
+
+```php
+// 限定只获取 send_message 动作的触发
+#[BotAction(action: 'send_message')]
+public function onSendMessage(\OneBot\V12\Object\Action $action)
+{
+    logger()->info('机器人发送了消息：' . \ZM\Utils\MessageUtil::getAltMessage($action->params['message']));
+}
+```
+
+举例三，你可以通过 `need_response` 参数来限定 BotAction 触发的时机。默认情况下，BotAction 在调用 `ctx()->sendAction()` 后立刻触发，
+如果限定 `need_response: true`，该事件将会在动作收到响应后再触发，届时你可以通过依赖注入的方式，获取 ActionResponse 对象：
+
+```php
+#[BotAction(need_response: true)]
+public function onActionWithResponse(\OneBot\V12\Object\Action $action, \OneBot\V12\Object\ActionResponse $response)
+{
+    logger()->info('机器人发送了动作：' . $action->action . '，并且返回状态码为 ' . $response->retcode);
 }
 ```
 
 ## BotActionResponse
 
-啊？？
+BoActionResponse 注解将在 OneBot 12 标准的动作发出，并收到了合法的响应内容时触发。
 
-| 参数名称    | 允许值 | 用途            | 默认   |
-|---------|-----|---------------|------|
-| retcode | int | 响应码           | null |
-| level   | int | 事件优先级（越大越先执行） | 20   |
+| 参数名称      | 允许值  | 用途             | 默认   |
+|-----------|------|----------------|------|
+| retcode   | int  | 响应码            | null |
+| only_fail | bool | 是否只限定返回非 0 响应码 |
+| level     | int  | 事件优先级（越大越先执行）  | 20   |
+
+举例一，你需要获取所有响应不成功的动作
 
 ## BotEvent
 
