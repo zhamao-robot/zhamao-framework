@@ -20,7 +20,7 @@ use ZM\Annotation\Interfaces\Level;
 #[\Attribute(\Attribute::IS_REPEATABLE | \Attribute::TARGET_METHOD)]
 class BotActionResponse extends AnnotationBase implements Level
 {
-    public function __construct(public ?int $retcode = null, public int $level = 20)
+    public function __construct(public ?string $status = null, public ?int $retcode = null, public int $level = 20)
     {
     }
 
