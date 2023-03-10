@@ -41,3 +41,9 @@ $redis->set('key', 'value');
 ## 连接池
 
 框架会自动为每个 Redis 连接创建一个连接池，你可以通过 `pool_size` 配置项来设置连接池的大小。
+
+## 通过 KV 库方式使用 Redis
+
+默认情况下，你使用 `redis()` 方法获取的是 redis 扩展的原生操作对象，使用方式和传统的 redis 扩展完全相同。
+
+框架实现了一个 KVInterface 接口，继承于 PSR SimpleCache 标准，你可以使用 PSR-16 的方式来使用其中一个 redis 库。详见 [KV 库](/components/store/cache)。

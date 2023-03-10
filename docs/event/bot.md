@@ -6,11 +6,11 @@
 </aside>
 
 > 在使用注解绑定事件时，如果不存在 **必需** 参数，可一个参数都不写，效果就是此事件在任何情况下都会调用此方法，例如 `#[BotEvent()]` 会在收到任意机器人事件时调用。
->
+
 
 ## BotAction
 
-啊？
+BotAction 注解将在 OneBot 12 标准的动作发送前会触发，体现在代码层面就是在使用机器人上下文 `ctx()->sendAction()` 方法时会触发。
 
 | 参数名称          | 允许值    | 用途            | 默认    |
 |---------------|--------|---------------|-------|
@@ -18,14 +18,60 @@
 | need_response | string | 动作是否需要响应      | false |
 | level         | int    | 事件优先级（越大越先执行） | 20    |
 
+举例一，你可以通过设置一个 BotAction 注解事件，来收集和统计所有机器人发出的消息、执行的动作：
+
+```php
+#[BotAction()]
+public function onBotAction(\OneBot\V12\Object\Action $action)
+{
+    logger()->info('机器人执行了动作：' . $action->action);
+}
+```
+
+举例二，你可以通过设置 BotAction 注解的限定参数来限定捕获触发的动作事件：
+
+```php
+// 限定只获取 send_message 动作的触发
+#[BotAction(action: 'send_message')]
+public function onSendMessage(\OneBot\V12\Object\Action $action)
+{
+    logger()->info('机器人发送了消息：' . \ZM\Utils\MessageUtil::getAltMessage($action->params['message']));
+}
+```
+
+举例三，你可以通过 `need_response` 参数来限定 BotAction 触发的时机。默认情况下，BotAction 在调用 `ctx()->sendAction()` 后立刻触发，
+如果限定 `need_response: true`，该事件将会在动作收到响应后再触发，届时你可以通过依赖注入的方式，获取 ActionResponse 对象：
+
+```php
+#[BotAction(need_response: true)]
+public function onActionWithResponse(\OneBot\V12\Object\Action $action, \OneBot\V12\Object\ActionResponse $response)
+{
+    logger()->info('机器人发送了动作：' . $action->action . '，并且返回状态码为 ' . $response->retcode);
+}
+```
+
 ## BotActionResponse
 
-啊？？
+BoActionResponse 注解将在 OneBot 12 标准的动作发出，并收到了合法的响应内容时触发。
 
-| 参数名称    | 允许值 | 用途            | 默认   |
-|---------|-----|---------------|------|
-| retcode | int | 响应码           | null |
-| level   | int | 事件优先级（越大越先执行） | 20   |
+| 参数名称      | 允许值    | 用途             | 默认    |
+|-----------|--------|----------------|-------|
+| status    | string | 用于限定成功与否的状态    | null  |
+| retcode   | int    | 响应码            | null  |
+| level     | int    | 事件优先级（越大越先执行）  | 20    |
+
+举例一，你需要获取所有响应不成功的动作，则只需设置 status 为 failed 即可：
+
+```php
+#[BotActionResponse(status: 'failed')]
+public function onFailedResponse(\OneBot\V12\Object\ActionResponse $response)
+{
+    logger()->error('动作请求失败，错误码：' . $response->retcode. '，错误消息：' . $response->message);
+}
+```
+
+如果你的机器日代码逻辑更偏向于关注单个动作请求的成功与否，
+这里其实更推荐使用上方的 `BotAction` 注解，并采用 `need_response: true` 参数，这样可以同时使用 Action 和 ActionResponse 对象。
 
 ## BotEvent
 
@@ -37,6 +83,29 @@
 | detail_type | string | 对应标准中的事件详细类型  | null |
 | sub_type    | string | 对应标准中的事件子类型   | null |
 | level       | int    | 事件优先级（越大越先执行） | 20   |
+
+除了 level 外的参数，均可做限定事件内容的参数。
+
+举例一，你想写一个事件注解绑定的方法，但只获取 `type` 为 `notice` 消息类的事件：
+
+```php
+#[BotEvent(type: 'notice')]
+public function onNotice(BotContext $ctx, OneBotEvent $event)
+{
+    logger()->info('收到了机器人 ' . $event->self['user_id'] . ' 的通知事件，子类型为 ' . $event->detail_type);
+}
+```
+
+举例二，你想限定获取群所有群消息，通过设置 `type`、`detail_type` 两个参数组合来获取：
+
+```php
+#[BotEvent(type: 'message', detail_type: 'group')]
+public function onGroupMessage(OneBotEvent $event)
+{
+    // getAltMessage() 为返回一个终端可读的展示型文本，非消息原文
+    logger()->info('来自群组 ' . $event->getGroupId() . ':' . $event->getUserId() . ' 的消息：' . $event->getAltMessage());
+}
+```
 
 ## BotCommand
 
@@ -57,7 +126,6 @@
 | level       | int             | 事件优先级（越大越先执行）                | 20  |
 
 > 机器人命令注册的实例可参见【一堆例子链接】
->
 
 ## CommandArgument
 

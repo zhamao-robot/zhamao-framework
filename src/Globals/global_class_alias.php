@@ -47,6 +47,7 @@ class_alias(\ZM\Utils\ZMRequest::class, 'ZMRequest');
 class_alias(\ZM\Utils\ZMUtil::class, 'ZMUtil');
 class_alias(\ZM\Store\KV\LightCache::class, 'LightCache');
 class_alias(\ZM\Store\KV\Redis\KVRedis::class, 'KVRedis');
+class_alias(\ZM\Config\ZMConfig::class, 'ZMConfig');
 
 // 下面是 OneBot 相关类的全局别称
 class_alias(\OneBot\Driver\Event\WebSocket\WebSocketOpenEvent::class, 'WebSocketOpenEvent');
@@ -56,6 +57,16 @@ class_alias(\OneBot\Driver\Event\Http\HttpRequestEvent::class, 'HttpRequestEvent
 
 // OneBot 12 的对象
 class_alias(\OneBot\V12\Object\OneBotEvent::class, 'OneBotEvent');
+class_alias(\OneBot\V12\Object\Action::class, 'Action');
 
 // 下面是 Choir 相关的全局别称
 class_alias(\Choir\Http\HttpFactory::class, 'HttpFactory');
+class_alias(\Choir\WebSocket\FrameInterface::class, 'FrameInterface');
+
+// PSR 接口的别名
+class_alias(\Psr\Http\Message\ServerRequestInterface::class, 'ServerRequestInterface');
+class_alias(\Psr\Http\Message\RequestInterface::class, 'RequestInterface');
+class_alias(\Psr\Http\Message\ResponseInterface::class, 'ResponseInterface');
+class_alias(\Psr\Http\Message\UriInterface::class, 'UriInterface');
+class_alias(\Psr\Log\LoggerInterface::class, 'LoggerInterface');
+class_alias(\Psr\Container\ContainerInterface::class, 'ContainerInterface');

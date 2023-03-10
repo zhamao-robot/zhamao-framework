@@ -80,9 +80,11 @@ module.exports = {
                 {
                     title: 'HTTP 组件',
                     collapsable: true,
-                    sidebarDepth: 2,
+                    sidebarDepth: 1,
                     children: [
                         'http/zmrequest',
+                        'http/websocket-access',
+                        'http/websocket-client',
                     ],
                 },
                 {
@@ -99,7 +101,7 @@ module.exports = {
                 {
                     title: '存储组件',
                     collapsable: true,
-                    sidebarDepth: 2,
+                    sidebarDepth: 1,
                     children: [
                         'store/file-system',
                         'store/cache',
