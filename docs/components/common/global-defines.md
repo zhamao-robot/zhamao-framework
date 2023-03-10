@@ -382,3 +382,18 @@ public function testRoute(HttpRequestEvent $event)
 快速生成一个符合 PSR-7 的 HTTP Response 对象。
 
 有关参数，等同于 HttpFactory 对象，详见 HttpFactory 文档（TODO）。
+
+### ws_socket()
+
+获取驱动的 WebSocket 操作对象。
+
+定义：`function ws_socket(int $flag = 1): WSServerResponse`
+
+传入一个 flag 值（值为你在 `global.php` 中为 server 设置的 flag 值），返回对应端口的 WebSocket 操作对象。
+
+操作对象可以主动发送消息到指定客户端、可以获取指定端口的配置信息等。
+
+```php
+$socket = ws_socket();
+$socket->send('hello world', $event->getFd()); // 客户端的连接 fd 编号可以通过 WebSocketOpenEvent 等事件获取
+```

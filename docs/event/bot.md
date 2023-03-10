@@ -6,17 +6,27 @@
 </aside>
 
 > 在使用注解绑定事件时，如果不存在 **必需** 参数，可一个参数都不写，效果就是此事件在任何情况下都会调用此方法，例如 `#[BotEvent()]` 会在收到任意机器人事件时调用。
->
+
 
 ## BotAction
 
-啊？
+BotAction 注解将在 OneBot 12 标准的动作发送前会触发，体现在代码层面就是在使用机器人上下文 `ctx()->sendAction()` 方法时会触发。
 
 | 参数名称          | 允许值    | 用途            | 默认    |
 |---------------|--------|---------------|-------|
 | action        | string | 动作名称          | “”    |
 | need_response | string | 动作是否需要响应      | false |
 | level         | int    | 事件优先级（越大越先执行） | 20    |
+
+举例一，你可以通过设置一个 BotAction 注解事件，来收集和统计所有机器人发出的消息、执行的动作：
+
+```php
+#[BotAction()]
+public function onBotAction(\OneBot\V12\Object\Action $action)
+{
+
+}
+```
 
 ## BotActionResponse
 
