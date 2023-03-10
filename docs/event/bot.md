@@ -54,13 +54,24 @@ public function onActionWithResponse(\OneBot\V12\Object\Action $action, \OneBot\
 
 BoActionResponse 注解将在 OneBot 12 标准的动作发出，并收到了合法的响应内容时触发。
 
-| 参数名称      | 允许值  | 用途             | 默认   |
-|-----------|------|----------------|------|
-| retcode   | int  | 响应码            | null |
-| only_fail | bool | 是否只限定返回非 0 响应码 |
-| level     | int  | 事件优先级（越大越先执行）  | 20   |
+| 参数名称      | 允许值    | 用途             | 默认    |
+|-----------|--------|----------------|-------|
+| status    | string | 用于限定成功与否的状态    | null  |
+| retcode   | int    | 响应码            | null  |
+| level     | int    | 事件优先级（越大越先执行）  | 20    |
 
-举例一，你需要获取所有响应不成功的动作
+举例一，你需要获取所有响应不成功的动作，则只需设置 status 为 failed 即可：
+
+```php
+#[BotActionResponse(status: 'failed')]
+public function onFailedResponse(\OneBot\V12\Object\ActionResponse $response)
+{
+    logger()->error('动作请求失败，错误码：' . $response->retcode. '，错误消息：' . $response->message);
+}
+```
+
+如果你的机器日代码逻辑更偏向于关注单个动作请求的成功与否，
+这里其实更推荐使用上方的 `BotAction` 注解，并采用 `need_response: true` 参数，这样可以同时使用 Action 和 ActionResponse 对象。
 
 ## BotEvent
 
@@ -72,6 +83,29 @@ BoActionResponse 注解将在 OneBot 12 标准的动作发出，并收到了合�
 | detail_type | string | 对应标准中的事件详细类型  | null |
 | sub_type    | string | 对应标准中的事件子类型   | null |
 | level       | int    | 事件优先级（越大越先执行） | 20   |
+
+除了 level 外的参数，均可做限定事件内容的参数。
+
+举例一，你想写一个事件注解绑定的方法，但只获取 `type` 为 `notice` 消息类的事件：
+
+```php
+#[BotEvent(type: 'notice')]
+public function onNotice(BotContext $ctx, OneBotEvent $event)
+{
+    logger()->info('收到了机器人 ' . $event->self['user_id'] . ' 的通知事件，子类型为 ' . $event->detail_type);
+}
+```
+
+举例二，你想限定获取群所有群消息，通过设置 `type`、`detail_type` 两个参数组合来获取：
+
+```php
+#[BotEvent(type: 'message', detail_type: 'group')]
+public function onGroupMessage(OneBotEvent $event)
+{
+    // getAltMessage() 为返回一个终端可读的展示型文本，非消息原文
+    logger()->info('来自群组 ' . $event->getGroupId() . ':' . $event->getUserId() . ' 的消息：' . $event->getAltMessage());
+}
+```
 
 ## BotCommand
 
@@ -92,7 +126,6 @@ BoActionResponse 注解将在 OneBot 12 标准的动作发出，并收到了合�
 | level       | int             | 事件优先级（越大越先执行）                | 20  |
 
 > 机器人命令注册的实例可参见【一堆例子链接】
->
 
 ## CommandArgument
 
