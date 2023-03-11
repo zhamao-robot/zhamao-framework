@@ -381,6 +381,16 @@ class ZMConfig
 
     private function loadInitConfig(): array
     {
-        return require SOURCE_ROOT_DIR . '/config/config.php';
+        $conf = [
+            WORKING_DIR . '/config/config.php',
+            SOURCE_ROOT_DIR . '/config/config.php',
+            FRAMEWORK_ROOT_DIR . '/config/config.php',
+        ];
+        foreach ($conf as $item) {
+            if (file_exists($item)) {
+                return require $item;
+            }
+        }
+        throw new \Exception('这个错误理论上不可能触发，除非这个 config.php 的配置的 base 位置也丢失了！');
     }
 }
