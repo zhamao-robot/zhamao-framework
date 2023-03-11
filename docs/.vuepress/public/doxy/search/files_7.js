@@ -4,6 +4,5 @@ var searchData=
   ['handler_2ephp_1',['Handler.php',['../_handler_8php.html',1,'']]],
   ['hello123_2ephp_2',['Hello123.php',['../_hello123_8php.html',1,'']]],
   ['httpeventlistener_2ephp_3',['HttpEventListener.php',['../_http_event_listener_8php.html',1,'']]],
-  ['httptrait_2ephp_4',['HttpTrait.php',['../_http_trait_8php.html',1,'']]],
-  ['httputil_2ephp_5',['HttpUtil.php',['../_http_util_8php.html',1,'']]]
+  ['httputil_2ephp_4',['HttpUtil.php',['../_http_util_8php.html',1,'']]]
 ];

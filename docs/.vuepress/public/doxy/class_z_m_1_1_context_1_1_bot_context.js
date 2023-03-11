@@ -10,5 +10,7 @@ var class_z_m_1_1_context_1_1_bot_context =
     [ "getSelf", "class_z_m_1_1_context_1_1_bot_context.html#ab5aad5fd49197b75ad66d28c0150c528", null ],
     [ "hasReplied", "class_z_m_1_1_context_1_1_bot_context.html#ac005ebb1f545cd032a917e89944ac673", null ],
     [ "promptString", "class_z_m_1_1_context_1_1_bot_context.html#a658777d23d340b09fe9af94c5f9d1591", null ],
-    [ "setParams", "class_z_m_1_1_context_1_1_bot_context.html#a490ec24c6b656e391669feb5ddcd6620", null ]
+    [ "setParams", "class_z_m_1_1_context_1_1_bot_context.html#a490ec24c6b656e391669feb5ddcd6620", null ],
+    [ "$params", "class_z_m_1_1_context_1_1_bot_context.html#a21ae116e22adda72b3971dde67f4ef19", null ],
+    [ "$self", "class_z_m_1_1_context_1_1_bot_context.html#a9a3bd662490b066138720cc485454608", null ]
 ];
