@@ -18,9 +18,6 @@ class PluginInstallCommand extends PluginCommand
     {
         $this->addArgument('address', InputArgument::REQUIRED, '插件地址');
         $this->addOption('github-token', null, InputOption::VALUE_REQUIRED, '提供的 GitHub Token');
-
-        // 下面是辅助用的，和 server:start 一样
-        $this->addOption('config-dir', null, InputOption::VALUE_REQUIRED, '指定其他配置文件目录');
     }
 
     /**

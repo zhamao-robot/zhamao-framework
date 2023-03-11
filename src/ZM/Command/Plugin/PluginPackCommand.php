@@ -17,9 +17,6 @@ class PluginPackCommand extends PluginCommand
     {
         $this->addArgument('name', InputArgument::REQUIRED, '要打包的插件名称');
         $this->addOption('build-dir', 'D', InputOption::VALUE_REQUIRED, '指定输出文件位置', WORKING_DIR . '/build');
-
-        // 下面是辅助用的，和 server:start 一样
-        $this->addOption('config-dir', null, InputOption::VALUE_REQUIRED, '指定其他配置文件目录');
     }
 
     /**
