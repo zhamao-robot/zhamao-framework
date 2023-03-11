@@ -13,7 +13,7 @@ class BotConnectContext
 {
     use BotActionTrait;
 
-    private ?array $self = null;
+    protected ?array $self = null;
 
     public function __construct(private int $flag, private int $fd)
     {
