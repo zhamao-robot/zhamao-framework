@@ -24,9 +24,6 @@ class PluginMakeCommand extends PluginCommand
 
         // 下面是 type=psr4 的选项
         $this->addOption('namespace', null, InputOption::VALUE_OPTIONAL, '插件命名空间', null);
-
-        // 下面是辅助用的，和 server:start 一样
-        $this->addOption('config-dir', null, InputOption::VALUE_REQUIRED, '指定其他配置文件目录');
     }
 
     /**
