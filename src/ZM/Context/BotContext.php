@@ -22,13 +22,13 @@ class BotContext implements ContextInterface
     use BotActionTrait;
 
     /** @var array<string, array<string, BotContext>> 记录机器人的上下文列表 */
-    private static array $bots = [];
+    protected static array $bots = [];
 
     /** @var null|string[] 记录当前上下文绑定的机器人 */
-    private ?array $self;
+    protected ?array $self;
 
     /** @var array 如果是 BotCommand 匹配的上下文，这里会存放匹配到的参数 */
-    private array $params = [];
+    protected array $params = [];
 
     public function __construct(string $bot_id, string $platform)
     {

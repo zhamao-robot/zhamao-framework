@@ -38,9 +38,26 @@ class BotMap
      */
     private static array $bot_fds = [];
 
+    /**
+     * 保存机器人自定义的上下文
+     */
+    private static array $custom_contexts = [];
+
+    /**
+     * 缓存 BotConnectContext 上下文对象的
+     *
+     * @var array<int, array<int, BotConnectContext>>
+     */
+    private static array $connect_contexts = [];
+
+    public static function setCustomConnectContext(int $flag, int $fd, BotConnectContext $context): void
+    {
+        self::$connect_contexts[$flag][$fd] = $context;
+    }
+
     public static function getConnectContext(int $flag, int $fd): BotConnectContext
     {
-        return new BotConnectContext($flag, $fd);
+        return self::$connect_contexts[$flag][$fd] ?? new BotConnectContext($flag, $fd);
     }
 
     /**
@@ -83,6 +100,10 @@ class BotMap
 
     public static function unregisterBotByFd(int $flag, int $fd): void
     {
+        // 注销 connect 上下文
+        unset(self::$connect_contexts[$flag][$fd]);
+
+        // 注销 bot 上下文
         $unreg_list = [];
         foreach (self::$bot_fds as $platform => $bots) {
             foreach ($bots as $bot_id => $bot_fd) {
@@ -112,14 +133,14 @@ class BotMap
             }
             // 有，那就通过事件本身的 self 字段来获取一下
             $self = $event->self;
-            return self::$bot_ctx_cache[$self['platform']][$self['user_id']] = new BotContext($self['user_id'], $self['platform']);
+            return self::$bot_ctx_cache[$self['platform']][$self['user_id']] = new (self::$custom_contexts[$self['platform']][$self['user_id']] ?? BotContext::class)($self['user_id'], $self['platform']);
         }
         // 传入的 platform 为空，但 ID 不为空，那么就模糊搜索一个平台的 ID 下的机器人 ID 返回
         if ($platform === '') {
             foreach (self::$bot_fds as $platform => $bot_ids) {
                 foreach ($bot_ids as $id => $fd_map) {
                     if ($id === $bot_id) {
-                        return self::$bot_ctx_cache[$platform][$id] = new BotContext($id, $platform);
+                        return self::$bot_ctx_cache[$platform][$id] = new (self::$custom_contexts[$platform][$id] ?? BotContext::class)($id, $platform);
                     }
                 }
             }
@@ -128,6 +149,11 @@ class BotMap
         if (!isset(self::$bot_fds[$platform][$bot_id])) {
             throw new OneBot12Exception('未找到 ' . $platform . ' 平台下 ID 为 ' . $bot_id . ' 的机器人');
         }
-        return self::$bot_ctx_cache[$platform][$bot_id] = new BotContext($bot_id, $platform);
+        return self::$bot_ctx_cache[$platform][$bot_id] = new (self::$custom_contexts[$platform][$bot_id] ?? BotContext::class)($bot_id, $platform);
+    }
+
+    public static function setCustomContext(string|int $bot_id, string $platform, string $context_class = BotContext::class): void
+    {
+        self::$custom_contexts[$platform][$bot_id] = $context_class;
     }
 }
