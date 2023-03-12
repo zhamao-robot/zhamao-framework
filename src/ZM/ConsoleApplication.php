@@ -11,7 +11,7 @@ use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use ZM\Exception\SingletonViolationException;
 use ZM\Store\FileSystem;
 
@@ -43,31 +43,38 @@ final class ConsoleApplication extends Application
 
         $this->registerGlobalOptions();
 
-        // 设置命令事件分发器
-        $dispatcher = new EventDispatcher();
-        $this->setDispatcher($dispatcher);
+        // 设置命令事件分发器（临时版）
+        $this->setDispatcher(new class() implements EventDispatcherInterface {
+            public function dispatch(object $event, string $eventName = null): object
+            {
+                $eventName ??= $event::class;
 
-        // 注册命令执行前监听器
-        $dispatcher->addListener(ConsoleEvents::COMMAND, function (ConsoleCommandEvent $event) {
-            $input = $event->getInput();
+                // 命令执行前
+                if ($eventName === ConsoleEvents::COMMAND) {
+                    /** @var ConsoleCommandEvent $event */
+                    $input = $event->getInput();
 
-            // 初始化内核
-            /** @var Framework $kernel */
-            $kernel = Framework::getInstance();
-            $kernel->runtime_preferences = $kernel->runtime_preferences
-                ->withConfigDir($input->getOption('config-dir'))
-                ->withEnvironment($input->getOption('env'))
-                ->enableDebugMode($input->getOption('debug'))
-                ->withLogLevel($input->getOption('log-level'));
-            $kernel->bootstrap();
-        });
+                    // 初始化内核
+                    $kernel = Framework::getInstance();
+                    $kernel->runtime_preferences = $kernel->runtime_preferences
+                        ->withConfigDir($input->getOption('config-dir'))
+                        ->withEnvironment($input->getOption('env'))
+                        ->enableDebugMode($input->getOption('debug'))
+                        ->withLogLevel($input->getOption('log-level'));
+                    $kernel->bootstrap();
+                }
 
-        // 注册命令执行错误监听器
-        $dispatcher->addListener(ConsoleEvents::ERROR, function (ConsoleErrorEvent $event) {
-            $e = $event->getError();
-            // 输出错误信息
-            echo zm_internal_errcode('E00005') . "{$e->getMessage()} at {$e->getFile()}({$e->getLine()})" . PHP_EOL;
-            exit(1);
+                // 命令执行错误
+                if ($eventName === ConsoleEvents::ERROR) {
+                    /** @var ConsoleErrorEvent $event */
+                    $e = $event->getError();
+                    // 输出错误信息
+                    echo zm_internal_errcode('E00005') . "{$e->getMessage()} at {$e->getFile()}({$e->getLine()})" . PHP_EOL;
+                    exit(1);
+                }
+
+                return $event;
+            }
         });
 
         // 设置单例，阻止后续实例化
