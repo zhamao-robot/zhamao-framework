@@ -93,7 +93,8 @@ $(document).ready(function(){initNavTree('class_z_m_1_1_console_application.html
 
 <div class="header">
   <div class="summary">
-<a href="#pub-methods">Public 成员函数</a>  </div>
+<a href="#pub-methods">Public 成员函数</a> &#124;
+<a href="#pro-methods">Protected 成员函数</a>  </div>
   <div class="headertitle"><div class="title">ConsoleApplication类 参考</div></div>
 </div><!--header-->
 <div class="contents">
@@ -112,13 +113,119 @@ ConsoleApplication 的协作图:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public 成员函数</h2></td></tr>
+<tr class="memitem:a6979d25dc39878d9e8ed9620e3b17a34"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_console_application.html#a6979d25dc39878d9e8ed9620e3b17a34">__construct</a> (string $name='zhamao-framework')</td></tr>
+<tr class="separator:a6979d25dc39878d9e8ed9620e3b17a34"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6474e644924bebff81f50225990f6079"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_console_application.html#a6474e644924bebff81f50225990f6079">doRun</a> (InputInterface $input, OutputInterface $output)</td></tr>
+<tr class="separator:a6474e644924bebff81f50225990f6079"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aca4d1e411fe1e258ddebb3ac8fcdc872"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_console_application.html#aca4d1e411fe1e258ddebb3ac8fcdc872">registerGlobalOptions</a> ()</td></tr>
 <tr class="separator:aca4d1e411fe1e258ddebb3ac8fcdc872"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-methods" name="pro-methods"></a>
+Protected 成员函数</h2></td></tr>
+<tr class="memitem:ad5aa8d500e24b1bba8e2120f50981dfc"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_console_application.html#ad5aa8d500e24b1bba8e2120f50981dfc">doRunCommand</a> (Command $command, InputInterface $input, OutputInterface $output)</td></tr>
+<tr class="separator:ad5aa8d500e24b1bba8e2120f50981dfc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
 <div class="textblock"><p >命令行启动的入口文件，用于初始化环境变量，并启动命令行应用</p>
 <p >这里启动的不是框架，而是框架相关的命令行环境 </p>
-</div><h2 class="groupheader">成员函数说明</h2>
+</div><h2 class="groupheader">构造及析构函数说明</h2>
+<a id="a6979d25dc39878d9e8ed9620e3b17a34" name="a6979d25dc39878d9e8ed9620e3b17a34"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6979d25dc39878d9e8ed9620e3b17a34">&#9670;&#160;</a></span>__construct()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">__construct </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>$name</em> = <code>'zhamao-framework'</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">成员函数说明</h2>
+<a id="a6474e644924bebff81f50225990f6079" name="a6474e644924bebff81f50225990f6079"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6474e644924bebff81f50225990f6079">&#9670;&#160;</a></span>doRun()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">doRun </td>
+          <td>(</td>
+          <td class="paramtype">InputInterface&#160;</td>
+          <td class="paramname"><em>$input</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">OutputInterface&#160;</td>
+          <td class="paramname"><em>$output</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >{} </p>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="class_z_m_1_1_console_application_a6474e644924bebff81f50225990f6079_cgraph.svg" width="256" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+</div>
+
+</div>
+</div>
+<a id="ad5aa8d500e24b1bba8e2120f50981dfc" name="ad5aa8d500e24b1bba8e2120f50981dfc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad5aa8d500e24b1bba8e2120f50981dfc">&#9670;&#160;</a></span>doRunCommand()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">doRunCommand </td>
+          <td>(</td>
+          <td class="paramtype">Command&#160;</td>
+          <td class="paramname"><em>$command</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">InputInterface&#160;</td>
+          <td class="paramname"><em>$input</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">OutputInterface&#160;</td>
+          <td class="paramname"><em>$output</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >{} </p>
+
+</div>
+</div>
 <a id="aca4d1e411fe1e258ddebb3ac8fcdc872" name="aca4d1e411fe1e258ddebb3ac8fcdc872"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aca4d1e411fe1e258ddebb3ac8fcdc872">&#9670;&#160;</a></span>registerGlobalOptions()</h2>
 

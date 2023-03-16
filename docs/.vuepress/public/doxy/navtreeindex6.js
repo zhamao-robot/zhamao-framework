@@ -1,5 +1,11 @@
 var NAVTREEINDEX6 =
 {
+"namespace_z_m_1_1_annotation_1_1_one_bot.html":[1,0,0,0,4],
+"namespace_z_m_1_1_bootstrap.html":[1,0,0,1],
+"namespace_z_m_1_1_command.html":[1,0,0,2],
+"namespace_z_m_1_1_command_1_1_bot_craft.html":[1,0,0,2,0],
+"namespace_z_m_1_1_command_1_1_generate.html":[1,0,0,2,1],
+"namespace_z_m_1_1_command_1_1_plugin.html":[1,0,0,2,2],
 "namespace_z_m_1_1_command_1_1_server.html":[1,0,0,2,3],
 "namespace_z_m_1_1_config.html":[1,0,0,3],
 "namespace_z_m_1_1_container.html":[1,0,0,4],
