@@ -6,12 +6,11 @@ namespace ZM;
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\CommandLoader\FactoryCommandLoader;
-use Symfony\Component\Console\ConsoleEvents;
-use Symfony\Component\Console\Event\ConsoleCommandEvent;
-use Symfony\Component\Console\Event\ConsoleErrorEvent;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use ZM\Exception\SingletonViolationException;
 use ZM\Store\FileSystem;
 
@@ -43,42 +42,22 @@ final class ConsoleApplication extends Application
 
         $this->registerGlobalOptions();
 
-        // 设置命令事件分发器（临时版）
-        $this->setDispatcher(new class() implements EventDispatcherInterface {
-            public function dispatch(object $event, string $eventName = null): object
-            {
-                $eventName ??= $event::class;
-
-                // 命令执行前
-                if ($eventName === ConsoleEvents::COMMAND) {
-                    /** @var ConsoleCommandEvent $event */
-                    $input = $event->getInput();
-
-                    // 初始化内核
-                    $kernel = Framework::getInstance();
-                    $kernel->runtime_preferences = $kernel->runtime_preferences
-                        ->withConfigDir($input->getOption('config-dir'))
-                        ->withEnvironment($input->getOption('env'))
-                        ->enableDebugMode($input->getOption('debug'))
-                        ->withLogLevel($input->getOption('log-level'));
-                    $kernel->bootstrap();
-                }
-
-                // 命令执行错误
-                if ($eventName === ConsoleEvents::ERROR) {
-                    /** @var ConsoleErrorEvent $event */
-                    $e = $event->getError();
-                    // 输出错误信息
-                    echo zm_internal_errcode('E00005') . "{$e->getMessage()} at {$e->getFile()}({$e->getLine()})" . PHP_EOL;
-                    exit(1);
-                }
-
-                return $event;
-            }
-        });
-
         // 设置单例，阻止后续实例化
         self::$obj = $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function doRun(InputInterface $input, OutputInterface $output): int
+    {
+        try {
+            return parent::doRun($input, $output);
+        } catch (\Throwable $e) {
+            // 输出错误信息
+            echo zm_internal_errcode('E00005') . "{$e->getMessage()} at {$e->getFile()}({$e->getLine()})" . PHP_EOL;
+            return 1;
+        }
     }
 
     /**
@@ -92,6 +71,22 @@ final class ConsoleApplication extends Application
             new InputOption('config-dir', 'c', InputOption::VALUE_REQUIRED, '指定配置文件目录', SOURCE_ROOT_DIR . '/config'),
             new InputOption('log-level', 'l', InputOption::VALUE_REQUIRED, '指定日志等级', 'info'),
         ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output): int
+    {
+        // 初始化内核
+        $kernel = Framework::getInstance();
+        $kernel->runtime_preferences = $kernel->runtime_preferences
+            ->withConfigDir($input->getOption('config-dir'))
+            ->withEnvironment($input->getOption('env'))
+            ->enableDebugMode($input->getOption('debug'))
+            ->withLogLevel($input->getOption('log-level'));
+        $kernel->bootstrap();
+        return parent::doRunCommand($command, $input, $output);
     }
 
     /**
