@@ -56,7 +56,8 @@ class RuntimePreferences
 
     public function getConfigDir(): string
     {
-        return $this->config_dir;
+        // fallback to internal config dir if config_dir not exists
+        return is_dir($this->config_dir) ? $this->config_dir : FRAMEWORK_ROOT_DIR . '/config';
     }
 
     public function withConfigDir(string $config_dir): self
