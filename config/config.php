@@ -21,7 +21,7 @@ return [
     'source' => [
         'extensions' => ['php', 'yaml', 'yml', 'json', 'toml'], // 配置文件扩展名
         'paths' => [
-            SOURCE_ROOT_DIR . '/config', // 配置文件所在目录
+            \ZM\Framework::getInstance()->runtime_preferences->getConfigDir(), // 配置文件所在目录
             // 可以添加多个配置文件目录
         ],
     ],
