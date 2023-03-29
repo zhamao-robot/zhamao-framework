@@ -7,7 +7,7 @@ actions:
     type: primary
     size: large
   - text: 插件市场
-    link: /plugin-market/
+    link: /plugins/market
     type: primary
     ghost: true
     size: large

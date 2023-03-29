@@ -129,8 +129,9 @@ module.exports = {
                     children: [
                         'management',
                         'develop',
+                        'market',
                     ]
-                }
+                },
             ],
             '/advanced/': [
                 {
