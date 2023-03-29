@@ -79,13 +79,13 @@ final class ConsoleApplication extends Application
     protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output): int
     {
         // 初始化内核
-        $kernel = Framework::getInstance();
-        $kernel->runtime_preferences = $kernel->runtime_preferences
+        $framework = Framework::getInstance();
+        $framework->runtime_preferences = $framework->runtime_preferences
             ->withConfigDir($input->getOption('config-dir'))
             ->withEnvironment($input->getOption('env'))
             ->enableDebugMode($input->getOption('debug'))
             ->withLogLevel($input->getOption('log-level'));
-        $kernel->bootstrap();
+        $framework->bootstrap();
         return parent::doRunCommand($command, $input, $output);
     }
 

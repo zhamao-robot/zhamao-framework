@@ -262,8 +262,17 @@ class Framework
         }
     }
 
-    public function bootstrap(): void
+    /**
+     * 执行初始化的函数列表
+     *
+     * @param null|string $bootstrapper 要运行的 bootstrapper
+     */
+    public function bootstrap(?string $bootstrapper = null): void
     {
+        if ($bootstrapper !== null) {
+            (new $bootstrapper())->bootstrap($this->runtime_preferences);
+            return;
+        }
         foreach ($this->bootstrappers as $bootstrapper) {
             /* @var Bootstrapper $bootstrapper */
             (new $bootstrapper())->bootstrap($this->runtime_preferences);
