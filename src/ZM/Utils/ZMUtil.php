@@ -27,4 +27,16 @@ class ZMUtil
     {
         return file_put_contents(($path ?? SOURCE_ROOT_DIR) . '/composer.json', json_encode($content, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
     }
+
+    /**
+     * 获取当前 Composer 二进制执行命令的初始位置
+     */
+    public static function getComposerExecutable(): string
+    {
+        $env = getenv('COMPOSER_EXECUTABLE');
+        if ($env === false) {
+            $env = 'composer';
+        }
+        return $env;
+    }
 }
