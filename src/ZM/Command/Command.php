@@ -7,6 +7,7 @@ namespace ZM\Command;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use ZM\Framework;
 
 abstract class Command extends \Symfony\Component\Console\Command\Command implements LoggerInterface
 {
@@ -62,4 +63,9 @@ abstract class Command extends \Symfony\Component\Console\Command\Command implem
      * @return int 命令执行结果 {@see self::SUCCESS} 或 {@see self::FAILURE} 或 {@see self::INVALID}
      */
     abstract protected function handle(): int;
+
+    protected function emitBootstrap(string $class): void
+    {
+        Framework::getInstance()->bootstrap($class);
+    }
 }
