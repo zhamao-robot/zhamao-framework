@@ -29,6 +29,7 @@ module.exports = {
             { text: '指南', link: '/guide/' },
             { text: '事件', link: '/event/' },
             { text: '组件', link: '/components/bot/bot-context' },
+            { text: '插件', link: '/plugins/management' },
             { text: '进阶', link: '/advanced/' },
             { text: '更新日志', link: '/update/v3' },
             { text: 'API 文档', link: '/doxy/', target: '_blank' },
@@ -118,6 +119,17 @@ module.exports = {
                         'container/configuration',
                         'container/dependencies',
                     ],
+                }
+            ],
+            '/plugins/': [
+                {
+                    title: '插件系统',
+                    collapsable: false,
+                    sidebarDepth: 2,
+                    children: [
+                        'management',
+                        'develop',
+                    ]
                 }
             ],
             '/advanced/': [
