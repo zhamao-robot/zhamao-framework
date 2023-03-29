@@ -9,6 +9,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use ZM\Exception\InitException;
+use ZM\Utils\ZMUtil;
 
 #[AsCommand(name: 'init', description: '初始化框架运行的基础文件')]
 class InitCommand extends Command
@@ -75,10 +76,7 @@ class InitCommand extends Command
                 $section->write('<fg=gray>执行 composer dump-autoload ... </>');
 
                 // 兼容内建 Composer
-                $env = getenv('COMPOSER_EXECUTABLE');
-                if ($env === false) {
-                    $env = 'composer';
-                }
+                $env = ZMUtil::getComposerExecutable();
                 passthru(PHP_BINARY . ' ' . escapeshellcmd($env) . ' dump-autoload');
 
                 $section->writeln('<info>完成</info>');
