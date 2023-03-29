@@ -16,6 +16,7 @@ var searchData=
   ['pluginmeta_2ephp_13',['PluginMeta.php',['../_plugin_meta_8php.html',1,'']]],
   ['pluginpackcommand_2ephp_14',['PluginPackCommand.php',['../_plugin_pack_command_8php.html',1,'']]],
   ['pluginpacktrait_2ephp_15',['PluginPackTrait.php',['../_plugin_pack_trait_8php.html',1,'']]],
-  ['processstatemanager_2ephp_16',['ProcessStateManager.php',['../_process_state_manager_8php.html',1,'']]],
-  ['proxyservercommand_2ephp_17',['ProxyServerCommand.php',['../_proxy_server_command_8php.html',1,'']]]
+  ['pluginremovecommand_2ephp_16',['PluginRemoveCommand.php',['../_plugin_remove_command_8php.html',1,'']]],
+  ['processstatemanager_2ephp_17',['ProcessStateManager.php',['../_process_state_manager_8php.html',1,'']]],
+  ['proxyservercommand_2ephp_18',['ProxyServerCommand.php',['../_proxy_server_command_8php.html',1,'']]]
 ];

@@ -1,10 +1,11 @@
 <map id="PluginCommand" name="PluginCommand">
-<area shape="rect" id="node1" title=" " alt="" coords="276,152,393,177"/>
-<area shape="rect" id="node5" href="$class_z_m_1_1_command_1_1_plugin_1_1_plugin_install_command.html" title=" " alt="" coords="5,225,157,251"/>
-<area shape="rect" id="node6" href="$class_z_m_1_1_command_1_1_plugin_1_1_plugin_list_command.html" title=" " alt="" coords="181,225,320,251"/>
-<area shape="rect" id="node7" href="$class_z_m_1_1_command_1_1_plugin_1_1_plugin_make_command.html" title=" " alt="" coords="344,225,493,251"/>
-<area shape="rect" id="node8" href="$class_z_m_1_1_command_1_1_plugin_1_1_plugin_pack_command.html" title=" " alt="" coords="517,225,664,251"/>
-<area shape="rect" id="node2" href="$class_z_m_1_1_command_1_1_command.html" title=" " alt="" coords="294,79,375,104"/>
-<area shape="rect" id="node3" title=" " alt="" coords="234,5,315,31"/>
-<area shape="rect" id="node4" title=" " alt="" coords="339,5,453,31"/>
+<area shape="rect" id="node1" title=" " alt="" coords="296,104,413,129"/>
+<area shape="rect" id="node5" href="$class_z_m_1_1_command_1_1_plugin_1_1_plugin_install_command.html" title=" " alt="" coords="468,5,620,31"/>
+<area shape="rect" id="node6" href="$class_z_m_1_1_command_1_1_plugin_1_1_plugin_list_command.html" title=" " alt="" coords="475,55,613,80"/>
+<area shape="rect" id="node7" href="$class_z_m_1_1_command_1_1_plugin_1_1_plugin_make_command.html" title=" " alt="" coords="469,104,619,129"/>
+<area shape="rect" id="node8" href="$class_z_m_1_1_command_1_1_plugin_1_1_plugin_pack_command.html" title=" " alt="" coords="471,153,617,179"/>
+<area shape="rect" id="node9" href="$class_z_m_1_1_command_1_1_plugin_1_1_plugin_remove_command.html" title=" " alt="" coords="461,203,627,228"/>
+<area shape="rect" id="node2" href="$class_z_m_1_1_command_1_1_command.html" title=" " alt="" coords="167,104,248,129"/>
+<area shape="rect" id="node3" title=" " alt="" coords="21,79,103,104"/>
+<area shape="rect" id="node4" title=" " alt="" coords="5,128,119,153"/>
 </map>

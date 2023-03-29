@@ -27,7 +27,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Zhamao Framework<span id="projectnumber">&#160;3.1.6</span>
+   <div id="projectname">Zhamao Framework<span id="projectnumber">&#160;3.1.7</span>
    </div>
    <div id="projectbrief">A high-performance chatbot + web framework</div>
   </td>
@@ -126,14 +126,14 @@ Public 成员函数</h2></td></tr>
 <tr class="separator:ae8f8f8fa3f35aac8f365d9ee4c4c943f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a599197d9778f3823307cd6877958f163"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_framework.html#a599197d9778f3823307cd6877958f163">initFramework</a> ()</td></tr>
 <tr class="separator:a599197d9778f3823307cd6877958f163"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1220bc28aca374cd4510d925eb05bccc"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_framework.html#a1220bc28aca374cd4510d925eb05bccc">bootstrap</a> ()</td></tr>
-<tr class="separator:a1220bc28aca374cd4510d925eb05bccc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac290f354b41b21c175f7cfe6d3401558"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_framework.html#ac290f354b41b21c175f7cfe6d3401558">bootstrap</a> (?string $bootstrapper=null)</td></tr>
+<tr class="separator:ac290f354b41b21c175f7cfe6d3401558"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 成员变量</h2></td></tr>
-<tr class="memitem:a835ac83b0f0a2c196532f370dc585aa0"><td class="memItemLeft" align="right" valign="top">const&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_framework.html#a835ac83b0f0a2c196532f370dc585aa0">VERSION_ID</a> = 710</td></tr>
+<tr class="memitem:a835ac83b0f0a2c196532f370dc585aa0"><td class="memItemLeft" align="right" valign="top">const&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_framework.html#a835ac83b0f0a2c196532f370dc585aa0">VERSION_ID</a> = 711</td></tr>
 <tr class="separator:a835ac83b0f0a2c196532f370dc585aa0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af71005841ce53adac00581ab0ba24c1f"><td class="memItemLeft" align="right" valign="top">const&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_framework.html#af71005841ce53adac00581ab0ba24c1f">VERSION</a> = '3.1.6'</td></tr>
+<tr class="memitem:af71005841ce53adac00581ab0ba24c1f"><td class="memItemLeft" align="right" valign="top">const&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_framework.html#af71005841ce53adac00581ab0ba24c1f">VERSION</a> = '3.1.7'</td></tr>
 <tr class="separator:af71005841ce53adac00581ab0ba24c1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a61669b98ed51b377756daaf2b82aafd2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_z_m_1_1_config_1_1_runtime_preferences.html">RuntimePreferences</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_z_m_1_1_framework.html#a61669b98ed51b377756daaf2b82aafd2">$runtime_preferences</a></td></tr>
 <tr class="separator:a61669b98ed51b377756daaf2b82aafd2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -178,8 +178,8 @@ Protected 属性</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">成员函数说明</h2>
-<a id="a1220bc28aca374cd4510d925eb05bccc" name="a1220bc28aca374cd4510d925eb05bccc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1220bc28aca374cd4510d925eb05bccc">&#9670;&#160;</a></span>bootstrap()</h2>
+<a id="ac290f354b41b21c175f7cfe6d3401558" name="ac290f354b41b21c175f7cfe6d3401558"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac290f354b41b21c175f7cfe6d3401558">&#9670;&#160;</a></span>bootstrap()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -187,11 +187,19 @@ Protected 属性</h2></td></tr>
         <tr>
           <td class="memname">bootstrap </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">?string&#160;</td>
+          <td class="paramname"><em>$bootstrapper</em> = <code>null</code></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
+<p >执行初始化的函数列表</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramtype">null&#160;|&#160;string</td><td class="paramname">$bootstrapper</td><td>要运行的 bootstrapper </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -500,7 +508,7 @@ Protected 属性</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const VERSION = '3.1.6'</td>
+          <td class="memname">const VERSION = '3.1.7'</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -514,7 +522,7 @@ Protected 属性</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const VERSION_ID = 710</td>
+          <td class="memname">const VERSION_ID = 711</td>
         </tr>
       </table>
 </div><div class="memdoc">

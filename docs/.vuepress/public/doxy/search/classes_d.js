@@ -13,6 +13,7 @@ var searchData=
   ['pluginmakecommand_10',['PluginMakeCommand',['../class_z_m_1_1_command_1_1_plugin_1_1_plugin_make_command.html',1,'ZM::Command::Plugin']]],
   ['pluginmeta_11',['PluginMeta',['../class_z_m_1_1_plugin_1_1_plugin_meta.html',1,'ZM::Plugin']]],
   ['pluginpackcommand_12',['PluginPackCommand',['../class_z_m_1_1_command_1_1_plugin_1_1_plugin_pack_command.html',1,'ZM::Command::Plugin']]],
-  ['processstatemanager_13',['ProcessStateManager',['../class_z_m_1_1_process_1_1_process_state_manager.html',1,'ZM::Process']]],
-  ['proxyservercommand_14',['ProxyServerCommand',['../class_z_m_1_1_command_1_1_proxy_server_command.html',1,'ZM::Command']]]
+  ['pluginremovecommand_13',['PluginRemoveCommand',['../class_z_m_1_1_command_1_1_plugin_1_1_plugin_remove_command.html',1,'ZM::Command::Plugin']]],
+  ['processstatemanager_14',['ProcessStateManager',['../class_z_m_1_1_process_1_1_process_state_manager.html',1,'ZM::Process']]],
+  ['proxyservercommand_15',['ProxyServerCommand',['../class_z_m_1_1_command_1_1_proxy_server_command.html',1,'ZM::Command']]]
 ];

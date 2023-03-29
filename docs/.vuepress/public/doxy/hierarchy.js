@@ -27,7 +27,8 @@ var hierarchy =
           [ "PluginInstallCommand", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_install_command.html", null ],
           [ "PluginListCommand", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_list_command.html", null ],
           [ "PluginMakeCommand", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_make_command.html", null ],
-          [ "PluginPackCommand", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_pack_command.html", null ]
+          [ "PluginPackCommand", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_pack_command.html", null ],
+          [ "PluginRemoveCommand", "class_z_m_1_1_command_1_1_plugin_1_1_plugin_remove_command.html", null ]
         ] ],
         [ "ProxyServerCommand", "class_z_m_1_1_command_1_1_proxy_server_command.html", null ],
         [ "ReplCommand", "class_z_m_1_1_command_1_1_repl_command.html", null ]

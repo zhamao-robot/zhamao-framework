@@ -3,7 +3,7 @@ var searchData=
   ['_24_5flist_0',['$_list',['../class_z_m_1_1_annotation_1_1_annotation_map.html#ac1a127e13cf186897072aa6ef8d70741',1,'ZM::Annotation::AnnotationMap']]],
   ['_24_5fmap_1',['$_map',['../class_z_m_1_1_annotation_1_1_annotation_map.html#a576ad90e830c591be5c2de87e1735ff6',1,'ZM::Annotation::AnnotationMap']]],
   ['_24argv_2',['$argv',['../class_z_m_1_1_framework.html#ad9a8952bc741b5305f6af9f1881519de',1,'ZM::Framework']]],
-  ['_24bootstrappers_3',['$bootstrappers',['../class_z_m_1_1_command_1_1_plugin_1_1_plugin_command.html#a204c8c9af4afd3a0254d46aaf263e1b1',1,'ZM\Command\Plugin\PluginCommand\$bootstrappers()'],['../class_z_m_1_1_framework.html#a204c8c9af4afd3a0254d46aaf263e1b1',1,'ZM\Framework\$bootstrappers()']]],
+  ['_24bootstrappers_3',['$bootstrappers',['../class_z_m_1_1_framework.html#a204c8c9af4afd3a0254d46aaf263e1b1',1,'ZM::Framework']]],
   ['_24bot_5fcoroutines_4',['$bot_coroutines',['../class_z_m_1_1_plugin_1_1_one_bot_1_1_bot_map.html#a8f4ce3c973e7934ea17d22f65a854709',1,'ZM::Plugin::OneBot::BotMap']]],
   ['_24bots_5',['$bots',['../class_z_m_1_1_context_1_1_bot_context.html#af10645b8f678356ed388ee925838429b',1,'ZM::Context::BotContext']]],
   ['_24callable_5fstack_6',['$callable_stack',['../class_z_m_1_1_middleware_1_1_middleware_handler.html#a53640e3f2d2f5eb5a68d53fa6b6587e2',1,'ZM::Middleware::MiddlewareHandler']]],
