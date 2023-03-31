@@ -24,6 +24,8 @@ use ZM\Store\Database\DBQueryBuilder;
 use ZM\Store\Database\DBWrapper;
 use ZM\Store\KV\KVInterface;
 use ZM\Store\KV\Redis\RedisWrapper;
+use ZM\ZMApplication;
+use ZM\Plugin\ZMPlugin;
 
 // 防止重复引用引发报错
 if (function_exists('zm_internal_errcode')) {
@@ -344,4 +346,20 @@ function ws_socket(int $flag = 1): WSServerSocketBase
         throw new Exception('找不到目标的 server socket，请检查 flag 值');
     }
     return $a;
+}
+
+/**
+ * 创建炸毛框架应用
+ */
+function zm_create_app(): ZMApplication
+{
+    return new ZMApplication();
+}
+
+/**
+ * 创建炸毛框架的插件对象
+ */
+function zm_create_plugin(): ZMPlugin
+{
+    return new ZMPlugin();
 }

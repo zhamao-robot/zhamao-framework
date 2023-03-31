@@ -397,3 +397,11 @@ public function testRoute(HttpRequestEvent $event)
 $socket = ws_socket();
 $socket->send('hello world', $event->getFd()); // 客户端的连接 fd 编号可以通过 WebSocketOpenEvent 等事件获取
 ```
+
+### zm_create_app()
+
+创建一个炸毛框架的单文件应用（仅单文件，项目外非编写插件模式时可用），效果等同于 `new \ZM\ZMApplication()`。
+
+### zm_create_plugin()
+
+创建一个炸毛单文件模式的插件对象，效果等同于 `new \ZM\Plugin\ZMPlugin()`。

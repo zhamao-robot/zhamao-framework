@@ -6,7 +6,7 @@
 
 ## GitHub 插件下载
 
-你可以到 [插件市场](/plugin-market/) 下载并安装你心仪的插件，这些插件大部分为 OneBot 机器人适用的聊天机器人功能类插件。
+你可以到 [插件市场](/plugins/market.md) 下载并安装你心仪的插件，这些插件大部分为 OneBot 机器人适用的聊天机器人功能类插件。
 
 在安装框架后，可以使用 `./zhamao plugin:install https://github.com/xxx/yyy.git` 样式的链接安装 GitHub 发布的插件。
 
