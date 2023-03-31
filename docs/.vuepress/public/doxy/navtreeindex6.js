@@ -1,5 +1,7 @@
 var NAVTREEINDEX6 =
 {
+"interface_z_m_1_1_middleware_1_1_pipeline_interface.html":[1,0,0,8,3],
+"interface_z_m_1_1_middleware_1_1_pipeline_interface.html#a24c199fb191332120f64703b40d5c983":[1,0,0,8,3,0],
 "interface_z_m_1_1_middleware_1_1_pipeline_interface.html#a24c199fb191332120f64703b40d5c983":[2,0,1,8,3,0],
 "interface_z_m_1_1_store_1_1_k_v_1_1_k_v_interface.html":[1,0,0,12,1,1],
 "interface_z_m_1_1_store_1_1_k_v_1_1_k_v_interface.html":[2,0,1,12,1,1],

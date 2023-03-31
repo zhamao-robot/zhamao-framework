@@ -18,6 +18,8 @@ var global__functions_8php =
     [ "segment", "global__functions_8php.html#aab951b3aba3cafdec6df825656344148", null ],
     [ "sql_builder", "global__functions_8php.html#a5e5e46262ccc376a933859820eaee89f", null ],
     [ "ws_socket", "global__functions_8php.html#a3117291dc19c3820da1c3bbf65327e9d", null ],
+    [ "zm_create_app", "global__functions_8php.html#aa30c4407119a85820af29d6386961cd0", null ],
+    [ "zm_create_plugin", "global__functions_8php.html#a83464722ebd662fcd9ac2bdd01836c6c", null ],
     [ "zm_dir", "global__functions_8php.html#a5ffdd3528ee418f5b556be8335641705", null ],
     [ "zm_exec", "global__functions_8php.html#a49a9c9fabfe3e76c1535ea0a42407b15", null ],
     [ "zm_http_response", "global__functions_8php.html#ae77ae8234f42c23b690431e8313b8c69", null ],
