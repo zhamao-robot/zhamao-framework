@@ -18,6 +18,7 @@ use ZM\Framework;
 use ZM\Logger\ConsoleLogger;
 use ZM\Middleware\MiddlewareHandler;
 use ZM\Plugin\OneBot\BotMap;
+use ZM\Plugin\ZMPlugin;
 use ZM\Schedule\Timer;
 use ZM\Store\Database\DBException;
 use ZM\Store\Database\DBQueryBuilder;
@@ -25,7 +26,6 @@ use ZM\Store\Database\DBWrapper;
 use ZM\Store\KV\KVInterface;
 use ZM\Store\KV\Redis\RedisWrapper;
 use ZM\ZMApplication;
-use ZM\Plugin\ZMPlugin;
 
 // 防止重复引用引发报错
 if (function_exists('zm_internal_errcode')) {
