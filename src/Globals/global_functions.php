@@ -18,12 +18,14 @@ use ZM\Framework;
 use ZM\Logger\ConsoleLogger;
 use ZM\Middleware\MiddlewareHandler;
 use ZM\Plugin\OneBot\BotMap;
+use ZM\Plugin\ZMPlugin;
 use ZM\Schedule\Timer;
 use ZM\Store\Database\DBException;
 use ZM\Store\Database\DBQueryBuilder;
 use ZM\Store\Database\DBWrapper;
 use ZM\Store\KV\KVInterface;
 use ZM\Store\KV\Redis\RedisWrapper;
+use ZM\ZMApplication;
 
 // 防止重复引用引发报错
 if (function_exists('zm_internal_errcode')) {
@@ -344,4 +346,20 @@ function ws_socket(int $flag = 1): WSServerSocketBase
         throw new Exception('找不到目标的 server socket，请检查 flag 值');
     }
     return $a;
+}
+
+/**
+ * 创建炸毛框架应用
+ */
+function zm_create_app(): ZMApplication
+{
+    return new ZMApplication();
+}
+
+/**
+ * 创建炸毛框架的插件对象
+ */
+function zm_create_plugin(): ZMPlugin
+{
+    return new ZMPlugin();
 }

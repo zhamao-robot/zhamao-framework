@@ -27,7 +27,7 @@ config/
 plugins/
 └── test-app/
     ├── main.php         # 你的插件源代码文件
-    └── zmplugin.json    # 插件元信息（如名称、版本等）
+    └── composer.json    # 插件元信息（如名称、版本等）
 ```
 
 ### zm_data 目录

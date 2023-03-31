@@ -27,7 +27,7 @@
 └── test-app/
     ├── main.php
     ├── empty/
-    └── zmplugin.json
+    └── composer.json
 ```
 
 ```php
@@ -36,7 +36,7 @@ $result = \ZM\Store\FileSystem::scanDirFiles('/home/ab/test/', true, false);
 结果：
 [
   "/home/ab/test/test-app/main.php",
-  "/home/ab/test/test-app/zmplugin.json"
+  "/home/ab/test/test-app/composer.json"
 ]
  */
 $result2 = \ZM\Store\FileSystem::scanDirFiles('/home/ab/test/', false, true, true);

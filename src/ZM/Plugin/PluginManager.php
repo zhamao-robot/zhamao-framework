@@ -53,7 +53,7 @@ class PluginManager
                 continue;
             }
 
-            // 先看有没有 zmplugin.json，没有则不是正常的插件，发个 notice 然后跳过
+            // 先看有没有 composer.json，没有则不是正常的插件，发个 notice 然后跳过
             $meta_file = $item . '/composer.json';
             if (!is_file($meta_file)) {
                 logger()->notice('插件目录 {dir} 没有插件元信息（composer.json），跳过扫描。', ['dir' => $item]);
@@ -382,7 +382,7 @@ class PluginManager
                 ++$file_added;
             }
             // 找有没有 main，没有 main 就不添加 stub
-            $main = (json_decode(file_get_contents($dir . '/zmplugin.json'), true)['main'] ?? 'main.php');
+            $main = (json_decode(file_get_contents($dir . '/composer.json'), true)['extra']['zm-plugin-main'] ?? 'main.php');
             if (file_exists(zm_dir($dir . '/' . $main)) && $phar->offsetExists($main)) {
                 $command_context?->info('设置插件默认入口文件 ' . $main);
                 $phar->setStub($phar->setDefaultStub($main));

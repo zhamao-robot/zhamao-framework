@@ -7,7 +7,7 @@ namespace ZM\Plugin;
 use ZM\Exception\PluginException;
 
 /**
- * 插件的元信息对象，对应 zmplugin.json
+ * 插件的元信息对象
  */
 class PluginMeta implements \JsonSerializable
 {
