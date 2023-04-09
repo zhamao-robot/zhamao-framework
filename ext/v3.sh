@@ -125,9 +125,6 @@ function darwin_env_check() {
     if type php >/dev/null 2>&1; then
         php_executable=$(which php)
         echo "位置：$php_executable"
-        if [ "$($php_executable -m | grep swoole)" = "" ]; then
-            echo "$(nhead red) PHP 不存在 swoole 扩展，可能无法正常使用 Swoole 框架！" && return 1
-        fi
     else
         echo "不存在"
         if type brew >/dev/null 2>&1; then
