@@ -405,3 +405,7 @@ $socket->send('hello world', $event->getFd()); // 客户端的连接 fd 编号�
 ### zm_create_plugin()
 
 创建一个炸毛单文件模式的插件对象，效果等同于 `new \ZM\Plugin\ZMPlugin()`。
+
+### zm_websocket_client()
+
+创建一个 WebSocket 客户端。详情见 [框架内置 WebSocket 客户端](/components/http/websocket-client)。
