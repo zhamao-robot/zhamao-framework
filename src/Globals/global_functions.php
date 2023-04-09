@@ -2,11 +2,14 @@
 
 declare(strict_types=1);
 
+use Choir\Http\Client\Exception\ClientException;
 use Choir\Http\HttpFactory;
 use OneBot\Driver\Coroutine\Adaptive;
 use OneBot\Driver\Coroutine\CoroutineInterface;
+use OneBot\Driver\Interfaces\WebSocketClientInterface;
 use OneBot\Driver\Process\ExecutionResult;
 use OneBot\Driver\Socket\WSServerSocketBase;
+use OneBot\Driver\Workerman\WebSocketClient;
 use OneBot\V12\Object\MessageSegment;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
@@ -14,6 +17,7 @@ use Psr\SimpleCache\CacheInterface;
 use ZM\Config\Environment;
 use ZM\Config\ZMConfig;
 use ZM\Container\ContainerHolder;
+use ZM\Exception\DriverException;
 use ZM\Framework;
 use ZM\Logger\ConsoleLogger;
 use ZM\Middleware\MiddlewareHandler;
@@ -362,4 +366,22 @@ function zm_create_app(): ZMApplication
 function zm_create_plugin(): ZMPlugin
 {
     return new ZMPlugin();
+}
+
+/**
+ * 创建一个 WebSocket 客户端
+ *
+ * @param  string          $address 接入地址，例如 ws://192.168.1.3:9998/
+ * @param  array           $header  请求头
+ * @param  null|mixed      $set     Swoole 驱动下传入的额外参数
+ * @throws DriverException
+ * @throws ClientException
+ */
+function zm_websocket_client(string $address, array $header = [], mixed $set = null): WebSocketClientInterface
+{
+    return match (Framework::getInstance()->getDriver()->getName()) {
+        'swoole' => \OneBot\Driver\Swoole\WebSocketClient::createFromAddress($address, $header, $set ?? ['websocket_mask' => true]),
+        'workerman' => WebSocketClient::createFromAddress($address, $header),
+        default => throw new DriverException('current driver is not supported for creating websocket client'),
+    };
 }
