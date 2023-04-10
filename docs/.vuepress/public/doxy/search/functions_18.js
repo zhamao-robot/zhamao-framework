@@ -9,5 +9,6 @@ var searchData=
   ['zm_5finternal_5ferrcode_6',['zm_internal_errcode',['../global__functions_8php.html#ab6532d66138e9cf91863546fc93556a1',1,'global_functions.php']]],
   ['zm_5fsleep_7',['zm_sleep',['../global__functions_8php.html#a6195e0d6bb303cd1161beefcdc9173af',1,'global_functions.php']]],
   ['zm_5ftimer_5fafter_8',['zm_timer_after',['../global__functions_8php.html#a79804576df10fd58f9d569e823e6aa9f',1,'global_functions.php']]],
-  ['zm_5ftimer_5ftick_9',['zm_timer_tick',['../global__functions_8php.html#a123ebc065b28f7c59b53a70d87b5e4ce',1,'global_functions.php']]]
+  ['zm_5ftimer_5ftick_9',['zm_timer_tick',['../global__functions_8php.html#a123ebc065b28f7c59b53a70d87b5e4ce',1,'global_functions.php']]],
+  ['zm_5fwebsocket_5fclient_10',['zm_websocket_client',['../global__functions_8php.html#a6063749774450cf71af3daf0ce7c32cc',1,'global_functions.php']]]
 ];

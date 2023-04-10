@@ -65,6 +65,7 @@ var hierarchy =
     [ "Exception", null, [
       [ "ZMException", "class_z_m_1_1_exception_1_1_z_m_exception.html", [
         [ "ConfigException", "class_z_m_1_1_exception_1_1_config_exception.html", null ],
+        [ "DriverException", "class_z_m_1_1_exception_1_1_driver_exception.html", null ],
         [ "FileSystemException", "class_z_m_1_1_exception_1_1_file_system_exception.html", null ],
         [ "InitException", "class_z_m_1_1_exception_1_1_init_exception.html", null ],
         [ "InterruptException", "class_z_m_1_1_exception_1_1_interrupt_exception.html", null ],

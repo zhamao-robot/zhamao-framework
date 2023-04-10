@@ -156,6 +156,8 @@ $(document).ready(function(){initNavTree('global__functions_8php.html',''); init
 <tr class="separator:aa30c4407119a85820af29d6386961cd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a83464722ebd662fcd9ac2bdd01836c6c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="global__functions_8php.html#a83464722ebd662fcd9ac2bdd01836c6c">zm_create_plugin</a> ()</td></tr>
 <tr class="separator:a83464722ebd662fcd9ac2bdd01836c6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6063749774450cf71af3daf0ce7c32cc"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="global__functions_8php.html#a6063749774450cf71af3daf0ce7c32cc">zm_websocket_client</a> (string $address, array $header=[], mixed $set=null)</td></tr>
+<tr class="separator:a6063749774450cf71af3daf0ce7c32cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">函数说明</h2>
 <a id="ad36f3e85e1dffc28a10a95382aaac608" name="ad36f3e85e1dffc28a10a95382aaac608"></a>
@@ -932,6 +934,56 @@ $(document).ready(function(){initNavTree('global__functions_8php.html',''); init
     <tr><td class="paramtype">int</td><td class="paramname">$ms</td><td>时间（毫秒） </td></tr>
     <tr><td class="paramtype">callable</td><td class="paramname">$callback</td><td>回调函数 </td></tr>
     <tr><td class="paramtype">int</td><td class="paramname">$times</td><td>重复次数（如果为 0 或 -1，则永久循环，其他大于 0 的数为限定次数） </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a6063749774450cf71af3daf0ce7c32cc" name="a6063749774450cf71af3daf0ce7c32cc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6063749774450cf71af3daf0ce7c32cc">&#9670;&#160;</a></span>zm_websocket_client()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">zm_websocket_client </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>$address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">array&#160;</td>
+          <td class="paramname"><em>$header</em> = <code>[]</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">mixed&#160;</td>
+          <td class="paramname"><em>$set</em> = <code>null</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >创建一个 WebSocket 客户端</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramtype">string</td><td class="paramname">$address</td><td>接入地址，例如 ws://192.168.1.3:9998/ </td></tr>
+    <tr><td class="paramtype">array</td><td class="paramname">$header</td><td>请求头 </td></tr>
+    <tr><td class="paramtype">null&#160;|&#160;mixed</td><td class="paramname">$set</td><td>Swoole 驱动下传入的额外参数 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>异常</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">DriverException</td><td></td></tr>
+    <tr><td class="paramname">ClientException</td><td></td></tr>
   </table>
   </dd>
 </dl>

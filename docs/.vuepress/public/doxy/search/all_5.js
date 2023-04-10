@@ -24,5 +24,7 @@ var searchData=
   ['dispatch_21',['dispatch',['../class_z_m_1_1_schedule_1_1_schedule.html#ae170c33194dbdbf84d2adf3fbb5d390c',1,'ZM::Schedule::Schedule']]],
   ['dorun_22',['doRun',['../class_z_m_1_1_console_application.html#a6474e644924bebff81f50225990f6079',1,'ZM::ConsoleApplication']]],
   ['doruncommand_23',['doRunCommand',['../class_z_m_1_1_console_application.html#ad5aa8d500e24b1bba8e2120f50981dfc',1,'ZM::ConsoleApplication']]],
-  ['downloadfile_24',['downloadFile',['../class_z_m_1_1_utils_1_1_one_bot12_file_downloader.html#ad557a652b1540e26064891aaf7fb6924',1,'ZM::Utils::OneBot12FileDownloader']]]
+  ['downloadfile_24',['downloadFile',['../class_z_m_1_1_utils_1_1_one_bot12_file_downloader.html#ad557a652b1540e26064891aaf7fb6924',1,'ZM::Utils::OneBot12FileDownloader']]],
+  ['driverexception_25',['DriverException',['../class_z_m_1_1_exception_1_1_driver_exception.html',1,'ZM::Exception']]],
+  ['driverexception_2ephp_26',['DriverException.php',['../_driver_exception_8php.html',1,'']]]
 ];

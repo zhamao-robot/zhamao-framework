@@ -27,5 +27,6 @@ var global__functions_8php =
     [ "zm_internal_errcode", "global__functions_8php.html#ab6532d66138e9cf91863546fc93556a1", null ],
     [ "zm_sleep", "global__functions_8php.html#a6195e0d6bb303cd1161beefcdc9173af", null ],
     [ "zm_timer_after", "global__functions_8php.html#a79804576df10fd58f9d569e823e6aa9f", null ],
-    [ "zm_timer_tick", "global__functions_8php.html#a123ebc065b28f7c59b53a70d87b5e4ce", null ]
+    [ "zm_timer_tick", "global__functions_8php.html#a123ebc065b28f7c59b53a70d87b5e4ce", null ],
+    [ "zm_websocket_client", "global__functions_8php.html#a6063749774450cf71af3daf0ce7c32cc", null ]
 ];
