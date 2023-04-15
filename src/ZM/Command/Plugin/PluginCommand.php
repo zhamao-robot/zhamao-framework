@@ -16,10 +16,15 @@ abstract class PluginCommand extends Command
     /** @var null|string 动态插件和 Phar 插件的加载目录 */
     protected ?string $plugin_dir = null;
 
+    private static bool $loaded = false;
+
     public function __construct(string $name = null)
     {
         parent::__construct($name);
-        $this->emitBootstrap(Bootstrap\LoadPlugins::class);
+        if (!self::$loaded) {
+            $this->emitBootstrap(Bootstrap\LoadPlugins::class);
+            self::$loaded = true;
+        }
     }
 
     /**
