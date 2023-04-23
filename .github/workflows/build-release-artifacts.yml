@@ -59,4 +59,4 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: update changelog
-          branch: ${{ github.base_ref }}
+          branch: ${{ github.event.release.target_commitish }}
