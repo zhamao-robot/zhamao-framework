@@ -40,5 +40,11 @@ module.exports = [
         description: '代码运行',
         avatar: null,
         link: 'https://github.com/FishZe/zhamao_plugin_code_runner'
+    },
+    {
+        name: 'ZMChatGPT',
+        description: '炸毛ChatGPT',
+        avatar: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/ChatGPT_logo.svg/120px-ChatGPT_logo.svg.png',
+        link: 'https://github.com/DreamMiu/zm-chat-gpt'
     }
 ];
