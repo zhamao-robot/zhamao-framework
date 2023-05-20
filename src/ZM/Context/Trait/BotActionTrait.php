@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ZM\Context\Trait;
 
 use OneBot\Driver\Coroutine\Adaptive;
+use OneBot\Driver\Interfaces\WebSocketClientInterface;
 use OneBot\Util\Utils;
 use OneBot\V12\Object\Action;
 use OneBot\V12\Object\ActionResponse;
@@ -72,7 +73,12 @@ trait BotActionTrait
                 logger()->error("机器人 [{$self['platform']}:{$self['user_id']}] 没有连接或未就绪，无法发送数据");
                 return false;
             }
-            $result = ws_socket($fd_map[0])->send(json_encode($a->jsonSerialize()), $fd_map[1]);
+            // 如果没指定 flag，但指定了第三个参数且为 WebSocketClientInterface，就是客户端模式
+            if ($fd_map[0] === null && ($fd_map[2] ?? null) instanceof WebSocketClientInterface) {
+                $result = $fd_map[2]->send(json_encode($a->jsonSerialize()));
+            } else {
+                $result = ws_socket($fd_map[0])->send(json_encode($a->jsonSerialize()), $fd_map[1]);
+            }
         } elseif ($this instanceof BotConnectContext) {
             // self 为空，说明可能是发送的元动作，需要通过 fd 来查找对应的 connect 连接
             $flag = $this->getFlag();

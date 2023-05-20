@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ZM\Plugin\OneBot;
 
+use OneBot\Driver\Interfaces\WebSocketClientInterface;
 use OneBot\V12\Object\OneBotEvent;
 use ZM\Context\BotConnectContext;
 use ZM\Context\BotContext;
@@ -78,6 +79,22 @@ class BotMap
     }
 
     /**
+     * 通过 ws client 注册机器人
+     *
+     * @param int|string               $bot_id   机器人 ID
+     * @param string                   $platform 机器人平台
+     * @param bool                     $status   机器人状态
+     * @param WebSocketClientInterface $client   机器人对应的 ws client
+     */
+    public static function registerBotWithWSClient(string|int $bot_id, string $platform, bool $status, WebSocketClientInterface $client): bool
+    {
+        logger()->debug('正在注册机器人：' . "{$platform}:{$bot_id}, client fd:{$client->getFd()}");
+        self::$bot_fds[$platform][strval($bot_id)] = [null, $client->getFd(), $client];
+        self::$bot_status[$platform][strval($bot_id)] = $status;
+        return true;
+    }
+
+    /**
      * 获取所有机器人对应的 fd
      *
      * @return array<string, array<string, array>>
@@ -108,6 +125,21 @@ class BotMap
         foreach (self::$bot_fds as $platform => $bots) {
             foreach ($bots as $bot_id => $bot_fd) {
                 if ($bot_fd[0] === $flag && $bot_fd[1] = $fd) {
+                    $unreg_list[] = [$platform, $bot_id];
+                }
+            }
+        }
+        foreach ($unreg_list as $item) {
+            self::unregisterBot($item[1], $item[0]);
+        }
+    }
+
+    public static function unregisterBotByWSClient(WebSocketClientInterface $client): void
+    {
+        $unreg_list = [];
+        foreach (self::$bot_fds as $platform => $bots) {
+            foreach ($bots as $bot_id => $bot_fd) {
+                if (isset($bot_fd[2]) && $bot_fd[2] === $client) {
                     $unreg_list[] = [$platform, $bot_id];
                 }
             }

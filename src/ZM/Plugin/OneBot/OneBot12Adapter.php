@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace ZM\Plugin\OneBot;
 
 use Choir\Http\HttpFactory;
+use DI\DependencyException;
+use DI\NotFoundException;
 use OneBot\Driver\Coroutine\Adaptive;
 use OneBot\Driver\Event\StopException;
 use OneBot\Driver\Event\WebSocket\WebSocketCloseEvent;
@@ -171,25 +173,30 @@ class OneBot12Adapter extends ZMPlugin
     /**
      * [CALLBACK] 处理 status_update 事件，更新 BotMap
      *
-     * @param OneBotEvent $event 机器人事件
+     * @param  OneBotEvent         $event 机器人事件
+     * @throws DependencyException
+     * @throws NotFoundException
      */
-    public function handleStatusUpdate(OneBotEvent $event, WebSocketMessageEvent $message_event): void
+    public function handleStatusUpdate(OneBotEvent $event): void
     {
         $status = $event->get('status');
         $old = BotMap::getBotFds();
         if (($status['good'] ?? false) === true) {
             foreach (($status['bots'] ?? []) as $bot) {
-                BotMap::registerBotWithFd(
-                    bot_id: $bot['self']['user_id'],
-                    platform: $bot['self']['platform'],
-                    status: $bot['good'] ?? false,
-                    fd: $message_event->getFd(),
-                    flag: $message_event->getSocketFlag()
-                );
+                if (container()->has(WebSocketMessageEvent::class)) {
+                    $message_event = container()->get(WebSocketMessageEvent::class);
+                    BotMap::registerBotWithFd(
+                        bot_id: $bot['self']['user_id'],
+                        platform: $bot['self']['platform'],
+                        status: $bot['good'] ?? false,
+                        fd: $message_event->getFd(),
+                        flag: $message_event->getSocketFlag()
+                    );
+                }
                 if (isset($old[$bot['self']['platform']][$bot['self']['user_id']])) {
                     unset($old[$bot['self']['platform']][$bot['self']['user_id']]);
                 }
-                logger()->error("[{$bot['self']['platform']}.{$bot['self']['user_id']}] 已接入，状态：" . (($bot['good'] ?? false) ? 'OK' : 'Not OK'));
+                logger()->notice("[{$bot['self']['platform']}.{$bot['self']['user_id']}] 已接入，状态：" . (($bot['good'] ?? false) ? 'OK' : 'Not OK'));
             }
         } else {
             logger()->debug('该实现状态目前不是正常的，不处理 bots 列表');

@@ -48,6 +48,7 @@ class WebSocketFilter implements MiddlewareInterface, PipelineInterface
             return false;
         }
         // 过滤连接信息
+        // 这里需要考虑一下 ws client 的情况，TODO
         $conn = ConnectionUtil::getConnection($event->getFd());
         foreach ($this->args as $k => $v) {
             if (!isset($conn[$k])) {
