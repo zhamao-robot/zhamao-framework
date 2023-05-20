@@ -83,7 +83,8 @@ class PluginGenerator
         // TODO: 寻找 PHP 运行环境和 Composer 是否在当前目录的情况
         chdir($plugin_base_dir);
         $env = ZMUtil::getComposerExecutable();
-        passthru(PHP_BINARY . ' ' . escapeshellcmd($env) . ' dump-autoload');
+        $cmd = $env === 'composer' ? $env . ' dump-autoload' : PHP_BINARY . ' ' . escapeshellcmd($env) . ' dump-autoload';
+        passthru($cmd);
         chdir(WORKING_DIR);
         return $plugin_base_dir;
     }
