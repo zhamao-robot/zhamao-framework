@@ -165,7 +165,7 @@ class AnnotationParser
                         // 用 clone 的目的是生成个独立的对象，避免和 class 以及方法之间互相冲突
                         $copy = clone $vs;
                         $copy->method = $method->getName();
-                        $reflection_tree[$v]['methods_annotations'][$method->getName()][] = $copy;
+                        array_unshift($reflection_tree[$v]['methods_annotations'][$method->getName()], $copy);
                         $annotation_list[get_class($vs)][] = $copy;
                     }
                 }
