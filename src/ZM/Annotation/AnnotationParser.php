@@ -161,7 +161,7 @@ class AnnotationParser
 
                 // 预处理2：将适用于每一个函数的注解到类注解重新注解到每个函数下面
                 if ($vs instanceof ErgodicAnnotation) {
-                    foreach (($reflection_tree[$v]['methods'] ?? []) as $method) {
+                    foreach ($reflection_tree[$v]['methods'] as $method) {
                         // 用 clone 的目的是生成个独立的对象，避免和 class 以及方法之间互相冲突
                         $copy = clone $vs;
                         $copy->method = $method->getName();
