@@ -168,6 +168,8 @@ class AnnotationParser
                         array_unshift($reflection_tree[$v]['methods_annotations'][$method->getName()], $copy);
                         $annotation_list[get_class($vs)][] = $copy;
                     }
+                    // 标记为 Ergodic 的类注解，不作为类的注解解析，而是全部当作每个方法有注解，所以直接跳过
+                    continue;
                 }
 
                 // 预处理3：调用自定义解析器
