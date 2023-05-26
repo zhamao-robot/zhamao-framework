@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ZM\Schedule;
 
+use OneBot\Driver\Coroutine\Adaptive;
 use ZM\Annotation\Framework\Tick;
 use ZM\Framework;
 
@@ -11,12 +12,19 @@ class Timer
 {
     public static function tick(int $ms, callable $callback, int $times = 0): int
     {
-        return Framework::getInstance()->getDriver()->getEventLoop()->addTimer($ms, $callback, $times);
+        return Framework::getInstance()->getDriver()->getEventLoop()->addTimer(
+            $ms,
+            fn (...$params) => Adaptive::getCoroutine() !== null ? Adaptive::getCoroutine()->create($callback, ...$params) : $callback(...$params),
+            $times
+        );
     }
 
     public static function after(int $ms, callable $callback): int
     {
-        return Framework::getInstance()->getDriver()->getEventLoop()->addTimer($ms, $callback);
+        return Framework::getInstance()->getDriver()->getEventLoop()->addTimer(
+            $ms,
+            fn (...$params) => Adaptive::getCoroutine() !== null ? Adaptive::getCoroutine()->create($callback, ...$params) : $callback(...$params)
+        );
     }
 
     public static function del(int $timer_id): void
