@@ -92,7 +92,7 @@ trait BotActionTrait
             if ($response instanceof ActionResponse) {
                 $handler = new AnnotationHandler(BotAction::class);
                 $handler->setRuleCallback(fn (BotAction $act) => ($act->action === '' || $act->action === $action) && $act->need_response);
-                // container()->set(ActionResponse::class, $response);
+                container()->set(ActionResponse::class, $response);
                 $handler->handleAll();
                 return $response;
             }
