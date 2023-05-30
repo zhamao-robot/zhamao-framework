@@ -22,6 +22,28 @@ class DBPool
     private static array $pools = [];
 
     /**
+     * 重新初始化连接池，有时候连不上某个对象时候可以使用，也可以定期调用释放链接
+     *
+     * @throws DBException
+     */
+    public static function resetPools(): void
+    {
+        // 清空 MySQL 的连接池
+        foreach (DBPool::getAllPools() as $name => $pool) {
+            DBPool::destroyPool($name);
+        }
+
+        // 读取 MySQL/PostgresSQL/SQLite 配置文件并创建连接池
+        $conf = config('global.database');
+        // 如果有多个数据库连接，则遍历
+        foreach ($conf as $name => $conn_conf) {
+            if (($conn_conf['enable'] ?? true) !== false) {
+                DBPool::create($name, $conn_conf);
+            }
+        }
+    }
+
+    /**
      * 通过配置文件创建一个 MySQL 连接池
      *
      * @throws DBException

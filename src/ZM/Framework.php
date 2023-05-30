@@ -50,7 +50,7 @@ class Framework
     public const VERSION_ID = 719;
 
     /** @var string 版本名称 */
-    public const VERSION = '3.1.13';
+    public const VERSION = '3.1.14';
 
     /**
      * @var RuntimePreferences 运行时偏好（环境信息&参数）

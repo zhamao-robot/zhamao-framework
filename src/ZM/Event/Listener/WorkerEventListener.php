@@ -262,30 +262,7 @@ class WorkerEventListener
      */
     private function initConnectionPool(): void
     {
-        // 清空 MySQL 的连接池
-        foreach (DBPool::getAllPools() as $name => $pool) {
-            DBPool::destroyPool($name);
-        }
-        // 清空 Redis 连接池
-        foreach (RedisPool::getAllPools() as $name => $pool) {
-            RedisPool::destroyPool($name);
-        }
-
-        // 读取 MySQL/PostgresSQL/SQLite 配置文件并创建连接池
-        $conf = config('global.database');
-        // 如果有多个数据库连接，则遍历
-        foreach ($conf as $name => $conn_conf) {
-            if (($conn_conf['enable'] ?? true) !== false) {
-                DBPool::create($name, $conn_conf);
-            }
-        }
-
-        // 读取 Redis 配置文件并创建池
-        $redis_conf = config('global.redis');
-        foreach ($redis_conf as $name => $conn_conf) {
-            if (($conn_conf['enable'] ?? true) !== false) {
-                RedisPool::create($name, $conn_conf);
-            }
-        }
+        DBPool::resetPools();
+        RedisPool::resetPools();
     }
 }
