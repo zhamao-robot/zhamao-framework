@@ -19,6 +19,27 @@ class RedisPool
     public static array $pools = [];
 
     /**
+     * 重新初始化连接池，有时候连不上某个对象时候可以使用，也可以定期调用释放链接
+     *
+     * @throws RedisException
+     */
+    public static function resetPools(): void
+    {
+        // 清空 Redis 连接池
+        foreach (self::getAllPools() as $name => $pool) {
+            self::destroyPool($name);
+        }
+
+        // 读取 Redis 配置文件并创建池
+        $redis_conf = config('global.redis');
+        foreach ($redis_conf as $name => $conn_conf) {
+            if (($conn_conf['enable'] ?? true) !== false) {
+                self::create($name, $conn_conf);
+            }
+        }
+    }
+
+    /**
      * @throws RedisException
      */
     public static function create(string $name, array $config): void
