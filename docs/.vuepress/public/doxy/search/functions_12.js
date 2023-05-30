@@ -19,12 +19,13 @@ var searchData=
   ['removecontextprompt_16',['removeContextPrompt',['../class_z_m_1_1_plugin_1_1_one_bot_1_1_one_bot12_adapter.html#a8b2d9c459850cb31e0f049884697fd59',1,'ZM::Plugin::OneBot::OneBot12Adapter']]],
   ['removeprocessstate_17',['removeProcessState',['../class_z_m_1_1_process_1_1_process_state_manager.html#acf2c7a3ae8e91f7d962a880c01bccdf4',1,'ZM::Process::ProcessStateManager']]],
   ['repeat_18',['repeat',['../class_module_1_1_example_1_1_hello123.html#a7da39ea9baab6da88af5268739c3b900',1,'Module::Example::Hello123']]],
-  ['resolve_19',['resolve',['../global__functions_8php.html#a72209840841640a3706f6393aa3bc0bc',1,'global_functions.php']]],
-  ['rollback_20',['rollBack',['../class_z_m_1_1_store_1_1_database_1_1_d_b_connection.html#aebaea4cae21e0e75ec1489c1648caeb3',1,'ZM\Store\Database\DBConnection\rollBack()'],['../class_z_m_1_1_store_1_1_database_1_1_d_b_wrapper.html#aebaea4cae21e0e75ec1489c1648caeb3',1,'ZM\Store\Database\DBWrapper\rollBack()']]],
-  ['rollbacksavepoint_21',['rollbackSavepoint',['../class_z_m_1_1_store_1_1_database_1_1_d_b_wrapper.html#a439f5cd29a7897d1a8d8382b5400f3f7',1,'ZM::Store::Database::DBWrapper']]],
-  ['route_22',['route',['../class_module_1_1_example_1_1_hello123.html#a92a609955504ed470b4b243eb6170739',1,'Module::Example::Hello123']]],
-  ['rowcount_23',['rowCount',['../class_z_m_1_1_store_1_1_database_1_1_d_b_statement.html#a82b073888555fc72e57142fe913db377',1,'ZM\Store\Database\DBStatement\rowCount()'],['../class_z_m_1_1_store_1_1_database_1_1_d_b_statement_wrapper.html#a82b073888555fc72e57142fe913db377',1,'ZM\Store\Database\DBStatementWrapper\rowCount()']]],
-  ['run_24',['run',['../class_z_m_1_1_z_m_application.html#afb0fafe7e02a3ae1993c01c19fad2bae',1,'ZM::ZMApplication']]],
-  ['runningininteractiveterminal_25',['runningInInteractiveTerminal',['../class_z_m_1_1_config_1_1_runtime_preferences.html#a08fa9f0bbffb1b7042208cce15365db9',1,'ZM::Config::RuntimePreferences']]],
-  ['runningunittests_26',['runningUnitTests',['../class_z_m_1_1_config_1_1_runtime_preferences.html#ad93370e733f0253ebce6b3234de3eef4',1,'ZM::Config::RuntimePreferences']]]
+  ['resetpools_19',['resetPools',['../class_z_m_1_1_store_1_1_database_1_1_d_b_pool.html#a6795764d8ed26a0dc4369ed008cbb588',1,'ZM\Store\Database\DBPool\resetPools()'],['../class_z_m_1_1_store_1_1_k_v_1_1_redis_1_1_redis_pool.html#a6795764d8ed26a0dc4369ed008cbb588',1,'ZM\Store\KV\Redis\RedisPool\resetPools()']]],
+  ['resolve_20',['resolve',['../global__functions_8php.html#a72209840841640a3706f6393aa3bc0bc',1,'global_functions.php']]],
+  ['rollback_21',['rollBack',['../class_z_m_1_1_store_1_1_database_1_1_d_b_connection.html#aebaea4cae21e0e75ec1489c1648caeb3',1,'ZM\Store\Database\DBConnection\rollBack()'],['../class_z_m_1_1_store_1_1_database_1_1_d_b_wrapper.html#aebaea4cae21e0e75ec1489c1648caeb3',1,'ZM\Store\Database\DBWrapper\rollBack()']]],
+  ['rollbacksavepoint_22',['rollbackSavepoint',['../class_z_m_1_1_store_1_1_database_1_1_d_b_wrapper.html#a439f5cd29a7897d1a8d8382b5400f3f7',1,'ZM::Store::Database::DBWrapper']]],
+  ['route_23',['route',['../class_module_1_1_example_1_1_hello123.html#a92a609955504ed470b4b243eb6170739',1,'Module::Example::Hello123']]],
+  ['rowcount_24',['rowCount',['../class_z_m_1_1_store_1_1_database_1_1_d_b_statement.html#a82b073888555fc72e57142fe913db377',1,'ZM\Store\Database\DBStatement\rowCount()'],['../class_z_m_1_1_store_1_1_database_1_1_d_b_statement_wrapper.html#a82b073888555fc72e57142fe913db377',1,'ZM\Store\Database\DBStatementWrapper\rowCount()']]],
+  ['run_25',['run',['../class_z_m_1_1_z_m_application.html#afb0fafe7e02a3ae1993c01c19fad2bae',1,'ZM::ZMApplication']]],
+  ['runningininteractiveterminal_26',['runningInInteractiveTerminal',['../class_z_m_1_1_config_1_1_runtime_preferences.html#a08fa9f0bbffb1b7042208cce15365db9',1,'ZM::Config::RuntimePreferences']]],
+  ['runningunittests_27',['runningUnitTests',['../class_z_m_1_1_config_1_1_runtime_preferences.html#ad93370e733f0253ebce6b3234de3eef4',1,'ZM::Config::RuntimePreferences']]]
 ];
