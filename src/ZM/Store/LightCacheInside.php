@@ -17,7 +17,8 @@ class LightCacheInside
     public static function init(): bool
     {
         try {
-            self::createTable('wait_api', 3, 65536);
+            $size = ZMConfig::get('global', 'runtime')['inside_table_size'] ?? 65536;
+            self::createTable('wait_api', 3, $size);
             self::createTable('connect', 3, 64);        // 用于存单机器人模式下的机器人fd的
             self::createTable('static_route', 64, 256); // 用于存储
             self::createTable('light_array', 8, 512, 0.6);
