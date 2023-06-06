@@ -18,17 +18,25 @@ class DBWrapper
      * DBWrapper constructor.
      * @throws DBException
      */
-    public function __construct(string $name)
+    public function __construct(string $name, array $options = [])
     {
+        // 初始化配置
+        $db_type = $options['dbType'] ?? ZM_DB_POOL;
         try {
-            $db_list = config()->get('global.database');
-            if (isset($db_list[$name]) || (is_countable($db_list) ? count($db_list) : 0) === 1) {
-                if ($name === '') {
-                    $name = array_key_first($db_list);
+            if ($db_type === ZM_DB_POOL) {
+                // pool 为连接池格式
+                $db_list = config()->get('global.database');
+                if (isset($db_list[$name]) || (is_countable($db_list) ? count($db_list) : 0) === 1) {
+                    if ($name === '') {
+                        $name = array_key_first($db_list);
+                    }
+                    $this->connection = DriverManager::getConnection(['driverClass' => $this->getConnectionClass($db_list[$name]['type']), ...$options]);
+                } else {
+                    throw new DBException('Cannot find database config named "' . $name . '" !');
                 }
-                $this->connection = DriverManager::getConnection(['driverClass' => $this->getConnectionClass($db_list[$name]['type']), 'dbName' => $name]);
-            } else {
-                throw new DBException('Cannot find database config named "' . $name . '" !');
+            } elseif ($db_type === ZM_DB_PORTABLE) {
+                // portable 为sqlite单文件模式
+                $this->connection = DriverManager::getConnection(['driverClass' => SQLiteDriver::class, 'filename' => $name, ...$options]);
             }
         } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
@@ -37,6 +45,7 @@ class DBWrapper
 
     public function __destruct()
     {
+        $this->connection->close();
         $this->connection->close();
     }
 

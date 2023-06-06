@@ -25,6 +25,7 @@ use ZM\Plugin\OneBot\BotMap;
 use ZM\Plugin\ZMPlugin;
 use ZM\Schedule\Timer;
 use ZM\Store\Database\DBException;
+use ZM\Store\Database\DBPool;
 use ZM\Store\Database\DBQueryBuilder;
 use ZM\Store\Database\DBWrapper;
 use ZM\Store\KV\KVInterface;
@@ -252,6 +253,32 @@ function db(string $name = '')
 function sql_builder(string $name = ''): DBQueryBuilder
 {
     return (new DBWrapper($name))->createQueryBuilder();
+}
+
+/**
+ * 获取一个便携 SQLite 操作类
+ *
+ * @param  string      $name       使用的 SQLite 连接文件名
+ * @param  bool        $create_new 是否在文件不存在时创建新的
+ * @param  bool        $keep_alive 是否维持 PDO 对象以便优化性能
+ * @throws DBException
+ */
+function zm_sqlite(string $name, bool $create_new = true, bool $keep_alive = true): DBWrapper
+{
+    return DBPool::createPortableSqlite($name, $create_new, $keep_alive);
+}
+
+/**
+ * 获取便携 SQLite 操作类的 SQL 语句构造器
+ *
+ * @param  string      $name       使用的 SQLite 连接文件名
+ * @param  bool        $create_new 是否在文件不存在时创建新的
+ * @param  bool        $keep_alive 是否维持 PDO 对象以便优化性能
+ * @throws DBException
+ */
+function zm_sqlite_builder(string $name, bool $create_new = true, bool $keep_alive = true): DBQueryBuilder
+{
+    return zm_sqlite($name, $create_new, $keep_alive)->createQueryBuilder();
 }
 
 /**
