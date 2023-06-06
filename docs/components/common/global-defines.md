@@ -213,7 +213,7 @@ container()->get('xxx');
 
 ### db()
 
-获取 Database 操作类。
+获取 Database 数据库连接操作类。
 
 - 定义：`db(string $name = '')`
 - 返回：`ZM\Store\Database\DBWrapper`
@@ -245,6 +245,16 @@ $result = db('mydb')->fetchAllAssociative('SELECT * FROM users WHERE username = 
 var_dump($result[0]); // 假设数据库表只有 id 和 username 两列，这里返回了 ['id' => 1, 'username' => 'jerry']
 ```
 
+有关此处数据库更详细的内容，请看 [SQL 数据库组件](/components/store/mysql.md)。
+
+### zm_sqlite()
+
+> 仅限于炸毛框架 3.2.0 及以上版本使用。
+
+获取一个便捷 SQLite 模式的数据库操作对象。
+
+有关此处数据库更详细的内容，请看 [SQL 数据库组件](/components/store/mysql.md)。
+
 ### sql_builder()
 
 使用 SQL 语句构建器构建一个查询。
@@ -260,6 +270,16 @@ var_dump($result[0]); // 假设数据库表只有 id 和 username 两列，这�
 $result = sql_builder('mydb')->select('*')->from('users')->where('username = :username')->setParameter('username', 'jerry')->execute()->fetchAllAssociative();
 // 结果与上方相同
 ```
+
+有关此处数据库更详细的内容，请看 [SQL 数据库组件](/components/store/mysql.md)。
+
+### zm_sqlite_builder()
+
+> 仅限于炸毛框架 3.2.0 及以上版本使用。
+
+获取一个便捷 SQLite 模式的数据库 SQL 语句构造器。
+
+有关此处数据库更详细的内容，请看 [SQL 数据库组件](/components/store/mysql.md)。
 
 ### redis()
 
