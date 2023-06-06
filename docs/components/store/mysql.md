@@ -13,7 +13,7 @@
 | 1 | jack | man | 2021-10-12 |
 | 2 | rose | woman | 2021-10-11 |
 
-## 配置
+## 连接池
 
 炸毛框架的数据库组件支持原生 SQL、查询构造器，去掉了复杂的对象模型关联，同时默认为数据库连接池，使开发变得简单。
 
@@ -46,9 +46,9 @@ $config['database'] = [
 
 在设置了 enable 为 true 后，将创建对应数据库的连接池。在框架所有插件加载后启用前会创建连接池。
 
-## 执行 SQL 语句
+## 连接池模式
 
-框架对于不同种类的 SQL 采用了统一的 wrapper 层，保证不同数据库调用时的接口尽可能相同。获取数据库操作对象很简单，通过方法 `db()`：
+框架对于不同种类的 SQL 采用了统一的 wrapper 层，保证不同数据库调用时的接口尽可能相同。从连接池拿取对象很简单，通过方法 `db()`：
 
 ```php
 // 获取 default 名称的数据库连接
@@ -56,6 +56,34 @@ $db = db();
 // 获取对应名称的数据库连接，名称等于上方配置中的键名
 $sqlite = db('sqlite_db1');
 ```
+
+返回的对象为 `DBWrapper` 对象。
+
+## 便捷 SQLite 模式
+
+对于 SQLite 数据库来说，使用连接池可能较为笨重，而且在开发者使用框架开发炸毛框架的插件分发时，可能需要使用 SQLite 数据库，但是又不想使用连接池。
+
+框架在 3.2.0 版本开始提供了便捷 SQLite 访问，无需任何配置，仅需 `zm_sqlite('dbname.db')` 方式即可创建和访问一个 SQLite 数据库。
+
+```php
+// 连接一个 SQLite 数据库，在相对路径下，文件会保存到 zm_data/db/ 目录
+$db = zm_sqlite('a.db');
+// 连接一个 SQLite 数据库，可以是任意绝对路径
+$db = zm_sqlite('/home/zhamao/a.db');
+// 在连接 SQLite 文件时，如果设置了 create_new 参数为 False，文件不存在时将会抛出异常
+$db = zm_sqlite('a.db', create_new: false);
+// 在连接 SQLite 文件时，如果设置了 keep_alive 参数为 False，框架将不会缓存已经打开的 PDO 对象，而是每次都会重新打开。（默认为 True，为了提升性能）
+$db = zm_sqlite('a.db', keep_alive: false);
+```
+
+返回的对象为 `DBWrapper` 对象。
+
+::: tip 提示
+
+无论是使用连接池的 `db()` 还是便捷 SQLite 模式的 `zm_sqlite()`，获取的都是 `DBWrapper` 对象，文档只是为了书写方便。
+实际使用过程中如果要使用便捷 SQLite 模式只需将 `db` 替换为 `zm_sqlite` 即可。
+
+:::
 
 ### 执行预处理 SQL 语句
 
@@ -241,13 +269,17 @@ $resultSet = sql_builder()->select(['username', 'gender'])->from('users')->where
 
 ### 获取 SQL Builder
 
-使用全局函数 `sql_builder()` 即可。
+连接池的访问模式，使用全局函数 `sql_builder()` 即可。便捷 SQLite 模式，使用全局函数 `zm_sqlite_builder()` 即可。
 
 ```php
 // 获取 default 名称的数据库连接的 builder
 $queryBuilder = sql_builder();
 // 获取对应名称的数据库连接的 builder，名称等于上方配置中的键名
 $queryBuilder = sql_builder('sqlite_db1');
+// 使用便捷 SQLite 模式获取 builder
+$queryBuilder = zm_sqlite_builder('mydb.db');
+// 在使用便捷 SQLite 模式时，也可以传入 create_new 参数和 keep_alive 参数
+$queryBuilder = zm_sqlite_builder('/home/a/d.db', create_new: false, keep_alive: false);
 ```
 
 ### 构建一个普通查询
