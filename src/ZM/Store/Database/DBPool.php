@@ -22,6 +22,11 @@ class DBPool
     private static array $pools = [];
 
     /**
+     * @var array<string, DBWrapper> 持久化的便携 SQLite 连接对象缓存
+     */
+    private static array $portable_cache = [];
+
+    /**
      * 重新初始化连接池，有时候连不上某个对象时候可以使用，也可以定期调用释放链接
      *
      * @throws DBException
@@ -40,6 +45,16 @@ class DBPool
             if (($conn_conf['enable'] ?? true) !== false) {
                 DBPool::create($name, $conn_conf);
             }
+        }
+    }
+
+    /**
+     * 重新初始化所有的便携 SQLite 连接（其实就是断开）
+     */
+    public static function resetPortableSQLite(): void
+    {
+        foreach (self::$portable_cache as $name => $wrapper) {
+            unset(self::$portable_cache[$name]);
         }
     }
 
@@ -179,5 +194,24 @@ class DBPool
                 throw new DBException(zm_internal_errcode('E00028') . '未安装 mysqlnd php-mysql扩展。');
             }
         }
+    }
+
+    /**
+     * 创建一个便携的 SQLite 处理类
+     *
+     * @param  string      $name       SQLite 文件名
+     * @param  bool        $create_new 如果数据库不存在，是否创建新的库
+     * @throws DBException
+     */
+    public static function createPortableSqlite(string $name, bool $create_new = true, bool $keep_alive = true): DBWrapper
+    {
+        if ($keep_alive && isset(self::$portable_cache[$name])) {
+            return self::$portable_cache[$name];
+        }
+        $db = new DBWrapper($name, ['dbType' => ZM_DB_PORTABLE, 'createNew' => $create_new]);
+        if ($keep_alive) {
+            self::$portable_cache[$name] = $db;
+        }
+        return $db;
     }
 }

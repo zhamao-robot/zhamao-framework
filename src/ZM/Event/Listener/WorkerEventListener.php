@@ -95,7 +95,7 @@ class WorkerEventListener
         });
 
         // 注册各种池子
-        $this->initConnectionPool();
+        $this->initDBConnections();
 
         // 加载用户代码资源
         $this->initUserPlugins();
@@ -144,6 +144,7 @@ class WorkerEventListener
         if (is_a(config('global.kv.use', \LightCache::class), LightCache::class, true)) {
             LightCache::saveAll();
         }
+        DBPool::resetPortableSQLite();
         logger()->debug('{is_task}Worker 进程 #{id} 正在停止', ['is_task' => ProcessStateManager::isTaskWorker() ? 'Task' : '', 'id' => ProcessManager::getProcessId()]);
 
         if (Framework::getInstance()->getDriver()->getName() !== 'swoole') {
@@ -260,9 +261,10 @@ class WorkerEventListener
      *
      * @throws DBException|RedisException
      */
-    private function initConnectionPool(): void
+    private function initDBConnections(): void
     {
         DBPool::resetPools();
+        DBPool::resetPortableSQLite();
         RedisPool::resetPools();
     }
 }

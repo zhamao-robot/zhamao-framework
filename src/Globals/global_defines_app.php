@@ -55,6 +55,9 @@ const ZM_PLUGIN_TYPE_COMPOSER = 3;              // Composer 依赖的插件
 const LOAD_MODE_SRC = 0;    // 从 src 加载
 const LOAD_MODE_VENDOR = 1; // 从 vendor 加载
 
+const ZM_DB_POOL = 1;       // 数据库连接池
+const ZM_DB_PORTABLE = 2;   // SQLite 便携数据库
+
 /* 定义工作目录 */
 define('WORKING_DIR', getcwd());
 
