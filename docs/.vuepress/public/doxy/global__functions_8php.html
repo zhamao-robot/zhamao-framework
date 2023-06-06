@@ -27,7 +27,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Zhamao Framework<span id="projectnumber">&#160;3.1.14</span>
+   <div id="projectname">Zhamao Framework<span id="projectnumber">&#160;3.2.0</span>
    </div>
    <div id="projectbrief">A high-performance chatbot + web framework</div>
   </td>
@@ -136,6 +136,10 @@ $(document).ready(function(){initNavTree('global__functions_8php.html',''); init
 <tr class="separator:abb1a3a76f52074604156a3da9ead1a98"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5e5e46262ccc376a933859820eaee89f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="global__functions_8php.html#a5e5e46262ccc376a933859820eaee89f">sql_builder</a> (string $name='')</td></tr>
 <tr class="separator:a5e5e46262ccc376a933859820eaee89f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a14c2bc0d348a47906850ebf6e27a0d80"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="global__functions_8php.html#a14c2bc0d348a47906850ebf6e27a0d80">zm_sqlite</a> (string $name, bool $create_new=true, bool $keep_alive=true)</td></tr>
+<tr class="separator:a14c2bc0d348a47906850ebf6e27a0d80"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4695835e940bd86423eea04865b3e28d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="global__functions_8php.html#a4695835e940bd86423eea04865b3e28d">zm_sqlite_builder</a> (string $name, bool $create_new=true, bool $keep_alive=true)</td></tr>
+<tr class="separator:a4695835e940bd86423eea04865b3e28d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9c69dfaa68f571577df4965bfed5ec79"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="global__functions_8php.html#a9c69dfaa68f571577df4965bfed5ec79">redis</a> (string $name='default')</td></tr>
 <tr class="separator:a9c69dfaa68f571577df4965bfed5ec79"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a71de63d02514c7e74d68338f4424139f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="global__functions_8php.html#a71de63d02514c7e74d68338f4424139f">config</a> (array|string $key=null, mixed $default=null)</td></tr>
@@ -858,6 +862,110 @@ $(document).ready(function(){initNavTree('global__functions_8php.html',''); init
       </table>
 </div><div class="memdoc">
 <p >sleep 指定时间，单位为秒（最小单位为1毫秒，即0.001） </p>
+
+</div>
+</div>
+<a id="a14c2bc0d348a47906850ebf6e27a0d80" name="a14c2bc0d348a47906850ebf6e27a0d80"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a14c2bc0d348a47906850ebf6e27a0d80">&#9670;&#160;</a></span>zm_sqlite()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">zm_sqlite </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>$name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>$create_new</em> = <code>true</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>$keep_alive</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >获取一个便携 SQLite 操作类</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramtype">string</td><td class="paramname">$name</td><td>使用的 SQLite 连接文件名 </td></tr>
+    <tr><td class="paramtype">bool</td><td class="paramname">$create_new</td><td>是否在文件不存在时创建新的 </td></tr>
+    <tr><td class="paramtype">bool</td><td class="paramname">$keep_alive</td><td>是否维持 PDO 对象以便优化性能 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>异常</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">DBException</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a4695835e940bd86423eea04865b3e28d" name="a4695835e940bd86423eea04865b3e28d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4695835e940bd86423eea04865b3e28d">&#9670;&#160;</a></span>zm_sqlite_builder()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">zm_sqlite_builder </td>
+          <td>(</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>$name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>$create_new</em> = <code>true</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>$keep_alive</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >获取便携 SQLite 操作类的 SQL 语句构造器</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramtype">string</td><td class="paramname">$name</td><td>使用的 SQLite 连接文件名 </td></tr>
+    <tr><td class="paramtype">bool</td><td class="paramname">$create_new</td><td>是否在文件不存在时创建新的 </td></tr>
+    <tr><td class="paramtype">bool</td><td class="paramname">$keep_alive</td><td>是否维持 PDO 对象以便优化性能 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>异常</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">DBException</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<div class="dynheader">
+函数调用图:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="global__functions_8php_a4695835e940bd86423eea04865b3e28d_cgraph.svg" width="259" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+</div>
 
 </div>
 </div>

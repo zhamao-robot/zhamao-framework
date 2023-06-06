@@ -10,6 +10,8 @@ var global__defines__app_8php =
     [ "SWOOLE_PROCESS", "global__defines__app_8php.html#a3277fc2f89a40896bf30cdf7d0203a0b", null ],
     [ "TRUE_LIST", "global__defines__app_8php.html#a87445f0514d6784e5f6dfa1388307da3", null ],
     [ "WORKING_DIR", "global__defines__app_8php.html#a59da374a74a6c75071a8b0abcdbb089b", null ],
+    [ "ZM_DB_POOL", "global__defines__app_8php.html#a14eb26f9e645aade3d88e03890380e09", null ],
+    [ "ZM_DB_PORTABLE", "global__defines__app_8php.html#a5d9ae9c14f7a2b4125f7249a478d3c26", null ],
     [ "ZM_ERR_METHOD_NOT_FOUND", "global__defines__app_8php.html#aa493ec75fd609f8740fad29eca598af7", null ],
     [ "ZM_ERR_NONE", "global__defines__app_8php.html#a506ee6eda8b4deca06e54b4b493805bb", null ],
     [ "ZM_ERR_ROUTE_METHOD_NOT_ALLOWED", "global__defines__app_8php.html#a9b5cee8b9d4043d155ce9b4ecad982b7", null ],

@@ -55,13 +55,14 @@ var searchData=
   ['coroutine_52',['coroutine',['../global__functions_8php.html#aea4203b9b3d3a0cecaad1479e2978e16',1,'global_functions.php']]],
   ['createdir_53',['createDir',['../class_z_m_1_1_store_1_1_file_system.html#a5307180a31adb7a0aae35addd32565fd',1,'ZM::Store::FileSystem']]],
   ['createjsonresponse_54',['createJsonResponse',['../class_z_m_1_1_utils_1_1_http_util.html#a5b352810bc6a14bfc5f78df1fec73fc2',1,'ZM::Utils::HttpUtil']]],
-  ['createquerybuilder_55',['createQueryBuilder',['../class_z_m_1_1_store_1_1_database_1_1_d_b_wrapper.html#ad0251d2b59b54d92521c94cf7cf3a567',1,'ZM::Store::Database::DBWrapper']]],
-  ['createsavepoint_56',['createSavepoint',['../class_z_m_1_1_store_1_1_database_1_1_d_b_wrapper.html#a5617b578691b5091afb116c90c26f41b',1,'ZM::Store::Database::DBWrapper']]],
-  ['cron_57',['Cron',['../class_z_m_1_1_annotation_1_1_framework_1_1_cron.html',1,'ZM::Annotation::Framework']]],
-  ['cron_2ephp_58',['Cron.php',['../_cron_8php.html',1,'']]],
-  ['crontrait_59',['CronTrait',['../namespace_z_m_1_1_plugin_1_1_traits.html#a5a744732152e091ea9fccf5df1324d0b',1,'ZM::Plugin::Traits']]],
-  ['crontrait_2ephp_60',['CronTrait.php',['../_cron_trait_8php.html',1,'']]],
-  ['current_61',['current',['../class_z_m_1_1_store_1_1_database_1_1_d_b_statement.html#af343507d1926e6ecf964625d41db528c',1,'ZM::Store::Database::DBStatement']]],
-  ['customannotation_62',['CustomAnnotation',['../interface_z_m_1_1_annotation_1_1_interfaces_1_1_custom_annotation.html',1,'ZM::Annotation::Interfaces']]],
-  ['customannotation_2ephp_63',['CustomAnnotation.php',['../_custom_annotation_8php.html',1,'']]]
+  ['createportablesqlite_55',['createPortableSqlite',['../class_z_m_1_1_store_1_1_database_1_1_d_b_pool.html#a9f92f5869647ae01ce57e00815950ae3',1,'ZM::Store::Database::DBPool']]],
+  ['createquerybuilder_56',['createQueryBuilder',['../class_z_m_1_1_store_1_1_database_1_1_d_b_wrapper.html#ad0251d2b59b54d92521c94cf7cf3a567',1,'ZM::Store::Database::DBWrapper']]],
+  ['createsavepoint_57',['createSavepoint',['../class_z_m_1_1_store_1_1_database_1_1_d_b_wrapper.html#a5617b578691b5091afb116c90c26f41b',1,'ZM::Store::Database::DBWrapper']]],
+  ['cron_58',['Cron',['../class_z_m_1_1_annotation_1_1_framework_1_1_cron.html',1,'ZM::Annotation::Framework']]],
+  ['cron_2ephp_59',['Cron.php',['../_cron_8php.html',1,'']]],
+  ['crontrait_60',['CronTrait',['../namespace_z_m_1_1_plugin_1_1_traits.html#a5a744732152e091ea9fccf5df1324d0b',1,'ZM::Plugin::Traits']]],
+  ['crontrait_2ephp_61',['CronTrait.php',['../_cron_trait_8php.html',1,'']]],
+  ['current_62',['current',['../class_z_m_1_1_store_1_1_database_1_1_d_b_statement.html#af343507d1926e6ecf964625d41db528c',1,'ZM::Store::Database::DBStatement']]],
+  ['customannotation_63',['CustomAnnotation',['../interface_z_m_1_1_annotation_1_1_interfaces_1_1_custom_annotation.html',1,'ZM::Annotation::Interfaces']]],
+  ['customannotation_2ephp_64',['CustomAnnotation.php',['../_custom_annotation_8php.html',1,'']]]
 ];
