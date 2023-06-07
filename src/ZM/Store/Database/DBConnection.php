@@ -22,12 +22,12 @@ class DBConnection implements Connection
     public function __construct(private array $params)
     {
         $this->db_type = $params['dbType'] ?? ZM_DB_POOL;
-        if ($params['dbType'] === ZM_DB_POOL) {
+        if ($this->db_type === ZM_DB_POOL) {
             // 默认连接池的形式，
             logger()->debug('Constructing...');
             $this->conn = DBPool::pool($params['dbName'])->get();
             $this->pool_name = $params['dbName'];
-        } elseif ($params['dbType'] === ZM_DB_PORTABLE) {
+        } elseif ($this->db_type === ZM_DB_PORTABLE) {
             $connect_str = 'sqlite:{filename}';
             if (FileSystem::isRelativePath($params['filename'])) {
                 $params['filename'] = zm_dir(config('global.data_dir') . '/db/' . $params['filename']);
