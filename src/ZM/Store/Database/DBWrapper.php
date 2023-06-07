@@ -24,19 +24,27 @@ class DBWrapper
         $db_type = $options['dbType'] ?? ZM_DB_POOL;
         try {
             if ($db_type === ZM_DB_POOL) {
+                // 设置 dbName
+                $options['dbName'] = $name;
                 // pool 为连接池格式
                 $db_list = config()->get('global.database');
                 if (isset($db_list[$name]) || (is_countable($db_list) ? count($db_list) : 0) === 1) {
                     if ($name === '') {
                         $name = array_key_first($db_list);
                     }
-                    $this->connection = DriverManager::getConnection(['driverClass' => $this->getConnectionClass($db_list[$name]['type']), ...$options]);
+                    $this->connection = DriverManager::getConnection(array_merge(
+                        ['driverClass' => $this->getConnectionClass($db_list[$name]['type']), 'dbName' => $name],
+                        $options
+                    ));
                 } else {
                     throw new DBException('Cannot find database config named "' . $name . '" !');
                 }
             } elseif ($db_type === ZM_DB_PORTABLE) {
                 // portable 为sqlite单文件模式
-                $this->connection = DriverManager::getConnection(['driverClass' => SQLiteDriver::class, 'filename' => $name, ...$options]);
+                $this->connection = DriverManager::getConnection(array_merge(
+                    ['driverClass' => SQLiteDriver::class, 'filename' => $name],
+                    $options
+                ));
             }
         } catch (\Throwable $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
