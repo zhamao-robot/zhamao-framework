@@ -165,7 +165,7 @@ class AnnotationParser
                         // 用 clone 的目的是生成个独立的对象，避免和 class 以及方法之间互相冲突
                         $copy = clone $vs;
                         $copy->method = $method->getName();
-                        array_unshift($reflection_tree[$v]['methods_annotations'][$method->getName()], $copy);
+                        $reflection_tree[$v]['methods_annotations'][$method->getName()][] = $copy;
                         $annotation_list[get_class($vs)][] = $copy;
                     }
                     // 标记为 Ergodic 的类注解，不作为类的注解解析，而是全部当作每个方法有注解，所以直接跳过
