@@ -154,8 +154,11 @@ class AnnotationParser
             foreach ($reflection_tree[$v]['class_annotations'] as $vs) {
                 $vs->class = $v;
 
+                if (in_array($vs::class, $conf['name'])) {
+                    continue;
+                }
                 // 预处理0：排除所有非继承于 AnnotationBase 的注解
-                if (!$vs instanceof AnnotationBase && !str_contains($vs::class, 'JetBrains\\Phpstorm\\ArrayShape')) {
+                if (!$vs instanceof AnnotationBase) {
                     logger()->notice($vs::class . ' is not extended from ' . AnnotationBase::class);
                     continue;
                 }
@@ -199,8 +202,11 @@ class AnnotationParser
             // 预处理3：处理每个函数上面的特殊注解，就是需要操作一些东西的
             foreach (($reflection_tree[$v]['methods_annotations'] ?? []) as $method_name => $methods_annotations) {
                 foreach ($methods_annotations as $method_anno) {
+                    if (in_array($method_anno::class, $conf['name'])) {
+                        continue;
+                    }
                     // 预处理3.0：排除所有非继承于 AnnotationBase 的注解
-                    if (!$method_anno instanceof AnnotationBase && !str_contains($method_anno::class, 'JetBrains\\Phpstorm\\ArrayShape')) {
+                    if (!$method_anno instanceof AnnotationBase) {
                         logger()->notice('Binding annotation ' . $method_anno::class . ' to ' . $v . '::' . $method_name . ' is not extended from ' . AnnotationBase::class);
                         continue;
                     }
