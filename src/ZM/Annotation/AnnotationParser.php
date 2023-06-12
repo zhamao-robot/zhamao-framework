@@ -139,7 +139,8 @@ class AnnotationParser
                 }
             }
             */
-
+            // 保留ergodic注解
+            $append_ergodics = [];
             // 保存对class的注解
             $reflection_tree[$v]['class_annotations'] = $class_annotations;
             // 保存类成员的方法的对应反射对象们
@@ -154,7 +155,7 @@ class AnnotationParser
                 $vs->class = $v;
 
                 // 预处理0：排除所有非继承于 AnnotationBase 的注解
-                if (!$vs instanceof AnnotationBase) {
+                if (!$vs instanceof AnnotationBase && !str_contains($vs::class, 'JetBrains\\Phpstorm\\ArrayShape')) {
                     logger()->notice($vs::class . ' is not extended from ' . AnnotationBase::class);
                     continue;
                 }
@@ -165,7 +166,8 @@ class AnnotationParser
                         // 用 clone 的目的是生成个独立的对象，避免和 class 以及方法之间互相冲突
                         $copy = clone $vs;
                         $copy->method = $method->getName();
-                        $reflection_tree[$v]['methods_annotations'][$method->getName()][] = $copy;
+                        $append_ergodics[$method->getName()][] = $copy;
+                        // $reflection_tree[$v]['methods_annotations'][$method->getName()][] = $copy;
                         $annotation_list[get_class($vs)][] = $copy;
                     }
                     // 标记为 Ergodic 的类注解，不作为类的注解解析，而是全部当作每个方法有注解，所以直接跳过
@@ -187,12 +189,18 @@ class AnnotationParser
                     $vs->group = array_merge($vs->group, $this->class_bind_group_list[get_class($vs)]);
                 }
             }
+            // 预处理：将Class的ergodic注解拼接到每个方法的注解列表前面，且按照顺序（修复 #365）
+            foreach ($reflection_tree[$v]['methods_annotations'] as $method_name => $annos) {
+                if (isset($append_ergodics[$method_name])) {
+                    $reflection_tree[$v]['methods_annotations'][$method_name] = array_merge($append_ergodics[$method_name], $annos);
+                }
+            }
 
             // 预处理3：处理每个函数上面的特殊注解，就是需要操作一些东西的
             foreach (($reflection_tree[$v]['methods_annotations'] ?? []) as $method_name => $methods_annotations) {
                 foreach ($methods_annotations as $method_anno) {
                     // 预处理3.0：排除所有非继承于 AnnotationBase 的注解
-                    if (!$method_anno instanceof AnnotationBase) {
+                    if (!$method_anno instanceof AnnotationBase && !str_contains($method_anno::class, 'JetBrains\\Phpstorm\\ArrayShape')) {
                         logger()->notice('Binding annotation ' . $method_anno::class . ' to ' . $v . '::' . $method_name . ' is not extended from ' . AnnotationBase::class);
                         continue;
                     }
