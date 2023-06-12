@@ -105,6 +105,8 @@ class AnnotationParser
                 }
                 */
 
+                // 保留ergodic注解
+                $append_ergodics = [];
                 // 生成主树
                 $this->annotation_map[$v]['class_annotations'] = $class_annotations;
                 $this->annotation_map[$v]['methods'] = $methods;
@@ -120,7 +122,8 @@ class AnnotationParser
                         foreach (($this->annotation_map[$v]['methods'] ?? []) as $method) {
                             $copy = clone $vs;
                             $copy->method = $method->getName();
-                            $this->annotation_map[$v]['methods_annotations'][$method->getName()][] = $copy;
+                            $append_ergodics[$method->getName()][] = $copy;
+                            // $this->annotation_map[$v]['methods_annotations'][$method->getName()][] = $copy;
                         }
                     }
 
@@ -138,6 +141,13 @@ class AnnotationParser
                 }
 
                 $inserted = [];
+
+                // 预处理：将Class的ergodic注解拼接到每个方法的注解列表前面，且按照顺序（修复 #365）
+                foreach ($this->annotation_map[$v]['methods_annotations'] as $method_name => $annos) {
+                    if (isset($append_ergodics[$method_name])) {
+                        $this->annotation_map[$v]['methods_annotations'][$method_name] = array_merge($append_ergodics[$method_name], $annos);
+                    }
+                }
 
                 // 预处理3：处理每个函数上面的特殊注解，就是需要操作一些东西的
                 foreach (($this->annotation_map[$v]['methods_annotations'] ?? []) as $method_name => $methods_annotations) {
