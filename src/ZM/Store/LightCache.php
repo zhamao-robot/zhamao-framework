@@ -75,7 +75,7 @@ class LightCache
                 } else {
                     return false;
                 }
-                $result = self::$kv_table->set((string)$k, [
+                $result = self::$kv_table->set((string) $k, [
                     'value' => $value,
                     'expire' => $v['expire'],
                     'data_type' => $data_type,
@@ -191,7 +191,7 @@ class LightCache
         } elseif (is_bool($value)) {
             $data_type = 'bool';
             $value = json_encode($value);
-        }  else {
+        } else {
             throw new LightCacheException('E00048', 'Only can set string, array and int');
         }
         try {

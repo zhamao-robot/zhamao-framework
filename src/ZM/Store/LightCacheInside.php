@@ -6,6 +6,7 @@ namespace ZM\Store;
 
 use Exception;
 use Swoole\Table;
+use ZM\Config\ZMConfig;
 use ZM\Exception\LightCacheException;
 use ZM\Exception\ZMException;
 
