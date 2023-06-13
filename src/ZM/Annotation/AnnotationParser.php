@@ -143,7 +143,7 @@ class AnnotationParser
                 $inserted = [];
 
                 // 预处理：将Class的ergodic注解拼接到每个方法的注解列表前面，且按照顺序（修复 #365）
-                foreach ($this->annotation_map[$v]['methods_annotations'] as $method_name => $annos) {
+                foreach (($this->annotation_map[$v]['methods_annotations'] ?? []) as $method_name => $annos) {
                     if (isset($append_ergodics[$method_name])) {
                         $this->annotation_map[$v]['methods_annotations'][$method_name] = array_merge($append_ergodics[$method_name], $annos);
                     }
