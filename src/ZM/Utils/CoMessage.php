@@ -16,7 +16,7 @@ class CoMessage
     /**
      * @return mixed
      */
-    public static function yieldByWS(array $hang, array $compare, int $timeout = 600)
+    public static function yieldByWS(array $hang, array $compare, int $timeout = 600, ?callable $callable = null)
     {
         $cid = Coroutine::getuid();
         $api_id = ZMAtomic::get('wait_msg_id')->add(1);
@@ -29,6 +29,9 @@ class CoMessage
         $wait[$api_id] = $hang;
         LightCacheInside::set('wait_api', 'wait_api', $wait);
         SpinLock::unlock('wait_api');
+        if ($callable instanceof \Closure) {
+            call_user_func($callable);
+        }
         $id = swoole_timer_after($timeout * 1000, function () use ($api_id) {
             $r = LightCacheInside::get('wait_api', 'wait_api')[$api_id] ?? null;
             if (is_array($r)) {
