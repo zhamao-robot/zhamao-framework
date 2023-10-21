@@ -51,9 +51,15 @@ trait CQAPI
 
     private function processWebsocketAPI($connection, $reply, $function = false)
     {
-        $api_id = ZMAtomic::get('wait_msg_id')->add();
-        $reply['echo'] = $api_id;
-        if (server()->push($connection->getFd(), json_encode($reply))) {
+        try {
+            $api_id = ZMAtomic::get('wait_msg_id')->add();
+            $reply['echo'] = $api_id;
+            $fd = $connection->getFd();
+            $send_func = function () use ($fd, $reply) {
+                if (!server()->push($fd, json_encode($reply))) {
+                    throw new \Exception('CQAPI send failed, websocket push error.');
+                }
+            };
             if ($function === true) {
                 $obj = [
                     'data' => $reply,
@@ -61,26 +67,32 @@ trait CQAPI
                     'self_id' => $connection->getOption('connect_id'),
                     'echo' => $api_id,
                 ];
-                return CoMessage::yieldByWS($obj, ['echo'], 30);
+                return CoMessage::yieldByWS($obj, ['echo'], 10, $send_func);
+            } else {
+                $send_func();
+                return true;
             }
-            return true;
+        } catch (\Exception $e) {
+            Console::warning(zm_internal_errcode('E00036') . $e->getMessage());
         }
-        Console::warning(zm_internal_errcode('E00036') . 'CQAPI send failed, websocket push error.');
-        $response = [
-            'status' => 'failed',
-            'retcode' => -1000,
-            'data' => null,
-            'self_id' => $connection->getOption('connect_id'),
-        ];
-        SpinLock::lock('wait_api');
-        $r = LightCacheInside::get('wait_api', 'wait_api');
-        unset($r[$reply['echo']]);
-        LightCacheInside::set('wait_api', 'wait_api', $r);
-        SpinLock::unlock('wait_api');
         if ($function === true) {
+            SpinLock::lock('wait_api');
+            $r = LightCacheInside::get('wait_api', 'wait_api');
+            if (isset($r[$reply['echo']])) {
+                unset($r[$reply['echo']]);
+                LightCacheInside::set('wait_api', 'wait_api', $r);
+            }
+            SpinLock::unlock('wait_api');
+            $response = [
+                'status' => 'failed',
+                'retcode' => -1000,
+                'data' => null,
+                'self_id' => $connection->getOption('connect_id'),
+            ];
             return $response;
+        } else {
+            return false;
         }
-        return false;
     }
 
     private function processHttpAPI($connection, $reply, $function = null): bool
