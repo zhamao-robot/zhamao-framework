@@ -68,6 +68,7 @@ function install_native_php() {
 
 # 安装下载Composer
 function install_native_composer() {
+
     if [ ! -f "$ZM_TEMP_DIR/composer.phar" ]; then
         # 下载 composer.phar
         download_file "https://mirrors.aliyun.com/composer/composer.phar" "$ZM_TEMP_DIR/composer.phar" || return 1
@@ -209,9 +210,9 @@ function if_use_aliyun() {
 
 function if_restore_native_runtime() {
     ZM_RUNTIME_DIR="$ZM_PWD/$ZM_CUSTOM_DIR/runtime/"
+    mkdir -p "$ZM_RUNTIME_DIR"
     if [ "$php_executable" = "$ZM_TEMP_DIR/php" ]; then
         echo "$(nhead) 移动内建 PHP 到框架目录 $ZM_RUNTIME_DIR ..." && \
-            mkdir -p "$ZM_RUNTIME_DIR" && \
             mv "$ZM_TEMP_DIR/php" "$ZM_RUNTIME_DIR" || {
                 echo "$(nhead red) 移动内建 PHP 到框架目录失败！" && return 1
             }
@@ -220,8 +221,8 @@ function if_restore_native_runtime() {
     if [ "$composer_executable" = "$ZM_TEMP_DIR/composer" ]; then
         echo "$(nhead) 移动内建 Composer 到框架目录 $ZM_RUNTIME_DIR ..." && \
             mkdir -p "$ZM_CUSTOM_DIR/runtime" && \
-            mv "$ZM_TEMP_DIR/composer" "$ZM_RUNTIME_DIR" && \
-            mv "$ZM_TEMP_DIR/composer.phar" "$ZM_RUNTIME_DIR" || {
+            mv "$ZM_TEMP_DIR/composer.phar" "$ZM_RUNTIME_DIR" && \
+            mv "$ZM_TEMP_DIR/composer" "$ZM_RUNTIME_DIR" || {
                 echo "$(nhead red) 移动内建 Composer 到框架目录失败！" && return 1
             }
         composer_executable="$ZM_RUNTIME_DIR/composer"
