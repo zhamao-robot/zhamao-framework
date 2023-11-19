@@ -34,10 +34,18 @@ function download_file() {
     fi
     _down_symbol=0
     if [ ! -f "$2" ]; then
-        echo -ne "$(nhead) 正在下载 $1 ... "
+        # 获取目录路径
+        download_dir=$(dirname "$2")
+
+        # 检查目录是否存在，如果不存在则创建
+        if [ ! -d "$download_dir" ]; then
+            mkdir -p "$download_dir"
+        fi
+
+        echo -ne "$(nhead) 正在下载 $1 到目录 $download_dir ... "
         $downloader "$1" -$_down_prefix "$2" >/dev/null 2>&1 && echo "完成！" && _down_symbol=1
     else
-        echo "已存在！" && _down_symbol=1
+        echo "文件已存在！" && _down_symbol=1
     fi
     if [ $_down_symbol == 0 ]; then
         echo "$(nhead red) 下载失败！请检查网络连接！"
