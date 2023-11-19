@@ -34,10 +34,18 @@ function download_file() {
     fi
     _down_symbol=0
     if [ ! -f "$2" ]; then
-        echo -ne "$(nhead) 正在下载 $1 ... "
+        # 获取目录路径
+        download_dir=$(dirname "$2")
+
+        # 检查目录是否存在，如果不存在则创建
+        if [ ! -d "$download_dir" ]; then
+            mkdir -p "$download_dir"
+        fi
+
+        echo -ne "$(nhead) 正在下载 $1 到目录 $download_dir ... "
         $downloader "$1" -$_down_prefix "$2" >/dev/null 2>&1 && echo "完成！" && _down_symbol=1
     else
-        echo "已存在！" && _down_symbol=1
+        echo "文件已存在！" && _down_symbol=1
     fi
     if [ $_down_symbol == 0 ]; then
         echo "$(nhead red) 下载失败！请检查网络连接！"
@@ -46,6 +54,7 @@ function download_file() {
     fi
     return 0
 }
+
 
 # 安装下载内建PHP
 function install_native_php() {
@@ -68,6 +77,7 @@ function install_native_php() {
 
 # 安装下载Composer
 function install_native_composer() {
+
     if [ ! -f "$ZM_TEMP_DIR/composer.phar" ]; then
         # 下载 composer.phar
         download_file "https://mirrors.aliyun.com/composer/composer.phar" "$ZM_TEMP_DIR/composer.phar" || return 1
@@ -209,9 +219,10 @@ function if_use_aliyun() {
 
 function if_restore_native_runtime() {
     ZM_RUNTIME_DIR="$ZM_PWD/$ZM_CUSTOM_DIR/runtime/"
+    mkdir -p "$ZM_RUNTIME_DIR"
+    mkdir -p "$ZM_CUSTOM_DIR/runtime"
     if [ "$php_executable" = "$ZM_TEMP_DIR/php" ]; then
         echo "$(nhead) 移动内建 PHP 到框架目录 $ZM_RUNTIME_DIR ..." && \
-            mkdir -p "$ZM_RUNTIME_DIR" && \
             mv "$ZM_TEMP_DIR/php" "$ZM_RUNTIME_DIR" || {
                 echo "$(nhead red) 移动内建 PHP 到框架目录失败！" && return 1
             }
@@ -219,15 +230,16 @@ function if_restore_native_runtime() {
     fi
     if [ "$composer_executable" = "$ZM_TEMP_DIR/composer" ]; then
         echo "$(nhead) 移动内建 Composer 到框架目录 $ZM_RUNTIME_DIR ..." && \
-            mkdir -p "$ZM_CUSTOM_DIR/runtime" && \
-            mv "$ZM_TEMP_DIR/composer" "$ZM_RUNTIME_DIR" && \
-            mv "$ZM_TEMP_DIR/composer.phar" "$ZM_RUNTIME_DIR" || {
+            ([ -e "$ZM_TEMP_DIR/composer" ] && mv "$ZM_TEMP_DIR/composer" "$ZM_RUNTIME_DIR") || \
+            ([ -e "$ZM_TEMP_DIR/composer.phar" ] && mv "$ZM_TEMP_DIR/composer.phar" "$ZM_RUNTIME_DIR") || {
                 echo "$(nhead red) 移动内建 Composer 到框架目录失败！" && return 1
-            }
+        }
         composer_executable="$ZM_RUNTIME_DIR/composer"
     fi
     return 0
 }
+
+
 
 function install_framework() {
     echo "$(nhead) 开始安装框架到目录 $ZM_CUSTOM_DIR ..."
@@ -239,10 +251,10 @@ function install_framework() {
         echo "$(nhead) 从 Composer 拉取框架 ..." && \
         echo '{"minimum-stability":"dev","prefer-stable":true}' > composer.json && $composer_executable require -n zhamao/framework:^3.0 && \
         $composer_executable require -n --dev swoole/ide-helper:^4.5 && \
-        if_restore_native_runtime && \
-        echo "$(nhead) 初始化框架脚手架文件 ..." && \
         vendor/bin/zhamao init && \
+        echo "$(nhead) 初始化框架脚手架文件 ..." && \
         $composer_executable dump-autoload -n && \
+        if_restore_native_runtime && \
         show_success_msg || {
             echo "$(nhead red) 安装框架失败！" && cd $ZM_PWD && rm -rf "$ZM_CUSTOM_DIR" && return 1
         }
