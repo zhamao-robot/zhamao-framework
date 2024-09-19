@@ -230,7 +230,7 @@ function if_restore_native_runtime() {
     fi
     if [ "$composer_executable" = "$ZM_TEMP_DIR/composer" ]; then
         echo "$(nhead) 移动内建 Composer 到框架目录 $ZM_RUNTIME_DIR ..." && \
-            ([ -e "$ZM_TEMP_DIR/composer" ] && mv "$ZM_TEMP_DIR/composer" "$ZM_RUNTIME_DIR") || \
+            ([ -e "$ZM_TEMP_DIR/composer" ] && mv "$ZM_TEMP_DIR/composer" "$ZM_RUNTIME_DIR") && \
             ([ -e "$ZM_TEMP_DIR/composer.phar" ] && mv "$ZM_TEMP_DIR/composer.phar" "$ZM_RUNTIME_DIR") || {
                 echo "$(nhead red) 移动内建 Composer 到框架目录失败！" && return 1
         }
@@ -251,10 +251,10 @@ function install_framework() {
         echo "$(nhead) 从 Composer 拉取框架 ..." && \
         echo '{"minimum-stability":"dev","prefer-stable":true}' > composer.json && $composer_executable require -n zhamao/framework:^3.0 && \
         $composer_executable require -n --dev swoole/ide-helper:^4.5 && \
+        if_restore_native_runtime && \
         vendor/bin/zhamao init && \
         echo "$(nhead) 初始化框架脚手架文件 ..." && \
         $composer_executable dump-autoload -n && \
-        if_restore_native_runtime && \
         show_success_msg || {
             echo "$(nhead red) 安装框架失败！" && cd $ZM_PWD && rm -rf "$ZM_CUSTOM_DIR" && return 1
         }
