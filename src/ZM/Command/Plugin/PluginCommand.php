@@ -18,7 +18,7 @@ abstract class PluginCommand extends Command
 
     private static bool $loaded = false;
 
-    public function __construct(string $name = null)
+    public function __construct(?string $name = null)
     {
         parent::__construct($name);
         if (!self::$loaded) {
@@ -30,7 +30,7 @@ abstract class PluginCommand extends Command
     /**
      * 插件名称合规验证器
      */
-    public function validatePluginName(string $answer): string
+    public function validatePluginName(?string $answer): string
     {
         if (empty($answer)) {
             throw new \RuntimeException('插件名称不能为空');
@@ -38,8 +38,8 @@ abstract class PluginCommand extends Command
         if (is_numeric(mb_substr($answer, 0, 1))) {
             throw new \RuntimeException('插件名称不能以数字开头，且只能包含字母、数字、下划线、短横线');
         }
-        if (!preg_match('/^[\/a-zA-Z0-9_-]+$/', $answer)) {
-            throw new \RuntimeException('插件名称只能包含字母、数字、下划线、短横线');
+        if (!preg_match('/^[\/a-z0-9_-]+$/', $answer)) {
+            throw new \RuntimeException('插件名称只能包含小写字母、数字、下划线、短横线');
         }
         $exp = explode('/', $answer);
         if (count($exp) !== 2) {
@@ -72,7 +72,7 @@ abstract class PluginCommand extends Command
             throw new \RuntimeException('插件命名空间不能以数字开头，且只能包含字母、数字、反斜线');
         }
         // 只能包含字母、数字和反斜线
-        if (!preg_match('/^[a-zA-Z0-9\\\\]+$/', $answer)) {
+        if (!preg_match('/^[a-zA-Z0-9\\\]+$/', $answer)) {
             throw new \RuntimeException('插件命名空间只能包含字母、数字、反斜线');
         }
         return $answer;
@@ -101,7 +101,7 @@ abstract class PluginCommand extends Command
      * @param string   $question  问题
      * @param callable $validator 验证器
      */
-    protected function questionWithOption(string $name, string $question, callable $validator, string $default = null): void
+    protected function questionWithOption(string $name, string $question, callable $validator, ?string $default = null): void
     {
         /** @var QuestionHelper $helper */
         $helper = $this->getHelper('question');
