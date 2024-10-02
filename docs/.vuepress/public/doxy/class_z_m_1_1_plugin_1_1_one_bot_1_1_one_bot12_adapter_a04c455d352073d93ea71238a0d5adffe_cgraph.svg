@@ -36,7 +36,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="class_z_m_1_1_plugin_1_1_one_bot_1_1_bot_map.html#aebd60610d6bf0022f82f03393cd38962" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="class_z_m_1_1_plugin_1_1_one_bot_1_1_bot_map.html#a442c2070ab13e4fa702e8c105ef01731" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="#666666" points="462,-30 328,-30 328,0 462,0 462,-30"/>
 <text text-anchor="start" x="336" y="-18" font-family="Helvetica,sans-Serif" font-size="10.00">ZM\Plugin\OneBot\BotMap</text>
 <text text-anchor="middle" x="395" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">\unregisterBot</text>

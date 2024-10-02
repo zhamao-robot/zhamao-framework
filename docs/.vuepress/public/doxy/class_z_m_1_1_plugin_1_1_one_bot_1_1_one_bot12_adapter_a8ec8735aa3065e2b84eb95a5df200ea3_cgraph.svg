@@ -51,7 +51,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="class_z_m_1_1_plugin_1_1_one_bot_1_1_bot_map.html#a99f33d4ff3549f3291afdd279c462ac8" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="class_z_m_1_1_plugin_1_1_one_bot_1_1_bot_map.html#ac0b327da7ac3298c093c3e12305dd19e" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="#666666" points="275,-78 141,-78 141,-48 275,-48 275,-78"/>
 <text text-anchor="start" x="149" y="-66" font-family="Helvetica,sans-Serif" font-size="10.00">ZM\Plugin\OneBot\BotMap</text>
 <text text-anchor="middle" x="208" y="-55" font-family="Helvetica,sans-Serif" font-size="10.00">\registerBotWithFd</text>
@@ -67,7 +67,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="class_z_m_1_1_plugin_1_1_one_bot_1_1_bot_map.html#aebd60610d6bf0022f82f03393cd38962" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="class_z_m_1_1_plugin_1_1_one_bot_1_1_bot_map.html#a442c2070ab13e4fa702e8c105ef01731" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="#666666" points="275,-30 141,-30 141,0 275,0 275,-30"/>
 <text text-anchor="start" x="149" y="-18" font-family="Helvetica,sans-Serif" font-size="10.00">ZM\Plugin\OneBot\BotMap</text>
 <text text-anchor="middle" x="208" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">\unregisterBot</text>

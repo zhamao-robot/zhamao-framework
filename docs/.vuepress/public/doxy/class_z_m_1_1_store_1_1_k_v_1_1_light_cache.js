@@ -8,6 +8,6 @@ var class_z_m_1_1_store_1_1_k_v_1_1_light_cache =
     [ "getMultiple", "class_z_m_1_1_store_1_1_k_v_1_1_light_cache.html#afabdec401f7e2063ddfca6780b1439b7", null ],
     [ "has", "class_z_m_1_1_store_1_1_k_v_1_1_light_cache.html#afdce603da130f170b2e650649949b544", null ],
     [ "save", "class_z_m_1_1_store_1_1_k_v_1_1_light_cache.html#afc8a3c62679cf00ade9f15fb2a6d6132", null ],
-    [ "set", "class_z_m_1_1_store_1_1_k_v_1_1_light_cache.html#a823026abf2f77b9ce2e65e9513727844", null ],
-    [ "setMultiple", "class_z_m_1_1_store_1_1_k_v_1_1_light_cache.html#a3f67d6727e507d6296cb06e25ce064fd", null ]
+    [ "set", "class_z_m_1_1_store_1_1_k_v_1_1_light_cache.html#abe06b9502f7b4c55bda1a86c1c3072f7", null ],
+    [ "setMultiple", "class_z_m_1_1_store_1_1_k_v_1_1_light_cache.html#a4f223518c5919c9fc86a2ca6932aa218", null ]
 ];

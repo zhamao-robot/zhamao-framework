@@ -35,7 +35,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="class_z_m_1_1_context_1_1_bot_context.html#a0ff6263819f2e9d930b347e0b9d8bcc4" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="class_z_m_1_1_context_1_1_bot_context.html#a112c3ec7c07ff7ca5874f1e3ea8a4578" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="#666666" points="201,-30 83,-30 83,0 201,0 201,-30"/>
 <text text-anchor="start" x="91" y="-18" font-family="Helvetica,sans-Serif" font-size="10.00">ZM\Context\BotContext</text>
 <text text-anchor="middle" x="142" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">\getParam</text>
