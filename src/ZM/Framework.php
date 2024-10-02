@@ -399,6 +399,7 @@ class Framework
             if (isset($translations[$k])) {
                 $keys = array_keys($properties);
                 $keys[array_search($k, $keys, false)] = $translations[$k];
+                /* @phpstan-ignore-next-line */
                 $properties = ($t = array_combine($keys, $properties)) ? $t : $properties;
             }
         }
