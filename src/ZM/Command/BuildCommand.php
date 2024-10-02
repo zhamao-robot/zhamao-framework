@@ -83,7 +83,7 @@ class BuildCommand extends Command
         $separator = '\\' . DIRECTORY_SEPARATOR;
         // 只打包 bin / config / resources / src / vendor 目录以及 composer.json / composer.lock / entry.php
         $files = array_filter($files, function ($file) use ($separator) {
-            return preg_match('/^(bin|config|resources|src|vendor)' . $separator . '|^(composer\\.json|README\\.md)$/', $file);
+            return preg_match('/^(bin|config|resources|src|vendor)' . $separator . '|^(composer\.json|README\.md)$/', $file);
         });
         sort($files);
 

@@ -66,6 +66,8 @@ return (new PhpCsFixer\Config())
         'multiline_comment_opening_closing' => true,
         'phpdoc_summary' => false,
         'php_unit_test_class_requires_covers' => false,
+        'fully_qualified_strict_types' => false,
+        'new_with_parentheses' => false,
     ])
     ->setFinder(
         PhpCsFixer\Finder::create()

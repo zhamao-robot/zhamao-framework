@@ -17,9 +17,6 @@ class PluginRemoveCommand extends PluginCommand
         $this->addArgument('name', InputArgument::REQUIRED, '插件名称');
     }
 
-    /**
-     * {@inheritDoc}
-     */
     protected function handle(): int
     {
         $plugin_name = $this->input->getArgument('name');

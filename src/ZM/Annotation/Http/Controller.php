@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ZM\Annotation\Http;
 
-use Attribute;
 use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
 use Doctrine\Common\Annotations\Annotation\Required;
 use Doctrine\Common\Annotations\Annotation\Target;
@@ -25,6 +24,5 @@ class Controller extends AnnotationBase implements ErgodicAnnotation
          * @Required()
          */
         public string $prefix
-    ) {
-    }
+    ) {}
 }

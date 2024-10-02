@@ -110,8 +110,7 @@ class WorkerEventListener
         }
         // Windows 系统的 CtrlC 由于和 Select 有一定的冲突，如果没事件解析的话 CtrlC 会阻塞，所以必须添加一个空的计时器
         if (PHP_OS_FAMILY === 'Windows') {
-            Framework::getInstance()->getDriver()->getEventLoop()->addTimer(1000, function () {
-            }, 0);
+            Framework::getInstance()->getDriver()->getEventLoop()->addTimer(1000, function () {}, 0);
         }
         // 回显 debug 日志：进程占用的内存
         $memory_total = memory_get_usage() / 1024 / 1024;

@@ -41,7 +41,7 @@ class WebSocketFilter implements MiddlewareInterface, PipelineInterface
         return true;
     }
 
-    private function filterMessageAndClose(WebSocketMessageEvent|WebSocketCloseEvent $event): bool
+    private function filterMessageAndClose(WebSocketCloseEvent|WebSocketMessageEvent $event): bool
     {
         // 过滤存在 flag 设置的情况
         if (($this->args['flag'] ?? null) !== null && $this->args['flag'] !== $event->getSocketFlag()) {

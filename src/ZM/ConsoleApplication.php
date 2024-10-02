@@ -46,9 +46,6 @@ final class ConsoleApplication extends Application
         self::$obj = $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function doRun(InputInterface $input, OutputInterface $output): int
     {
         try {
@@ -73,9 +70,6 @@ final class ConsoleApplication extends Application
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output): int
     {
         // 初始化内核
@@ -99,7 +93,7 @@ final class ConsoleApplication extends Application
         // 先加载框架内置命令
         $command_classes = array_merge(
             $command_classes,
-            FileSystem::getClassesPsr4(FRAMEWORK_ROOT_DIR . '/src/ZM/Command', 'ZM\\Command')
+            FileSystem::getClassesPsr4(FRAMEWORK_ROOT_DIR . '/src/ZM/Command', 'ZM\Command')
         );
         // 再加载用户自定义命令（如存在）
         if (is_dir(SOURCE_ROOT_DIR . '/src/Command')) {

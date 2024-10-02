@@ -27,7 +27,6 @@ class PluginMakeCommand extends PluginCommand
     }
 
     /**
-     * {@inheritDoc}
      * @throws FileSystemException
      */
     protected function handle(): int

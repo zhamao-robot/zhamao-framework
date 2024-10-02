@@ -14,11 +14,11 @@ class WaitTimeoutException extends ZMException
 
     public function __construct(
         public mixed $module,
-        string|\MessageSegment|array|\Stringable $timeout_prompt = '',
+        array|\MessageSegment|string|\Stringable $timeout_prompt = '',
         private ?ActionResponse $prompt_response = null,
         private ?OneBotEvent $user_event = null,
         private int $prompt_option = ZM_PROMPT_NONE,
-        \Throwable $previous = null
+        ?\Throwable $previous = null
     ) {
         parent::__construct('wait timeout!', 0, $previous);
         if ($timeout_prompt === '') {

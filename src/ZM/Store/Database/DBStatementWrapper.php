@@ -14,9 +14,7 @@ use Doctrine\DBAL\ForwardCompatibility\Result;
 
 class DBStatementWrapper
 {
-    public function __construct(public ?Result $stmt)
-    {
-    }
+    public function __construct(public ?Result $stmt) {}
 
     /**
      * 获取结果的迭代器
@@ -41,7 +39,7 @@ class DBStatementWrapper
     /**
      * wrapper method
      * @return array|false|mixed
-     *@throws DBException
+     * @throws DBException
      */
     public function fetchNumeric()
     {
@@ -55,7 +53,7 @@ class DBStatementWrapper
     /**
      * wrapper method
      * @return array|false|mixed
-     *@throws DBException
+     * @throws DBException
      */
     public function fetchAssociative()
     {
@@ -69,7 +67,7 @@ class DBStatementWrapper
     /**
      * wrapper method
      * @return false|mixed
-     *@throws DBException
+     * @throws DBException
      */
     public function fetchOne()
     {

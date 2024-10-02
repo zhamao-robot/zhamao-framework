@@ -10,8 +10,7 @@ class Solution
         private string $title,
         private string $description,
         private array $links,
-    ) {
-    }
+    ) {}
 
     public function getSolutionTitle(): string
     {

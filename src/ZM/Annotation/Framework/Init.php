@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ZM\Annotation\Framework;
 
-use Attribute;
 use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
 use Doctrine\Common\Annotations\Annotation\Target;
 use ZM\Annotation\AnnotationBase;
@@ -20,9 +19,7 @@ use ZM\Annotation\Interfaces\Level;
 #[\Attribute(\Attribute::IS_REPEATABLE | \Attribute::TARGET_METHOD)]
 class Init extends AnnotationBase implements Level
 {
-    public function __construct(public int $worker = 0, public int $level = 20)
-    {
-    }
+    public function __construct(public int $worker = 0, public int $level = 20) {}
 
     public function getLevel()
     {

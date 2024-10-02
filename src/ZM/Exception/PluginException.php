@@ -7,6 +7,4 @@ namespace ZM\Exception;
 /**
  * 插件加载器出现的错误
  */
-class PluginException extends ZMException
-{
-}
+class PluginException extends ZMException {}

@@ -31,7 +31,7 @@ class ProcessStateManager
      * @throws ZMKnownException
      * @internal
      */
-    public static function removeProcessState(int $type, int|string $id_or_name = null): void
+    public static function removeProcessState(int $type, null|int|string $id_or_name = null): void
     {
         switch ($type) {
             case ZM_PROCESS_MASTER:

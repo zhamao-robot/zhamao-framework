@@ -241,9 +241,7 @@ namespace ZM\Store\KV\Redis;
  */
 class RedisWrapper
 {
-    public function __construct(private string $pool = 'default')
-    {
-    }
+    public function __construct(private string $pool = 'default') {}
 
     public function __call(string $name, array $arguments)
     {

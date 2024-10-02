@@ -14,7 +14,7 @@ class RuntimePreferences
 
     protected string $config_dir = SOURCE_ROOT_DIR . '/config';
 
-    public function environment(...$environments): string|bool
+    public function environment(...$environments): bool|string
     {
         if (empty($environments)) {
             return $this->environment;

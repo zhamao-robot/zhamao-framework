@@ -13,7 +13,6 @@ use OneBot\Driver\Workerman\WebSocketClient;
 use OneBot\V12\Object\MessageSegment;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
-use Psr\SimpleCache\CacheInterface;
 use ZM\Config\Environment;
 use ZM\Config\ZMConfig;
 use ZM\Container\ContainerHolder;
@@ -148,7 +147,7 @@ function is_assoc_array(array $array): bool
  */
 function match_pattern(string $pattern, string $subject): bool
 {
-    $pattern = str_replace(['\*', '\\\\.*'], ['.*', '\*'], preg_quote($pattern, '/'));
+    $pattern = str_replace(['\*', '\\\.*'], ['.*', '\*'], preg_quote($pattern, '/'));
     $pattern = '/^' . $pattern . '$/i';
     return preg_match($pattern, $subject) === 1;
 }
@@ -302,7 +301,7 @@ function redis(string $name = 'default'): RedisWrapper
  * @param  null|mixed          $default 默认值
  * @return mixed|void|ZMConfig
  */
-function config(array|string $key = null, mixed $default = null)
+function config(null|array|string $key = null, mixed $default = null)
 {
     $config = ZMConfig::getInstance();
     if (is_null($key)) {
@@ -328,8 +327,7 @@ function bot_connect(int $flag, int $fd)
 /**
  * 获取一个 KV 库实例
  *
- * @param  string         $name KV 库名称
- * @return CacheInterface
+ * @param string $name KV 库名称
  */
 function kv(string $name = ''): Psr\SimpleCache\CacheInterface
 {

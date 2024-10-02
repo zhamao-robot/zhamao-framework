@@ -68,8 +68,7 @@ class ReflectionUtilTest extends TestCase
 
     public function provideTestGetCallReflector(): array
     {
-        $closure = function () {
-        };
+        $closure = function () {};
 
         return [
             'callable' => [[new ReflectionUtilTestClass(), 'method'], new \ReflectionMethod(ReflectionUtilTestClass::class, 'method')],
@@ -83,18 +82,12 @@ class ReflectionUtilTest extends TestCase
 
 class ReflectionUtilTestClass
 {
-    public function method(string $string, ReflectionUtilTestClass $class): void
-    {
-    }
+    public function method(string $string, ReflectionUtilTestClass $class): void {}
 
-    public static function staticMethod(string $string, ReflectionUtilTestClass $class): void
-    {
-    }
+    public static function staticMethod(string $string, ReflectionUtilTestClass $class): void {}
 }
 
 class InvokableClass
 {
-    public function __invoke(): void
-    {
-    }
+    public function __invoke(): void {}
 }

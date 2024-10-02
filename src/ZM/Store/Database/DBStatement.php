@@ -13,9 +13,7 @@ use Doctrine\DBAL\ParameterType;
 
 class DBStatement implements \IteratorAggregate, Statement
 {
-    public function __construct(private \PDOStatement $statement)
-    {
-    }
+    public function __construct(private \PDOStatement $statement) {}
 
     public function closeCursor()
     {

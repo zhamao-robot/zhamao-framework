@@ -21,7 +21,7 @@ class AnnotationHandler
 
     public const STATUS_RULE_FAILED = 4;       // 判断事件执行的规则函数判定为false，所以不执行此方法
 
-    private string|AnnotationBase $annotation_class;
+    private AnnotationBase|string $annotation_class;
 
     /** @var callable */
     private $rule_callback;

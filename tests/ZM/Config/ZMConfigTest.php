@@ -68,8 +68,8 @@ class ZMConfigTest extends TestCase
     public function testGetValueWhenKeyContainsDot(): void
     {
         $this->markTestSkipped('should it be supported?');
-//        $this->assertEquals('c', $this->config->get('test.a.b'));
-//        $this->assertEquals('d', $this->config->get('test.a.b.c'));
+        //        $this->assertEquals('c', $this->config->get('test.a.b'));
+        //        $this->assertEquals('d', $this->config->get('test.a.b.c'));
     }
 
     public function testGetBooleanValue(): void

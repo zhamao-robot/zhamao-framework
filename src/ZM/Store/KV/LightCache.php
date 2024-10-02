@@ -104,7 +104,7 @@ class LightCache implements KVInterface
     /**
      * @throws InvalidArgumentException
      */
-    public function set(string $key, mixed $value, null|int|\DateInterval $ttl = null): bool
+    public function set(string $key, mixed $value, null|\DateInterval|int $ttl = null): bool
     {
         $this->validateKey($key);
         self::$caches[$this->name][$key] = $value;
@@ -139,7 +139,7 @@ class LightCache implements KVInterface
         }
     }
 
-    public function setMultiple(iterable $values, \DateInterval|int|null $ttl = null): bool
+    public function setMultiple(iterable $values, null|\DateInterval|int $ttl = null): bool
     {
         foreach ($values as $k => $v) {
             if (!$this->set($k, $v, $ttl)) {

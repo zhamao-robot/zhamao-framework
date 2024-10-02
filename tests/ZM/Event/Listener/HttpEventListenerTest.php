@@ -95,7 +95,7 @@ class HttpEventListenerTest extends TestCase
         return $event->reveal();
     }
 
-    private function mockHandler(bool $should_be_called, callable $callback = null): self
+    private function mockHandler(bool $should_be_called, ?callable $callback = null): self
     {
         $handler = $this->prophesize(self::class);
         if ($should_be_called) {

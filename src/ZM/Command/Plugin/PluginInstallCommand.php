@@ -20,9 +20,6 @@ class PluginInstallCommand extends PluginCommand
         $this->addOption('github-token', null, InputOption::VALUE_REQUIRED, '提供的 GitHub Token');
     }
 
-    /**
-     * {@inheritDoc}
-     */
     protected function handle(): int
     {
         $addr = $this->input->getArgument('address');

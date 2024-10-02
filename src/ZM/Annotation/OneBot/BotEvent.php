@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ZM\Annotation\OneBot;
 
-use Attribute;
 use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
 use Doctrine\Common\Annotations\Annotation\Target;
 use ZM\Annotation\AnnotationBase;
@@ -20,9 +19,7 @@ use ZM\Annotation\Interfaces\Level;
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class BotEvent extends AnnotationBase implements Level
 {
-    public function __construct(public ?string $type = null, public ?string $detail_type = null, public ?string $sub_type = null, public int $level = 20)
-    {
-    }
+    public function __construct(public ?string $type = null, public ?string $detail_type = null, public ?string $sub_type = null, public int $level = 20) {}
 
     public static function make(
         ?string $type = null,

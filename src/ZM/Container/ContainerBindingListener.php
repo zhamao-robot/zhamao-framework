@@ -28,9 +28,7 @@ class ContainerBindingListener
         }
     }
 
-    public static function callback(): void
-    {
-    }
+    public static function callback(): void {}
 
     public static function cleanCallback(): void
     {

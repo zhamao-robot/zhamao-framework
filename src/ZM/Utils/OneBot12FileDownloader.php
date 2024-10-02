@@ -59,10 +59,10 @@ class OneBot12FileDownloader
             $name = $obj->data['name'];
             $data = base64_decode($obj->data['data']);
         // TODO: Walle-Q 返回的 sha256 是空的
-            /* if ($obj->data['sha256'] !== hash('sha256', $data)) {
-                $this->err = 'sha256 mismatch between ' . $obj->data['sha256'] . ' and ' . hash('sha256', $data) . "\n" . json_encode($obj);
-                return false;
-            }*/
+        /* if ($obj->data['sha256'] !== hash('sha256', $data)) {
+            $this->err = 'sha256 mismatch between ' . $obj->data['sha256'] . ' and ' . hash('sha256', $data) . "\n" . json_encode($obj);
+            return false;
+        }*/
         } else {
             $obj = $this->ctx->sendAction('get_file_fragmented', [
                 'stage' => 'prepare',

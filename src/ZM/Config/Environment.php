@@ -29,9 +29,6 @@ class Environment implements EnvironmentInterface
         $this->values = $values + $_ENV + $_SERVER;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function set(string $name, mixed $value): self
     {
         if (array_key_exists($name, $this->values) && !$this->overwrite) {
@@ -45,9 +42,6 @@ class Environment implements EnvironmentInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get(string $name, mixed $default = null): mixed
     {
         if (isset($this->values[$name])) {
@@ -57,9 +51,6 @@ class Environment implements EnvironmentInterface
         return $default;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAll(): array
     {
         $result = [];

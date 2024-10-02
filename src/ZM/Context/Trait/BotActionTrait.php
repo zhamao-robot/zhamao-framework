@@ -35,7 +35,7 @@ trait BotActionTrait
      * @param  array|MessageSegment|string|\Stringable $message 消息内容，可以是消息段、字符串
      * @throws \Throwable
      */
-    public function sendMessage(\Stringable|array|MessageSegment|string $message, string $detail_type, array $params = []): ActionResponse|bool
+    public function sendMessage(array|MessageSegment|string|\Stringable $message, string $detail_type, array $params = []): ActionResponse|bool
     {
         $message = MessageUtil::convertToArr($message);
         $params['message'] = $message;
@@ -48,7 +48,7 @@ trait BotActionTrait
      *
      * @throws \Throwable
      */
-    public function sendAction(string $action, array $params = [], ?array $self = null): bool|ActionResponse
+    public function sendAction(string $action, array $params = [], ?array $self = null): ActionResponse|bool
     {
         if ($self === null && $this->self !== null) {
             $self = $this->self;
