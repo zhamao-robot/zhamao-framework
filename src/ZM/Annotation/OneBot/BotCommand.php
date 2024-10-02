@@ -39,8 +39,7 @@ class BotCommand extends AnnotationBase implements Level
         public string $detail_type = '',
         public string $prefix = '',
         public int $level = 20
-    ) {
-    }
+    ) {}
 
     public static function make(
         string $name = '',

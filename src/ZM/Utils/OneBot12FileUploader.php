@@ -20,9 +20,7 @@ class OneBot12FileUploader
      * @param BotContext $ctx         机器人上下文，用于调用发送动作
      * @param int        $buffer_size 分片传输的大小，默认为 65536 字节，建议调整小于 2MB
      */
-    public function __construct(private BotContext $ctx, private int $buffer_size = 131072)
-    {
-    }
+    public function __construct(private BotContext $ctx, private int $buffer_size = 131072) {}
 
     /**
      * 通过文件内容上传一个文件

@@ -10,9 +10,7 @@ use ZM\Annotation\OneBot\CommandHelp;
 
 class StaticManualFactory
 {
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     public function __invoke(BotCommand $command, array $template, array $adjacent_annotations): string
     {

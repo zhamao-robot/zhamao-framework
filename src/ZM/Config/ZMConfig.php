@@ -64,7 +64,7 @@ class ZMConfig
      *
      * @throws ConfigException 配置文件加载出错
      */
-    public function __construct(array $init_config = null)
+    public function __construct(?array $init_config = null)
     {
         // 合并初始化配置，构造传入优先
         $conf = array_merge_recursive($this->loadInitConfig(), $init_config ?? []);
@@ -332,7 +332,7 @@ class ZMConfig
         // 读取并解析配置
         $content = file_get_contents($path);
         // TODO: 使用 Loader 替代
-//        $config = $this->loader->load($path);
+        //        $config = $this->loader->load($path);
         $config = [];
         switch ($ext) {
             case 'php':

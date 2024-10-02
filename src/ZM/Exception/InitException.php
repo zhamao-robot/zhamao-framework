@@ -7,6 +7,4 @@ namespace ZM\Exception;
 /**
  * 初始化命令（./zhamao init）出现的错误
  */
-class InitException extends ZMException
-{
-}
+class InitException extends ZMException {}

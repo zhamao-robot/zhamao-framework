@@ -17,9 +17,7 @@ use ZM\Annotation\Interfaces\Level;
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class BotAction extends AnnotationBase implements Level
 {
-    public function __construct(public string $action = '', public bool $need_response = false, public int $level = 20)
-    {
-    }
+    public function __construct(public string $action = '', public bool $need_response = false, public int $level = 20) {}
 
     public static function make(callable $callback, string $action, bool $need_response = false, int $level = 20): BotAction
     {

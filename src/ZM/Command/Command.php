@@ -26,7 +26,6 @@ abstract class Command extends \Symfony\Component\Console\Command\Command implem
     protected OutputInterface $output;
 
     /**
-     * {@inheritdoc}
      * @internal 不建议覆写此方法，建议使用 {@see handle()} 方法
      */
     protected function execute(InputInterface $input, OutputInterface $output): int

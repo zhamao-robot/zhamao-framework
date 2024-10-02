@@ -19,9 +19,6 @@ class PluginPackCommand extends PluginCommand
         $this->addOption('build-dir', 'D', InputOption::VALUE_REQUIRED, '指定输出文件位置', WORKING_DIR . '/build');
     }
 
-    /**
-     * {@inheritDoc}
-     */
     protected function handle(): int
     {
         try {

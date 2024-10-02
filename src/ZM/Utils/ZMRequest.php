@@ -22,7 +22,7 @@ class ZMRequest
      * @param  bool                            $only_body 是否只返回 Response 的 body 部分，默认为 True
      * @return bool|ResponseInterface|string   返回 False 代表请求失败，返回 string 为仅 Body 的内容，返回 Response 接口对象表明是回包
      */
-    public static function get(string|UriInterface|\Stringable $url, array $headers = [], array $config = [], bool $only_body = true): bool|ResponseInterface|string
+    public static function get(string|\Stringable|UriInterface $url, array $headers = [], array $config = [], bool $only_body = true): bool|ResponseInterface|string
     {
         $socket = Framework::getInstance()->getDriver()->createHttpClientSocket(array_merge_recursive([
             'url' => ($url instanceof UriInterface ? $url->__toString() : $url),
@@ -51,7 +51,7 @@ class ZMRequest
      * @param  bool                            $only_body 是否只返回 Response 的 body 部分，默认为 True
      * @return bool|ResponseInterface|string   返回 False 代表请求失败，返回 string 为仅 Body 的内容，返回 Response 接口对象表明是回包
      */
-    public static function post(string|UriInterface|\Stringable $url, array $header, mixed $data, array $config = [], bool $only_body = true): bool|ResponseInterface|string
+    public static function post(string|\Stringable|UriInterface $url, array $header, mixed $data, array $config = [], bool $only_body = true): bool|ResponseInterface|string
     {
         $socket = Framework::getInstance()->getDriver()->createHttpClientSocket(array_merge_recursive([
             'url' => ($url instanceof UriInterface ? $url->__toString() : $url),

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ZM\Annotation\Http;
 
-use Attribute;
 use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
 use Doctrine\Common\Annotations\Annotation\Required;
 use Doctrine\Common\Annotations\Annotation\Target;
@@ -30,8 +29,7 @@ class Route extends AnnotationBase
          * Routing path params binding. eg. {"id"="\d+"}
          */
         public $params = []
-    ) {
-    }
+    ) {}
 
     public static function make($route, $name = '', $request_method = ['GET', 'POST'], $params = []): static
     {

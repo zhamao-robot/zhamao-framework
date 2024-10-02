@@ -15,9 +15,7 @@ class BotConnectContext
 
     protected ?array $self = null;
 
-    public function __construct(private int $flag, private int $fd)
-    {
-    }
+    public function __construct(private int $flag, private int $fd) {}
 
     public function getFd(): int
     {

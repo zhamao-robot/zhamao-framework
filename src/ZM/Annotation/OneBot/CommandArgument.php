@@ -41,7 +41,7 @@ class CommandArgument extends AnnotationBase implements ErgodicAnnotation
         string $type = 'string',
         public bool $required = false,
         public string $prompt = '',
-        public string|\Closure|array|int|float|null $default = '',
+        public null|array|\Closure|float|int|string $default = '',
         public int $timeout = 60,
         public int $error_prompt_policy = 1
     ) {

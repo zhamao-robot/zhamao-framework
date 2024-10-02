@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ZM\Annotation\Middleware;
 
-use Attribute;
 use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
 use Doctrine\Common\Annotations\Annotation\Required;
 use Doctrine\Common\Annotations\Annotation\Target;
@@ -22,6 +21,7 @@ class Middleware extends AnnotationBase implements ErgodicAnnotation
 {
     /**
      * @param string[] $args
+     * @param mixed    $name
      */
     public function __construct(
         /**
@@ -29,6 +29,5 @@ class Middleware extends AnnotationBase implements ErgodicAnnotation
          */
         public $name,
         public array $args = []
-    ) {
-    }
+    ) {}
 }

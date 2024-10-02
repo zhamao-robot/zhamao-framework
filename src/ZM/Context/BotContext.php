@@ -54,7 +54,7 @@ class BotContext implements ContextInterface
      * @noinspection PhpDocMissingThrowsInspection
      * @noinspection PhpUnhandledExceptionInspection
      */
-    public function reply(\Stringable|MessageSegment|array|string $message, int $reply_mode = ZM_REPLY_NONE): ActionResponse|bool
+    public function reply(array|MessageSegment|string|\Stringable $message, int $reply_mode = ZM_REPLY_NONE): ActionResponse|bool
     {
         if (container()->has('bot.event')) {
             // 这里直接使用当前上下文的事件里面的参数，不再重新挨个获取怎么发消息的参数
@@ -87,7 +87,7 @@ class BotContext implements ContextInterface
      * @noinspection PhpDocMissingThrowsInspection
      * @noinspection PhpUnhandledExceptionInspection
      */
-    public function prompt(string|\Stringable|MessageSegment|array $prompt = '', int $timeout = 600, string|\Stringable|MessageSegment|array $timeout_prompt = '', int $option = ZM_PROMPT_NONE): null|OneBotEvent|array|string
+    public function prompt(array|MessageSegment|string|\Stringable $prompt = '', int $timeout = 600, array|MessageSegment|string|\Stringable $timeout_prompt = '', int $option = ZM_PROMPT_NONE): null|array|OneBotEvent|string
     {
         if (!container()->has('bot.event')) {
             throw new OneBot12Exception('bot()->prompt() can only be used in message event');
@@ -135,7 +135,7 @@ class BotContext implements ContextInterface
      * 如果是多级群组，则等待最小级下当前消息人的消息
      * @noinspection PhpUnhandledExceptionInspection
      */
-    public function promptString(string|\Stringable|MessageSegment|array $prompt = '', int $timeout = 600, string|\Stringable|MessageSegment|array $timeout_prompt = '', int $option = ZM_PROMPT_NONE): string
+    public function promptString(array|MessageSegment|string|\Stringable $prompt = '', int $timeout = 600, array|MessageSegment|string|\Stringable $timeout_prompt = '', int $option = ZM_PROMPT_NONE): string
     {
         return $this->prompt($prompt, $timeout, $timeout_prompt, $option | ZM_PROMPT_RETURN_STRING);
     }
@@ -194,12 +194,12 @@ class BotContext implements ContextInterface
      *
      * @param int|string $name 参数名称或索引
      */
-    public function getParam(string|int $name): mixed
+    public function getParam(int|string $name): mixed
     {
         return $this->params[$name] ?? null;
     }
 
-    public function getParamString(string|int $name): ?string
+    public function getParamString(int|string $name): ?string
     {
         return MessageUtil::getAltMessage($this->params[$name] ?? null);
     }
@@ -242,7 +242,7 @@ class BotContext implements ContextInterface
      * @param  OneBotEvent                             $event  事件对象
      * @return array                                   消息段
      */
-    private function applyPromptMode(int $option, array|string|\Stringable|MessageSegment $prompt, OneBotEvent $event): array
+    private function applyPromptMode(int $option, array|MessageSegment|string|\Stringable $prompt, OneBotEvent $event): array
     {
         // 先格式化消息
         if ($prompt instanceof MessageSegment) {
@@ -268,7 +268,7 @@ class BotContext implements ContextInterface
      * @return null|array|OneBotEvent|string 根据不同匹配类型返回不同的东西
      * @throws OneBot12Exception
      */
-    private function applyPromptReturn(mixed $result, int $option): null|OneBotEvent|array|string
+    private function applyPromptReturn(mixed $result, int $option): null|array|OneBotEvent|string
     {
         // 必须是 OneBotEvent 且是消息类型
         if (!$result instanceof OneBotEvent || $result->type !== 'message') {

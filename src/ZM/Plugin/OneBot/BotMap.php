@@ -69,7 +69,7 @@ class BotMap
      * @param int        $fd       绑定的反向 ws 连接的客户端对应 fd
      * @param int        $flag     fd 所在 server 监听端口
      */
-    public static function registerBotWithFd(string|int $bot_id, string $platform, bool $status, int $fd, int $flag): bool
+    public static function registerBotWithFd(int|string $bot_id, string $platform, bool $status, int $fd, int $flag): bool
     {
         logger()->debug('正在注册机器人：' . "{$platform}:{$bot_id}, fd:{$fd}, flag:{$flag}");
         self::$bot_fds[$platform][strval($bot_id)] = [$flag, $fd];
@@ -87,12 +87,12 @@ class BotMap
         return self::$bot_fds;
     }
 
-    public static function getBotFd(string|int $bot_id, string $platform): ?array
+    public static function getBotFd(int|string $bot_id, string $platform): ?array
     {
         return self::$bot_fds[$platform][$bot_id] ?? null;
     }
 
-    public static function unregisterBot(string|int $bot_id, string $platform): void
+    public static function unregisterBot(int|string $bot_id, string $platform): void
     {
         logger()->debug('取消注册 bot: ' . $bot_id);
         unset(self::$bot_fds[$platform][$bot_id], self::$bot_status[$platform][$bot_id], self::$bot_ctx_cache[$platform][$bot_id]);
@@ -117,7 +117,7 @@ class BotMap
         }
     }
 
-    public static function getBotContext(string|int $bot_id = '', string $platform = ''): BotContext
+    public static function getBotContext(int|string $bot_id = '', string $platform = ''): BotContext
     {
         if (isset(self::$bot_ctx_cache[$platform][$bot_id])) {
             return self::$bot_ctx_cache[$platform][$bot_id];
@@ -152,7 +152,7 @@ class BotMap
         return self::$bot_ctx_cache[$platform][$bot_id] = new (self::$custom_contexts[$platform][$bot_id] ?? BotContext::class)($bot_id, $platform);
     }
 
-    public static function setCustomContext(string|int $bot_id, string $platform, string $context_class = BotContext::class): void
+    public static function setCustomContext(int|string $bot_id, string $platform, string $context_class = BotContext::class): void
     {
         self::$custom_contexts[$platform][$bot_id] = $context_class;
     }

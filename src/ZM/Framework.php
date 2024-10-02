@@ -61,7 +61,7 @@ class Framework
     protected array $argv;
 
     /** @var null|Driver|SwooleDriver|WorkermanDriver OneBot驱动 */
-    protected SwooleDriver|Driver|WorkermanDriver|null $driver = null;
+    protected null|Driver|SwooleDriver|WorkermanDriver $driver = null;
 
     /** @var array<array<string, string>> 启动注解列表 */
     protected array $setup_annotations = [];

@@ -21,9 +21,6 @@ class KVRedis implements KVInterface
         return new KVRedis($name);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function get(string $key, mixed $default = null): mixed
     {
         /** @var ZMRedis $redis */
@@ -38,10 +35,7 @@ class KVRedis implements KVInterface
         return $ret;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function set(string $key, mixed $value, \DateInterval|int|null $ttl = null): bool
+    public function set(string $key, mixed $value, null|\DateInterval|int $ttl = null): bool
     {
         /** @var ZMRedis $redis */
         $redis = RedisPool::pool($this->pool_name)->get();
@@ -50,9 +44,6 @@ class KVRedis implements KVInterface
         return (bool) $ret;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function delete(string $key): bool
     {
         /** @var ZMRedis $redis */
@@ -62,9 +53,6 @@ class KVRedis implements KVInterface
         return (bool) $ret;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function clear(): bool
     {
         /** @var ZMRedis $redis */
@@ -74,9 +62,6 @@ class KVRedis implements KVInterface
         return (bool) $ret;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getMultiple(iterable $keys, mixed $default = null): iterable
     {
         /** @var ZMRedis $redis */
@@ -93,10 +78,7 @@ class KVRedis implements KVInterface
         RedisPool::pool($this->pool_name)->put($redis);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function setMultiple(iterable $values, \DateInterval|int|null $ttl = null): bool
+    public function setMultiple(iterable $values, null|\DateInterval|int $ttl = null): bool
     {
         /** @var ZMRedis $redis */
         $redis = RedisPool::pool($this->pool_name)->get();
@@ -108,9 +90,6 @@ class KVRedis implements KVInterface
         return $ret;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function deleteMultiple(iterable $keys): bool
     {
         /** @var ZMRedis $redis */
@@ -123,9 +102,6 @@ class KVRedis implements KVInterface
         return $ret;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function has(string $key): bool
     {
         /** @var ZMRedis $redis */

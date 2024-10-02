@@ -61,7 +61,7 @@ class MessageUtil
         return $arr;
     }
 
-    public static function convertToArr(MessageSegment|\Stringable|array|string $message): array
+    public static function convertToArr(array|MessageSegment|string|\Stringable $message): array
     {
         if (is_array($message)) {
             foreach ($message as $k => $v) {
@@ -99,7 +99,7 @@ class MessageUtil
         return $ls;
     }
 
-    public static function getAltMessage(null|array|string|MessageSegment $message): string
+    public static function getAltMessage(null|array|MessageSegment|string $message): string
     {
         if ($message === null) {
             return '';

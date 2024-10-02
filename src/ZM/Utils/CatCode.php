@@ -14,7 +14,7 @@ class CatCode
      * @param array|MessageSegment|string $message_segment MessageSegment 对象或数组
      * @param bool                        $encode_text     是否对文本进行 CatCode 编码（默认为否）
      */
-    public static function fromSegment(string|array|MessageSegment $message_segment, bool $encode_text = false): string
+    public static function fromSegment(array|MessageSegment|string $message_segment, bool $encode_text = false): string
     {
         // 传入的必须是段数组或段对象
         if (is_array($message_segment)) {
@@ -40,7 +40,7 @@ class CatCode
      * @param  bool                   $is_param 如果是转义CatCode本体内容，则为false（默认），如果是参数内的字符串，则为true
      * @return string                 转义后的CatCode
      */
-    public static function encode(\Stringable|int|string $msg, bool $is_param = false): string
+    public static function encode(int|string|\Stringable $msg, bool $is_param = false): string
     {
         $msg = str_replace(['&', '[', ']'], ['&amp;', '&#91;', '&#93;'], (string) $msg);
         if ($is_param) {
@@ -56,7 +56,7 @@ class CatCode
      * @param  bool                   $is_param 如果是解码CatCode本体内容，则为false（默认），如果是参数内的字符串，则为true
      * @return string                 转义后的CatCode
      */
-    public static function decode(\Stringable|int|string $msg, bool $is_param = false): string
+    public static function decode(int|string|\Stringable $msg, bool $is_param = false): string
     {
         $msg = str_replace(['&amp;', '&#91;', '&#93;'], ['&', '[', ']'], (string) $msg);
         if ($is_param) {

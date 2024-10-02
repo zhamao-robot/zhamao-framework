@@ -49,6 +49,6 @@ function _zm_setup_loader()
 
 // 在*nix等支持多进程环境的情况，可直接运行此文件，那么就执行
 if (debug_backtrace() === []) {
-    require((!is_dir(__DIR__ . '/../../vendor')) ? getcwd() : (__DIR__ . '/../..')) . '/vendor/autoload.php';
+    require ((!is_dir(__DIR__ . '/../../vendor')) ? getcwd() : (__DIR__ . '/../..')) . '/vendor/autoload.php';
     echo _zm_setup_loader();
 }

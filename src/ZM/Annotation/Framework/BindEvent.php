@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ZM\Annotation\Framework;
 
-use Attribute;
 use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
 use Doctrine\Common\Annotations\Annotation\Required;
 use Doctrine\Common\Annotations\Annotation\Target;
@@ -32,8 +31,7 @@ class BindEvent extends AnnotationBase implements Level
          */
         public string $event_class,
         public int $level = 800
-    ) {
-    }
+    ) {}
 
     public function getLevel(): int
     {

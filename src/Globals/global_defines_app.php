@@ -65,7 +65,7 @@ define('WORKING_DIR', getcwd());
 define('SOURCE_ROOT_DIR', Phar::running() !== '' ? Phar::running() : WORKING_DIR);
 
 if (DIRECTORY_SEPARATOR === '\\') {
-    define('TMP_DIR', 'C:\\Windows\\Temp');
+    define('TMP_DIR', 'C:\Windows\Temp');
 } elseif (!empty(getenv('TMPDIR'))) {
     define('TMP_DIR', getenv('TMPDIR'));
 } elseif (is_writable('/tmp')) {

@@ -22,8 +22,7 @@ class CommandHelp extends AnnotationBase
         public string $description,
         public string $usage,
         public string $example,
-    ) {
-    }
+    ) {}
 
     public static function make(
         string $description,

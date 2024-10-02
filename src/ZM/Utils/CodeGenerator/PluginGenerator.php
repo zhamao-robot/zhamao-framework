@@ -14,9 +14,7 @@ use ZM\Utils\ZMUtil;
  */
 class PluginGenerator
 {
-    public function __construct(private string $name, private string $plugin_dir)
-    {
-    }
+    public function __construct(private string $name, private string $plugin_dir) {}
 
     /**
      * 开始生成
