@@ -190,7 +190,7 @@ class Framework
                     $conf = ZMConfig::get('global', 'mysql_config');
                     $out['mysql'] = $conf['dbname'] . '@' . $conf['host'] . ':' . $conf['port'];
                 }
-                if (ZMConfig::get('global', 'redis_config')['host'] !== '') {
+                if ((ZMConfig::get('global', 'redis_config')['host'] ?? '') !== '') {
                     $conf = ZMConfig::get('global', 'redis_config');
                     $out['redis_pool'] = $conf['host'] . ':' . $conf['port'];
                 }
