@@ -81,8 +81,8 @@ class InitCommand extends Command
                     }
                 }
                 file_put_contents($base_path . '/composer.json', json_encode($composer, 64 | 128 | 256));
-                $output->writeln('<info>Executing composer command: `composer dump-autoload`</info>');
-                exec('composer dump-autoload');
+                $output->writeln('<warning>Please executing composer command: `composer dump-autoload`</warning>');
+                #exec('composer dump-autoload'); // 使用内建php时候不要使用系统的composer，注释以调整为用户手动执行完成该命令。
                 echo PHP_EOL;
             } else {
                 echo zm_internal_errcode('E00041') . "Error occurred. Please check your updates.\n";
