@@ -125,7 +125,7 @@ bash <(curl -fsSL https://zhamao.xin/v3.sh)
 
 框架和 SDK 是 炸毛机器人 项目的核心框架开源部分。炸毛机器人是作者写的一个高性能机器人，曾获全国计算机设计大赛一等奖。
 
-作者的炸毛机器人已从2018年初起稳定运行了**五年**，并且持续迭代。
+作者的炸毛机器人已从2018年初起稳定运行了**七年**，并且持续迭代。
 
 可以提交 [Issue](https://github.com/zhamao-robot/zhamao-framework/issues/new/choose) 或 [加群(670821194)](https://jq.qq.com/?_wv=1027&k=YkNI3AIr) 进行疑难解答。
 
