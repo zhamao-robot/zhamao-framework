@@ -20,7 +20,6 @@ class HandleExceptions implements Bootstrapper
                 E_USER_ERROR => ['PHP Error: ', 'error'],
                 E_USER_WARNING => ['PHP Warning: ', 'warning'],
                 E_USER_NOTICE => ['PHP Notice: ', 'notice'],
-                E_STRICT => ['PHP Strict: ', 'notice'],
                 E_RECOVERABLE_ERROR => ['PHP Recoverable Error: ', 'error'],
                 E_DEPRECATED => ['PHP Deprecated: ', 'notice'],
                 E_USER_DEPRECATED => ['PHP User Deprecated: ', 'notice'],
@@ -30,7 +29,7 @@ class HandleExceptions implements Bootstrapper
             logger()->{$level_tip[1]}($error);
             // 如果 return false 则错误会继续递交给 PHP 标准错误处理
             return true;
-        }, E_ALL | E_STRICT);
+        });
 
         // 重载异常处理器
         ExceptionHandler::getInstance()->overrideWith(new Handler());
