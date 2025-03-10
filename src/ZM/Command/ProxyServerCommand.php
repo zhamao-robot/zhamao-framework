@@ -262,7 +262,6 @@ class ProxyServerCommand extends Command
                         break;
                     case CMD_UDP_ASSOCIATE:
                         $connection->stage = STAGE_UDP_ASSOC;
-                        var_dump('CMD_UDP_ASSOCIATE ' . ($this->config['udp_port'] ?? 2222));
                         if ($this->config['udp_port'] == 0) {
                             $connection->udpWorker = new Worker('udp://0.0.0.0:0');
                             /* @phpstan-ignore-next-line */
@@ -274,7 +273,7 @@ class ProxyServerCommand extends Command
                             $listenInfo = stream_socket_get_name($connection->udpWorker->getMainSocket(), false);
                             [$bind_addr, $bind_port] = explode(':', $listenInfo);
                         } else {
-                            $bind_port = $this->config['udp_port'] ?? 2222;
+                            $bind_port = $this->config['udp_port'];
                         }
                         $bind_addr = $this->config['wanIP'] ?? '192.168.1.1';
 
