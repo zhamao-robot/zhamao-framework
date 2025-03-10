@@ -39,7 +39,7 @@
         "jangregor/phpstan-prophecy": "^1.0",
         "jetbrains/phpstorm-attributes": "^1.0",
         "mikey179/vfsstream": "^1.6",
-        "phpspec/prophecy-phpunit": "^2.0",
+        "phpspec/prophecy-phpunit": "^2.3",
         "phpstan/extension-installer": "^1.1",
         "phpstan/phpstan": "^1.1",
         "phpstan/phpstan-deprecation-rules": "^1.0",
@@ -99,7 +99,7 @@
     },
     "scripts": {
         "analyse": "phpstan analyse --memory-limit 300M",
-        "cs-fix": "PHP_CS_FIXER_FUTURE_MODE=1 php-cs-fixer fix",
+        "cs-fix": "PHP_CS_FIXER_IGNORE_ENV=1 php-cs-fixer fix",
         "test": "bin/phpunit-zm --no-coverage"
     }
 }
