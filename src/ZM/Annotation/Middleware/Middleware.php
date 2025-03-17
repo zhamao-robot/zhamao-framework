@@ -20,8 +20,7 @@ use ZM\Annotation\Interfaces\ErgodicAnnotation;
 class Middleware extends AnnotationBase implements ErgodicAnnotation
 {
     /**
-     * @param string[] $args
-     * @param mixed    $name
+     * @param mixed $name
      */
     public function __construct(
         /**
