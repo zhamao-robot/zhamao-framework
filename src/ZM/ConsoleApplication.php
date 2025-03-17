@@ -32,7 +32,11 @@ final class ConsoleApplication extends Application
         // 初始化 Composer 变量
         if (file_exists(WORKING_DIR . '/runtime/composer.phar')) {
             echo '* Using native composer' . PHP_EOL;
-            putenv('COMPOSER_EXECUTABLE=' . WORKING_DIR . '/runtime/composer.phar');
+            if (WORKING_DIR . '/runtime/php' === PHP_BINARY) {
+                putenv('COMPOSER_EXECUTABLE="' . WORKING_DIR . '/runtime/php ' . WORKING_DIR . '/runtime/composer.phar"');
+            } else {
+                putenv('COMPOSER_EXECUTABLE="' . WORKING_DIR . '/runtime/composer.phar"');
+            }
         }
 
         $this->registerCommandLoader();
