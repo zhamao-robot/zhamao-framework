@@ -30,10 +30,13 @@ class SignalListener
         switch (Framework::getInstance()->getDriver()->getName()) {
             case 'swoole':
                 Process::signal(SIGINT, [$this, 'onWorkerInt']);
+                Process::signal(SIGTERM, [$this, 'onWorkerInt']);
+                Process::signal(SIGHUP, [$this, 'onWorkerInt']);
                 break;
             case 'workerman':
                 Worker::$globalEvent->add(SIGINT, EventInterface::EV_SIGNAL, [$this, 'onWorkerInt']);
                 Worker::$globalEvent->add(SIGTERM, EventInterface::EV_SIGNAL, fn () => Worker::stopAll(15));
+                Worker::$globalEvent->add(SIGHUP, EventInterface::EV_SIGNAL, fn () => Worker::stopAll(15));
                 if (function_exists('pcntl_signal')) {
                     pcntl_signal(SIGUSR1, SIG_IGN, false);
                 }
@@ -51,10 +54,9 @@ class SignalListener
     {
         $driver = Framework::getInstance()->getDriver()->getName();
         if ($driver === 'swoole') {
-            Process::signal(SIGINT, function () {
+            $stopHandler = function () {
                 echo "\r";
-                logger()->notice('Master 进程收到中断信号 SIGINT');
-                logger()->notice('正在停止服务器');
+                logger()->notice('Master 进程收到中断信号，正在停止服务器');
                 Framework::getInstance()->stop();
                 if (extension_loaded('posix')) {
                     Process::kill(posix_getpid(), SIGTERM);
@@ -62,10 +64,13 @@ class SignalListener
                     /* @phpstan-ignore-next-line */
                     Process::kill(Framework::getInstance()->getDriver()->getSwooleServer()->master_pid, SIGTERM);
                 }
-            });
+            };
+            Process::signal(SIGINT, $stopHandler);
+            Process::signal(SIGTERM, $stopHandler);
+            Process::signal(SIGHUP, $stopHandler);
         } elseif ($driver === 'workerman') {
             if (!extension_loaded('pcntl') || !extension_loaded('posix')) {
-                logger()->error('请安装 pcntl 和 posix 扩展以支持 SIGINT 监听');
+                logger()->error('请安装 pcntl 和 posix 扩展以支持信号监听');
                 return;
             }
 
@@ -73,15 +78,14 @@ class SignalListener
                 logger()->warning('重启ing');
                 Worker::reloadSelf();
             }, false);
-            pcntl_signal(SIGTERM, function () {
-                Worker::stopAll();
-            }, false);
-            pcntl_signal(SIGINT, function () {
+            $stopMaster = function () {
                 echo "\r";
-                logger()->notice('Master 进程收到中断信号 SIGINT');
-                logger()->notice('正在停止服务器');
+                logger()->notice('Master 进程收到中断信号，正在停止服务器');
                 Worker::stopAll();
-            }, false);
+            };
+            pcntl_signal(SIGTERM, $stopMaster, false);
+            pcntl_signal(SIGINT, $stopMaster, false);
+            pcntl_signal(SIGHUP, $stopMaster, false);
         }
     }
 

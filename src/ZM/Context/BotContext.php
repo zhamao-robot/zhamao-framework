@@ -87,7 +87,7 @@ class BotContext implements ContextInterface
      * @noinspection PhpDocMissingThrowsInspection
      * @noinspection PhpUnhandledExceptionInspection
      */
-    public function prompt(array|MessageSegment|string|\Stringable $prompt = '', int $timeout = 600, array|MessageSegment|string|\Stringable $timeout_prompt = '', int $option = ZM_PROMPT_NONE): null|array|OneBotEvent|string
+    public function prompt(array|MessageSegment|string|\Stringable $prompt = '', int $timeout = 600, array|MessageSegment|string|\Stringable $timeout_prompt = '', int $option = ZM_PROMPT_NONE): array|OneBotEvent|string|null
     {
         if (!container()->has('bot.event')) {
             throw new OneBot12Exception('bot()->prompt() can only be used in message event');
@@ -268,7 +268,7 @@ class BotContext implements ContextInterface
      * @return null|array|OneBotEvent|string 根据不同匹配类型返回不同的东西
      * @throws OneBot12Exception
      */
-    private function applyPromptReturn(mixed $result, int $option): null|array|OneBotEvent|string
+    private function applyPromptReturn(mixed $result, int $option): array|OneBotEvent|string|null
     {
         // 必须是 OneBotEvent 且是消息类型
         if (!$result instanceof OneBotEvent || $result->type !== 'message') {

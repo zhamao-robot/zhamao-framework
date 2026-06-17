@@ -301,7 +301,7 @@ function redis(string $name = 'default'): RedisWrapper
  * @param  null|mixed          $default 默认值
  * @return mixed|void|ZMConfig
  */
-function config(null|array|string $key = null, mixed $default = null)
+function config(array|string|null $key = null, mixed $default = null)
 {
     $config = ZMConfig::getInstance();
     if (is_null($key)) {
