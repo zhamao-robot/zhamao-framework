@@ -50,7 +50,7 @@ class Framework
     public const VERSION_ID = 726;
 
     /** @var string 版本名称 */
-    public const VERSION = '3.2.6';
+    public const VERSION = '3.2.7';
 
     /**
      * @var RuntimePreferences 运行时偏好（环境信息&参数）
@@ -61,7 +61,7 @@ class Framework
     protected array $argv;
 
     /** @var null|Driver|SwooleDriver|WorkermanDriver OneBot驱动 */
-    protected null|Driver|SwooleDriver|WorkermanDriver $driver = null;
+    protected Driver|SwooleDriver|WorkermanDriver|null $driver = null;
 
     /** @var array<array<string, string>> 启动注解列表 */
     protected array $setup_annotations = [];

@@ -99,7 +99,7 @@ class MessageUtil
         return $ls;
     }
 
-    public static function getAltMessage(null|array|MessageSegment|string $message): string
+    public static function getAltMessage(array|MessageSegment|string|null $message): string
     {
         if ($message === null) {
             return '';

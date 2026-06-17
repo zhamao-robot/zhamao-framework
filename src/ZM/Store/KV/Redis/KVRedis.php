@@ -35,7 +35,7 @@ class KVRedis implements KVInterface
         return $ret;
     }
 
-    public function set(string $key, mixed $value, null|\DateInterval|int $ttl = null): bool
+    public function set(string $key, mixed $value, \DateInterval|int|null $ttl = null): bool
     {
         /** @var ZMRedis $redis */
         $redis = RedisPool::pool($this->pool_name)->get();
@@ -78,7 +78,7 @@ class KVRedis implements KVInterface
         RedisPool::pool($this->pool_name)->put($redis);
     }
 
-    public function setMultiple(iterable $values, null|\DateInterval|int $ttl = null): bool
+    public function setMultiple(iterable $values, \DateInterval|int|null $ttl = null): bool
     {
         /** @var ZMRedis $redis */
         $redis = RedisPool::pool($this->pool_name)->get();

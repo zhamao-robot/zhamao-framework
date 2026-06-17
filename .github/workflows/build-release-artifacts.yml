@@ -12,14 +12,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.base_ref }}
 
       - name: Setup PHP
         uses: sunxyw/workflows/setup-environment@main
         with:
-          php-version: 8.1
+          php-version: 8.3
           php-extensions: swoole, posix, json
           operating-system: ubuntu-latest
           use-cache: true
@@ -40,14 +40,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.base_ref }}
 
       - name: Setup PHP
         uses: sunxyw/workflows/setup-environment@main
         with:
-          php-version: 8.1
+          php-version: 8.3
           php-extensions: swoole, posix, json
           operating-system: ubuntu-latest
           use-cache: true

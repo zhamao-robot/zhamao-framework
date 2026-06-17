@@ -27,14 +27,14 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup PHP
         uses: sunxyw/workflows/setup-environment@main
         with:
-          php-version: 8.1
+          php-version: 8.3
           php-extensions: swoole, posix, json
           operating-system: ubuntu-latest
           use-cache: true
