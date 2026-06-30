@@ -2,7 +2,7 @@ var global__functions_8php =
 [
     [ "bot", "global__functions_8php.html#ad36f3e85e1dffc28a10a95382aaac608", null ],
     [ "bot_connect", "global__functions_8php.html#a76f57c411996a730c3759fa1b5e23dc5", null ],
-    [ "config", "global__functions_8php.html#a4683e84c7a7d81d6a7d6b93a10e4be32", null ],
+    [ "config", "global__functions_8php.html#a2566c367a98699414594a7af231f0f5d", null ],
     [ "container", "global__functions_8php.html#aeacc0140de439ebab9a5466c45d38191", null ],
     [ "coroutine", "global__functions_8php.html#aea4203b9b3d3a0cecaad1479e2978e16", null ],
     [ "db", "global__functions_8php.html#abb1a3a76f52074604156a3da9ead1a98", null ],

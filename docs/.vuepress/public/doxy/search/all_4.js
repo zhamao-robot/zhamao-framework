@@ -28,7 +28,7 @@ var searchData=
   ['commit_25',['commit',['../class_z_m_1_1_store_1_1_database_1_1_d_b_connection.html#af5674c27d4a92f6228565010eacbb9cb',1,'ZM\Store\Database\DBConnection\commit()'],['../class_z_m_1_1_store_1_1_database_1_1_d_b_wrapper.html#af5674c27d4a92f6228565010eacbb9cb',1,'ZM\Store\Database\DBWrapper\commit()']]],
   ['composerstrategy_26',['ComposerStrategy',['../class_z_m_1_1_plugin_1_1_strategy_1_1_composer_strategy.html',1,'ZM::Plugin::Strategy']]],
   ['composerstrategy_2ephp_27',['ComposerStrategy.php',['../_composer_strategy_8php.html',1,'']]],
-  ['config_28',['config',['../global__functions_8php.html#a4683e84c7a7d81d6a7d6b93a10e4be32',1,'global_functions.php']]],
+  ['config_28',['config',['../global__functions_8php.html#a2566c367a98699414594a7af231f0f5d',1,'global_functions.php']]],
   ['configexception_29',['ConfigException',['../class_z_m_1_1_exception_1_1_config_exception.html',1,'ZM::Exception']]],
   ['configexception_2ephp_30',['ConfigException.php',['../_config_exception_8php.html',1,'']]],
   ['configtracer_31',['ConfigTracer',['../class_z_m_1_1_config_1_1_config_tracer.html',1,'ZM::Config']]],
