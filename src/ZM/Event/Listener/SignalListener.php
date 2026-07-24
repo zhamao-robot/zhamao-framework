@@ -29,9 +29,9 @@ class SignalListener
     {
         switch (Framework::getInstance()->getDriver()->getName()) {
             case 'swoole':
-                Process::signal(SIGINT, [$this, 'onWorkerInt']);
-                Process::signal(SIGTERM, [$this, 'onWorkerInt']);
-                Process::signal(SIGHUP, [$this, 'onWorkerInt']);
+                $this->safeSignal(SIGINT, [$this, 'onWorkerInt']);
+                $this->safeSignal(SIGTERM, [$this, 'onWorkerInt']);
+                $this->safeSignal(SIGHUP, [$this, 'onWorkerInt']);
                 break;
             case 'workerman':
                 Worker::$globalEvent->add(SIGINT, EventInterface::EV_SIGNAL, [$this, 'onWorkerInt']);
@@ -65,9 +65,9 @@ class SignalListener
                     Process::kill(Framework::getInstance()->getDriver()->getSwooleServer()->master_pid, SIGTERM);
                 }
             };
-            Process::signal(SIGINT, $stopHandler);
-            Process::signal(SIGTERM, $stopHandler);
-            Process::signal(SIGHUP, $stopHandler);
+            $this->safeSignal(SIGINT, $stopHandler);
+            $this->safeSignal(SIGTERM, $stopHandler);
+            $this->safeSignal(SIGHUP, $stopHandler);
         } elseif ($driver === 'workerman') {
             if (!extension_loaded('pcntl') || !extension_loaded('posix')) {
                 logger()->error('请安装 pcntl 和 posix 扩展以支持信号监听');
@@ -127,6 +127,16 @@ class SignalListener
         if (self::$manager_kill_time === 1) {
             logger()->notice('Keyboard interrupt, shutting down server...');
             Framework::getInstance()->stop();
+        }
+    }
+
+    /**
+     * 注册 Swoole 信号处理器，信号已被 Swoole 自身注册时跳过
+     */
+    private function safeSignal(int $signo, callable $handler): void
+    {
+        if (!@Process::signal($signo, $handler)) {
+            logger()->debug('信号 {signo} 已被系统注册，跳过监听', ['signo' => $signo]);
         }
     }
 
