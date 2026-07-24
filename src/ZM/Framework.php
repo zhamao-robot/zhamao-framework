@@ -50,7 +50,7 @@ class Framework
     public const VERSION_ID = 727;
 
     /** @var string 版本名称 */
-    public const VERSION = '3.2.7';
+    public const VERSION = '3.2.8';
 
     /**
      * @var RuntimePreferences 运行时偏好（环境信息&参数）
@@ -211,6 +211,9 @@ class Framework
                 break;
             case 'workerman':
                 config(['global.workerman_options.driver_init_policy' => DriverInitPolicy::MULTI_PROCESS_INIT_IN_MASTER]);
+                if (!extension_loaded('event') && !extension_loaded('libevent')) {
+                    Worker::$eventLoopClass = \Workerman\Events\Select::class;
+                }
                 $this->driver = new WorkermanDriver(config('global.workerman_options'));
                 $this->driver->initDriverProtocols(config('global.servers'));
                 break;
