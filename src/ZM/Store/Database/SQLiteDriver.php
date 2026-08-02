@@ -34,7 +34,7 @@ class SQLiteDriver implements DoctrineDriver
     public function getDatabase($conn)
     {
         if ($conn instanceof DBConnection) {
-            return config('database')[$conn->getPoolName()]['dbname'] ?? '';
+            return config('global.database')[$conn->getPoolName()]['dbname'] ?? '';
         }
         return '';
     }

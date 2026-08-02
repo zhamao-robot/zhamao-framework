@@ -23,7 +23,7 @@ class PgSQLDriver extends AbstractPostgreSQLDriver
     public function getDatabase(Connection $conn)
     {
         if ($conn instanceof DBConnection) {
-            return config('database')[$conn->getPoolName()]['dbname'] ?? '';
+            return config('global.database')[$conn->getPoolName()]['dbname'] ?? '';
         }
         return '';
     }

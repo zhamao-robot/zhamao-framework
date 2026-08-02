@@ -48,7 +48,7 @@ class DBConnection implements Connection
     public function __destruct()
     {
         if ($this->db_type === ZM_DB_POOL) {
-            logger()->debug('Destructing！！！');
+            logger()->debug('DBConnection destructed');
             DBPool::pool($this->pool_name)->put($this->conn);
         }
     }
