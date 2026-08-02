@@ -49,6 +49,14 @@ function _zm_setup_loader()
 
 // 在*nix等支持多进程环境的情况，可直接运行此文件，那么就执行
 if (debug_backtrace() === []) {
-    require ((!is_dir(__DIR__ . '/../../vendor')) ? getcwd() : (__DIR__ . '/../..')) . '/vendor/autoload.php';
+    // 优先使用当前工作目录的 vendor（被框架 exec 调用时 cwd 为项目根目录），
+    // 以兼容通过 Composer path 仓库 symlink 安装框架的场景——此时 __DIR__ 会解析到框架源码真实目录，
+    // 若据此查找 vendor 会错误地加载框架自身的依赖而非宿主项目的依赖
+    $autoload = getcwd() . '/vendor/autoload.php';
+    if (!file_exists($autoload) && is_dir(__DIR__ . '/../../vendor')) {
+        // 兜底：直接从框架源码目录运行时的依赖加载
+        $autoload = __DIR__ . '/../../vendor/autoload.php';
+    }
+    require $autoload;
     echo _zm_setup_loader();
 }
