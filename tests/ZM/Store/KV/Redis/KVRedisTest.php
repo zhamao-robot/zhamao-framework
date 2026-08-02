@@ -22,7 +22,8 @@ class KVRedisTest extends TestCase
     {
         parent::setUp();
         $this->redis = new FakeRedisClient();
-        $this->pool = new FakeRedisPool(1, FakeRedisClient::class, $this->redis);
+        $this->pool = new FakeRedisPool($this->redis);
+        /* @phpstan-ignore-next-line 测试需要注入 Fake 池实现 */
         RedisPool::$pools = ['default' => $this->pool];
     }
 
@@ -130,6 +131,7 @@ class FakeRedisPool implements PoolInterface
 {
     private object $redis;
 
+    /** @phpstan-ignore-next-line 为保持 PoolInterface 构造器签名兼容，多余参数仅用于传参 */
     public function __construct(int $size = 1, string $construct_class = '', ...$args)
     {
         $this->redis = $args[0];
