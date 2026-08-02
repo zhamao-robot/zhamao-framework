@@ -30,6 +30,7 @@ class PluginPackCommand extends PluginCommand
             $this->info("插件打包完成，输出文件：{$output}");
         } catch (PluginException $e) {
             $this->error($e->getMessage());
+            return 1;
         }
         $this->output->writeln('打包插件到 Phar 格式');
         return 0;
