@@ -32,8 +32,8 @@ class LightCache implements KVInterface
     public function __construct(private string $name = '', string $find_str = '')
     {
         if ((ProcessStateManager::$process_mode['worker'] ?? 0) > 1) {
-            logger()->error('LightCache 不支持多进程模式，如需在多进程下使用，请使用 ZMRedis 作为 KV 引擎！');
-            return;
+            // 直接抛出异常，避免对象处于半初始化状态导致后续方法报错
+            throw new InvalidArgumentException('LightCache 不支持多进程模式，如需在多进程下使用，请使用 ZMRedis 作为 KV 引擎！');
         }
         $this->find_dir = empty($find_str) ? config('global.kv.light_cache_dir', '/tmp/zm_light_cache') : $find_str;
         FileSystem::createDir($this->find_dir);

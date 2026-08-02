@@ -54,7 +54,6 @@ class DBWrapper
     public function __destruct()
     {
         $this->connection->close();
-        $this->connection->close();
     }
 
     /**

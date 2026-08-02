@@ -68,10 +68,18 @@ class PluginMeta implements \JsonSerializable
         if ($this->root_dir === null) {
             return null;
         }
-        // 首先看看元信息中有没有 main 字段指定，没有就从 default 里找
-        $main = zm_dir($this->root_dir . '/' . ($this->metas['main'] ?? 'main.php'));
-        if (file_exists($main)) {
-            return $main;
+        // 读取插件根目录 composer.json 的 extra.zm-plugin-main 作为入口文件，没有则回退 main.php
+        $main = 'main.php';
+        $composer_path = zm_dir($this->root_dir . '/composer.json');
+        if (file_exists($composer_path)) {
+            $composer = json_decode(file_get_contents($composer_path), true);
+            if (is_array($composer) && isset($composer['extra']['zm-plugin-main'])) {
+                $main = $composer['extra']['zm-plugin-main'];
+            }
+        }
+        $entry = zm_dir($this->root_dir . '/' . $main);
+        if (file_exists($entry)) {
+            return $entry;
         }
         return null;
     }

@@ -46,11 +46,11 @@ class Framework
 {
     use Singleton;
 
-    /** @var int 版本ID */
+    /** @var int 版本ID（由 GitHub Actions 自动递增） */
     public const VERSION_ID = 727;
 
     /** @var string 版本名称 */
-    public const VERSION = '3.2.9';
+    public const VERSION = '3.2.10';
 
     /**
      * @var RuntimePreferences 运行时偏好（环境信息&参数）
@@ -330,7 +330,7 @@ class Framework
         } elseif ($this->driver->getName() === 'workerman') {
             $properties['process_mode'] = 'MST1';
             ProcessStateManager::$process_mode['master'] = 1;
-            $worker_num = config('global.workerman_options.workerman_worker_num');
+            $worker_num = config('global.workerman_options.workerman_worker_num') ?? config('global.workerman_options.worker_num');
             if (DIRECTORY_SEPARATOR === '\\') {
                 $properties['process_mode'] .= '#0';
                 ProcessStateManager::$process_mode['manager'] = 0;
