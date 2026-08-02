@@ -107,7 +107,7 @@ class BotMap
         $unreg_list = [];
         foreach (self::$bot_fds as $platform => $bots) {
             foreach ($bots as $bot_id => $bot_fd) {
-                if ($bot_fd[0] === $flag && $bot_fd[1] = $fd) {
+                if ($bot_fd[0] === $flag && $bot_fd[1] === $fd) {
                     $unreg_list[] = [$platform, $bot_id];
                 }
             }

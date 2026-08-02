@@ -189,7 +189,7 @@ class OneBot12Adapter extends ZMPlugin
                 if (isset($old[$bot['self']['platform']][$bot['self']['user_id']])) {
                     unset($old[$bot['self']['platform']][$bot['self']['user_id']]);
                 }
-                logger()->error("[{$bot['self']['platform']}.{$bot['self']['user_id']}] 已接入，状态：" . (($bot['good'] ?? false) ? 'OK' : 'Not OK'));
+                logger()->info("[{$bot['self']['platform']}.{$bot['self']['user_id']}] 已接入，状态：" . (($bot['good'] ?? false) ? 'OK' : 'Not OK'));
             }
         } else {
             logger()->debug('该实现状态目前不是正常的，不处理 bots 列表');
@@ -229,7 +229,7 @@ class OneBot12Adapter extends ZMPlugin
             $matched = match ($old_event->detail_type) {
                 'private' => $new_event->getUserId() === $old_event->getUserId(),
                 'group' => $new_event->getGroupId() === $old_event->getGroupId() && $new_event->getUserId() === $old_event->getUserId(),
-                'guild' => $new_event->getGuildId() === $old_event->getGuildId() && $new_event->getChannelId() === $old_event->getChannelId() && $new_event->getUserId() === $old_event->getUserId(),
+                'channel' => $new_event->getGuildId() === $old_event->getGuildId() && $new_event->getChannelId() === $old_event->getChannelId() && $new_event->getUserId() === $old_event->getUserId(),
                 default => false,
             };
             if (!$matched) {
@@ -319,18 +319,23 @@ class OneBot12Adapter extends ZMPlugin
             $request = $event->getRequest();
             $info = ['impl' => $line[1] ?? 'unknown', 'onebot-version' => '12'];
             if (($stored_token = $event->getSocketConfig()['access_token'] ?? '') !== '') {
-                // 测试 Header
+                // 测试 Header（OneBot 12 规范要求 Authorization 头使用 "Bearer <token>" 格式）
                 $token = $request->getHeaderLine('Authorization');
                 if ($token === '') {
-                    // 测试 Query
+                    // 测试 Query（URL 查询参数 access_token 直接使用原始 token，无需 Bearer 前缀）
                     $token = $request->getQueryParams()['access_token'] ?? '';
+                    if ($token === '') {
+                        $token = null;
+                    }
+                } else {
+                    $token = explode('Bearer ', $token)[1] ?? null;
                 }
-                $token = explode('Bearer ', $token);
                 // 动态和静态鉴权
                 if ($stored_token instanceof \Closure) {
-                    $stored_token = $stored_token($token[1] ?? null);
+                    $stored_token = $stored_token($token);
                 } else {
-                    $stored_token = !isset($token[1]) || $token[1] !== $stored_token;
+                    // 静态 token 鉴权，$stored_token 表示鉴权是否通过
+                    $stored_token = $token !== null && $token === $stored_token;
                 }
                 if (!$stored_token) { // 没有 token，鉴权失败
                     logger()->warning('OneBot 12 反向 WS 连接鉴权失败，拒绝接入');
@@ -659,7 +664,10 @@ class OneBot12Adapter extends ZMPlugin
                     // 先遍历参数，找到具有布尔值参数的语言
                     $cnt = count($match_result);
                     for ($k = 0; $k < $cnt; ++$k) {
-                        $v = $match_result[$k];
+                        $v = $this->normalizeSegmentValue($match_result[$k]);
+                        if ($v === null) {
+                            continue;
+                        }
                         // 看看有没有true值
                         if (in_array(strtolower($v), TRUE_LIST, true)) {
                             array_splice($match_result, $k, 1);
@@ -680,20 +688,18 @@ class OneBot12Adapter extends ZMPlugin
                     }
                     // 到这里还没找到，就说明需要询问用户了
                     $g = yield $argument;
-                    if (in_array(strtolower($g), TRUE_LIST, true)) {
-                        $arguments[$argument->name] = true;
-                    } elseif (in_array(strtolower($g), FALSE_LIST, true)) {
-                        $arguments[$argument->name] = false;
+                    $bool_value = $this->matchBoolFromReply($g);
+                    if ($bool_value !== null) {
+                        $arguments[$argument->name] = $bool_value;
                     } else {
                         if ($argument->error_prompt_policy === 1) {
                             $prompt = $argument->getTypeErrorPrompt() . "\n" . $argument->prompt;
                             $clone_argument = clone $argument;
                             $clone_argument->prompt = $prompt;
                             $g = yield $clone_argument;
-                            if (in_array(strtolower($g), TRUE_LIST, true)) {
-                                $arguments[$argument->name] = true;
-                            } elseif (in_array(strtolower($g), FALSE_LIST, true)) {
-                                $arguments[$argument->name] = false;
+                            $bool_value = $this->matchBoolFromReply($g);
+                            if ($bool_value !== null) {
+                                $arguments[$argument->name] = $bool_value;
                             } else {
                                 throw new WaitTimeoutException($cmd->name, $argument->getErrorQuitPrompt());
                             }
@@ -746,6 +752,45 @@ class OneBot12Adapter extends ZMPlugin
         }
         $arguments['.unnamed'] = $match_result;
         return $arguments;
+    }
+
+    /**
+     * 将候选参数值规范化为字符串，供布尔类型匹配使用
+     *
+     * @param  mixed       $v 候选参数值
+     * @return null|string 可匹配的字符串，无法匹配时返回 null
+     */
+    private function normalizeSegmentValue(mixed $v): ?string
+    {
+        if ($v instanceof MessageSegment) {
+            return $v->type === 'text' ? ($v->data['text'] ?? '') : null;
+        }
+        return is_string($v) ? $v : null;
+    }
+
+    /**
+     * 从询问用户得到的一组消息段中匹配布尔参数值
+     *
+     * @param  mixed     $g 询问用户得到的回复内容（通常为 MessageSegment[] 数组）
+     * @return null|bool 命中 TRUE_LIST/FALSE_LIST 时返回对应布尔值，未命中时返回 null
+     */
+    private function matchBoolFromReply(mixed $g): ?bool
+    {
+        foreach ($g as $item) {
+            $v = $this->normalizeSegmentValue($item);
+            if ($v === null) {
+                continue;
+            }
+            // 看看有没有 true 值
+            if (in_array(strtolower($v), TRUE_LIST, true)) {
+                return true;
+            }
+            // 看看有没有 false 值
+            if (in_array(strtolower($v), FALSE_LIST, true)) {
+                return false;
+            }
+        }
+        return null;
     }
 
     /**
