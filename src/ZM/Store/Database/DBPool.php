@@ -17,14 +17,28 @@ use ZM\Store\FileSystem;
 class DBPool
 {
     /**
+     * 每个便携 SQLite 数据库文件的连接池容量（同一文件最多同时持有的复用连接数）
+     *
+     * 可通过配置 global.database.portable_pool_size 覆盖
+     */
+    private const PORTABLE_POOL_SIZE = 4;
+
+    /**
+     * 便携 SQLite 连接池的常驻数量上限（超出后按 LRU 淘汰最久未访问的池）
+     *
+     * 可通过配置 global.database.portable_pool_max 覆盖
+     */
+    private const PORTABLE_POOL_MAX = 64;
+
+    /**
      * @var array<string, SwooleObjectPool|WorkermanObjectPool> 连接池列表
      */
     private static array $pools = [];
 
     /**
-     * @var array<string, DBWrapper> 持久化的便携 SQLite 连接对象缓存
+     * @var array<string, PoolInterface> 便携 SQLite 连接池注册表（键为解析后的数据库文件路径）
      */
-    private static array $portable_cache = [];
+    private static array $portable_pools = [];
 
     /**
      * 重新初始化连接池，有时候连不上某个对象时候可以使用，也可以定期调用释放链接
@@ -49,13 +63,11 @@ class DBPool
     }
 
     /**
-     * 重新初始化所有的便携 SQLite 连接（其实就是断开）
+     * 重新初始化所有的便携 SQLite 连接池（其实就是断开所有连接）
      */
     public static function resetPortableSQLite(): void
     {
-        foreach (self::$portable_cache as $name => $wrapper) {
-            unset(self::$portable_cache[$name]);
-        }
+        self::$portable_pools = [];
     }
 
     /**
@@ -197,21 +209,73 @@ class DBPool
     }
 
     /**
+     * 解析便携 SQLite 数据库文件的绝对路径
+     *
+     * 相对路径基于 data_dir/db 目录解析，与 DBConnection 原有行为保持一致
+     */
+    public static function resolvePortableFilename(string $name): string
+    {
+        if (FileSystem::isRelativePath($name)) {
+            $name = zm_dir(config('global.data_dir') . '/db/' . $name);
+            FileSystem::createDir(zm_dir(config('global.data_dir') . '/db'));
+        }
+        return $name;
+    }
+
+    /**
      * 创建一个便携的 SQLite 处理类
      *
      * @param  string      $name       SQLite 文件名
      * @param  bool        $create_new 如果数据库不存在，是否创建新的库
+     * @param  bool        $keep_alive 是否复用连接（keep_alive 为 true 时按数据库文件接入有界连接池）
      * @throws DBException
      */
     public static function createPortableSqlite(string $name, bool $create_new = true, bool $keep_alive = true): DBWrapper
     {
-        if ($keep_alive && isset(self::$portable_cache[$name])) {
-            return self::$portable_cache[$name];
-        }
-        $db = new DBWrapper($name, ['dbType' => ZM_DB_PORTABLE, 'createNew' => $create_new]);
+        $options = ['dbType' => ZM_DB_PORTABLE, 'createNew' => $create_new, 'keepAlive' => $keep_alive];
         if ($keep_alive) {
-            self::$portable_cache[$name] = $db;
+            // keep_alive 语义升级为连接池：同一数据库文件复用有界数量的连接，协程之间互斥持有
+            $options['pool'] = self::getPortablePool(self::resolvePortableFilename($name), $create_new);
         }
-        return $db;
+        return new DBWrapper($name, $options);
+    }
+
+    /**
+     * 获取指定数据库文件的便携 SQLite 连接池
+     *
+     * 连接池按解析后的文件路径注册，采用 LRU 淘汰策略：常驻池数量达到上限时，
+     * 淘汰最久未访问的池（池内空闲连接随对象销毁释放）。
+     *
+     * @throws DBException 文件不存在且 createNew 为 false 时抛出
+     */
+    private static function getPortablePool(string $filepath, bool $create_new): PoolInterface
+    {
+        if (!isset(self::$portable_pools[$filepath])) {
+            $max = intval(config('global.database.portable_pool_max', self::PORTABLE_POOL_MAX));
+            if ($max > 0 && count(self::$portable_pools) >= $max) {
+                unset(self::$portable_pools[array_key_first(self::$portable_pools)]);
+            }
+            if (!$create_new && !file_exists($filepath)) {
+                throw new DBException("Database file {$filepath} not found!");
+            }
+            self::$portable_pools[$filepath] = self::createPortablePool($filepath);
+        } else {
+            // 刷新访问顺序（LRU）
+            $pool = self::$portable_pools[$filepath];
+            unset(self::$portable_pools[$filepath]);
+            self::$portable_pools[$filepath] = $pool;
+        }
+        return self::$portable_pools[$filepath];
+    }
+
+    private static function createPortablePool(string $filepath): PoolInterface
+    {
+        $size = intval(config('global.database.portable_pool_size', self::PORTABLE_POOL_SIZE));
+        switch (Driver::getActiveDriverClass()) {
+            case SwooleDriver::class:
+                return new SwooleObjectPool($size, PortablePDO::class, $filepath, true);
+            default:
+                return new WorkermanObjectPool($size, PortablePDO::class, $filepath, true);
+        }
     }
 }
