@@ -330,7 +330,7 @@ class Framework
         } elseif ($this->driver->getName() === 'workerman') {
             $properties['process_mode'] = 'MST1';
             ProcessStateManager::$process_mode['master'] = 1;
-            $worker_num = config('global.workerman_options.workerman_worker_num');
+            $worker_num = config('global.workerman_options.workerman_worker_num') ?? config('global.workerman_options.worker_num');
             if (DIRECTORY_SEPARATOR === '\\') {
                 $properties['process_mode'] .= '#0';
                 ProcessStateManager::$process_mode['manager'] = 0;

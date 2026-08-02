@@ -22,7 +22,7 @@ $config['servers'] = [
 
 /* Workerman 驱动相关配置 */
 $config['workerman_options'] = [
-    'worker_num' => env('WORKER_NUM', 1),          // 如果你只有一个 OneBot 实例连接到框架并且代码没有复杂的CPU密集计算，则可把这里改为1使用全局变量
+    'workerman_worker_num' => env('WORKER_NUM', 1), // 如果你只有一个 OneBot 实例连接到框架并且代码没有复杂的CPU密集计算，则可把这里改为1使用全局变量
 ];
 
 /* Swoole 驱动相关配置 */
