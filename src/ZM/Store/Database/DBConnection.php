@@ -8,7 +8,7 @@ namespace ZM\Store\Database;
 
 use Doctrine\DBAL\Driver\Connection;
 use Doctrine\DBAL\ParameterType;
-use ZM\Store\FileSystem;
+use OneBot\Driver\Interfaces\PoolInterface;
 
 class DBConnection implements Connection
 {
@@ -28,20 +28,17 @@ class DBConnection implements Connection
             $this->conn = DBPool::pool($params['dbName'])->get();
             $this->pool_name = $params['dbName'];
         } elseif ($this->db_type === ZM_DB_PORTABLE) {
-            $connect_str = 'sqlite:{filename}';
-            if (FileSystem::isRelativePath($params['filename'])) {
-                $params['filename'] = zm_dir(config('global.data_dir') . '/db/' . $params['filename']);
-                FileSystem::createDir(zm_dir(config('global.data_dir') . '/db'));
+            $params['filename'] = DBPool::resolvePortableFilename($params['filename']);
+            /** @var null|PoolInterface $pool */
+            $pool = $params['pool'] ?? null;
+            if ($pool instanceof PoolInterface && $pool->getFreeCount() > 0) {
+                // 从连接池获取连接（此时池内有空闲连接或可新建，不会阻塞），用完归还
+                $this->conn = $pool->get();
+                $this->pool_name = $pool;
+            } else {
+                // 未启用连接池或池内连接全部被占用时，使用临时连接（用完即销毁，不进入池）
+                $this->conn = new PortablePDO($params['filename'], $params['createNew'] ?? true);
             }
-            $table = [
-                '{filename}' => $params['filename'],
-            ];
-            // 如果文件不存在则创建，但如果设置了 createNew 为 false 则不创建，不存在就直接抛出异常
-            if (!file_exists($params['filename']) && ($params['createNew'] ?? true) === false) {
-                throw new DBException("Database file {$params['filename']} not found!");
-            }
-            $connect_str = str_replace(array_keys($table), array_values($table), $connect_str);
-            $this->conn = new \PDO($connect_str);
         }
     }
 
@@ -50,6 +47,9 @@ class DBConnection implements Connection
         if ($this->db_type === ZM_DB_POOL) {
             logger()->debug('DBConnection destructed');
             DBPool::pool($this->pool_name)->put($this->conn);
+        } elseif ($this->db_type === ZM_DB_PORTABLE && $this->pool_name instanceof PoolInterface) {
+            // 归还便携 SQLite 连接到对应的连接池，临时连接则随对象销毁释放
+            $this->pool_name->put($this->conn);
         }
     }
 
