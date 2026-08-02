@@ -22,7 +22,7 @@ class KVRedisTest extends TestCase
     {
         parent::setUp();
         $this->redis = new FakeRedisClient();
-        $this->pool = new FakeRedisPool($this->redis);
+        $this->pool = new FakeRedisPool(1, FakeRedisClient::class, $this->redis);
         /* @phpstan-ignore-next-line 测试需要注入 Fake 池实现 */
         RedisPool::$pools = ['default' => $this->pool];
     }
