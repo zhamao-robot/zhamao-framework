@@ -10,8 +10,6 @@ use ZM\Annotation\Framework\Cron;
 
 class Schedule
 {
-    private int $next_run = 0;
-
     /**
      * 正在执行的排程任务列表
      *
@@ -39,12 +37,8 @@ class Schedule
             logger()->error('排程任务只能在协程环境下使用，排程任务 {location} 将不会被执行', ['location' => $location]);
             return;
         }
+        // 每个 Cron 各自独立计算下一次运行时间，互不干扰
         $next_run = $cron->expression->getNextRunDate()->getTimestamp();
-        // 防止在同一分钟内重复执行
-        if ($next_run < $this->next_run) {
-            $next_run = $this->next_run;
-        }
-        $this->next_run = $cron->expression->getNextRunDate()->getTimestamp();
         $wait_ms = max(0, ($next_run - time()) * 1000);
         Timer::after($wait_ms, function () use ($cron) {
             $this->dispatch($cron);
@@ -61,9 +55,16 @@ class Schedule
         $this->executing[] = $cron;
         // 新建一个协程运行排程任务，避免阻塞
         Adaptive::getCoroutine()->create(function () use ($cron) {
-            $callable = $cron->class === '' ? $cron->method : [$cron->class, $cron->method];
-            container()->call($callable);
-            $this->executing = array_diff($this->executing, [$cron]);
+            try {
+                $callable = $cron->class === '' ? $cron->method : [$cron->class, $cron->method];
+                container()->call($callable);
+            } finally {
+                // 无论任务是否抛异常，都要从执行列表中移除，避免 no_overlap 永久失效
+                $index = array_search($cron, $this->executing, true);
+                if ($index !== false) {
+                    unset($this->executing[$index]);
+                }
+            }
         });
     }
 }
