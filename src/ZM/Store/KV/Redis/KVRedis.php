@@ -57,9 +57,21 @@ class KVRedis implements KVInterface
     {
         /** @var ZMRedis $redis */
         $redis = RedisPool::pool($this->pool_name)->get();
-        $ret = $redis->del($this->name . ':*');
+        // Redis 的 DEL 命令不支持通配符，这里使用 SCAN 迭代删除所有以 name 开头的键
+        // PSR-16 规定 clear() 执行成功即返回 true，即使没有匹配到任何键
+        $iterator = null;
+        $prefix = $this->name . ':*';
+        do {
+            $keys = $redis->scan($iterator, $prefix);
+            if ($keys === false) {
+                break;
+            }
+            foreach ($keys as $key) {
+                $redis->del($key);
+            }
+        } while ($iterator > 0);
         RedisPool::pool($this->pool_name)->put($redis);
-        return (bool) $ret;
+        return true;
     }
 
     public function getMultiple(iterable $keys, mixed $default = null): iterable
