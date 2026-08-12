@@ -47,7 +47,7 @@ class Framework
     use Singleton;
 
     /** @var int 版本ID（由 GitHub Actions 自动递增） */
-    public const VERSION_ID = 727;
+    public const VERSION_ID = 728;
 
     /** @var string 版本名称 */
     public const VERSION = '3.2.10';
