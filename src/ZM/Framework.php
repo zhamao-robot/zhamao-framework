@@ -445,7 +445,10 @@ class Framework
             $result_code = 0;
         } else {
             // 其他情况下，需要启动一个新的进程执行结果后退出内存中加载的内容，以便重载模块
-            $r = exec(PHP_BINARY . ' ' . FRAMEWORK_ROOT_DIR . '/src/Globals/script_setup_loader.php', $output, $result_code);
+            // 该子进程只需要输出 JSON：把 deprecation 关掉。PHP 8.4+ 起 vendor 依赖在 autoload 阶段
+            // 就会抛出「隐式可空参数」等弃用告警，否则会直接打进父进程的终端 / 守护进程日志。
+            $php_flags = '-d error_reporting=' . (E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED);
+            $r = exec(PHP_BINARY . ' ' . $php_flags . ' ' . FRAMEWORK_ROOT_DIR . '/src/Globals/script_setup_loader.php', $output, $result_code);
         }
         if ($result_code !== 0) {
             logger()->emergency('代码解析错误！');

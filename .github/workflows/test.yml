@@ -33,7 +33,9 @@ jobs:
     strategy:
       matrix:
         operating-system: [ ubuntu-latest, windows-latest, macos-latest ]
-        php-version: [ 8.1, 8.2, 8.3, 8.4 ]
+        # PHP 8.1 已 EOL：roave/security-advisories dev-latest 会声明与 php <8.2.36 冲突，
+        # 而本仓库 .gitignore 忽略了 composer.lock，CI 走 composer update 必然解析失败。
+        php-version: [ 8.2, 8.3, 8.4 ]
     name: PHP ${{ matrix.php-version }} Test (${{ matrix.operating-system }})
     runs-on: ${{ matrix.operating-system }}
     timeout-minutes: 10

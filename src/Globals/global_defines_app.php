@@ -86,8 +86,15 @@ if (Phar::running() !== '') {
 
 define('ZM_INIT_TIME', microtime(true));
 
-/* 定义用于存放框架运行状态的目录（Windows 可用） */
-define('ZM_STATE_DIR', TMP_DIR . '/.zm_' . sha1(ZM_INIT_TIME . FRAMEWORK_ROOT_DIR));
+/* 定义用于存放框架运行状态的目录（Windows 可用）
+ *
+ * 注意：这里**不能**用 ZM_INIT_TIME 参与哈希。那是个「当前进程启动时刻」的时间戳，
+ * 每条 CLI 命令算出来的目录都不一样，导致 server:status / server:stop / server:reload
+ * 永远找不到正在运行的实例（守护模式尤其明显：--daemon 起来了但 stop 说"未检测到"）。
+ * 用工作目录 + 框架目录做键：同一个项目目录下始终是同一个状态目录，
+ * 也因此让「不允许同时启动两个框架」的检查真正生效。
+ */
+define('ZM_STATE_DIR', TMP_DIR . '/.zm_' . sha1(WORKING_DIR . FRAMEWORK_ROOT_DIR));
 
 /* 对 global.php 在 Windows 下的兼容性考虑，因为 Windows 或者无 Swoole 环境时候无法运行 */
 !defined('SWOOLE_BASE') && define('SWOOLE_BASE', 1) && define('SWOOLE_PROCESS', 2);

@@ -26,7 +26,7 @@ class MasterEventListener
                     SignalListener::getInstance()->signalMaster();
                 }
                 ProcessStateManager::saveProcessState(ONEBOT_PROCESS_MASTER, $server->master_pid, [
-                    'stdout' => config('global.swoole_options.swoole_set.log_file'),
+                    'stdout' => config('global.daemon_log_file') ?? config('global.swoole_options.swoole_set.log_file'),
                     'daemon' => (bool) Framework::getInstance()->getArgv()['daemon'],
                 ]);
             });
@@ -37,7 +37,7 @@ class MasterEventListener
             }
             if (PHP_OS_FAMILY !== 'Windows' && extension_loaded('posix')) {
                 ProcessStateManager::saveProcessState(ONEBOT_PROCESS_MASTER, posix_getpid(), [
-                    'stdout' => null,
+                    'stdout' => config('global.daemon_log_file'),
                     'daemon' => (bool) Framework::getInstance()->getArgv()['daemon'],
                 ]);
                 Worker::$onMasterStop = [MasterEventListener::getInstance(), 'onMasterStop'];
